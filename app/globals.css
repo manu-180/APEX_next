@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APEX Portfolio — Global Styles & Dynamic Theme System
+   ═══════════════════════════════════════════════════════════════════════════
+   Theme is applied by setting data-theme="<name>" on <html>.
+   Light/dark is handled by next-themes via class="dark" on <html>.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Base Layer ────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-surface-base);
+    color: var(--color-on-surface);
+    font-family: var(--font-oxanium), system-ui, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+    color: var(--color-on-surface);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE — BASE SURFACES (neutral, shared across all themes)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root,
+.dark {
+  --color-surface-lowest:  #0C0E12;
+  --color-surface-low:     #161A20;
+  --color-surface:         #1C2028;
+  --color-surface-high:    #222830;
+  --color-surface-highest: #282E38;
+  --color-surface-base:    #111318;
+
+  --color-on-surface:         rgba(255, 255, 255, 0.87);
+  --color-on-surface-variant: rgba(255, 255, 255, 0.55);
+  --color-primary-foreground:  #ffffff;
+
+  /* Glass effect tokens */
+  --glass-bg-opacity:   0.62;
+  --glass-tint-neutral: #B0B0B0;
+  --glass-tint-cold:    #B8C8E0;
+  --glass-tint-alpha:   0.06;
+  --glass-blur:         10px;
+}
+
+.light {
+  --color-surface-lowest:  #FFFFFF;
+  --color-surface-low:     #F0F2F5;
+  --color-surface:         #E8ECF0;
+  --color-surface-high:    #DDE2E8;
+  --color-surface-highest: #D2D8E0;
+  --color-surface-base:    #F4F6F8;
+
+  --color-on-surface:         rgba(0, 0, 0, 0.87);
+  --color-on-surface-variant: rgba(0, 0, 0, 0.55);
+  --color-primary-foreground:  #ffffff;
+
+  --glass-bg-opacity:   0.96;
+  --glass-tint-neutral: #E0E0E0;
+  --glass-tint-cold:    #E2EAF5;
+  --glass-tint-alpha:   0.08;
+  --glass-blur:         10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME DEFINITIONS — DARK MODE (default)
+   Applied via: data-theme="<name>" on <html>
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Neutral (default) ─────────────────────────────────────────────────── */
+[data-theme="neutral"],
+:root {
+  --color-primary:     #64748B;
+  --color-primary-rgb: 100, 116, 139;
+  --theme-name:        "neutral";
+}
+
+/* ── Flutter ────────────────────────────────────────────────────────────── */
+[data-theme="flutter"] {
+  --color-primary:     #0175C2;
+  --color-primary-rgb: 1, 117, 194;
+  --theme-name:        "flutter";
+}
+
+/* ── Supabase ───────────────────────────────────────────────────────────── */
+[data-theme="supabase"] {
+  --color-primary:     #3ECF8E;
+  --color-primary-rgb: 62, 207, 142;
+  --theme-name:        "supabase";
+}
+
+/* ── Riverpod ───────────────────────────────────────────────────────────── */
+[data-theme="riverpod"] {
+  --color-primary:     #6E56F8;
+  --color-primary-rgb: 110, 86, 248;
+  --theme-name:        "riverpod";
+}
+
+/* ── BotLode ────────────────────────────────────────────────────────────── */
+[data-theme="botlode"] {
+  --color-primary:     #FFC000;
+  --color-primary-rgb: 255, 192, 0;
+  --theme-name:        "botlode";
+}
+
+/* ── Assistify ──────────────────────────────────────────────────────────── */
+[data-theme="assistify"] {
+  --color-primary:     #00A8E8;
+  --color-primary-rgb: 0, 168, 232;
+  --theme-name:        "assistify";
+}
+
+/* ── Contact Engine ─────────────────────────────────────────────────────── */
+[data-theme="contact-engine"] {
+  --color-primary:     #15803D;
+  --color-primary-rgb: 21, 128, 61;
+  --theme-name:        "contact-engine";
+  /* Contact Engine uses a slightly different neutral surface */
+  --color-surface-base: #121212;
+}
+
+.light[data-theme="contact-engine"] {
+  --color-surface-base: #F5F5F5;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  /* Primary color with opacity via RGB variable */
+  .bg-primary-8  { background-color: rgba(var(--color-primary-rgb), 0.08); }
+  .bg-primary-12 { background-color: rgba(var(--color-primary-rgb), 0.12); }
+  .bg-primary-20 { background-color: rgba(var(--color-primary-rgb), 0.20); }
+  .border-primary-40 { border-color: rgba(var(--color-primary-rgb), 0.40); }
+
+  /* Glass card effect */
+  .glass {
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background-color: rgba(var(--color-primary-rgb), var(--glass-bg-opacity));
+  }
+
+  /* Text gradient with primary */
+  .text-gradient-primary {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      color-mix(in srgb, var(--color-primary) 60%, white) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Glow border */
+  .glow-border {
+    border: 1.5px solid rgba(var(--color-primary-rgb), 0.5);
+    box-shadow:
+      0 0 12px 2px rgba(var(--color-primary-rgb), 0.15),
+      inset 0 0 8px 1px rgba(var(--color-primary-rgb), 0.06);
+  }
+
+  /* Inspector mode highlight */
+  .inspector-highlight {
+    outline: 1.5px solid rgba(56, 189, 248, 0.5);
+    background-color: rgba(56, 189, 248, 0.05);
+  }
+
+  /* Theme transition on interactive elements */
+  .theme-transition {
+    transition:
+      color 0.24s ease,
+      background-color 0.24s ease,
+      border-color 0.24s ease,
+      box-shadow 0.24s ease;
+  }
+
+  /* Card hover scale */
+  .hover-lift {
+    transition: transform 0.24s cubic-bezier(0.33, 1, 0.68, 1),
+                box-shadow 0.24s ease;
+  }
+  .hover-lift:hover {
+    transform: scale(1.008) translateY(-2px);
+  }
+
+  /* Hide scrollbar but keep scroll */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
