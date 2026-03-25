@@ -100,6 +100,17 @@
   --theme-name:        "flutter";
 }
 
+/* ── Next.js ────────────────────────────────────────────────────────────── */
+[data-theme="nextjs"] {
+  --color-primary:     #FFFFFF;
+  --color-primary-rgb: 255, 255, 255;
+  --theme-name:        "nextjs";
+}
+.light[data-theme="nextjs"] {
+  --color-primary:     #000000;
+  --color-primary-rgb: 0, 0, 0;
+}
+
 /* ── Supabase ───────────────────────────────────────────────────────────── */
 [data-theme="supabase"] {
   --color-primary:     #3ECF8E;
@@ -112,6 +123,13 @@
   --color-primary:     #6E56F8;
   --color-primary-rgb: 110, 86, 248;
   --theme-name:        "riverpod";
+}
+
+/* ── TypeScript + Tailwind ───────────────────────────────────────────────── */
+[data-theme="typescript"] {
+  --color-primary:     #3178C6;
+  --color-primary-rgb: 49, 120, 198;
+  --theme-name:        "typescript";
 }
 
 /* ── BotLode ────────────────────────────────────────────────────────────── */
@@ -211,4 +229,30 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION — respect user preference
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INSPECTOR MODE
+   ═══════════════════════════════════════════════════════════════════════════ */
+.inspector-mode [data-hover],
+.inspector-mode section,
+.inspector-mode nav {
+  outline: 1px solid rgba(56, 189, 248, 0.3);
+  outline-offset: -1px;
+}
+.inspector-mode [data-hover]:hover {
+  outline-color: rgba(56, 189, 248, 0.6);
+  background-color: rgba(56, 189, 248, 0.03);
 }

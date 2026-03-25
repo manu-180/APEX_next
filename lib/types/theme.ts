@@ -1,10 +1,10 @@
-// ─── Theme Types ────────────────────────────────────────────────────────────
-
 export type ThemeId =
   | 'neutral'
   | 'flutter'
+  | 'nextjs'
   | 'supabase'
   | 'riverpod'
+  | 'typescript'
   | 'botlode'
   | 'assistify'
   | 'contact-engine'
@@ -12,14 +12,11 @@ export type ThemeId =
 export interface ThemeConfig {
   id: ThemeId
   name: string
-  primary: string       // hex color
-  primaryRgb: string    // "r, g, b"
-  surfaceBase: {
-    dark: string
-    light: string
-  }
-  logo?: string         // asset path (for BotLode, Assistify)
-  icon?: string         // icon name (for others)
+  primary: string
+  primaryRgb: string
+  surfaceBase: { dark: string; light: string }
+  logo?: string
+  icon?: string
 }
 
 export const THEMES: ThemeConfig[] = [
@@ -39,6 +36,14 @@ export const THEMES: ThemeConfig[] = [
     icon: 'flutter',
   },
   {
+    id: 'nextjs',
+    name: 'Next.js',
+    primary: '#FFFFFF',
+    primaryRgb: '255, 255, 255',
+    surfaceBase: { dark: '#111318', light: '#F4F6F8' },
+    icon: 'nextjs',
+  },
+  {
     id: 'supabase',
     name: 'Supabase',
     primary: '#3ECF8E',
@@ -53,6 +58,14 @@ export const THEMES: ThemeConfig[] = [
     primaryRgb: '110, 86, 248',
     surfaceBase: { dark: '#111318', light: '#F4F6F8' },
     icon: 'water-drop',
+  },
+  {
+    id: 'typescript',
+    name: 'TypeScript + Tailwind',
+    primary: '#3178C6',
+    primaryRgb: '49, 120, 198',
+    surfaceBase: { dark: '#111318', light: '#F4F6F8' },
+    icon: 'typescript',
   },
   {
     id: 'botlode',
@@ -81,3 +94,132 @@ export const THEMES: ThemeConfig[] = [
 ]
 
 export const DEFAULT_THEME: ThemeId = 'neutral'
+
+// Tech stack cards shown on home page (5 cards)
+export interface TechStackItem {
+  themeId: ThemeId
+  title: string
+  subtitle: string
+  description: string
+  features: string[]
+  category: 'mobile' | 'web' | 'backend' | 'architecture' | 'tooling'
+}
+
+export const TECH_STACK: TechStackItem[] = [
+  {
+    themeId: 'flutter',
+    title: 'Flutter',
+    subtitle: 'Apps Nativas',
+    description: 'Apps móviles nativas ultrarrápidas para iOS y Android desde un solo código.',
+    features: [
+      'Un código, dos plataformas',
+      'Rendimiento nativo real',
+      'Hot reload instantáneo',
+      'UI pixel-perfect en cualquier dispositivo',
+    ],
+    category: 'mobile',
+  },
+  {
+    themeId: 'nextjs',
+    title: 'Next.js',
+    subtitle: 'Webs de Alto Rendimiento',
+    description: 'Webs de alto rendimiento, SEO real y carga instantánea.',
+    features: [
+      'Server-side rendering para SEO',
+      'Carga instantánea optimizada',
+      'App Router + Server Components',
+      'Deploy en Vercel con un click',
+    ],
+    category: 'web',
+  },
+  {
+    themeId: 'supabase',
+    title: 'Supabase',
+    subtitle: 'Backend en Tiempo Real',
+    description: 'Base de datos, autenticación y storage en tiempo real. Todo conectado.',
+    features: [
+      'PostgreSQL serverless',
+      'Auth con Google, Apple, email',
+      'Realtime subscriptions',
+      'Storage para archivos y media',
+    ],
+    category: 'backend',
+  },
+  {
+    themeId: 'riverpod',
+    title: 'Riverpod',
+    subtitle: 'Estado Sólido',
+    description: 'Arquitectura de estado sólida: tu app escala sin volverse un caos.',
+    features: [
+      'Estado reactivo y predecible',
+      'Testing simplificado',
+      'Code generation integrado',
+      'Escala sin perder el control',
+    ],
+    category: 'architecture',
+  },
+  {
+    themeId: 'typescript',
+    title: 'TypeScript + Tailwind',
+    subtitle: 'Código Limpio',
+    description: 'Código limpio, tipado y estilos precisos sin plantillas genéricas.',
+    features: [
+      'Tipado estricto = menos bugs',
+      'Utility-first CSS preciso',
+      'Refactoring sin miedo',
+      'Componentes reutilizables',
+    ],
+    category: 'tooling',
+  },
+]
+
+// Projects shown on home page
+export interface ProjectItem {
+  themeId: ThemeId
+  title: string
+  tagline: string
+  subtitle: string
+  url?: string
+  features: { title: string; description: string }[]
+}
+
+export const PROJECTS: ProjectItem[] = [
+  {
+    themeId: 'contact-engine',
+    title: 'Contact Engine',
+    tagline: 'Encuentra clientes y convierte conversaciones en ventas, de forma automática',
+    subtitle: 'Prospección Inteligente',
+    features: [
+      { title: 'Prospección 24/7', description: 'Detecta negocios y prepara contacto incluso fuera de horario' },
+      { title: 'Canal Correcto', description: 'Combinación Email + WhatsApp optimizada para respuesta máxima' },
+      { title: 'Operación Bajo Control', description: 'Dashboard con estados, volumen de envíos, conversaciones centralizadas' },
+      { title: 'Modelo Escalable', description: 'Multi-tenant: usá en tu marca o revendé como servicio' },
+    ],
+  },
+  {
+    themeId: 'botlode',
+    title: 'BotLode',
+    tagline: 'Ecosistema de Bots IA',
+    subtitle: 'Fábrica \u2022 Player \u2022 History \u2022 24/7',
+    url: 'https://botlode.com',
+    features: [
+      { title: 'BotLode Factory', description: 'Creá bots sin código con personalización completa' },
+      { title: 'Cat Bot IA', description: '6 personalidades: vendedor, técnico, neutral y más' },
+      { title: 'Command Center', description: 'Tracking de leads, alertas por email, calendario integrado' },
+      { title: 'Inversión Cero', description: 'Producto listo para vender desde el día uno' },
+    ],
+  },
+  {
+    themeId: 'assistify',
+    title: 'Assistify',
+    tagline: 'Gestión para Profesores',
+    subtitle: 'App en Producción \u2022 iOS & Android',
+    url: 'https://assistify.lat',
+    features: [
+      { title: 'Autogestión Total', description: 'Alumnos autogestionan cancelaciones y reprogramaciones' },
+      { title: 'Ingresos Blindados', description: 'Sistema de créditos + lista de espera auto-llena huecos' },
+      { title: 'Cero Fricción', description: 'Notificaciones WhatsApp sin abrir la app' },
+      { title: 'Control Operativo', description: 'Crear clases, ajustar cupos, gestionar alumnos en tiempo real' },
+    ],
+  },
+]
