@@ -1,24 +1,26 @@
 import type { Metadata, Viewport } from 'next'
 import { Oxanium } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
+import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
-import { APP_URL } from '@/lib/constants'
+import { APP_URL, BRAND_IMAGE_SRC } from '@/lib/constants'
 import './globals.css'
 
 const oxanium = Oxanium({
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   variable: '--font-oxanium',
-  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  weight: 'variable',
   display: 'swap',
+  adjustFontFallback: true,
 })
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#111318' },
-    { media: '(prefers-color-scheme: light)', color: '#F4F6F8' },
+    { media: '(prefers-color-scheme: dark)', color: '#050508' },
+    { media: '(prefers-color-scheme: light)', color: '#F4F5FA' },
   ],
 }
 
@@ -29,8 +31,8 @@ export const metadata: Metadata = {
     template: '%s | Manuel Navarro',
   },
   description:
-    'Especializado en crear experiencias de usuario fluidas y eficientes. Apps móviles con Flutter y webs de alto rendimiento con Next.js.',
-  keywords: ['Flutter', 'Next.js', 'Supabase', 'Riverpod', 'TypeScript', 'Full-Stack', 'Mobile', 'Argentina', 'Desarrollo web', 'Apps móviles'],
+    'Especializado en crear experiencias fluidas, eficientes y con diseño premium. Apps móviles con Flutter y webs de alto rendimiento con Next.js.',
+  keywords: ['Flutter', 'Next.js', 'Supabase', 'Riverpod', 'TypeScript', 'Full-Stack', 'Mobile', 'Argentina', 'Desarrollo web', 'Apps móviles', 'Diseño premium', 'UX'],
   authors: [{ name: 'Manuel Navarro' }],
   creator: 'Manuel Navarro',
   openGraph: {
@@ -39,16 +41,23 @@ export const metadata: Metadata = {
     url: APP_URL,
     siteName: 'APEX Portfolio',
     title: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
-    description: 'Apps móviles con Flutter y webs de alto rendimiento con Next.js. Consultá precios y agendá tu reunión gratis.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Manuel Navarro — APEX Portfolio' }],
+    description:
+      'Experiencias con diseño premium: apps con Flutter y webs de alto rendimiento con Next.js. Consultá precios y agendá tu reunión gratis.',
+    images: [{ url: BRAND_IMAGE_SRC, width: 512, height: 512, alt: 'APEX — Manuel Navarro' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
-    description: 'Apps móviles con Flutter y webs de alto rendimiento con Next.js.',
+    description: 'Experiencias fluidas con diseño premium: Flutter, Next.js y más.',
+    images: [BRAND_IMAGE_SRC],
   },
   robots: { index: true, follow: true },
   alternates: { canonical: APP_URL },
+  icons: {
+    icon: [{ url: BRAND_IMAGE_SRC, type: 'image/png', sizes: '32x32' }],
+    apple: [{ url: BRAND_IMAGE_SRC, sizes: '180x180', type: 'image/png' }],
+    shortcut: BRAND_IMAGE_SRC,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -60,9 +69,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ServiceJsonLd />
         <AggregateRatingJsonLd />
       </head>
-      <body className="font-sans">
+      <body className={oxanium.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
-          <AppShell>{children}</AppShell>
+          <ApexThemeProvider>
+            <AppShell>{children}</AppShell>
+          </ApexThemeProvider>
         </ThemeProvider>
       </body>
     </html>

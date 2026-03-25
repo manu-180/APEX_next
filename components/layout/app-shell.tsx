@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, type ReactNode } from 'react'
+import { useState, useCallback, type ReactNode, type MouseEvent } from 'react'
 import { useTheme } from 'next-themes'
 import { useApexTheme } from '@/hooks/useTheme'
 import { useInspector } from '@/hooks/useInspector'
@@ -8,9 +8,8 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { Navbar } from './navbar'
 import { Footer } from './footer'
 import { ShortcutsModal } from './shortcuts-modal'
-import { WhatsAppButton } from '@/components/floating/whatsapp-button'
-import { ApexBot } from '@/components/floating/apex-bot'
-import { CustomCursor } from '@/components/ui/custom-cursor'
+import { InspectorOverlay } from '@/components/ui/inspector-overlay'
+import { ThemeWaveOverlay } from '@/components/ui/theme-wave-overlay'
 
 // Context exports for child components
 export { useApexTheme } from '@/hooks/useTheme'
@@ -18,15 +17,26 @@ export { useInspector } from '@/hooks/useInspector'
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme()
-  const { resetTheme } = useApexTheme()
+  const { resetTheme, activeConfig } = useApexTheme()
   const inspector = useInspector()
   const [showShortcuts, setShowShortcuts] = useState(false)
 
-  const toggleDarkMode = useCallback(() => {
+  const toggleDarkMode = useCallback((e?: MouseEvent) => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-  }, [setTheme, resolvedTheme])
+    if (e) {
+      window.dispatchEvent(
+        new CustomEvent('apex:wave', {
+          detail: { x: e.clientX, y: e.clientY, colorRgb: activeConfig.primaryRgb },
+        })
+      )
+    }
+  }, [setTheme, resolvedTheme, activeConfig])
 
-  const showShortcutsDialog = useCallback(() => {
+  const toggleShortcutsDialog = useCallback(() => {
+    setShowShortcuts((open) => !open)
+  }, [])
+
+  const openShortcutsDialog = useCallback(() => {
     setShowShortcuts(true)
   }, [])
 
@@ -34,21 +44,30 @@ export function AppShell({ children }: { children: ReactNode }) {
     toggleDarkMode,
     resetTheme,
     toggleInspector: inspector.toggle,
-    showShortcutsDialog,
+    toggleShortcutsDialog,
   })
 
   return (
     <div className={inspector.isActive ? 'inspector-mode' : ''}>
-      <CustomCursor />
       <Navbar
         onToggleDarkMode={toggleDarkMode}
-        onShowShortcuts={showShortcutsDialog}
+        onShowShortcuts={openShortcutsDialog}
+        inspectorActive={inspector.isActive}
+        onToggleInspector={inspector.toggle}
       />
-      <main className="min-h-screen pt-16">{children}</main>
+      <main
+        className={
+          inspector.isActive
+            ? 'min-h-screen pt-[calc(4rem+2.25rem)]'
+            : 'min-h-screen pt-16'
+        }
+      >
+        {children}
+      </main>
       <Footer />
-      <WhatsAppButton />
-      <ApexBot />
+      {inspector.isActive && <InspectorOverlay onDisable={inspector.disable} />}
       <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      <ThemeWaveOverlay />
     </div>
   )
 }

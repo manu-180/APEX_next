@@ -19,7 +19,8 @@ export function NextjsIcon({ className }: { className?: string }) {
 export function SupabaseIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-      <path d="M13.503 23.727c-.418.508-1.242.127-1.224-.566l.263-9.769H22.39c.925 0 1.44 1.069.855 1.771L13.503 23.727zM10.497.273c.419-.508 1.242-.127 1.224.566L11.459 10.608H1.61c-.925 0-1.44-1.069-.855-1.771L10.497.273z"/>
+      {/* Clean lightning bolt — recognizable Supabase brand symbol */}
+      <path d="M13 2L4 14h7l-1 8 9-12h-7z"/>
     </svg>
   )
 }
@@ -132,6 +133,68 @@ export function BotIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+    </svg>
+  )
+}
+
+export function BotLodeIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      {/* Robot body */}
+      <rect x="4" y="8" width="16" height="12" rx="3" />
+      {/* Antenna */}
+      <line x1="12" y1="2" x2="12" y2="8" />
+      <circle cx="12" cy="2" r="1" fill="currentColor" stroke="none" />
+      {/* Eyes */}
+      <circle cx="9" cy="13" r="1.5" />
+      <circle cx="15" cy="13" r="1.5" />
+      {/* Mouth */}
+      <line x1="9" y1="17" x2="15" y2="17" />
+      {/* Arms */}
+      <line x1="2" y1="13" x2="4" y2="13" />
+      <line x1="20" y1="13" x2="22" y2="13" />
+    </svg>
+  )
+}
+
+export function AssistifyIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="9" y1="4" x2="9" y2="10" />
+      <line x1="15" y1="4" x2="15" y2="10" />
+      <circle cx="8" cy="15" r="1.5" />
+      <circle cx="12" cy="15" r="1.5" />
+      <circle cx="16" cy="15" r="1.5" />
+      <path d="M8 19h8" />
+    </svg>
+  )
+}
+
+export function ContactEngineIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+      <line x1="12" y1="1" x2="12" y2="5" />
+      <line x1="12" y1="19" x2="12" y2="23" />
+      <line x1="1" y1="12" x2="5" y2="12" />
+      <line x1="19" y1="12" x2="23" y2="12" />
+    </svg>
+  )
+}
+
+/** Crosshair / viewfinder — modo inspector */
+export function InspectorIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <line x1="12" y1="2" x2="12" y2="6" />
+      <line x1="12" y1="18" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="6" y2="12" />
+      <line x1="18" y1="12" x2="22" y2="12" />
     </svg>
   )
 }

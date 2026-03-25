@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ROUTES, WHATSAPP_NUMBER, WHATSAPP_KEYBOARD_MSG } from '@/lib/constants'
+import { ROUTES } from '@/lib/constants'
+import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 
 interface ShortcutHandlers {
   toggleDarkMode: () => void
   resetTheme: () => void
   toggleInspector: () => void
-  showShortcutsDialog: () => void
+  toggleShortcutsDialog: () => void
 }
 
 // ─── useKeyboardShortcuts ─────────────────────────────────────────────────────
@@ -35,15 +36,15 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
       switch (key) {
         case 'H':
           e.preventDefault()
-          router.push(ROUTES.home)
+          if (e.shiftKey) {
+            window.open(whatsappUrl(WA_MSG_NAV), '_blank', 'noopener,noreferrer')
+          } else {
+            router.push(ROUTES.home)
+          }
           break
         case 'A':
           e.preventDefault()
           router.push(ROUTES.about)
-          break
-        case 'C':
-          e.preventDefault()
-          router.push(ROUTES.contact)
           break
         case 'S':
           e.preventDefault()
@@ -53,20 +54,13 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
           e.preventDefault()
           router.push(`${ROUTES.servicios}?tab=mobile`)
           break
-        case 'T':
+        case 'Y':
           e.preventDefault()
           handlers.toggleDarkMode()
           break
         case 'R':
           e.preventDefault()
           handlers.resetTheme()
-          break
-        case 'W':
-          e.preventDefault()
-          window.open(
-            `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_KEYBOARD_MSG}`,
-            '_blank'
-          )
           break
         case 'I':
           e.preventDefault()
@@ -75,7 +69,7 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
         case 'K':
         case '?':
           e.preventDefault()
-          handlers.showShortcutsDialog()
+          handlers.toggleShortcutsDialog()
           break
       }
     }

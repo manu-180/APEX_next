@@ -17,13 +17,20 @@ export function TextReveal({ text, className, delay = 0, as: Tag = 'span' }: Tex
   const words = text.split(' ')
 
   return (
-    <Tag ref={ref} className={cn('inline-block', className)}>
+    <Tag
+      ref={ref}
+      className={cn('inline-block', className)}
+      style={{ visibility: isInView ? 'visible' : 'hidden' }}
+    >
       {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
+        <span
+          key={i}
+          className="inline-block overflow-hidden mr-[0.3em] pb-[0.28em] align-bottom"
+        >
           <motion.span
-            className="inline-block"
-            initial={{ y: '110%' }}
-            animate={isInView ? { y: 0 } : {}}
+            className="inline-block pb-[0.02em]"
+            initial={{ y: '140%', opacity: 0 }}
+            animate={isInView ? { y: 0, opacity: 1 } : { y: '140%', opacity: 0 }}
             transition={{
               duration: 0.5,
               delay: delay + i * 0.04,
@@ -49,7 +56,7 @@ export function TypeWriter({ text, className, delay = 0 }: Omit<TextRevealProps,
         <motion.span
           key={i}
           initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.03, delay: delay + i * 0.035 }}
         >
           {char}
