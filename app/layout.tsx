@@ -4,8 +4,11 @@ import { ThemeProvider } from 'next-themes'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
+import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
 import { APP_URL, BRAND_IMAGE_SRC } from '@/lib/constants'
 import './globals.css'
+
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
 const oxanium = Oxanium({
   subsets: ['latin', 'latin-ext'],
@@ -70,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AggregateRatingJsonLd />
       </head>
       <body className={oxanium.className}>
+        {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
           <ApexThemeProvider>
             <AppShell>{children}</AppShell>
