@@ -3,7 +3,7 @@ import { SobreMiContent } from './content'
 
 export const metadata: Metadata = {
   title: 'Sobre Mí',
-  description: 'Manuel Navarro — 3 años de experiencia en desarrollo Full-Stack & Mobile con Flutter, Supabase y Riverpod.',
+  description: 'Manuel Navarro — 5 años de experiencia en desarrollo Full-Stack & Mobile con Flutter, Supabase y Riverpod.',
 }
 
 export default function SobreMiPage() {

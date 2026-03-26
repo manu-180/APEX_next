@@ -20,7 +20,7 @@ export function TextReveal({ text, className, delay = 0, as: Tag = 'span' }: Tex
     <Tag
       ref={ref}
       className={cn('inline-block', className)}
-      style={{ visibility: isInView ? 'visible' : 'hidden' }}
+      style={{ opacity: isInView ? 1 : 0 }}
     >
       {words.map((word, i) => (
         <span

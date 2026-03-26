@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion'
 import { TextReveal, TypeWriter } from '@/components/ui/text-reveal'
 import { GridBackground } from '@/components/ui/grid-background'
@@ -15,6 +16,7 @@ import Link from 'next/link'
 
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
   const particleMouseRef = useRef<MousePosition>({ x: -9999, y: -9999, active: false })
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -37,6 +39,12 @@ export function HeroSection() {
   const handleMouseLeave = useCallback(() => {
     particleMouseRef.current.active = false
   }, [])
+
+  const handleCTAClick = useCallback(() => {
+    const waLink = whatsappUrl(WA_MSG_NAV)
+    router.push('/gracias')
+    window.open(waLink, '_blank', 'noopener,noreferrer')
+  }, [router])
 
   return (
     <section
@@ -97,7 +105,7 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0 }}
           className="mb-8 flex flex-wrap items-center justify-center gap-2"
         >
           <div
@@ -122,10 +130,10 @@ export function HeroSection() {
 
         {/* Heading */}
         <h1 className="font-sans text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.18] sm:leading-[1.15] text-[var(--color-on-surface)] mb-6">
-          <TextReveal text="Desarrollo" delay={0.3} />
+          <TextReveal text="Tu negocio en internet," delay={0.1} />
           <br />
           <span className="text-gradient-primary inline-block pb-0.5">
-            <TextReveal text="Full-Stack & Mobile" delay={0.5} />
+            <TextReveal text="hecho para vender" delay={0.2} />
           </span>
         </h1>
 
@@ -133,21 +141,20 @@ export function HeroSection() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
           className="mx-auto max-w-2xl text-base sm:text-lg text-[var(--color-on-surface-variant)] leading-relaxed mb-10"
         >
-          Especializado en crear experiencias fluidas, eficientes y con diseño premium.
+          Páginas web y apps móviles para emprendedores y pymes en Argentina.
           <br className="hidden sm:block" />
-          Apps móviles con{' '}
-          <span className="font-semibold" style={{ color: '#0175C2' }}>Flutter</span> y webs de alto rendimiento con{' '}
-          <span className="text-[var(--color-on-surface)] font-semibold">Next.js</span>.
+          Diseño premium, entrega en 30 días y precios transparentes desde{' '}
+          <span className="font-semibold text-[var(--color-on-surface)]">ARS 300k</span>.
         </motion.p>
 
         {/* Terminal */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.5 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
           className="relative mx-auto mb-10 max-w-lg overflow-hidden rounded-xl font-mono text-sm"
           data-hover
           data-inspector-title="Terminal con TypeWriter Animado"
@@ -176,7 +183,7 @@ export function HeroSection() {
             </div>
             <div className="text-[var(--color-on-surface-variant)]">
               <span style={{ color: 'rgba(6, 182, 212, 0.5)' }}>$</span>{' '}
-              <TypeWriter text="npx create-apex-app --full-stack" delay={1.2} />
+              <TypeWriter text="crear-mi-web.start()" delay={0.6} />
             </div>
           </div>
         </motion.div>
@@ -185,17 +192,16 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
           data-hover
           data-inspector-title="Botones con Microinteracción Spring"
           data-inspector-desc="Estos botones escalan y se elevan al hover usando spring physics de Framer Motion — la diferencia entre sentir que 'presionás' algo físico versus simplemente cambiar de color. El efecto 'press' al click usa una escala de 0.97 con duración de 80ms para dar sensación de peso real."
           data-inspector-cat="UX · Motion"
         >
-          <a
-            href={whatsappUrl(WA_MSG_NAV)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={handleCTAClick}
             className={cn(
               'inline-flex items-center justify-center gap-2 font-semibold select-none',
               'transition-all duration-300 ease-out',
@@ -205,13 +211,24 @@ export function HeroSection() {
             )}
             data-hover
           >
-            Agendar consulta gratis
+            Contame tu idea (15 min gratis)
             <ArrowRightIcon className="h-4 w-4" />
-          </a>
+          </button>
           <Link href={ROUTES.servicios}>
-            <Button size="lg" variant="outline">Ver servicios</Button>
+            <Button size="lg" variant="outline">Ver precios</Button>
           </Link>
         </motion.div>
+
+        {/* Micro-copy de confianza */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+          className="mt-4 text-xs text-[var(--color-on-surface-variant)] opacity-60"
+        >
+          Respondemos en menos de 2 horas · Sin compromiso · 100% gratuito
+        </motion.p>
+
       </motion.div>
     </section>
   )

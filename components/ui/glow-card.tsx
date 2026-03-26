@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useState, type ReactNode, type MouseEvent } from 'react'
-import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 
 interface GlowCardProps {
@@ -49,7 +48,7 @@ export function GlowCard({
     : `radial-gradient(300px circle at ${mousePos.x}% ${mousePos.y}%, rgba(var(--color-primary-rgb), 0.15), transparent 60%)`
 
   return (
-    <motion.div
+    <div
       ref={cardRef}
       className={cn(
         'group relative overflow-hidden rounded-xl',
@@ -89,6 +88,6 @@ export function GlowCard({
 
       {/* Content */}
       <div className="relative z-20">{children}</div>
-    </motion.div>
+    </div>
   )
 }

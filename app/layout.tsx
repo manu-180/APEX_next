@@ -46,13 +46,13 @@ export const metadata: Metadata = {
     title: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
     description:
       'Experiencias con diseño premium: apps con Flutter y webs de alto rendimiento con Next.js. Consultá precios y agendá tu reunión gratis.',
-    images: [{ url: BRAND_IMAGE_SRC, width: 512, height: 512, alt: 'APEX — Manuel Navarro' }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Manuel Navarro — Desarrollo Web & Mobile | APEX' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
     description: 'Experiencias fluidas con diseño premium: Flutter, Next.js y más.',
-    images: [BRAND_IMAGE_SRC],
+    images: ['/opengraph-image'],
   },
   robots: { index: true, follow: true },
   alternates: { canonical: APP_URL },

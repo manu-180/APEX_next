@@ -86,6 +86,14 @@ export function AggregateRatingJsonLd() {
     '@type': 'LocalBusiness',
     name: 'APEX — Manuel Navarro',
     image: `${APP_URL.replace(/\/$/, '')}${BRAND_IMAGE_SRC}`,
+    telephone: '+54 9 11 3427 2488',
+    areaServed: 'AR',
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'AR',
+      addressLocality: 'Buenos Aires',
+    },
+    openingHours: 'Mo-Fr 09:00-19:00',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.9',
