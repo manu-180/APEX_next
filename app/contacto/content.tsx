@@ -19,6 +19,7 @@ import { BOOKING_SLOT_HOURS, BLOCKED_WEEKDAYS, formatBookingHour } from '@/lib/c
 import { useBooking } from '@/hooks/useBooking'
 import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { bookingWhatsappLocalToE164, BOOKING_WA_LOCAL_DIGITS } from '@/lib/booking-phone'
 import { cn } from '@/lib/utils/cn'
 
@@ -617,18 +618,17 @@ function ContactForm() {
             {sending ? 'Enviando…' : 'Enviar mensaje'}
             <SendIcon className="h-4 w-4" />
           </Button>
-          <a
-            href={whatsappUrl(WA_MSG_NAV)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <WhatsAppOutboundLink
+            waHref={whatsappUrl(WA_MSG_NAV)}
             className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10 hover:shadow-[0_0_15px_rgba(37,211,102,0.3)] transition-colors"
             data-hover
             data-inspector-title="Abrir WhatsApp"
-            data-inspector-desc="Enlace directo a wa.me con tu número configurado: nueva pestaña y rel noopener para que WhatsApp no acceda a window.opener. Atajo verde al lado del envío por formulario."
+            data-inspector-desc="Abre wa.me en nueva pestaña y muestra la página de confirmación en esta ventana, igual que el resto del sitio."
             data-inspector-cat="Seguridad"
+            aria-label="Abrir WhatsApp"
           >
             <WhatsAppIcon className="h-5 w-5" />
-          </a>
+          </WhatsAppOutboundLink>
         </div>
       </form>
     </SectionReveal>

@@ -3,6 +3,7 @@ import { Oxanium } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
+import { BotlodeChat } from '@/components/floating/botlode-chat'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
 import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
 import { APP_URL, BRAND_IMAGE_SRC } from '@/lib/constants'
@@ -71,6 +72,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WebSiteJsonLd />
         <ServiceJsonLd />
         <AggregateRatingJsonLd />
+        {/* Preconexión al player de BotLode — resuelve DNS/TLS antes del primer render */}
+        <link rel="preconnect" href="https://botlode-player.vercel.app" />
+        <link rel="dns-prefetch" href="https://botlode-player.vercel.app" />
       </head>
       <body className={oxanium.className}>
         {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
@@ -79,6 +83,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AppShell>{children}</AppShell>
           </ApexThemeProvider>
         </ThemeProvider>
+        {/* BotLode Chat — posición fixed, fuera del flujo de la app */}
+        <BotlodeChat />
       </body>
     </html>
   )

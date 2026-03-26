@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import { ServiciosContent } from './content'
 
 export const metadata: Metadata = {
-  title: 'Servicios Web & Mobile Argentina | Precios | Manuel Navarro',
+  title: 'Desarrollo de software Argentina | Precios | Manuel Navarro',
   description:
-    'Desarrollo web profesional, apps móviles iOS/Android y landing pages personalizadas. Presupuestos desde ARS 300k.',
+    'Desarrollo de software a medida para empresas y emprendedores. Precio fijo, entrega garantizada. Presupuestos desde ARS 300k.',
   keywords: [
-    'desarrollo web argentina',
-    'apps móviles argentina',
-    'páginas web profesionales',
+    'desarrollo de software argentina',
+    'software a medida',
+    'desarrollador de software',
     'desarrollador full stack',
   ],
 }
@@ -22,7 +22,7 @@ const faqSchema = {
       name: '¿Cuánto tarda hacer una página web?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Entre 2 y 4 semanas para una landing page, 30 días para una web completa. Fecha de entrega garantizada desde el día 1.',
+        text: 'Entre 2 y 4 semanas para una landing page, 15 días para una web completa. Fecha de entrega garantizada desde el día 1.',
       },
     },
     {

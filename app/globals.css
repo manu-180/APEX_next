@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── BotLode Chat Widget ──────────────────────────────────────────────────
+   Fuerza transparencia y corrección táctil en el iframe del player.
+   Se aplica globalmente para sobreescribir estilos inline de Flutter Web.
+   ───────────────────────────────────────────────────────────────────────── */
+#botlode-player {
+  background: none !important;
+  background-color: transparent !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    APEX Portfolio — "Fua, esto es tecnología"
    ═══════════════════════════════════════════════════════════════════════════
@@ -494,12 +505,76 @@
 }
 
 .cta-tech-card:hover {
-  border-color: rgba(var(--color-primary-rgb), 0.24);
+  border-color: rgba(var(--color-primary-rgb), 0.28);
   box-shadow:
     0 0 0 1px rgba(var(--color-primary-rgb), 0.06),
     0 12px 64px rgba(0, 0, 0, 0.5),
-    0 0 40px -10px rgba(var(--color-primary-rgb), 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 0 40px -10px rgba(var(--color-primary-rgb), 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 60px -20px rgba(var(--color-primary-rgb), 0.04);
+}
+
+/* ─── CTA hover: scan line que barre la tarjeta ─────────────────────────── */
+.cta-scan-line {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.cta-scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: -1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-primary-rgb), 0.4) 20%,
+    rgba(var(--color-primary-rgb), 0.85) 50%,
+    rgba(var(--color-primary-rgb), 0.4) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px 1px rgba(var(--color-primary-rgb), 0.3);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.group:hover .cta-scan-line::after {
+  opacity: 1;
+  animation: cta-scan-drop 3.2s ease-in-out infinite;
+}
+
+@keyframes cta-scan-drop {
+  0%   { top: -1px; opacity: 0; }
+  6%   { opacity: 1; }
+  88%  { opacity: 0.45; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Grid mesh: un poco más visible en hover */
+.cta-grid-mesh {
+  opacity: 0.45;
+  transition: opacity 0.5s ease;
+}
+
+.group:hover .cta-grid-mesh {
+  opacity: 0.9;
+}
+
+/* Corners: pulsan más rápido en hover */
+.group:hover .cta-corner {
+  animation-duration: 1.8s !important;
+  box-shadow: 0 0 10px 2px rgba(var(--color-primary-rgb), 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-scan-line::after { display: none; }
+  .group:hover .cta-grid-mesh { opacity: 0.45; }
 }
 
 /* Floating orb lights */

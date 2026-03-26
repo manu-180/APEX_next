@@ -17,6 +17,8 @@ export const ROUTES = {
   servicios: '/servicios',
   about:     '/sobre-mi',
   contact:   '/contacto',
+  /** Tras abrir WhatsApp desde un CTA del sitio (misma pestaña). */
+  gracias:   '/gracias',
 } as const
 
 // ─── Social / External ───────────────────────────────────────────────────────

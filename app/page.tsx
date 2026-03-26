@@ -20,7 +20,7 @@ function SocialProofStrip() {
           <span className="opacity-40 mx-2">·</span>
           Desde <span className="font-semibold text-[var(--color-on-surface)]">ARS 300k</span>{' '}
           <span className="opacity-40 mx-2">·</span>
-          <span className="font-semibold text-[var(--color-on-surface)]">30 días</span> garantizado
+          <span className="font-semibold text-[var(--color-on-surface)]">15 días</span> garantizado
         </p>
       </div>
     </div>

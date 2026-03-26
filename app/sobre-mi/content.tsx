@@ -6,17 +6,19 @@ import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CodeRainBg } from '@/components/ui/code-rain-bg'
+import { TiltCard } from '@/components/ui/tilt-card'
 import { ArrowRightIcon, CalendarIcon } from '@/components/ui/icons'
 import { whatsappUrl, WA_MSG_ABOUT } from '@/lib/whatsapp'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { cn } from '@/lib/utils/cn'
 
 const SKILLS = [
-  { label: 'Resolución de Problemas', icon: '\u{1F9E9}' },
-  { label: 'Arquitectura Limpia', icon: '\u{1F4DA}' },
-  { label: 'Constancia Diaria', icon: '\u{1F4C5}' },
-  { label: 'Pensamiento Lógico', icon: '\u{1F9E0}' },
-  { label: 'Enfoque en Resultados', icon: '\u{1F3AF}' },
-  { label: 'Adaptabilidad', icon: '\u{1F527}' },
+  { label: 'Resolución de Problemas', icon: '🧩' },
+  { label: 'Arquitectura Limpia', icon: '📚' },
+  { label: 'Constancia Diaria', icon: '📅' },
+  { label: 'Pensamiento Lógico', icon: '🧠' },
+  { label: 'Enfoque en Resultados', icon: '🎯' },
+  { label: 'Adaptabilidad', icon: '🔧' },
 ]
 
 const YEARS_EXP = new Date().getFullYear() - 2021
@@ -51,7 +53,7 @@ export function SobreMiContent() {
         }}
         data-hover
         data-inspector-title="Hero que respira con el scroll"
-        data-inspector-desc="Al hacer scroll, esta cabecera se desvanece y la máscara suaviza el borde inferior. El fondo de ‘lluvia de código’ reacciona al movimiento del mouse: las columnas brillan cerca del cursor, como una terminal cinematográfica."
+        data-inspector-desc="Al hacer scroll, esta cabecera se desvanece y la máscara suaviza el borde inferior. El fondo de lluvia de código reacciona al movimiento del mouse: las columnas brillan cerca del cursor, como una terminal cinematográfica."
         data-inspector-cat="Performance"
         onMouseMove={(e) => {
           const rect = headerRef.current?.getBoundingClientRect()
@@ -91,7 +93,7 @@ export function SobreMiContent() {
               className="rounded-2xl glass-card glow-border p-6 md:p-10 mb-8"
               data-hover
               data-inspector-title="Biografía en vidrio"
-              data-inspector-desc="Bloque de texto principal con vidrio esmerilado y borde luminoso: la lectura queda centrada y el fondo no compite. Es contenido estático pero presentado con la misma estética tech del resto del sitio."
+              data-inspector-desc="Bloque de texto principal con vidrio esmerilado y borde luminoso: la lectura queda centrada y el fondo no compite."
               data-inspector-cat="CSS · Ambiance"
             >
               <p className="text-base md:text-lg text-[var(--color-on-surface)] leading-relaxed mb-6">
@@ -124,7 +126,7 @@ export function SobreMiContent() {
                   className="stat-card-shine rounded-xl glass-card glow-border p-5 text-center"
                   data-hover
                   data-inspector-title={s.label}
-                  data-inspector-desc="Cada tarjeta aparece al entrar en vista con un pequeño deslizamiento vertical; al pasar el mouse, un brillo diagonal muy sutil recorre la superficie (solo si el usuario no pidió reducir movimiento)."
+                  data-inspector-desc="Cada tarjeta aparece al entrar en vista con un pequeño deslizamiento vertical; al pasar el mouse, un brillo diagonal recorre la superficie."
                   data-inspector-cat="UX · Motion"
                 >
                   <p className="relative z-10 text-2xl md:text-3xl font-extrabold text-[var(--color-primary)] shadow-glow-sm theme-transition mb-1">{s.value}</p>
@@ -148,7 +150,7 @@ export function SobreMiContent() {
                   className="flex items-center gap-2 rounded-xl glass-card px-4 py-2.5"
                   data-hover
                   data-inspector-title={s.label}
-                  data-inspector-desc="Chip de habilidad con icono y texto: entra con un ligero zoom al hacer scroll para que la grilla no aparezca toda de golpe. Refuerza el mensaje sin saturar la pantalla."
+                  data-inspector-desc="Chip de habilidad: entra con un ligero zoom al hacer scroll para que la grilla no aparezca toda de golpe."
                   data-inspector-cat="UX · Motion"
                 >
                   <span className="text-base">{s.icon}</span>
@@ -158,37 +160,36 @@ export function SobreMiContent() {
             </div>
           </SectionReveal>
 
-          {/* CTA */}
+          {/* CTA — TiltCard con tilt sutil, sin linterna, con scan line tech */}
           <SectionReveal delay={0.4}>
-            <motion.div
-              className="cta-tech-card relative rounded-2xl overflow-hidden p-8 md:p-12 text-center"
-              whileHover={{ scale: 1.006 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-              data-hover
-              data-inspector-title="CTA estilo consola"
-              data-inspector-desc="Orbes flotantes, malla, haces y esquinas tipo HUD envuelven el llamado a la acción. Al pasar el mouse, el bloque crece un pelo con resorte; el indicador ‘PROYECTO_SLOT’ pulsa como un LED de panel industrial."
-              data-inspector-cat="3D · Glow"
+            <TiltCard
+              tiltMax={3}
+              glowColor="rgba(0,0,0,0)"
+              className="cta-tech-card rounded-2xl overflow-hidden"
             >
               {/* Floating orb lights */}
               <div className="cta-orb cta-orb-1" aria-hidden="true" />
               <div className="cta-orb cta-orb-2" aria-hidden="true" />
               <div className="cta-orb cta-orb-3" aria-hidden="true" />
 
-              {/* Grid mesh */}
+              {/* Grid mesh — se intensifica en hover vía CSS */}
               <div className="cta-grid-mesh" aria-hidden="true" />
+
+              {/* Scan line hover effect */}
+              <div className="cta-scan-line" aria-hidden="true" />
 
               {/* Accent beams */}
               <div className="cta-top-beam" aria-hidden="true" />
               <div className="cta-bottom-beam" aria-hidden="true" />
 
-              {/* Corner dots */}
+              {/* Corner dots — pulsan más rápido en hover vía CSS */}
               <div className="cta-corner cta-corner-tl" aria-hidden="true" />
               <div className="cta-corner cta-corner-tr" aria-hidden="true" />
               <div className="cta-corner cta-corner-bl" aria-hidden="true" />
               <div className="cta-corner cta-corner-br" aria-hidden="true" />
 
               {/* HUD indicator */}
-              <div className="absolute top-4 right-4 flex items-center gap-2" aria-hidden="true">
+              <div className="absolute top-4 right-4 z-20 flex items-center gap-2" aria-hidden="true">
                 <span
                   className="h-1.5 w-1.5 rounded-full animate-hud-pulse"
                   style={{ backgroundColor: 'var(--color-primary)' }}
@@ -201,53 +202,153 @@ export function SobreMiContent() {
                 </span>
               </div>
 
-              <motion.h2
-                className="relative z-10 text-2xl md:text-3xl font-extrabold text-[var(--color-on-surface)] mb-3"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              {/* Contenido principal */}
+              <div
+                className="relative z-20 p-8 md:p-10"
+                data-hover
+                data-inspector-title="CTA 3D con Tilt Parallax"
+                data-inspector-desc="La card inclina muy sutilmente con física de resorte siguiendo al cursor. En hover: scan line que barre la tarjeta de arriba a abajo, grid mesh más intenso, corners que pulsan más rápido y borde que brilla."
+                data-inspector-cat="3D · Glow"
               >
-                ¿Listo para llevar tu proyecto al siguiente nivel?
-              </motion.h2>
-              <motion.p
-                className="relative z-10 text-[var(--color-on-surface-variant)] mb-8 max-w-lg mx-auto"
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-              >
-                Agendá una reunión gratuita y validamos tu idea con foco en resultados.
-              </motion.p>
-              <motion.div
-                className="relative z-10"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
-              >
-                <a
-                  href={whatsappUrl(WA_MSG_ABOUT)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-hover
-                  data-inspector-title="WhatsApp desde Sobre mí"
-                  data-inspector-desc="Abre WhatsApp con un mensaje corto indicando que vienen de la página Sobre mí."
-                  data-inspector-cat="UX"
-                  className={cn(
-                    'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                    'transition-all duration-300 ease-out',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                    'btn-tech btn-primary-tech active:scale-[0.97]',
-                    'h-13 px-8 text-base rounded-xl',
-                  )}
-                >
-                  <CalendarIcon className="h-4 w-4" />
-                  Agendar consulta gratis
-                  <ArrowRightIcon className="h-4 w-4" />
-                </a>
-              </motion.div>
-            </motion.div>
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+
+                  {/* ── Panel izquierdo: perfil compacto (solo desktop) ── */}
+                  <motion.div
+                    className="hidden md:flex flex-shrink-0 flex-col gap-4 w-52 rounded-xl p-5"
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(var(--color-primary-rgb), 0.15)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                    }}
+                    initial={{ opacity: 0, x: -18 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+                  >
+                    {/* Avatar + nombre */}
+                    <div className="flex flex-col items-center gap-2.5">
+                      <div className="relative">
+                        <div
+                          className="h-14 w-14 rounded-full flex items-center justify-center text-base font-bold select-none"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.28), rgba(6, 182, 212, 0.18))',
+                            border: '2px solid rgba(var(--color-primary-rgb), 0.38)',
+                            color: 'var(--color-primary)',
+                          }}
+                        >
+                          MN
+                        </div>
+                        <span
+                          className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 animate-pulse"
+                          style={{
+                            backgroundColor: 'var(--color-online)',
+                            borderColor: 'var(--color-surface-low)',
+                            boxShadow: '0 0 6px var(--color-online)',
+                          }}
+                        />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-[var(--color-on-surface)]">Manuel Navarro</p>
+                        <p className="text-xs text-[var(--color-on-surface-variant)]">Full-Stack · Mobile</p>
+                      </div>
+                    </div>
+
+                    {/* Divisor */}
+                    <div
+                      className="h-px"
+                      style={{ background: 'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.22), transparent)' }}
+                    />
+
+                    {/* Mini stats */}
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      {[
+                        { v: `${YEARS_EXP}+`, l: 'Años exp.' },
+                        { v: '15+', l: 'Proyectos' },
+                        { v: '100%', l: 'Satisfechos' },
+                        { v: '<2h', l: 'Respuesta' },
+                      ].map((s) => (
+                        <div key={s.l}>
+                          <p className="text-base font-extrabold glow-text" style={{ color: 'var(--color-primary)' }}>{s.v}</p>
+                          <p className="text-[9px] leading-tight text-[var(--color-on-surface-variant)]">{s.l}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Divisor */}
+                    <div
+                      className="h-px"
+                      style={{ background: 'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.22), transparent)' }}
+                    />
+
+                    {/* Tech tags */}
+                    <div className="flex flex-wrap gap-1 justify-center">
+                      {['Next.js', 'Flutter', 'Supabase'].map((t) => (
+                        <span
+                          key={t}
+                          className="rounded px-1.5 py-0.5 text-[9px] font-mono font-semibold"
+                          style={{
+                            background: 'rgba(var(--color-primary-rgb), 0.08)',
+                            color: 'rgba(var(--color-primary-rgb), 0.8)',
+                            border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* ── Panel derecho: CTA text ── */}
+                  <div className="flex-1 text-center md:text-left">
+                    <motion.h2
+                      className="text-2xl md:text-3xl font-extrabold text-[var(--color-on-surface)] mb-3"
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      ¿Listo para llevar tu proyecto al siguiente nivel?
+                    </motion.h2>
+                    <motion.p
+                      className="text-[var(--color-on-surface-variant)] mb-8 max-w-md md:mx-0 mx-auto"
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+                    >
+                      Agendá una reunión gratuita y validamos tu idea con foco en resultados.
+                    </motion.p>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
+                    >
+                      <WhatsAppOutboundLink
+                        waHref={whatsappUrl(WA_MSG_ABOUT)}
+                        data-hover
+                        data-inspector-title="WhatsApp desde Sobre mí"
+                        data-inspector-desc="Abre WhatsApp con un mensaje corto indicando que vienen de la página Sobre mí."
+                        data-inspector-cat="UX"
+                        className={cn(
+                          'inline-flex items-center justify-center gap-2 font-semibold select-none',
+                          'transition-all duration-300 ease-out',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                          'btn-tech btn-primary-tech active:scale-[0.97]',
+                          'h-13 px-8 text-base rounded-xl',
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        Agendar consulta gratis
+                        <ArrowRightIcon className="h-4 w-4" />
+                      </WhatsAppOutboundLink>
+                    </motion.div>
+                  </div>
+
+                </div>
+              </div>
+            </TiltCard>
           </SectionReveal>
         </div>
       </section>

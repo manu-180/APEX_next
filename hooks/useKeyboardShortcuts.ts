@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
+import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 
 interface ShortcutHandlers {
   toggleDarkMode: () => void
@@ -37,7 +38,7 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
         case 'H':
           e.preventDefault()
           if (e.shiftKey) {
-            window.open(whatsappUrl(WA_MSG_NAV), '_blank', 'noopener,noreferrer')
+            openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
           } else {
             router.push(ROUTES.home)
           }

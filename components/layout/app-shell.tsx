@@ -10,6 +10,7 @@ import { Footer } from './footer'
 import { ShortcutsModal } from './shortcuts-modal'
 import { InspectorOverlay } from '@/components/ui/inspector-overlay'
 import { ThemeWaveOverlay } from '@/components/ui/theme-wave-overlay'
+import { BotlodeGraciasBridge } from '@/components/whatsapp/botlode-gracias-bridge'
 
 // Context exports for child components
 export { useApexTheme } from '@/hooks/useTheme'
@@ -68,6 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {inspector.isActive && <InspectorOverlay onDisable={inspector.disable} />}
       <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
       <ThemeWaveOverlay />
+      <BotlodeGraciasBridge />
     </div>
   )
 }

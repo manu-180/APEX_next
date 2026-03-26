@@ -13,6 +13,7 @@ import { ProjectsSheet, type SheetEntry } from '@/components/ui/projects-sheet'
 import { cn } from '@/lib/utils/cn'
 import { BRAND_IMAGE_SRC } from '@/lib/constants'
 import { whatsappUrl, waMsgPlan, waMsgEstimator } from '@/lib/whatsapp'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import {
   WEB_PLANS, APP_PLANS,
   WEB_MODULES, APP_MODULES,
@@ -197,13 +198,302 @@ export function ServiciosContent() {
               <Badge variant="outline">Diseño premium</Badge>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[var(--color-on-surface)] mb-4">
-              Desarrollo web en Argentina para empresas y emprendedores
+              Desarrollo de software en Argentina para empresas y emprendedores
             </h1>
-            <p className="mx-auto max-w-xl text-[var(--color-on-surface-variant)] mb-10">
-              Diseño a medida, precio fijo y entrega garantizada. Sin agencias.
+            <p className="mx-auto max-w-xl text-[var(--color-on-surface-variant)] mb-6 sm:mb-8">
+              A medida, precio fijo y entrega garantizada. Sin agencias.
             </p>
+          </SectionReveal>
+        </div>
+      </motion.section>
 
-            {/* Tab toggle — HUD switch with animated thumb */}
+      {/* Proceso */}
+      <section className="pb-8">
+        <div className="mx-auto max-w-4xl px-6">
+          <SectionReveal>
+            <div
+              className="rounded-2xl overflow-hidden glass-card"
+              data-hover
+              data-inspector-title="Proceso en 3 pasos"
+              data-inspector-desc="Muestra el flujo de trabajo para reducir fricción: el visitante sabe exactamente qué esperar antes de hacer clic."
+              data-inspector-cat="UX · Conversión"
+            >
+              {/* Top accent line */}
+              <div
+                className="h-[2px] w-full"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.85) 50%, transparent)' }}
+              />
+
+              <div className="px-8 py-8">
+                {/* Label with flanking lines */}
+                <div className="flex items-center gap-3 justify-center mb-8">
+                  <div
+                    className="h-px flex-1 max-w-[80px]"
+                    style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.45))' }}
+                  />
+                  <span className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)]">
+                    ¿Cómo funciona?
+                  </span>
+                  <div
+                    className="h-px flex-1 max-w-[80px]"
+                    style={{ background: 'linear-gradient(90deg, rgba(var(--color-primary-rgb), 0.45), transparent)' }}
+                  />
+                </div>
+
+                {/* Steps */}
+                <div className="flex flex-col sm:flex-row items-center justify-center mb-6">
+                  {[
+                    { step: '01', title: 'Consulta gratis', sub: '15 minutos', highlight: false },
+                    { step: '02', title: 'Presupuesta en 24 hs', sub: 'Precio fijo, sin sorpresas', highlight: false },
+                    { step: '03', title: 'Entrega en 15 días', sub: 'Garantizado. Si no cumplimos, devolvemos el depósito.', highlight: true },
+                  ].map(({ step, title, sub, highlight }, i, arr) => (
+                    <div key={step} className="flex flex-col sm:flex-row items-center">
+                      {/* Step card */}
+                      <div
+                        className={cn(
+                          'flex flex-col items-center text-center px-7 py-5 rounded-xl transition-all duration-300',
+                          highlight
+                            ? 'bg-[rgba(var(--color-primary-rgb),0.07)] border border-[rgba(var(--color-primary-rgb),0.2)]'
+                            : ''
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'w-10 h-10 rounded-full flex items-center justify-center mb-3 text-xs font-black',
+                            highlight
+                              ? 'bg-[var(--color-primary)] text-[var(--color-surface-base)]'
+                              : 'border border-[rgba(var(--color-primary-rgb),0.45)] text-[var(--color-primary)]'
+                          )}
+                          style={highlight ? { boxShadow: '0 0 20px rgba(var(--color-primary-rgb), 0.45)' } : undefined}
+                        >
+                          {step}
+                        </div>
+                        <span className="text-sm font-bold text-[var(--color-on-surface)] mb-1 whitespace-nowrap">{title}</span>
+                        <span className={cn(
+                          'text-xs leading-relaxed max-w-[9.5rem]',
+                          highlight ? 'text-[var(--color-primary)] font-medium' : 'text-[var(--color-on-surface-variant)]'
+                        )}>
+                          {sub}
+                        </span>
+                      </div>
+
+                      {/* Connector */}
+                      {i < arr.length - 1 && (
+                        <div className="flex items-center my-3 sm:my-0 sm:mx-1">
+                          <div
+                            className="hidden sm:block w-6 h-px"
+                            style={{ background: 'linear-gradient(90deg, rgba(var(--color-primary-rgb), 0.25), rgba(var(--color-primary-rgb), 0.6))' }}
+                          />
+                          <span
+                            className="text-base select-none hidden sm:block leading-none"
+                            style={{ color: 'rgba(var(--color-primary-rgb), 0.55)' }}
+                            aria-hidden
+                          >
+                            ›
+                          </span>
+                          <div
+                            className="sm:hidden w-px h-5"
+                            style={{ background: 'linear-gradient(180deg, rgba(var(--color-primary-rgb), 0.25), rgba(var(--color-primary-rgb), 0.55))' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-center text-[11px] tracking-[0.2em] uppercase opacity-50 text-[var(--color-on-surface-variant)]">
+                  Sin vueltas · Sin letra chica
+                </p>
+              </div>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
+      {/* Por qué APEX */}
+      <section className="my-12 mx-auto max-w-4xl px-6">
+        <SectionReveal>
+          <div className="glass-card rounded-2xl overflow-hidden">
+            {/* Top accent */}
+            <div
+              className="h-[2px] w-full"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.7) 50%, transparent)' }}
+            />
+
+            <div className="p-8">
+              {/* Header */}
+              <div className="flex flex-wrap items-center gap-3 mb-7">
+                <span
+                  className="text-[10px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full"
+                  style={{
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.35)',
+                    color: 'var(--color-primary)',
+                  }}
+                >
+                  Comparativa
+                </span>
+                <h3 className="text-xl font-bold text-[var(--color-on-surface)]">¿Por qué APEX y no una agencia?</h3>
+              </div>
+
+              {/* Comparison grid — gap acts as divider line */}
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 mb-7 rounded-xl overflow-hidden"
+                style={{
+                  border: '1px solid rgba(var(--color-primary-rgb), 0.1)',
+                  gap: '1px',
+                  background: 'rgba(var(--color-primary-rgb), 0.1)',
+                }}
+              >
+                {/* Agencia column */}
+                <div
+                  className="p-6"
+                  style={{ background: 'var(--color-surface-low, #0d0d0d)' }}
+                >
+                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-gray-500 mb-4">
+                    Agencia tradicional
+                  </p>
+                  <ul className="space-y-3">
+                    {[
+                      'Hablar con un vendedor',
+                      'Precio "a cotizar"',
+                      '3-6 meses de espera',
+                      'Mantenimiento aparte',
+                      'Plantillas genéricas',
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-3">
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 bg-red-500/10 text-red-400">
+                          ✕
+                        </span>
+                        <span className="text-sm text-gray-500">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* APEX column */}
+                <div
+                  className="p-6"
+                  style={{ background: 'rgba(var(--color-primary-rgb), 0.04)' }}
+                >
+                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--color-primary)] mb-4">
+                    APEX
+                  </p>
+                  <ul className="space-y-3">
+                    {[
+                      'Hablar directo conmigo',
+                      'Precio fijo pactado',
+                      'Entrega en 15 días',
+                      '3 meses de soporte incluido',
+                      '100% a tu medida',
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-3">
+                        <span
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 text-[var(--color-primary)]"
+                          style={{
+                            background: 'rgba(var(--color-primary-rgb), 0.15)',
+                            boxShadow: '0 0 8px rgba(var(--color-primary-rgb), 0.2)',
+                          }}
+                        >
+                          ✓
+                        </span>
+                        <span className="text-sm font-medium text-[var(--color-on-surface)]">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Quote */}
+              <div className="flex gap-4 items-start">
+                <div
+                  className="w-[3px] rounded-full flex-shrink-0 self-stretch"
+                  style={{ background: 'var(--color-primary)', minHeight: '2.5rem' }}
+                />
+                <p className="text-sm italic text-[var(--color-on-surface-variant)] leading-relaxed">
+                  "Trabajo con vos, no para vos. Cuando tenés una duda, te respondo yo — no un asistente."
+                </p>
+              </div>
+            </div>
+          </div>
+        </SectionReveal>
+      </section>
+
+      {/* Confiaron en APEX */}
+      <div className="my-12 text-center mx-auto max-w-4xl px-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-100">Confiaron en APEX</h3>
+        <p className="text-sm text-gray-400 mb-6">
+          simonmindset.com · metalwailers.com · botrive.com · pulpiprint.com · mnltecno.com
+        </p>
+        <blockquote className="text-sm italic text-gray-300 border-l-2 border-cyan-500 pl-4 max-w-2xl mx-auto text-left">
+          "Entregó antes de lo prometido y quedó exactamente como lo imaginé."
+          <footer className="text-xs text-gray-400 mt-2">— Simón R., Coach</footer>
+        </blockquote>
+      </div>
+
+      {/* CTA intermedia */}
+      <div className="my-8 mx-auto max-w-4xl px-6">
+        <SectionReveal>
+          <div
+            className="relative rounded-2xl overflow-hidden glass-card text-center py-12 px-6"
+            data-hover
+            data-inspector-title="CTA intermedia"
+            data-inspector-desc="Llamada a la acción intermedia: WhatsApp o ver precios."
+            data-inspector-cat="UX · Conversión"
+          >
+            {/* Radial background glow */}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(var(--color-primary-rgb), 0.07) 0%, transparent 70%)' }}
+            />
+            {/* Top accent */}
+            <div
+              className="absolute top-0 inset-x-0 h-[2px]"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.75) 50%, transparent)' }}
+            />
+
+            <div className="relative z-10">
+              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)] mb-2">
+                Siguiente paso
+              </p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-[var(--color-on-surface)] mb-2 tracking-tight">
+                ¿Sabés qué necesitás?
+              </p>
+              <p className="text-sm text-[var(--color-on-surface-variant)] mb-8 opacity-70">
+                Empezá hoy, sin compromisos.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <WhatsAppOutboundLink
+                  waHref={whatsappUrl('Hola, quiero saber más sobre mis opciones')}
+                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                  style={{
+                    background: 'var(--color-primary)',
+                    color: 'var(--color-surface-base)',
+                    boxShadow: '0 0 24px rgba(var(--color-primary-rgb), 0.35)',
+                  }}
+                >
+                  Consulta gratis en WhatsApp
+                </WhatsAppOutboundLink>
+                <a
+                  href="#pricing"
+                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm transition-all duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.08)]"
+                  style={{
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.4)',
+                    color: 'var(--color-primary)',
+                  }}
+                >
+                  Ver precios →
+                </a>
+              </div>
+            </div>
+          </div>
+        </SectionReveal>
+      </div>
+
+      {/* Pricing cards */}
+      <section id="pricing" className="pb-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="flex justify-center mb-8">
+            {/* Tab toggle — HUD switch justo encima de las cards de planes */}
             <div className="inline-flex rounded-xl glass-card p-1">
               {(['web', 'mobile'] as const).map((t) => (
                 <button
@@ -239,135 +529,7 @@ export function ServiciosContent() {
                 </button>
               ))}
             </div>
-          </SectionReveal>
-        </div>
-      </motion.section>
-
-      {/* Proceso */}
-      <section className="pb-8">
-        <div className="mx-auto max-w-4xl px-6">
-          <SectionReveal>
-            <div
-              className="rounded-2xl px-8 py-6 glass-card text-center"
-              data-hover
-              data-inspector-title="Proceso en 3 pasos"
-              data-inspector-desc="Muestra el flujo de trabajo para reducir fricción: el visitante sabe exactamente qué esperar antes de hacer clic."
-              data-inspector-cat="UX · Conversión"
-            >
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)] mb-4">
-                ¿Cómo funciona?
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-4">
-                {[
-                  { step: '01', title: 'Consulta gratis', sub: '15 minutos', highlight: false },
-                  { step: '02', title: 'Propuesta en 48 hs', sub: 'Precio fijo, sin sorpresas', highlight: false },
-                  { step: '03', title: 'Entrega en 30 días', sub: 'Garantizado. Si no cumplimos, devolvemos el depósito.', highlight: true },
-                ].map(({ step, title, sub, highlight }, i, arr) => (
-                  <div key={step} className="flex items-center gap-4 sm:gap-6">
-                    <div className="flex flex-col items-center gap-1">
-                      <span
-                        className="text-[10px] font-black tabular-nums"
-                        style={{ color: 'var(--color-primary)' }}
-                      >
-                        {step}
-                      </span>
-                      <span className="text-sm font-bold text-[var(--color-on-surface)]">{title}</span>
-                      <span className={cn(
-                        'text-xs text-center max-w-[10rem]',
-                        highlight ? 'font-semibold text-[var(--color-primary)]' : 'text-[var(--color-on-surface-variant)]'
-                      )}>{sub}</span>
-                    </div>
-                    {i < arr.length - 1 && (
-                      <span
-                        className="hidden sm:block text-lg font-light select-none"
-                        style={{ color: 'rgba(var(--color-primary-rgb), 0.4)' }}
-                        aria-hidden
-                      >
-                        →
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-[var(--color-on-surface-variant)] opacity-70">
-                Sin vueltas, sin letra chica.
-              </p>
-            </div>
-          </SectionReveal>
-        </div>
-      </section>
-
-      {/* Por qué APEX */}
-      <section className="my-12 mx-auto max-w-4xl px-6">
-        <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-lg p-8">
-          <h3 className="text-2xl font-bold mb-6 text-[var(--color-on-surface)]">¿Por qué APEX y no una agencia?</h3>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <p className="font-semibold text-gray-300 mb-2">Agencia tradicional:</p>
-              <ul className="text-sm text-gray-400 space-y-1">
-                <li>✗ Hablar con un vendedor</li>
-                <li>✗ Precio "a cotizar"</li>
-                <li>✗ 3-6 meses de espera</li>
-                <li>✗ Mantenimiento aparte</li>
-                <li>✗ Plantillas genéricas</li>
-              </ul>
-            </div>
-
-            <div>
-              <p className="font-semibold text-cyan-400 mb-2">APEX:</p>
-              <ul className="text-sm text-cyan-400 space-y-1">
-                <li>✓ Hablar directo conmigo</li>
-                <li>✓ Precio fijo pactado</li>
-                <li>✓ Entrega en 30 días</li>
-                <li>✓ 3 meses de soporte incluido</li>
-                <li>✓ 100% a tu medida</li>
-              </ul>
-            </div>
           </div>
-
-          <p className="text-sm italic text-gray-300 border-t border-gray-700 pt-4">
-            "Trabajo con vos, no para vos. Cuando tenés una duda, te respondo yo — no un asistente."
-          </p>
-        </div>
-      </section>
-
-      {/* Confiaron en APEX */}
-      <div className="my-12 text-center mx-auto max-w-4xl px-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-100">Confiaron en APEX</h3>
-        <p className="text-sm text-gray-400 mb-6">
-          simonmindset.com · metalwailers.com · botrive.com · pulpiprint.com · mnltecno.com
-        </p>
-        <blockquote className="text-sm italic text-gray-300 border-l-2 border-cyan-500 pl-4 max-w-2xl mx-auto text-left">
-          "Entregó antes de lo prometido y quedó exactamente como lo imaginé."
-          <footer className="text-xs text-gray-400 mt-2">— Simón R., Coach</footer>
-        </blockquote>
-      </div>
-
-      {/* CTA intermedia */}
-      <div className="text-center my-8 py-6 border-y border-gray-800 mx-auto max-w-4xl px-6">
-        <p className="text-gray-300 mb-4 text-sm">¿Sabés qué necesitás?</p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href={whatsappUrl('Hola, quiero saber más sobre mis opciones')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-6 py-2 bg-cyan-500 hover:bg-cyan-600 rounded text-white font-semibold transition"
-          >
-            Consulta gratis en WhatsApp
-          </a>
-          <a
-            href="#pricing"
-            className="inline-block px-6 py-2 border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 rounded font-semibold transition"
-          >
-            Ver precios
-          </a>
-        </div>
-      </div>
-
-      {/* Pricing cards */}
-      <section id="pricing" className="pb-24">
-        <div className="mx-auto max-w-6xl px-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={tab}
@@ -476,10 +638,8 @@ export function ServiciosContent() {
               <p className="text-sm text-[var(--color-on-surface-variant)] mb-1">Total estimado</p>
               <p className="text-3xl font-extrabold text-[var(--color-on-surface)]">{formatARS(estimatorTotal)}</p>
             </div>
-            <a
-              href={estimatorWaHref}
-              target="_blank"
-              rel="noopener noreferrer"
+            <WhatsAppOutboundLink
+              waHref={estimatorWaHref}
               data-hover
               data-inspector-title="Consultar por WhatsApp"
               data-inspector-desc="Abre WhatsApp con el tipo de proyecto, módulos elegidos y total estimado en el mensaje."
@@ -494,7 +654,7 @@ export function ServiciosContent() {
             >
               Consultar ahora
               <ArrowRightIcon className="h-4 w-4" />
-            </a>
+            </WhatsAppOutboundLink>
           </div>
         </div>
       </section>
@@ -503,23 +663,84 @@ export function ServiciosContent() {
       <FAQSection />
 
       {/* CTA final post-estimador */}
-      <section className="my-16 text-center border-t border-gray-800 pt-12 mx-auto max-w-4xl px-6">
-        <h3 className="text-2xl font-bold mb-4 text-[var(--color-on-surface)]">¿Todavía tenés dudas?</h3>
-        <p className="text-gray-400 mb-6 max-w-xl mx-auto text-sm">
-          No hay compromiso. En 15 minutos te cuento exactamente
-          qué conviene para tu caso y cuánto cuesta.
-        </p>
-        <a
-          href={whatsappUrl('Hola, quiero hablar sobre mi proyecto')}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block px-8 py-3 bg-cyan-500 hover:bg-cyan-600 rounded text-white font-bold text-lg transition mb-4"
-        >
-          Hablemos por WhatsApp →
-        </a>
-        <p className="text-xs text-gray-500">
-          Respondemos en menos de 2 horas · Lunes a viernes 9-19 hs
-        </p>
+      <section className="my-16 mx-auto max-w-4xl px-6">
+        <SectionReveal>
+          <div
+            className="relative rounded-2xl overflow-hidden glass-card text-center py-14 px-8"
+            data-hover
+            data-inspector-title="CTA final — ¿Todavía tenés dudas?"
+            data-inspector-desc="Cierre de página: captura la intención residual con un contacto directo sin fricción."
+            data-inspector-cat="UX · Conversión"
+          >
+            {/* Corner glow blobs */}
+            <div
+              className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 rounded-full blur-3xl opacity-30"
+              style={{ background: 'rgba(var(--color-primary-rgb), 0.4)' }}
+            />
+            <div
+              className="pointer-events-none absolute -bottom-16 -right-16 w-48 h-48 rounded-full blur-3xl opacity-20"
+              style={{ background: 'rgba(var(--color-primary-rgb), 0.3)' }}
+            />
+            {/* Top accent line */}
+            <div
+              className="absolute top-0 inset-x-0 h-[2px]"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.8) 50%, transparent)' }}
+            />
+
+            <div className="relative z-10">
+              {/* Animated label */}
+              <div className="inline-flex items-center gap-2 mb-5">
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ background: 'var(--color-primary)' }}
+                />
+                <span className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)]">
+                  Contacto directo
+                </span>
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ background: 'var(--color-primary)', animationDelay: '0.5s' }}
+                />
+              </div>
+
+              <h3 className="text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)] mb-3 tracking-tight">
+                ¿Todavía tenés dudas?
+              </h3>
+              <p className="text-sm text-[var(--color-on-surface-variant)] mb-8 max-w-sm mx-auto leading-relaxed opacity-80">
+                No hay compromiso. En 15 minutos te cuento exactamente
+                qué conviene para tu caso y cuánto cuesta.
+              </p>
+
+              <WhatsAppOutboundLink
+                waHref={whatsappUrl('Hola, quiero hablar sobre mi proyecto')}
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-base transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] mb-5"
+                style={{
+                  background: 'var(--color-primary)',
+                  color: 'var(--color-surface-base)',
+                  boxShadow: '0 0 32px rgba(var(--color-primary-rgb), 0.4), 0 4px 16px rgba(var(--color-primary-rgb), 0.25)',
+                }}
+              >
+                Hablemos por WhatsApp
+                <span className="text-lg" aria-hidden>→</span>
+              </WhatsAppOutboundLink>
+
+              {/* Trust signal */}
+              <div className="flex items-center justify-center gap-2">
+                <div
+                  className="h-px w-12 opacity-30"
+                  style={{ background: 'var(--color-on-surface-variant)' }}
+                />
+                <p className="text-[11px] text-[var(--color-on-surface-variant)] opacity-50 tracking-wide">
+                  Respondemos en menos de 2 hs · Lunes a viernes 9-19 hs
+                </p>
+                <div
+                  className="h-px w-12 opacity-30"
+                  style={{ background: 'var(--color-on-surface-variant)' }}
+                />
+              </div>
+            </div>
+          </div>
+        </SectionReveal>
       </section>
 
       {/* ProjectsSheet kept for future reactivation — currently closed (sheetPlanId = null from card clicks) */}
@@ -565,7 +786,7 @@ export function ServiciosContent() {
 const FAQ_ITEMS = [
   {
     q: '¿Cuánto tarda hacer una página web?',
-    a: 'Entre 2 y 4 semanas para una landing page, 30 días para una web completa. Fecha de entrega garantizada desde el día 1.',
+    a: 'Entre 2 y 4 semanas para una landing page, 15 días para una web completa. Fecha de entrega garantizada desde el día 1.',
   },
   {
     q: '¿Cuánto cuesta una página web en Argentina?',
@@ -622,13 +843,23 @@ function FAQSection() {
                     {item.q}
                   </span>
                   <motion.span
-                    animate={{ rotate: isOpen ? 45 : 0 }}
-                    transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="flex-shrink-0 text-lg leading-none font-light select-none"
-                    style={{ color: 'var(--color-primary)' }}
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="flex-shrink-0 inline-flex text-[var(--color-primary)] select-none"
                     aria-hidden
                   >
-                    +
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.25}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
                   </motion.span>
                 </button>
 
@@ -657,7 +888,7 @@ function FAQSection() {
   )
 }
 
-/** Mismo estado que el switch del hero: Web ↔ App y lista de módulos + planes arriba. */
+/** Mismo estado que el switch de planes: Web ↔ App; sincroniza módulos del estimador. */
 function ServiciosEstimatorTabSwitch({
   tab,
   onChange,
@@ -1007,10 +1238,8 @@ function PricingCard({
 
               {/* CTA — pointer-events-auto: capa encima del tilt sin capturar clics del resto */}
               <div className="pointer-events-auto relative z-20" onClick={(e) => e.stopPropagation()}>
-                <a
-                  href={whatsappUrl(waMsgPlan(plan.name))}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <WhatsAppOutboundLink
+                  waHref={whatsappUrl(waMsgPlan(plan.name))}
                   className={cn(
                     'inline-flex w-full items-center justify-center gap-2 font-semibold',
                     'transition-all duration-300 ease-out',
@@ -1028,7 +1257,7 @@ function PricingCard({
                 >
                   {getPlanCtaLabel(plan)}
                   <ArrowRightIcon className="h-4 w-4" />
-                </a>
+                </WhatsAppOutboundLink>
               </div>
             </div>
             </motion.div>
@@ -1132,16 +1361,17 @@ function PricingCard({
                 style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb),0.3), transparent)' }}
               />
 
-              {/* Gains grid — ocupa el espacio vertical sobrante; filas 1fr para alinear alturas */}
+              {/* Gains grid — filas auto (sin 1fr) para no estirar; gap amplio; bloque centrado en el hueco flexible */}
               <div className="mb-3 flex min-h-0 flex-1 flex-col md:mb-4">
                 <p className="mb-2 shrink-0 text-[10px] font-black uppercase tracking-[0.16em] text-[var(--color-on-surface-variant)] md:text-[11px] md:mb-3">
                   Lo que ganás
                 </p>
-                <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2.5 md:gap-3">
+                <div className="flex min-h-0 flex-1 items-center py-2 md:py-3">
+                  <div className="grid w-full grid-cols-2 gap-4 md:gap-5">
                   {plan.gains.map((gain) => (
                     <div
                       key={gain.num}
-                      className="flex min-h-0 h-full min-w-0 flex-col justify-center gap-1 rounded-xl p-3 md:gap-1.5 md:p-3.5"
+                      className="flex min-w-0 flex-col items-start justify-start gap-1 rounded-xl p-3.5 md:gap-1.5 md:p-4"
                       style={{
                         background: 'rgba(var(--color-primary-rgb), 0.06)',
                         border: '1px solid rgba(var(--color-primary-rgb), 0.14)',
@@ -1161,6 +1391,7 @@ function PricingCard({
                       </span>
                     </div>
                   ))}
+                  </div>
                 </div>
               </div>
 
@@ -1173,10 +1404,8 @@ function PricingCard({
 
               {/* CTA */}
               <div onClick={(e) => e.stopPropagation()}>
-                <a
-                  href={whatsappUrl(waMsgPlan(plan.name))}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <WhatsAppOutboundLink
+                  waHref={whatsappUrl(waMsgPlan(plan.name))}
                   className={cn(
                     'inline-flex w-full items-center justify-center gap-2 font-semibold',
                     'transition-all duration-300 ease-out',
@@ -1190,7 +1419,7 @@ function PricingCard({
                 >
                   {getPlanCtaLabel(plan)}
                   <ArrowRightIcon className="h-4 w-4" />
-                </a>
+                </WhatsAppOutboundLink>
               </div>
               </div>
             </div>

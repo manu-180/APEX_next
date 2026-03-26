@@ -12,6 +12,7 @@ import { ArrowRightIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
+import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import Link from 'next/link'
 
 export function HeroSection() {
@@ -41,9 +42,7 @@ export function HeroSection() {
   }, [])
 
   const handleCTAClick = useCallback(() => {
-    const waLink = whatsappUrl(WA_MSG_NAV)
-    router.push('/gracias')
-    window.open(waLink, '_blank', 'noopener,noreferrer')
+    openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
   }, [router])
 
   return (
@@ -146,7 +145,7 @@ export function HeroSection() {
         >
           Páginas web y apps móviles para emprendedores y pymes en Argentina.
           <br className="hidden sm:block" />
-          Diseño premium, entrega en 30 días y precios transparentes desde{' '}
+          Diseño premium, entrega en 15 días y precios transparentes desde{' '}
           <span className="font-semibold text-[var(--color-on-surface)]">ARS 300k</span>.
         </motion.p>
 

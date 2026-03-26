@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_FOOTER_LINK } from '@/lib/whatsapp'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 
 const FOOTER_LINKS = {
   servicios: [
@@ -96,18 +97,31 @@ export function Footer() {
               {FOOTER_LINKS.contacto.map((l) => (
                 <li key={l.label}>
                   {l.external ? (
-                    <a
-                      href={l.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="footer-link text-sm"
-                      data-hover
-                      data-inspector-title="Link Externo con Protección Anti-Tabnabbing"
-                      data-inspector-desc="Cada link externo tiene rel=noopener noreferrer. Esto evita el ataque 'tabnabbing': sin esta protección, la página externa podría redirigir tu pestaña original a otra URL maliciosa. Es un detalle de seguridad invisible que protege al visitante sin que lo note."
-                      data-inspector-cat="Seguridad"
-                    >
-                      {l.label}
-                    </a>
+                    l.label === 'WhatsApp' ? (
+                      <WhatsAppOutboundLink
+                        waHref={l.href}
+                        className="footer-link text-sm"
+                        data-hover
+                        data-inspector-title="WhatsApp + página de gracias"
+                        data-inspector-desc="Abre WhatsApp en nueva pestaña y muestra la confirmación en esta misma ventana, igual que el resto de los CTAs del sitio."
+                        data-inspector-cat="Seguridad"
+                      >
+                        {l.label}
+                      </WhatsAppOutboundLink>
+                    ) : (
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="footer-link text-sm"
+                        data-hover
+                        data-inspector-title="Link Externo con Protección Anti-Tabnabbing"
+                        data-inspector-desc="Cada link externo tiene rel=noopener noreferrer. Esto evita el ataque 'tabnabbing': sin esta protección, la página externa podría redirigir tu pestaña original a otra URL maliciosa. Es un detalle de seguridad invisible que protege al visitante sin que lo note."
+                        data-inspector-cat="Seguridad"
+                      >
+                        {l.label}
+                      </a>
+                    )
                   ) : (
                     <Link
                       href={l.href}

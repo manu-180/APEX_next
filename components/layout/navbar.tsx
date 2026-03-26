@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon } from '@/components/ui/icons'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
@@ -228,10 +229,8 @@ export function Navbar({
             <KeyboardIcon className="h-4 w-4" />
           </button>
 
-          <a
-            href={WHATSAPP_NAV_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
+          <WhatsAppOutboundLink
+            waHref={WHATSAPP_NAV_HREF}
             className={cn(
               'hidden md:inline-flex items-center justify-center gap-2 font-semibold',
               'transition-all duration-300 ease-out',
@@ -245,7 +244,7 @@ export function Navbar({
             data-inspector-cat="UX · Motion"
           >
             Hablemos
-          </a>
+          </WhatsAppOutboundLink>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -310,10 +309,8 @@ export function Navbar({
                 ),
               )}
               <div className="mt-2 pt-2 border-t border-[var(--color-surface-high)]">
-                <a
-                  href={WHATSAPP_NAV_HREF}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <WhatsAppOutboundLink
+                  waHref={WHATSAPP_NAV_HREF}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'inline-flex w-full items-center justify-center gap-2 font-semibold',
@@ -325,7 +322,7 @@ export function Navbar({
                   data-hover
                 >
                   Hablemos
-                </a>
+                </WhatsAppOutboundLink>
               </div>
             </div>
             {/* Gradient bottom for mobile */}
