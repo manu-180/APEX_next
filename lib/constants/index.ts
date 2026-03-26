@@ -1,8 +1,7 @@
 // ─── App Constants ───────────────────────────────────────────────────────────
 
 export const APP_NAME = 'APEX Portfolio'
-export const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://apexportfolio.com'
-
+export const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.theapexweb.com'
 /** Logo / favicon / OG / previews: una sola imagen en `public/`. */
 export const BRAND_IMAGE_SRC = '/apex-logo.png' as const
 
