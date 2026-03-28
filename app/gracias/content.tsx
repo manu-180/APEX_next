@@ -22,7 +22,7 @@ const NEXT_STEPS = [
 
 export function GraciasContent() {
   useEffect(() => {
-    window.gtag?.('event', 'conversion', { send_to: 'G-TK45RZGM4F' })
+    window.gtag?.('event', 'conversion', { send_to: 'AW-18041789644' })
   }, [])
 
   return (

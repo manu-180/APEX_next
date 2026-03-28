@@ -10,6 +10,8 @@ declare global {
   }
 }
 
+const AW_ID = 'AW-18041789644'
+
 function GaRoutePageViews({ gaId }: { gaId: string }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -32,9 +34,17 @@ function GaRoutePageViews({ gaId }: { gaId: string }) {
   return null
 }
 
+function GoogleAdsInit() {
+  useEffect(() => {
+    if (typeof window.gtag !== 'function') return
+    window.gtag('config', AW_ID)
+  }, [])
+
+  return null
+}
+
 /**
- * GA4 vía `@next/third-parties` + `page_path` en cada navegación del App Router
- * (la etiqueta inicial ya cubre la primera carga).
+ * GA4 vía `@next/third-parties` + Google Ads (AW-18041789644) init en cada carga.
  */
 export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
   return (
@@ -42,6 +52,9 @@ export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
       <GoogleAnalytics gaId={gaId} />
       <Suspense fallback={null}>
         <GaRoutePageViews gaId={gaId} />
+      </Suspense>
+      <Suspense fallback={null}>
+        <GoogleAdsInit />
       </Suspense>
     </>
   )
