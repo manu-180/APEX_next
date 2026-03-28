@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { GraciasContent } from './content'
 
 export const metadata: Metadata = {
-  title: '¡Recibimos tu consulta! | APEX',
+  title: 'Gracias por tu consulta | APEX',
   robots: { index: false, follow: false },
 }
 

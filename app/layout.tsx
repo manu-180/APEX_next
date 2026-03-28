@@ -6,6 +6,8 @@ import { AppShell } from '@/components/layout/app-shell'
 import { BotlodeChat } from '@/components/floating/botlode-chat'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
 import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
+import { SentryProvider } from '@/components/providers/sentry-provider'
+import { PostHogProviderWrapper, PostHogPageView } from '@/components/providers/posthog-provider'
 import { APP_URL, BRAND_IMAGE_SRC } from '@/lib/constants'
 import './globals.css'
 
@@ -18,6 +20,7 @@ const oxanium = Oxanium({
   display: 'swap',
   adjustFontFallback: true,
 })
+
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -77,14 +80,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://botlode-player.vercel.app" />
       </head>
       <body className={oxanium.className}>
-        {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
-          <ApexThemeProvider>
-            <AppShell>{children}</AppShell>
-          </ApexThemeProvider>
-        </ThemeProvider>
-        {/* BotLode Chat — posición fixed, fuera del flujo de la app */}
-        <BotlodeChat />
+        <SentryProvider />
+        <PostHogProviderWrapper>
+          <PostHogPageView />
+          {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
+            <ApexThemeProvider>
+              <AppShell>{children}</AppShell>
+            </ApexThemeProvider>
+          </ThemeProvider>
+          {/* BotLode Chat — posición fixed, fuera del flujo de la app */}
+          <BotlodeChat />
+        </PostHogProviderWrapper>
       </body>
     </html>
   )

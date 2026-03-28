@@ -97,7 +97,7 @@ export function GraciasContent() {
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--color-primary)' }} />
             <span className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)]">
-              Casi listo
+              Gracias
             </span>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--color-primary)', animationDelay: '0.5s' }} />
           </motion.div>
@@ -109,7 +109,7 @@ export function GraciasContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            Se abrió WhatsApp.
+            Gracias por tu consulta.
           </motion.h1>
 
           {/* Subheadline */}
@@ -120,7 +120,7 @@ export function GraciasContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            Solo tocá Enviar y arrancamos.
+            Te respondemos lo antes posible para avanzar con lo que necesitás.
           </motion.p>
 
           <motion.p
@@ -129,7 +129,7 @@ export function GraciasContent() {
             animate={{ opacity: 0.65 }}
             transition={{ delay: 0.6, duration: 0.4 }}
           >
-            El mensaje ya está escrito — no tenés que escribir nada.
+            Si se abrió WhatsApp, tocá Enviar: el mensaje ya está listo y nos llega al instante.
           </motion.p>
 
           {/* CTAs */}

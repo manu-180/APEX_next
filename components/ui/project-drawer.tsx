@@ -12,6 +12,7 @@ import {
   BotLodeIcon,
   AssistifyIcon,
   ContactEngineIcon,
+  LumaInvitaIcon,
 } from '@/components/ui/icons'
 
 // ─── Project-specific icons ─────────────────────────────────────────────────
@@ -19,6 +20,7 @@ const PROJECT_ICONS: Record<string, React.FC<{ className?: string }>> = {
   botlode: BotLodeIcon,
   assistify: AssistifyIcon,
   'contact-engine': ContactEngineIcon,
+  'luma-invita': LumaInvitaIcon,
 }
 
 // ─── Tech stacks ─────────────────────────────────────────────────────────────
@@ -26,6 +28,7 @@ const PROJECT_TECH: Record<string, string[]> = {
   botlode: ['Flutter', 'Supabase', 'Riverpod', 'OpenAI', 'Next.js'],
   assistify: ['Flutter', 'Supabase', 'Riverpod', 'WhatsApp API'],
   'contact-engine': ['Next.js', 'Supabase', 'TypeScript', 'Tailwind', 'WhatsApp API'],
+  'luma-invita': ['Next.js', 'Supabase', 'Framer Motion', 'Mapbox', 'Zod', 'Tailwind'],
 }
 
 // ─── Rich content types ───────────────────────────────────────────────────────
@@ -54,7 +57,15 @@ interface ContactEngineData {
   modules: { step: number; title: string; desc: string }[]
   quote: string
 }
-type ProjectRichData = BotlodeData | AssistifyData | ContactEngineData
+interface LumaInvitaData {
+  kind: 'luma-invita'
+  pitch: string
+  personas: { title: string; desc: string }[]
+  experiencePillars: { title: string; desc: string }[]
+  flow: { step: number; title: string; desc: string }[]
+  quote: string
+}
+type ProjectRichData = BotlodeData | AssistifyData | ContactEngineData | LumaInvitaData
 
 // ─── SVG icons for pillars ────────────────────────────────────────────────────
 const FactoryIcon = () => (
@@ -232,6 +243,52 @@ const RICH_DATA: Record<string, ProjectRichData> = {
     ],
     quote:
       'Contact Engine transforma el alcance comercial en una máquina de oportunidades: más conversaciones, más reuniones y más cierres.',
+  },
+
+  'luma-invita': {
+    kind: 'luma-invita',
+    pitch:
+      'Luma Invita es la capa premium entre tu evento y cada invitado: una URL única, diseño que enamora en el primer scroll y RSVP sin fricción. El foco es la estética — animaciones senior y plantillas que se sienten como productos distintos, no variantes de la misma plantilla.',
+    personas: [
+      {
+        title: 'Administrador',
+        desc: 'Creás y editás invitaciones, subís galería, elegís plantilla, publicás y copiás links (invitación pública + dashboard del cliente).',
+      },
+      {
+        title: 'Dueño del evento',
+        desc: 'Accede con token único: ve la invitación, confirmaciones y estadísticas sin cuenta ni contraseña.',
+      },
+      {
+        title: 'Invitado',
+        desc: 'Abre el link, vive la experiencia y confirma asistencia con botones claros y formulario validado.',
+      },
+    ],
+    experiencePillars: [
+      {
+        title: 'Hero cinematográfico',
+        desc: 'Imagen principal, tipografía a escala fluida y motion que respeta prefers-reduced-motion.',
+      },
+      {
+        title: 'Countdown + info + mapa',
+        desc: 'Fecha en español, lugar, Mapbox con estilo acorde a la plantilla y atajos a Google Maps / Waze.',
+      },
+      {
+        title: 'RSVP que convierte',
+        desc: 'Confirmación con “Con todo” / “No puedo”, personas, menú especial y rate limiting por IP.',
+      },
+      {
+        title: 'Compartir en WhatsApp',
+        desc: 'Meta tags y OG por invitación para que la preview brille cuando la mandan al grupo.',
+      },
+    ],
+    flow: [
+      { step: 1, title: 'Crear invitación', desc: 'Tipo de evento, protagonistas, slug y estado (borrador / publicada).' },
+      { step: 2, title: 'Contenido y media', desc: 'Textos, Spotify, galería en Supabase Storage con imagen principal.' },
+      { step: 3, title: 'Plantilla', desc: 'Una de seis identidades: Elegante, Botánico, Moderno, Rústico, Lujo oscuro o Fiesta.' },
+      { step: 4, title: 'Distribuir', desc: 'Link público para invitados y link con token para el dueño del evento.' },
+    ],
+    quote:
+      'Si la invitación no emociona en 3 segundos, perdés RSVP. Luma Invita está pensada para que cada evento se sienta irrepetible.',
   },
 }
 
@@ -807,6 +864,72 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                 </>
               )}
 
+              {/* ─────────────── LUMA INVITA ─────────────────── */}
+              {rich?.kind === 'luma-invita' && (
+                <>
+                  <motion.p
+                    variants={fadeUpVariants}
+                    className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed mb-7"
+                  >
+                    {rich.pitch}
+                  </motion.p>
+
+                  <SectionLabel>Roles</SectionLabel>
+                  <motion.div variants={nestedStagger} className="grid grid-cols-1 gap-2.5 mb-7">
+                    {rich.personas.map((p, i) => (
+                      <PillarCard
+                        key={p.title}
+                        icon={i === 0 ? <FactoryIcon /> : i === 1 ? <CalendarIcon /> : <AnalyticsIcon />}
+                        title={p.title}
+                        desc={p.desc}
+                      />
+                    ))}
+                  </motion.div>
+
+                  <SectionLabel>Experiencia del invitado</SectionLabel>
+                  <motion.div variants={nestedStagger} className="space-y-3 mb-7">
+                    {rich.experiencePillars.map((f) => (
+                      <FeatureItem key={f.title} title={f.title} desc={f.desc} />
+                    ))}
+                  </motion.div>
+
+                  <SectionLabel>Flujo del producto</SectionLabel>
+                  <motion.div
+                    variants={fadeUpVariants}
+                    className="rounded-xl p-4 mb-7"
+                    style={{
+                      background: 'rgba(var(--color-primary-rgb), 0.04)',
+                      border: '1px solid rgba(var(--color-primary-rgb), 0.1)',
+                    }}
+                  >
+                    <motion.div variants={nestedStagger}>
+                      {rich.flow.map((m, i) => (
+                        <ModuleRow
+                          key={m.title}
+                          {...m}
+                          isLast={i === rich.flow.length - 1}
+                        />
+                      ))}
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    variants={fadeUpVariants}
+                    className="rounded-xl p-4 mb-7 flex items-start gap-3"
+                    style={{
+                      background: 'rgba(var(--color-primary-rgb), 0.05)',
+                      borderLeft: '3px solid var(--color-primary)',
+                      border: '1px solid rgba(var(--color-primary-rgb), 0.12)',
+                      borderLeftColor: 'var(--color-primary)',
+                    }}
+                  >
+                    <p className="text-[13px] italic text-[var(--color-on-surface-variant)] leading-relaxed">
+                      &ldquo;{rich.quote}&rdquo;
+                    </p>
+                  </motion.div>
+                </>
+              )}
+
               {/* ── Tech Stack ───────────────────────────────── */}
               <SectionLabel>Tech Stack</SectionLabel>
               <motion.div variants={nestedStagger} className="flex flex-wrap gap-2 mb-7">
@@ -880,6 +1003,26 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     whileTap={{ scale: 0.99 }}
                   >
                     Visitar assistify.lat
+                    <ExternalLinkIcon className="h-3.5 w-3.5 opacity-70" />
+                  </motion.a>
+                )}
+
+                {project.url && rich?.kind === 'luma-invita' && (
+                  <motion.a
+                    variants={fadeUpVariants}
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200"
+                    style={{
+                      background: 'rgba(var(--color-primary-rgb), 0.07)',
+                      color: 'var(--color-primary)',
+                      border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
+                    }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                  >
+                    Visitar bylumainvita.com
                     <ExternalLinkIcon className="h-3.5 w-3.5 opacity-70" />
                   </motion.a>
                 )}

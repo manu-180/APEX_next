@@ -5,7 +5,14 @@ import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
-import { CheckIcon, ArrowRightIcon, BotLodeIcon, AssistifyIcon, ContactEngineIcon } from '@/components/ui/icons'
+import {
+  CheckIcon,
+  ArrowRightIcon,
+  BotLodeIcon,
+  AssistifyIcon,
+  ContactEngineIcon,
+  LumaInvitaIcon,
+} from '@/components/ui/icons'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CircuitBoardBg } from '@/components/ui/circuit-board-bg'
 import { ProjectDrawer } from '@/components/ui/project-drawer'
@@ -54,6 +61,7 @@ const PROJECT_ICONS: Record<string, React.FC<{ className?: string }>> = {
   botlode: BotLodeIcon,
   assistify: AssistifyIcon,
   'contact-engine': ContactEngineIcon,
+  'luma-invita': LumaInvitaIcon,
 }
 
 /** Sincroniza la pestaña con `?tab=mobile` (useSearchParams bajo Suspense). */
@@ -181,7 +189,7 @@ export function ServiciosContent() {
         }}
         data-hover
         data-inspector-title="Hero que respira con el scroll"
-        data-inspector-desc="Mientras bajás, esta zona se desvanece y la máscara suaviza el borde inferior como un monitor que se apaga de a poco. El fondo de placa de circuito reacciona a tu mouse: las conexiones brillan cerca del cursor, como si la página fuera un hardware vivo."
+        data-inspector-desc="Mientras bajás, esta zona se desvanece y la máscara suaviza el borde inferior como un monitor que se apaga de a poco. El fondo de placa de circuito reacciona al mouse: cerca del cursor se duplican nodos (gemelos), las conexiones brillan y los pulsos de luz son más densos."
         data-inspector-cat="Performance"
         onMouseMove={(e) => {
           const rect = headerRef.current?.getBoundingClientRect()
@@ -191,18 +199,25 @@ export function ServiciosContent() {
       >
         <GridBackground />
         <CircuitBoardBg cursorRef={bgCursorRef} />
-        <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
+        <div className="relative z-10 mx-auto max-w-4xl px-6">
           <SectionReveal>
-            <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-              <Badge variant="primary">Servicios</Badge>
-              <Badge variant="outline">Diseño premium</Badge>
+            <div className="max-w-2xl">
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <Badge variant="primary">Servicios</Badge>
+                <Badge variant="outline">Diseño premium</Badge>
+              </div>
+              <h1 className="font-heading text-balance leading-tight mb-4">
+                <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
+                  Software a medida
+                </span>
+                <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
+                  para quienes venden en serio.
+                </span>
+              </h1>
+              <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg mb-6 sm:mb-8">
+                Precio fijo, entrega garantizada, sin agencias. Hablás directo conmigo.
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[var(--color-on-surface)] mb-4">
-              Desarrollo de software en Argentina para empresas y emprendedores
-            </h1>
-            <p className="mx-auto max-w-xl text-[var(--color-on-surface-variant)] mb-6 sm:mb-8">
-              A medida, precio fijo y entrega garantizada. Sin agencias.
-            </p>
           </SectionReveal>
         </div>
       </motion.section>
@@ -259,7 +274,7 @@ export function ServiciosContent() {
                       >
                         <div
                           className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center mb-3 text-xs font-black',
+                            'size-10 rounded-full flex items-center justify-center mb-3 text-xs font-black',
                             highlight
                               ? 'bg-[var(--color-primary)] text-[var(--color-surface-base)]'
                               : 'border border-[rgba(var(--color-primary-rgb),0.45)] text-[var(--color-primary)]'
@@ -349,7 +364,7 @@ export function ServiciosContent() {
                   className="p-6"
                   style={{ background: 'var(--color-surface-low, #0d0d0d)' }}
                 >
-                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-gray-500 mb-4">
+                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-60 mb-4">
                     Agencia tradicional
                   </p>
                   <ul className="space-y-3">
@@ -361,10 +376,10 @@ export function ServiciosContent() {
                       'Plantillas genéricas',
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-3">
-                        <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 bg-red-500/10 text-red-400">
+                        <span className="size-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 bg-red-500/10 text-red-400">
                           ✕
                         </span>
-                        <span className="text-sm text-gray-500">{item}</span>
+                        <span className="text-sm text-[var(--color-on-surface-variant)] opacity-60">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -388,7 +403,7 @@ export function ServiciosContent() {
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-3">
                         <span
-                          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 text-[var(--color-primary)]"
+                          className="size-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 text-[var(--color-primary)]"
                           style={{
                             background: 'rgba(var(--color-primary-rgb), 0.15)',
                             boxShadow: '0 0 8px rgba(var(--color-primary-rgb), 0.2)',
@@ -419,15 +434,24 @@ export function ServiciosContent() {
       </section>
 
       {/* Confiaron en APEX */}
-      <div className="my-12 text-center mx-auto max-w-4xl px-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-100">Confiaron en APEX</h3>
-        <p className="text-sm text-gray-400 mb-6">
-          simonmindset.com · metalwailers.com · botrive.com · pulpiprint.com · mnltecno.com
-        </p>
-        <blockquote className="text-sm italic text-gray-300 border-l-2 border-cyan-500 pl-4 max-w-2xl mx-auto text-left">
-          "Entregó antes de lo prometido y quedó exactamente como lo imaginé."
-          <footer className="text-xs text-gray-400 mt-2">— Simón R., Coach</footer>
-        </blockquote>
+      <div className="my-12 mx-auto max-w-4xl px-6">
+        <SectionReveal>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
+            <div className="shrink-0">
+              <h3 className="text-lg font-heading font-extrabold text-[var(--color-on-surface)] mb-1">Confiaron en APEX</h3>
+              <p className="text-sm text-[var(--color-on-surface-variant)]">
+                simonmindset.com · metalwailers.com · botrive.com · pulpiprint.com · mnltecno.com
+              </p>
+            </div>
+            <blockquote
+              className="text-sm italic text-[var(--color-on-surface-variant)] pl-4 max-w-md"
+              style={{ borderLeft: '2px solid var(--color-primary)' }}
+            >
+              "Entregó antes de lo prometido y quedó exactamente como lo imaginé."
+              <footer className="text-xs text-[var(--color-on-surface-variant)] opacity-60 mt-2 not-italic">— Simón R., Coach</footer>
+            </blockquote>
+          </div>
+        </SectionReveal>
       </div>
 
       {/* CTA intermedia */}
@@ -492,6 +516,17 @@ export function ServiciosContent() {
       {/* Pricing cards */}
       <section id="pricing" className="pb-24">
         <div className="mx-auto max-w-6xl px-6">
+          <SectionReveal>
+            <div className="max-w-2xl mb-10">
+              <h2 className="font-heading text-balance leading-tight mb-3">
+                <span className="text-2xl sm:text-3xl md:text-4xl font-extralight text-[var(--color-on-surface-variant)]">Elegí tu </span>
+                <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)]">plan ideal</span>
+              </h2>
+              <p className="text-pretty text-sm text-[var(--color-on-surface-variant)]">
+                Precio fijo en pesos argentinos. Sin sorpresas, sin letra chica.
+              </p>
+            </div>
+          </SectionReveal>
           <div className="flex justify-center mb-8">
             {/* Tab toggle — HUD switch justo encima de las cards de planes */}
             <div className="inline-flex rounded-xl glass-card p-1">
@@ -537,17 +572,21 @@ export function ServiciosContent() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
             >
               {plans.map((plan, i) => (
-                <PricingCard
+                <div
                   key={plan.id}
-                  plan={plan}
-                  index={i}
-                  isExpanded={sheetPlanId === plan.id}
-                  onToggleExpand={() => setSheetPlanId(prev => prev === plan.id ? null : plan.id)}
-                  deliveryInfo={PLAN_DELIVERY[plan.id]}
-                />
+                  className={plan.isFeatured ? 'md:-mt-4 md:mb-4' : ''}
+                >
+                  <PricingCard
+                    plan={plan}
+                    index={i}
+                    isExpanded={sheetPlanId === plan.id}
+                    onToggleExpand={() => setSheetPlanId(prev => prev === plan.id ? null : plan.id)}
+                    deliveryInfo={PLAN_DELIVERY[plan.id]}
+                  />
+                </div>
               ))}
             </motion.div>
           </AnimatePresence>
@@ -604,12 +643,12 @@ export function ServiciosContent() {
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn(
-                      'flex h-5 w-5 items-center justify-center rounded border transition-colors',
+                      'flex size-5 items-center justify-center rounded border transition-colors',
                       (m.isCore || selectedModules.has(m.id))
                         ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-primary-foreground)]'
                         : 'border-[var(--color-surface-highest)]'
                     )}>
-                      {(m.isCore || selectedModules.has(m.id)) && <CheckIcon className="h-3 w-3" />}
+                      {(m.isCore || selectedModules.has(m.id)) && <CheckIcon className="size-3" />}
                     </div>
                     <div>
                       <span className="text-sm font-semibold text-[var(--color-on-surface)]">{m.label}</span>
@@ -653,7 +692,7 @@ export function ServiciosContent() {
               )}
             >
               Consultar ahora
-              <ArrowRightIcon className="h-4 w-4" />
+              <ArrowRightIcon className="size-4" />
             </WhatsAppOutboundLink>
           </div>
         </div>
@@ -674,11 +713,11 @@ export function ServiciosContent() {
           >
             {/* Corner glow blobs */}
             <div
-              className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 rounded-full blur-3xl opacity-30"
+              className="pointer-events-none absolute -top-16 -left-16 size-48 rounded-full blur-3xl opacity-30"
               style={{ background: 'rgba(var(--color-primary-rgb), 0.4)' }}
             />
             <div
-              className="pointer-events-none absolute -bottom-16 -right-16 w-48 h-48 rounded-full blur-3xl opacity-20"
+              className="pointer-events-none absolute -bottom-16 -right-16 size-48 rounded-full blur-3xl opacity-20"
               style={{ background: 'rgba(var(--color-primary-rgb), 0.3)' }}
             />
             {/* Top accent line */}
@@ -829,8 +868,8 @@ function FAQSection() {
                 key={i}
                 className="rounded-xl overflow-hidden"
                 style={{
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid var(--glass-border)',
+                  backgroundColor: 'var(--color-surface-high)',
                 }}
               >
                 <button
@@ -856,7 +895,7 @@ function FAQSection() {
                       strokeWidth={2.25}
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="h-5 w-5"
+                      className="size-5"
                     >
                       <path d="m6 9 6 6 6-6" />
                     </svg>
@@ -1007,19 +1046,19 @@ function PricingCard({
   // Shared corner tech brackets used on both faces
   const CornerBrackets = ({ opacity = 0.5 }: { opacity?: number }) => (
     <>
-      <div className="absolute top-4 left-4 w-5 h-5 pointer-events-none">
+      <div className="absolute top-4 left-4 size-5 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
         <div className="absolute top-0 left-0 h-full w-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
       </div>
-      <div className="absolute top-4 right-4 w-5 h-5 pointer-events-none">
+      <div className="absolute top-4 right-4 size-5 pointer-events-none">
         <div className="absolute top-0 right-0 w-full h-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
         <div className="absolute top-0 right-0 h-full w-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
       </div>
-      <div className="absolute bottom-4 left-4 w-5 h-5 pointer-events-none">
+      <div className="absolute bottom-4 left-4 size-5 pointer-events-none">
         <div className="absolute bottom-0 left-0 w-full h-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
         <div className="absolute bottom-0 left-0 h-full w-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
       </div>
-      <div className="absolute bottom-4 right-4 w-5 h-5 pointer-events-none">
+      <div className="absolute bottom-4 right-4 size-5 pointer-events-none">
         <div className="absolute bottom-0 right-0 w-full h-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
         <div className="absolute bottom-0 right-0 h-full w-px" style={{ background: `rgba(var(--color-primary-rgb), ${opacity})` }} />
       </div>
@@ -1218,7 +1257,7 @@ function PricingCard({
               <ul className="flex-1 space-y-2.5 mb-5">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-[var(--color-on-surface-variant)]">
-                    <CheckIcon className="h-4 w-4 mt-0.5 flex-shrink-0 text-[var(--color-primary)]" />
+                    <CheckIcon className="size-4 mt-0.5 flex-shrink-0 text-[var(--color-primary)]" />
                     {f}
                   </li>
                 ))}
@@ -1231,7 +1270,7 @@ function PricingCard({
                 transition={{ duration: 0.18 }}
               >
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.08)] border border-[rgba(var(--color-primary-rgb),0.18)] rounded-full px-3 py-1">
-                  <FlipIcon className="w-3 h-3" />
+                  <FlipIcon className="size-3" />
                   Ver por qué es ideal para vos
                 </span>
               </motion.div>
@@ -1256,7 +1295,7 @@ function PricingCard({
                   data-inspector-cat="Seguridad"
                 >
                   {getPlanCtaLabel(plan)}
-                  <ArrowRightIcon className="h-4 w-4" />
+                  <ArrowRightIcon className="size-4" />
                 </WhatsAppOutboundLink>
               </div>
             </div>
@@ -1348,7 +1387,7 @@ function PricingCard({
                       key={idx}
                       className="flex items-start gap-2 text-sm leading-snug text-[var(--color-on-surface-variant)]"
                     >
-                      <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-primary)]" />
+                      <CheckIcon className="mt-0.5 size-4 flex-shrink-0 text-[var(--color-primary)]" />
                       {item}
                     </li>
                   ))}
@@ -1418,7 +1457,7 @@ function PricingCard({
                   )}
                 >
                   {getPlanCtaLabel(plan)}
-                  <ArrowRightIcon className="h-4 w-4" />
+                  <ArrowRightIcon className="size-4" />
                 </WhatsAppOutboundLink>
               </div>
               </div>

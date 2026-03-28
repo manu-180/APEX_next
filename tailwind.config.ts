@@ -47,6 +47,7 @@ const config: Config = {
         'theme-botlode':        '#FFC000',
         'theme-assistify':      '#00A8E8',
         'theme-contact-engine': '#15803D',
+        'theme-luma-invita':    '#D946A6',
       },
 
       // ─── Border Radius ───────────────────────────────────────────────

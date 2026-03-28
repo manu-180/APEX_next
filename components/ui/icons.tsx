@@ -186,6 +186,18 @@ export function ContactEngineIcon({ className }: { className?: string }) {
   )
 }
 
+/** Invitación / sobre — Luma Invita */
+export function LumaInvitaIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z" />
+      <path d="m4 6 7.89 5.26a2 2 0 0 0 2.22 0L20 6" />
+      <path d="M12 11v9" />
+      <path d="M9 14h6" />
+    </svg>
+  )
+}
+
 /** Crosshair / viewfinder — modo inspector */
 export function InspectorIcon({ className }: { className?: string }) {
   return (

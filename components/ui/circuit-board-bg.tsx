@@ -148,6 +148,8 @@ export function CircuitBoardBg({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const graphRef = useRef<CircuitGraph | null>(null)
+  /** Desplazamiento aleatorio por nodo para un “gemelo” visual solo bajo el cursor (doble densidad local). */
+  const nodeTwinJitterRef = useRef<{ dx: number; dy: number }[]>([])
 
   const pulsesRef = useRef<Pulse[]>([])
   const nextPulseAtRef = useRef(0)
@@ -178,6 +180,10 @@ export function CircuitBoardBg({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
     graphRef.current = buildCircuit(w, h)
+    nodeTwinJitterRef.current = Array.from({ length: NODE_COUNT }, () => ({
+      dx: (Math.random() - 0.5) * 9,
+      dy: (Math.random() - 0.5) * 9,
+    }))
     pulsesRef.current = []
     nextPulseAtRef.current = performance.now() + 2000 + Math.random() * 1000
   }, [])
@@ -269,17 +275,19 @@ export function CircuitBoardBg({
         let nodeAlpha = 0.08
         let ringAlpha = 0
         let ringR = 0
+        /** 0 fuera del radio del cursor; dentro, 1 en el cursor → 0 en el borde del radio */
+        let proxT = 0
         if (cursor.active && cursor.x >= 0 && cursor.y >= 0) {
           const dx = n.x - cursor.x
           const dy = n.y - cursor.y
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < PROXIMITY_RADIUS) {
-            const t = 1 - dist / PROXIMITY_RADIUS
-            const falloff = Math.pow(t, 1.15)
+            proxT = 1 - dist / PROXIMITY_RADIUS
+            const falloff = Math.pow(proxT, 1.15)
             nodeAlpha = 0.1 + 0.55 * falloff
-            if (t > 0.45) {
-              ringAlpha = 0.2 * (t - 0.45) / 0.55
-              ringR = r + 4 + 5 * t
+            if (proxT > 0.45) {
+              ringAlpha = 0.2 * (proxT - 0.45) / 0.55
+              ringR = r + 4 + 5 * proxT
             }
           }
         }
@@ -294,11 +302,23 @@ export function CircuitBoardBg({
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(${rgb}, ${nodeAlpha})`
         ctx.fill()
+
+        // Nodo “gemelo” bajo el cursor: duplica la densidad visual en la zona del mouse
+        if (proxT > 0) {
+          const falloff = Math.pow(proxT, 1.15)
+          const twinAlpha = (0.06 + 0.42 * falloff) * 0.92
+          const jitter = nodeTwinJitterRef.current[i] ?? { dx: 0, dy: 0 }
+          const tr = Math.max(1.1, r * 0.72)
+          ctx.beginPath()
+          ctx.arc(n.x + jitter.dx, n.y + jitter.dy, tr, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${rgb}, ${twinAlpha})`
+          ctx.fill()
+        }
       }
 
-      // Pulsos por hover: más luces simultáneas y más frecuentes al mover el mouse
-      const MAX_INTENSE_PULSES = 7
-      const CURSOR_PULSE_COOLDOWN_MS = 100
+      // Pulsos por hover: el doble de capacidad vs. antes para acompañar la densidad extra de nodos
+      const MAX_INTENSE_PULSES = 14
+      const CURSOR_PULSE_COOLDOWN_MS = 55
       /** Duración total del recorrido — más alta = luz más pausada por segmento */
       const INTENSE_DURATION_MIN = 1050
       const INTENSE_DURATION_SPREAD = 750

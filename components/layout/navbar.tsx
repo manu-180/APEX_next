@@ -92,36 +92,42 @@ export function Navbar({
   }, [updateUnderline])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav
+      className="fixed top-0 left-0 right-0"
+      style={{ zIndex: 'var(--z-sticky)' } as React.CSSProperties}
+    >
+      {/* Full-bleed bar; inner row keeps alignment with page max-width */}
       <div
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6"
+        className="w-full"
         style={{
-          backgroundColor: 'var(--nav-bg)',
-          backdropFilter: 'blur(24px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+          backgroundColor: 'var(--color-surface-low)',
+          borderBottom: '1px solid var(--glass-border)',
         }}
       >
-        {/* Logo */}
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* Logo — asymmetric: cut-corner badge + Syne heading font */}
         <Link
           href="/"
-          className="flex items-center gap-3 font-bold text-lg tracking-tight text-[var(--color-on-surface)]"
+          className="flex items-center gap-3 group"
           data-hover
           data-inspector-title="Logo con Glow Dinámico"
-          data-inspector-desc="El logotipo circular y el texto 'APEX' con glow usan el tema activo: el anillo sutil alrededor del logo toma el color primario vía CSS Custom Properties."
+          data-inspector-desc="El logotipo circular y el texto 'APEX' con Syne usan el tema activo."
           data-inspector-cat="Tema Dinámico"
         >
           <ApexLogoMark priority />
-          <span className="hidden sm:block glow-text">APEX</span>
+          <span className="hidden sm:block font-heading text-lg font-extrabold text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)]">
+            APEX
+          </span>
         </Link>
 
-        {/* Desktop links — subrayado único: solo anima X/ancho (evita salto vertical tras scroll con layoutId) */}
+        {/* Desktop links — spring-animated underline */}
         <div ref={navLinksRef} className="relative hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
             const active = !link.external && pathname === link.href
             const navClass = cn(
-              'relative z-[1] px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg',
+              'relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg',
               active
-                ? 'text-[var(--color-primary)] glow-text'
+                ? 'text-[var(--color-primary)]'
                 : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]',
             )
             if (link.external) {
@@ -148,7 +154,7 @@ export function Navbar({
                 href={link.href}
                 data-hover
                 data-inspector-title="Nav Link con Underline Spring"
-                data-inspector-desc="El subrayado que se mueve entre links usa layoutId de Framer Motion — es un único elemento DOM que 'salta' de posición a posición con física de resorte. Esto da la ilusión de que se desliza, pero técnicamente es una sola barra que anima su posición X y su ancho."
+                data-inspector-desc="El subrayado se mueve con física de resorte — un único elemento DOM que anima su posición X y ancho."
                 data-inspector-cat="Motion · Spring"
                 className={navClass}
               >
@@ -159,7 +165,7 @@ export function Navbar({
           {underline !== null && underline.width > 0 && (
             <motion.div
               aria-hidden
-              className="pointer-events-none absolute left-0 z-0 h-[2px] rounded-full"
+              className="pointer-events-none absolute left-0 h-[2px] rounded-full"
               style={{
                 top: underline.top,
                 backgroundColor: 'var(--color-primary)',
@@ -172,30 +178,30 @@ export function Navbar({
           )}
         </div>
 
-        {/* Right side */}
+        {/* Right side — action cluster */}
         <div className="flex items-center gap-2">
           {typeof onlineCount === 'number' && (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-surface-high)]/50 text-xs text-[var(--color-on-surface-variant)]">
-              <span className="h-2 w-2 rounded-full bg-[var(--color-online)] animate-pulse" />
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-surface-high)]/50 text-xs text-[var(--color-on-surface-variant)] tabular-nums">
+              <span className="size-2 rounded-full bg-[var(--color-online)] animate-pulse" />
               {onlineCount} online
             </div>
           )}
 
           <button
             onClick={(e) => onToggleDarkMode(e)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-all duration-200"
-            aria-label="Toggle tema"
+            className="flex size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
+            aria-label="Toggle tema claro/oscuro"
             data-hover
             data-inspector-title="Toggle Claro/Oscuro con Ola"
-            data-inspector-desc="Al hacer click aquí, una ola circular nace exactamente desde la posición de tu click y se expande por toda la pantalla usando clip-path animado en CSS. El punto de origen se pasa como variable CSS desde JavaScript — el navegador hace el resto en la GPU sin bloquear el hilo principal."
+            data-inspector-desc="Una ola circular nace desde tu click y se expande usando clip-path animado — el origen se pasa como variable CSS desde JavaScript."
             data-inspector-cat="CSS · Ambiance"
           >
             {!mounted ? (
-              <span className="block h-4 w-4" aria-hidden />
+              <span className="block size-4" aria-hidden />
             ) : resolvedTheme === 'dark' ? (
-              <SunIcon className="h-4 w-4" />
+              <SunIcon className="size-4" />
             ) : (
-              <MoonIcon className="h-4 w-4" />
+              <MoonIcon className="size-4" />
             )}
           </button>
 
@@ -204,7 +210,7 @@ export function Navbar({
               type="button"
               onClick={onToggleInspector}
               className={cn(
-                'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
+                'flex size-9 items-center justify-center rounded-lg transition-colors duration-200',
                 inspectorActive
                   ? 'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.12)] ring-1 ring-[rgba(var(--color-primary-rgb),0.35)]'
                   : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]'
@@ -213,34 +219,34 @@ export function Navbar({
               aria-pressed={inspectorActive}
               title={inspectorActive ? 'Cerrar inspector (Ctrl+I)' : 'Modo inspector (Ctrl+I)'}
             >
-              <InspectorIcon className="h-4 w-4" />
+              <InspectorIcon className="size-4" />
             </button>
           )}
 
           <button
             onClick={onShowShortcuts}
-            className="hidden md:flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-all duration-200"
+            className="hidden md:flex size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
             aria-label="Atajos de teclado"
             data-hover
             data-inspector-title="Centro de Atajos de Teclado"
-            data-inspector-desc="Esta web tiene un sistema completo de atajos: Ctrl+I activa este inspector, Ctrl+Y alterna claro/oscuro, Ctrl+Shift+H abre WhatsApp, Ctrl+R resetea el tema, Ctrl+K o Ctrl+? abren el panel de atajos. Todo sin mouse, accesible para usuarios que navegan exclusivamente con teclado."
+            data-inspector-desc="Ctrl+I inspector, Ctrl+Y claro/oscuro, Ctrl+Shift+H WhatsApp, Ctrl+R reset tema, Ctrl+K panel de atajos."
             data-inspector-cat="UX · Accesibilidad"
           >
-            <KeyboardIcon className="h-4 w-4" />
+            <KeyboardIcon className="size-4" />
           </button>
 
           <WhatsAppOutboundLink
             waHref={WHATSAPP_NAV_HREF}
             className={cn(
               'hidden md:inline-flex items-center justify-center gap-2 font-semibold',
-              'transition-all duration-300 ease-out',
+              'transition-all duration-200 ease-out',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
               'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
               'h-9 px-4 text-sm rounded-xl'
             )}
             data-hover
             data-inspector-title="CTA Principal con Conversión Directa"
-            data-inspector-desc="Abre WhatsApp con un mensaje corto que indica que te escriben desde tu sitio (texto centralizado en lib/whatsapp.ts)."
+            data-inspector-desc="Abre WhatsApp con un mensaje corto que indica que te escriben desde tu sitio."
             data-inspector-cat="UX · Motion"
           >
             Hablemos
@@ -248,21 +254,14 @@ export function Navbar({
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex md:hidden h-9 w-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-all duration-200"
-            aria-label="Menu"
+            className="flex md:hidden size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
+            aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
-            {mobileOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+            {mobileOpen ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
           </button>
         </div>
+        </div>
       </div>
-
-      {/* Gradient bottom border */}
-      <div
-        className="h-px"
-        style={{
-          background: 'linear-gradient(to right, transparent 5%, rgba(var(--color-primary-rgb), 0.2) 30%, rgba(6, 182, 212, 0.15) 50%, rgba(var(--color-primary-rgb), 0.2) 70%, transparent 95%)',
-        }}
-      />
 
       {/* Mobile menu */}
       <AnimatePresence>
@@ -271,12 +270,11 @@ export function Navbar({
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.2, ease: [0.33, 1, 0.68, 1] }}
             className="md:hidden"
             style={{
-              backgroundColor: 'var(--nav-bg-mobile)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
+              backgroundColor: 'var(--color-surface-low)',
+              borderBottom: '1px solid var(--glass-border)',
             }}
           >
             <div className="flex flex-col px-6 py-4 gap-1">
@@ -288,7 +286,7 @@ export function Navbar({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setMobileOpen(false)}
-                    className="px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]"
+                    className="px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]"
                   >
                     {link.label}
                   </a>
@@ -298,7 +296,7 @@ export function Navbar({
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      'px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200',
+                      'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
                       pathname === link.href
                         ? 'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.08)]'
                         : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]',
@@ -314,7 +312,7 @@ export function Navbar({
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'inline-flex w-full items-center justify-center gap-2 font-semibold',
-                    'transition-all duration-300 ease-out',
+                    'transition-all duration-200 ease-out',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                     'btn-tech btn-primary-tech active:scale-[0.97]',
                     'h-11 px-6 text-sm rounded-xl'
@@ -325,13 +323,6 @@ export function Navbar({
                 </WhatsAppOutboundLink>
               </div>
             </div>
-            {/* Gradient bottom for mobile */}
-            <div
-              className="h-px"
-              style={{
-                background: 'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.15), transparent)',
-              }}
-            />
           </motion.div>
         )}
       </AnimatePresence>

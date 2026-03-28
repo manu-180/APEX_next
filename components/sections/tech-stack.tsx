@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { TECH_STACK, type ThemeId } from '@/lib/types/theme'
 import { useApexTheme } from '@/hooks/useTheme'
+import { useGsapReveal } from '@/hooks/useGsapReveal'
 import { GlowCard } from '@/components/ui/glow-card'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
@@ -29,34 +30,53 @@ export function TechStackSection() {
   const { activeTheme, applyTheme } = useApexTheme()
   const [pressedId, setPressedId] = React.useState<string | null>(null)
 
+  // GSAP ScrollTrigger stagger on the cards grid
+  const gridRef = useRef<HTMLDivElement>(null)
+  useGsapReveal(gridRef, {
+    selector: '[data-tech-card]',
+    y: 36,
+    stagger: 0.09,
+    start: 'top 82%',
+  })
+
   return (
     <section id="stack" className="relative py-24 md:py-32">
       <GridBackground showRadialLight />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6">
+        {/* ── Section header — LEFT-ALIGNED, asymmetric ──────────── */}
         <SectionReveal>
-          <div className="text-center mb-16">
-            <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+          <div className="max-w-2xl mb-16">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
               <Badge variant="primary">Tech Stack</Badge>
               <Badge variant="outline">Diseño premium</Badge>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[var(--color-on-surface)] mb-4">
-              Tecnologías que domino
+            <h2 className="font-heading text-balance leading-tight mb-4">
+              <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
+                Tecnologías que
+              </span>
+              <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
+                domino a fondo.
+              </span>
             </h2>
-            <p className="mx-auto max-w-xl text-[var(--color-on-surface-variant)]">
+            <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg">
               Cada herramienta cumple un rol específico. Apps con Flutter, webs con Next.js — misma exigencia de
               diseño premium y rendimiento en cada capa.
             </p>
           </div>
         </SectionReveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {TECH_STACK.map((tech, i) => {
+        {/* Cards grid — GSAP stagger via gridRef */}
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+        >
+          {TECH_STACK.map((tech) => {
             const Icon = ICON_MAP[tech.themeId]
             const isActive = activeTheme === tech.themeId
 
             return (
-              <SectionReveal key={tech.themeId} delay={i * 0.08}>
+              <div key={tech.themeId} data-tech-card>
                 <GlowCard
                   active={isActive}
                   className={`h-full rounded-2xl ${pressedId === tech.themeId ? 'card-wave-pressed' : ''}`}
@@ -76,14 +96,14 @@ export function TechStackSection() {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-5">
                       <div
-                        className="tech-icon-box flex h-12 w-12 items-center justify-center rounded-xl theme-transition"
+                        className="tech-icon-box flex size-12 items-center justify-center rounded-xl theme-transition"
                         style={{
                           backgroundColor: 'rgba(var(--color-primary-rgb), 0.12)',
                           color: 'var(--color-primary)',
                           boxShadow: isActive ? '0 0 20px rgba(var(--color-primary-rgb), 0.20)' : 'none',
                         }}
                       >
-                        {Icon ? <Icon className="h-6 w-6" /> : <span className="text-lg font-bold">?</span>}
+                        {Icon ? <Icon className="size-6" /> : <span className="text-lg font-bold">?</span>}
                       </div>
                       <Badge variant="outline" className="text-[10px]">
                         {CATEGORY_LABELS[tech.category]}
@@ -107,14 +127,14 @@ export function TechStackSection() {
                     <ul className="space-y-2">
                       {tech.features.map((f) => (
                         <li key={f} className="flex items-start gap-2 text-sm text-[var(--color-on-surface-variant)]">
-                          <CheckIcon className="h-4 w-4 mt-0.5 flex-shrink-0 text-[var(--color-primary)] theme-transition" />
+                          <CheckIcon className="size-4 mt-0.5 flex-shrink-0 text-[var(--color-primary)] theme-transition" />
                           {f}
                         </li>
                       ))}
                     </ul>
                   </div>
                 </GlowCard>
-              </SectionReveal>
+              </div>
             )
           })}
         </div>

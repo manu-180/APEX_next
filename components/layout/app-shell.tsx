@@ -59,8 +59,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main
         className={
           inspector.isActive
-            ? 'min-h-screen pt-[calc(4rem+2.25rem)]'
-            : 'min-h-screen pt-16'
+            ? 'min-h-dvh pt-[calc(4rem+2.25rem)]'
+            : 'min-h-dvh pt-16'
         }
       >
         {children}

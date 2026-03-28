@@ -8,6 +8,7 @@ export type ThemeId =
   | 'botlode'
   | 'assistify'
   | 'contact-engine'
+  | 'luma-invita'
 
 export interface ThemeConfig {
   id: ThemeId
@@ -90,6 +91,14 @@ export const THEMES: ThemeConfig[] = [
     primaryRgb: '21, 128, 61',
     surfaceBase: { dark: '#121212', light: '#F5F5F5' },
     icon: 'crosshairs',
+  },
+  {
+    id: 'luma-invita',
+    name: 'Luma Invita',
+    primary: '#D946A6',
+    primaryRgb: '217, 70, 166',
+    surfaceBase: { dark: '#110A0F', light: '#FDF4F9' },
+    icon: 'sparkles',
   },
 ]
 
@@ -225,6 +234,20 @@ export const PROJECTS: ProjectItem[] = [
       { title: 'Ingresos Blindados', description: 'Sistema de créditos + lista de espera auto-llena huecos' },
       { title: 'Cero Fricción', description: 'Notificaciones WhatsApp sin abrir la app' },
       { title: 'Control Operativo', description: 'Crear clases, ajustar cupos, gestionar alumnos en tiempo real' },
+    ],
+  },
+  {
+    themeId: 'luma-invita',
+    title: 'Luma Invita',
+    tagline:
+      'Plataforma para invitaciones digitales de alta gama: URLs únicas, RSVP, plantillas radicalmente distintas y animaciones de nivel senior.',
+    subtitle: 'Next.js \u2022 Supabase \u2022 Framer Motion',
+    url: 'https://www.bylumainvita.com',
+    features: [
+      { title: 'Seis identidades visuales', description: 'Plantillas que no son solo otro color: tipografía, layout y motion propios por estilo' },
+      { title: 'Admin + dueño + invitado', description: 'Panel para vos, dashboard con token para el cliente e invitación pública con RSVP' },
+      { title: 'Compartir que vende', description: 'OG dinámico, preview perfecta en WhatsApp, countdown y galería con lightbox' },
+      { title: 'Stack production-ready', description: 'Supabase con RLS, Mapbox, Spotify embed, formularios con Zod — listo para escalar' },
     ],
   },
 ]
