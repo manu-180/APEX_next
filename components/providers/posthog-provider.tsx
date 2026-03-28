@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
-export function PostHogPageView() {
+function PostHogPageViewInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -22,6 +22,15 @@ export function PostHogPageView() {
   }, [pathname, searchParams]);
 
   return null;
+}
+
+/** Next.js 14: useSearchParams requiere Suspense en build estático / prerender. */
+export function PostHogPageView() {
+  return (
+    <Suspense fallback={null}>
+      <PostHogPageViewInner />
+    </Suspense>
+  );
 }
 
 export function PostHogProviderWrapper({
