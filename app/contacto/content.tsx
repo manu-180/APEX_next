@@ -555,7 +555,7 @@ function BookingCalendar() {
                       const x = e.target.value.replace(/\D/g, '').slice(0, BOOKING_WA_LOCAL_DIGITS)
                       setWaLocalDigits(x)
                     }}
-                    placeholder="34272488"
+                    placeholder="24842720"
                     type="tel"
                     inputMode="numeric"
                     autoComplete="tel-national"

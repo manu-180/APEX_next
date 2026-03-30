@@ -472,7 +472,7 @@ Protección: desactivar cuando el usuario está escribiendo en inputs.
 ---
 
 ### Burbuja WhatsApp Flotante
-- Número: `5491134272488`
+- Número: `5491124842720`
 - Posición: esquina inferior (cerca del APEXbot)
 - Accesible también via `Ctrl+W`
 - Mensaje predeterminado configurable por contexto
@@ -653,7 +653,7 @@ app/
 ## 6. DATOS DE CONFIGURACIÓN
 
 ### WhatsApp
-- Número: `5491134272488`
+- Número: `5491124842720`
 - Mensaje desde atajo Ctrl+W: "Hola, vengo desde los atajos de teclado 🚀"
 
 ### Admin UUID (Supabase)
