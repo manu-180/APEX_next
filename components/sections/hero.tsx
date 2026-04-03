@@ -201,14 +201,10 @@ function FeatureCard({
 
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null)
-  const heroCtaAnchorRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const particleMouseRef = useRef<MousePosition>({ x: -9999, y: -9999, active: false })
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
-  const [showMobileStickyCta, setShowMobileStickyCta] = useState(false)
-  const [heroCtaVisible, setHeroCtaVisible] = useState(true)
-  const [isFooterVisible, setIsFooterVisible] = useState(false)
   const [isMobileViewport, setIsMobileViewport] = useState(false)
 
   const rotateX = useSpring(useTransform(mouseY, [-300, 300], [2, -2]), { stiffness: 150, damping: 25 })
@@ -247,47 +243,6 @@ export function HeroSection() {
       mediaQuery.removeEventListener('change', onChange)
     }
   }, [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const footer = document.getElementById('site-footer')
-    if (!footer) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsFooterVisible(entry.isIntersecting)
-      },
-      { threshold: 0.01 }
-    )
-
-    observer.observe(footer)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
-  /** Barra fija solo cuando el CTA principal ya no se ve — evita dos "Contame tu idea" a la vez. */
-  useEffect(() => {
-    if (!isMobileViewport) {
-      setShowMobileStickyCta(false)
-      return
-    }
-    setShowMobileStickyCta(!heroCtaVisible && !isFooterVisible)
-  }, [heroCtaVisible, isFooterVisible, isMobileViewport])
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !isMobileViewport) return
-    const el = heroCtaAnchorRef.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([entry]) => setHeroCtaVisible(entry.isIntersecting),
-      { threshold: 0, rootMargin: '0px 0px 8px 0px' }
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [isMobileViewport])
 
   return (
     <section
@@ -420,9 +375,8 @@ export function HeroSection() {
               <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300k</span>.
             </motion.p>
 
-            {/* CTAs — en móvil solo "Ver precios" a ancho completo; WhatsApp vía barra fija al scroll */}
+            {/* CTAs */}
             <motion.div
-              ref={heroCtaAnchorRef}
               custom={3}
               variants={fadeUp}
               className="flex w-full flex-col gap-3 lg:flex-row lg:items-start lg:gap-4"
@@ -521,28 +475,6 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
       </motion.div>
-
-      <motion.button
-        type="button"
-        onClick={handleCTAClick}
-        className={cn(
-          '!fixed bottom-0 left-0 right-0 z-[100001] sm:hidden',
-          'h-[52px] w-full rounded-none',
-          'inline-flex items-center justify-center gap-2 px-4',
-          'btn-primary-tech text-sm font-semibold',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
-          'focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-          showMobileStickyCta ? 'pointer-events-auto' : 'pointer-events-none'
-        )}
-        initial={{ y: '100%' }}
-        animate={{ y: showMobileStickyCta ? '0%' : '100%' }}
-        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        aria-hidden={!showMobileStickyCta}
-        tabIndex={showMobileStickyCta ? 0 : -1}
-      >
-        Contame tu idea
-        <ArrowRightIcon className="size-4" />
-      </motion.button>
     </section>
   )
 }
