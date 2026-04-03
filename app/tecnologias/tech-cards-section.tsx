@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useRef } from 'react'
+import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { TECH_STACK, type ThemeId } from '@/lib/types/theme'
 import { useApexTheme } from '@/hooks/useTheme'
 import { useGsapReveal } from '@/hooks/useGsapReveal'
 import { GlowCard } from '@/components/ui/glow-card'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
-import { GridBackground } from '@/components/ui/grid-background'
 import { CheckIcon, FlutterIcon, NextjsIcon, SupabaseIcon, RiverpodIcon, TypeScriptIcon } from '@/components/ui/icons'
 
 const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
@@ -26,11 +26,13 @@ const CATEGORY_LABELS: Record<string, string> = {
   tooling: 'Herramientas',
 }
 
-export function TechStackSection() {
+export function TechCardsSection() {
   const { activeTheme, applyTheme } = useApexTheme()
   const [pressedId, setPressedId] = React.useState<string | null>(null)
+  const prefersReducedMotion = useReducedMotion()
+  const hintRef = useRef<HTMLDivElement>(null)
+  const hintInView = useInView(hintRef, { amount: 0.6 })
 
-  // GSAP ScrollTrigger stagger on the cards grid
   const gridRef = useRef<HTMLDivElement>(null)
   useGsapReveal(gridRef, {
     selector: '[data-tech-card]',
@@ -40,37 +42,30 @@ export function TechStackSection() {
   })
 
   return (
-    <section id="stack" className="relative py-24 md:py-32">
-      <GridBackground showRadialLight />
-
+    <section className="relative pb-24 md:pb-32">
       <div className="relative z-10 mx-auto max-w-6xl px-6">
-        {/* ── Section header — LEFT-ALIGNED, asymmetric ──────────── */}
         <SectionReveal>
-          <div className="max-w-2xl mb-16">
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <Badge variant="primary">Tech Stack</Badge>
-              <Badge variant="outline">Diseño premium</Badge>
+          <div className="mb-8 flex justify-start">
+            <div
+              ref={hintRef}
+              className="inline-flex max-w-xl items-center gap-3 rounded-full border border-[var(--color-outline)] bg-[var(--color-surface-low)] px-4 py-2.5"
+            >
+              <motion.span
+                aria-hidden
+                className="size-2.5 rounded-full bg-[var(--color-primary)]"
+                animate={
+                  prefersReducedMotion || !hintInView ? undefined : { scale: [1, 1.18, 1], opacity: [0.72, 1, 0.72] }
+                }
+                transition={{ duration: 1.6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+              />
+              <p className="text-pretty text-sm text-[var(--color-on-surface-variant)]">
+                Hacé click en una card para cambiar el tema de todo el sitio.
+              </p>
             </div>
-            <h2 className="font-heading text-balance leading-tight mb-4">
-              <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
-                Tecnologías que
-              </span>
-              <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                domino a fondo.
-              </span>
-            </h2>
-            <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg">
-              Cada herramienta cumple un rol específico. Apps con Flutter, webs con Next.js — misma exigencia de
-              diseño premium y rendimiento en cada capa.
-            </p>
           </div>
         </SectionReveal>
 
-        {/* Cards grid — GSAP stagger via gridRef */}
-        <div
-          ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
+        <div ref={gridRef} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TECH_STACK.map((tech) => {
             const Icon = ICON_MAP[tech.themeId]
             const isActive = activeTheme === tech.themeId
@@ -87,14 +82,13 @@ export function TechStackSection() {
                   }}
                 >
                   <div
-                    className="w-full text-left p-6 md:p-8"
+                    className="w-full p-6 text-left md:p-8"
                     data-hover
                     data-inspector-title="Card con Cambio de Tema Global"
                     data-inspector-desc="Al hacer clic, toda la web cambia su paleta de colores con una ola animada desde el punto del click. El tema viaja por CSS Custom Properties en cascada hacia todos los componentes, sin recargar la página."
                     data-inspector-cat="Tema Dinámico"
                   >
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-5">
+                    <div className="mb-5 flex items-start justify-between">
                       <div
                         className="tech-icon-box flex size-12 items-center justify-center rounded-xl theme-transition"
                         style={{
@@ -110,25 +104,25 @@ export function TechStackSection() {
                       </Badge>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-[var(--color-on-surface)] mb-1 theme-transition">
+                    <h3 className="mb-1 text-xl font-bold text-[var(--color-on-surface)] theme-transition">
                       {tech.title}
                     </h3>
-                    <p className="text-sm font-medium text-[var(--color-primary)] mb-3 theme-transition glow-text">
+                    <p className="glow-text mb-3 text-sm font-medium text-[var(--color-primary)] theme-transition">
                       {tech.subtitle}
                     </p>
 
-                    {/* Description */}
-                    <p className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed mb-5">
+                    <p className="mb-5 text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
                       {tech.description}
                     </p>
 
-                    {/* Features */}
                     <ul className="space-y-2">
-                      {tech.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-sm text-[var(--color-on-surface-variant)]">
-                          <CheckIcon className="size-4 mt-0.5 flex-shrink-0 text-[var(--color-primary)] theme-transition" />
-                          {f}
+                      {tech.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className="flex items-start gap-2 text-sm text-[var(--color-on-surface-variant)]"
+                        >
+                          <CheckIcon className="mt-0.5 size-4 flex-shrink-0 text-[var(--color-primary)] theme-transition" />
+                          {feature}
                         </li>
                       ))}
                     </ul>
@@ -138,12 +132,6 @@ export function TechStackSection() {
             )
           })}
         </div>
-
-        <SectionReveal delay={0.5}>
-          <p className="mt-8 text-center text-xs" style={{ color: 'var(--color-hint)' }}>
-            Hacé click en una card para cambiar el tema de todo el sitio
-          </p>
-        </SectionReveal>
       </div>
     </section>
   )

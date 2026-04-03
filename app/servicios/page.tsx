@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { ServiciosContent } from './content'
+import { ServiciosStaticTop, ServiciosStaticFaq } from './static-sections'
+import { ServiciosFinalCta } from './servicios-final-cta'
 
 export const metadata: Metadata = {
   title: 'Desarrollo de software Argentina | Precios | Manuel Navarro',
@@ -67,7 +69,10 @@ export default function ServiciosPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
+      <ServiciosStaticTop />
       <ServiciosContent />
+      <ServiciosStaticFaq />
+      <ServiciosFinalCta />
     </>
   )
 }

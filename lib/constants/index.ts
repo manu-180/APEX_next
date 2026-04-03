@@ -15,6 +15,7 @@ export const ADMIN_UUID = '37dad3e9-531c-4657-8db6-ddebbdcfa878'
 export const ROUTES = {
   home:      '/',
   servicios: '/servicios',
+  tecnologias: '/tecnologias',
   about:     '/sobre-mi',
   contact:   '/contacto',
   /** Tras abrir WhatsApp desde un CTA del sitio (misma pestaña). */

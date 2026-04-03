@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils/cn'
 interface Particle {
   x: number
   y: number
+  homeX: number
+  homeY: number
   vx: number
   vy: number
   radius: number
@@ -26,7 +28,23 @@ interface ParticleFieldProps {
   connectionDistance?: number
   mouseRadius?: number
   mouseForce?: number
+  /** Escala del impulso aplicado por frame al repeler (0–1 típico) */
+  mouseImpulseScale?: number
+  /** ms sin mover el cursor antes de activar el resorte de vuelta al hogar */
+  returnDelayMs?: number
   externalMouse?: React.RefObject<MousePosition>
+  /** Radio mínimo de cada punto (px lógicos) */
+  particleRadiusMin?: number
+  /** Radio máximo de cada punto */
+  particleRadiusMax?: number
+  /** Opacidad base mínima (0–1) */
+  particleAlphaMin?: number
+  /** Opacidad base máxima (0–1) */
+  particleAlphaMax?: number
+  /** Opacidad máxima de las líneas entre partículas cercanas (0–1) */
+  lineAlphaMax?: number
+  /** Grosor de las líneas de conexión (px) */
+  lineWidth?: number
 }
 
 const COLORS = [
@@ -35,13 +53,27 @@ const COLORS = [
   '124, 58, 237',  // violet
 ]
 
+const RETURN_FORCE_IDLE = 0.006
+const VELOCITY_DAMPING = 0.955
+const RESET_INTERVAL_MS = 5000
+const RESET_WINDOW_MS = 900
+const RETURN_FORCE_RESET = 0.02
+
 export function ParticleField({
   className,
   particleCount = 160,
   connectionDistance = 120,
   mouseRadius = 180,
   mouseForce = 0.8,
+  mouseImpulseScale = 0.4,
+  returnDelayMs = 2000,
   externalMouse,
+  particleRadiusMin = 0.6,
+  particleRadiusMax = 2.4,
+  particleAlphaMin = 0.15,
+  particleAlphaMax = 0.5,
+  lineAlphaMax = 0.12,
+  lineWidth: lineWidthPx = 0.5,
 }: ParticleFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
@@ -54,20 +86,26 @@ export function ParticleField({
       const particles: Particle[] = []
       for (let i = 0; i < particleCount; i++) {
         const colorRgb = COLORS[Math.floor(Math.random() * COLORS.length)]
+        const x = Math.random() * w
+        const y = Math.random() * h
+        const rRange = particleRadiusMax - particleRadiusMin
+        const aRange = particleAlphaMax - particleAlphaMin
         particles.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
+          x,
+          y,
+          homeX: x,
+          homeY: y,
           vx: (Math.random() - 0.5) * 0.4,
           vy: (Math.random() - 0.5) * 0.4,
-          radius: Math.random() * 1.8 + 0.6,
-          baseAlpha: Math.random() * 0.35 + 0.15,
+          radius: Math.random() * rRange + particleRadiusMin,
+          baseAlpha: Math.random() * aRange + particleAlphaMin,
           alpha: 0,
           color: colorRgb,
         })
       }
       return particles
     },
-    [particleCount]
+    [particleCount, particleRadiusMin, particleRadiusMax, particleAlphaMin, particleAlphaMax]
   )
 
   useEffect(() => {
@@ -120,27 +158,41 @@ export function ParticleField({
     }
 
     const mouseRef = externalMouse ?? internalMouseRef
+    let lastMouseActiveAt = performance.now()
 
     const animate = () => {
       const w = canvas.width / dprRef.current
       const h = canvas.height / dprRef.current
       const particles = particlesRef.current
       const mouse = mouseRef.current ?? { x: -9999, y: -9999, active: false }
+      const now = performance.now()
+      const isResetWindow = now % RESET_INTERVAL_MS < RESET_WINDOW_MS
+
+      if (mouse.active && !isResetWindow) {
+        lastMouseActiveAt = now
+      }
+
+      const idleTime = now - lastMouseActiveAt
+      const returnForce = isResetWindow
+        ? RETURN_FORCE_RESET
+        : idleTime > returnDelayMs
+          ? RETURN_FORCE_IDLE
+          : 0
 
       ctx.clearRect(0, 0, w, h)
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
-        if (mouse.active) {
+        if (mouse.active && !isResetWindow) {
           const dx = p.x - mouse.x
           const dy = p.y - mouse.y
           const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dist < mouseRadius) {
+          if (dist > 0.001 && dist < mouseRadius) {
             const force = (1 - dist / mouseRadius) * mouseForce
-            p.vx += (dx / dist) * force * 0.3
-            p.vy += (dy / dist) * force * 0.3
+            p.vx += (dx / dist) * force * mouseImpulseScale
+            p.vy += (dy / dist) * force * mouseImpulseScale
             p.alpha = Math.min(1, p.baseAlpha + (1 - dist / mouseRadius) * 0.6)
           } else {
             p.alpha += (p.baseAlpha - p.alpha) * 0.02
@@ -149,15 +201,29 @@ export function ParticleField({
           p.alpha += (p.baseAlpha - p.alpha) * 0.02
         }
 
-        p.vx *= 0.98
-        p.vy *= 0.98
+        // "Spring" suave hacia su posición original para recuperar la composición.
+        p.vx += (p.homeX - p.x) * returnForce
+        p.vy += (p.homeY - p.y) * returnForce
+        p.vx *= VELOCITY_DAMPING
+        p.vy *= VELOCITY_DAMPING
         p.x += p.vx
         p.y += p.vy
 
-        if (p.x < 0) p.x = w
-        if (p.x > w) p.x = 0
-        if (p.y < 0) p.y = h
-        if (p.y > h) p.y = 0
+        if (p.x < 0) {
+          p.x = 0
+          p.vx *= -0.35
+        } else if (p.x > w) {
+          p.x = w
+          p.vx *= -0.35
+        }
+
+        if (p.y < 0) {
+          p.y = 0
+          p.vy *= -0.35
+        } else if (p.y > h) {
+          p.y = h
+          p.vy *= -0.35
+        }
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
@@ -171,12 +237,12 @@ export function ParticleField({
           const dist = Math.sqrt(dx * dx + dy * dy)
 
           if (dist < connectionDistance) {
-            const alpha = (1 - dist / connectionDistance) * 0.12
+            const alpha = (1 - dist / connectionDistance) * lineAlphaMax
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
             ctx.strokeStyle = `rgba(${p.color}, ${alpha})`
-            ctx.lineWidth = 0.5
+            ctx.lineWidth = lineWidthPx
             ctx.stroke()
           }
         }
@@ -193,7 +259,17 @@ export function ParticleField({
       if (handleMouse) canvas.removeEventListener('mousemove', handleMouse)
       if (handleMouseLeave) canvas.removeEventListener('mouseleave', handleMouseLeave)
     }
-  }, [createParticles, connectionDistance, mouseRadius, mouseForce, externalMouse])
+  }, [
+    createParticles,
+    connectionDistance,
+    mouseRadius,
+    mouseForce,
+    mouseImpulseScale,
+    returnDelayMs,
+    externalMouse,
+    lineAlphaMax,
+    lineWidthPx,
+  ])
 
   return (
     <canvas

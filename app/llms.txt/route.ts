@@ -11,7 +11,7 @@ Todos los proyectos incluyen revisiones. Si el cliente no está conforme al fina
 
 ## Servicios y precios
 
-- Landing Page: ARS 300.000 — entrega en 2-3 semanas. Página de conversión que captura consultas 24/7.
+- Landing Page: ARS 300.000 — entrega en 2-3 semanas. Página de conversión con diseño premium que captura consultas 24/7.
 - Web Interactiva: ARS 600.000 — entrega en 4-5 semanas. Incluye reservas, cotizaciones o pagos automatizados.
 - Tienda Online (E-commerce): ARS 900.000 — entrega en 5-6 semanas. Catálogo, carrito y medios de pago integrados.
 - App Móvil MVP: desde ARS 580.000/mes — tu negocio en iOS y Android con fee mensual sin permanencia.
@@ -37,7 +37,7 @@ Todos los proyectos incluyen revisiones. Si el cliente no está conforme al fina
 ## Páginas del sitio
 
 - https://www.theapexweb.com — inicio, propuesta de valor y proyectos
-- https://www.theapexweb.com/servicios — planes, precios y estimador de proyectos
+- https://www.theapexweb.com/servicios — planes y precios
 - https://www.theapexweb.com/sobre-mi — trayectoria y stack tecnológico de Manuel Navarro
 - https://www.theapexweb.com/contacto — reservas, reseñas y formulario de contacto
 

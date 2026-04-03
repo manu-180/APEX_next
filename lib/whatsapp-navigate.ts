@@ -8,13 +8,13 @@ export const WHATSAPP_THANK_YOU_ROUTE = ROUTES.gracias
 type AppRouterPush = { push: (href: string) => void }
 
 /**
- * Abre wa.me en pestaña nueva y lleva la pestaña actual a /gracias
- * (mismo flujo que el CTA principal del hero).
+ * Lleva la pestaña actual a /gracias y delega allí la redirección a wa.me.
+ * Esto asegura que el usuario vea primero el estado de confirmación.
  */
 export function openWhatsAppWithThankYouPage(
   waHref: string,
   router: AppRouterPush,
 ): void {
-  router.push(WHATSAPP_THANK_YOU_ROUTE)
-  window.open(waHref, '_blank', 'noopener,noreferrer')
+  const target = `${WHATSAPP_THANK_YOU_ROUTE}?wa=${encodeURIComponent(waHref)}`
+  router.push(target)
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion'
 import { TextReveal } from '@/components/ui/text-reveal'
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
+import { trackGoogleAdsHeroCtaClick } from '@/lib/analytics/google-ads'
 import Link from 'next/link'
 
 const STAGGER_BASE = 0.08
@@ -78,11 +79,11 @@ const FEATURES = [
   },
   {
     icon: <DiamondIcon />,
-    tag: 'DISEÑO',
+    tag: 'DISEÑO PREMIUM',
     value: 'Diseño premium',
     desc: 'Todo a medida. No templates, no rellenos.',
-    inspectorTitle: 'Diseño a Medida vs Templates',
-    inspectorDesc: 'Cada proyecto parte de cero: wireframe → diseño → código. Ninguna página APEX se parece a otra.',
+    inspectorTitle: 'Diseño premium a medida vs plantillas',
+    inspectorDesc: 'Cada proyecto parte de cero: wireframe → diseño premium → código. Ninguna página APEX se parece a otra.',
     inspectorCat: 'Propuesta de Valor',
   },
 ]
@@ -204,6 +205,9 @@ export function HeroSection() {
   const particleMouseRef = useRef<MousePosition>({ x: -9999, y: -9999, active: false })
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
+  const [showMobileStickyCta, setShowMobileStickyCta] = useState(false)
+  const [isFooterVisible, setIsFooterVisible] = useState(false)
+  const [isMobileViewport, setIsMobileViewport] = useState(false)
 
   const rotateX = useSpring(useTransform(mouseY, [-300, 300], [2, -2]), { stiffness: 150, damping: 25 })
   const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-2, 2]), { stiffness: 150, damping: 25 })
@@ -225,8 +229,71 @@ export function HeroSection() {
   }, [])
 
   const handleCTAClick = useCallback(() => {
+    trackGoogleAdsHeroCtaClick()
     openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
   }, [router])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const mediaQuery = window.matchMedia('(max-width: 639px)')
+    const onChange = (event: MediaQueryListEvent) => setIsMobileViewport(event.matches)
+    setIsMobileViewport(mediaQuery.matches)
+    mediaQuery.addEventListener('change', onChange)
+
+    return () => {
+      mediaQuery.removeEventListener('change', onChange)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const footer = document.getElementById('site-footer')
+    if (!footer) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsFooterVisible(entry.isIntersecting)
+      },
+      { threshold: 0.01 }
+    )
+
+    observer.observe(footer)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const onScroll = () => {
+      if (!isMobileViewport) {
+        setShowMobileStickyCta(false)
+        return
+      }
+
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight
+      if (scrollable <= 0) {
+        setShowMobileStickyCta(false)
+        return
+      }
+
+      const progress = window.scrollY / scrollable
+      setShowMobileStickyCta(progress > 0.4 && !isFooterVisible)
+    }
+
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [isFooterVisible, isMobileViewport])
 
   return (
     <section
@@ -250,7 +317,20 @@ export function HeroSection() {
         data-inspector-desc="300 partículas con física de repulsión en Canvas 2D puro — huyen del cursor calculando vectores a 60fps con requestAnimationFrame. Sin WebGL."
         data-inspector-cat="Animación"
       >
-        <ParticleField externalMouse={particleMouseRef} particleCount={300} />
+        <ParticleField
+          externalMouse={particleMouseRef}
+          particleCount={300}
+          connectionDistance={152}
+          mouseForce={1.45}
+          mouseImpulseScale={0.58}
+          returnDelayMs={3000}
+          particleRadiusMin={1.05}
+          particleRadiusMax={3.35}
+          particleAlphaMin={0.3}
+          particleAlphaMax={0.78}
+          lineAlphaMax={0.28}
+          lineWidth={1.1}
+        />
       </div>
 
       <div
@@ -443,6 +523,28 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
       </motion.div>
+
+      <motion.button
+        type="button"
+        onClick={handleCTAClick}
+        className={cn(
+          'fixed bottom-0 left-0 right-0 z-[100001] sm:hidden',
+          'h-[52px] w-full rounded-none',
+          'inline-flex items-center justify-center gap-2 px-4',
+          'btn-tech btn-primary-tech text-sm font-semibold',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
+          'focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+          showMobileStickyCta ? 'pointer-events-auto' : 'pointer-events-none'
+        )}
+        initial={{ y: '100%' }}
+        animate={{ y: showMobileStickyCta ? '0%' : '100%' }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+        aria-hidden={!showMobileStickyCta}
+        tabIndex={showMobileStickyCta ? 0 : -1}
+      >
+        Contame tu idea
+        <ArrowRightIcon className="size-4" />
+      </motion.button>
     </section>
   )
 }

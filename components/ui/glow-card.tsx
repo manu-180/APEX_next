@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ReactNode, type MouseEvent } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react'
 import { cn } from '@/lib/utils/cn'
 
 interface GlowCardProps {
@@ -9,6 +9,8 @@ interface GlowCardProps {
   glowColor?: string
   active?: boolean
   tiltIntensity?: number
+  /** Inclinación base en reposo (grados), visible sin hover — útil para alinear con secciones tipo “tecnologías”. */
+  restTilt?: { x: number; y: number }
   onClick?: (e: MouseEvent<HTMLDivElement>) => void
 }
 
@@ -18,12 +20,19 @@ export function GlowCard({
   glowColor,
   active = false,
   tiltIntensity = 8,
+  restTilt,
   onClick,
 }: GlowCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
   const [isHovered, setIsHovered] = useState(false)
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const baseX = restTilt?.x ?? 0
+  const baseY = restTilt?.y ?? 0
+  const [tilt, setTilt] = useState({ x: baseX, y: baseY })
+
+  useEffect(() => {
+    if (!isHovered) setTilt({ x: baseX, y: baseY })
+  }, [baseX, baseY, isHovered])
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return
@@ -39,7 +48,7 @@ export function GlowCard({
 
   const handleMouseLeave = () => {
     setIsHovered(false)
-    setTilt({ x: 0, y: 0 })
+    setTilt({ x: baseX, y: baseY })
     setMousePos({ x: 50, y: 50 })
   }
 
@@ -60,9 +69,7 @@ export function GlowCard({
         className
       )}
       style={{
-        transform: isHovered
-          ? `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
-          : 'perspective(800px) rotateX(0deg) rotateY(0deg)',
+        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: isHovered
           ? 'transform 0.1s ease-out'
           : 'transform 0.4s cubic-bezier(0.33, 1, 0.68, 1)',

@@ -5,12 +5,15 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
+const posthogToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+
 function PostHogPageViewInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (pathname && typeof window !== 'undefined') {
+    if (pathname && typeof window !== 'undefined' && posthogToken) {
       let url = window.location.origin + pathname;
       if (searchParams.toString()) {
         url += `?${searchParams.toString()}`;
@@ -39,9 +42,9 @@ export function PostHogProviderWrapper({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
-        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    if (typeof window !== 'undefined' && posthogToken) {
+      posthog.init(posthogToken, {
+        api_host: posthogHost,
         person_profiles: 'identified_only',
         loaded: (posthog) => {
           if (process.env.NODE_ENV === 'development') posthog.debug();

@@ -5,9 +5,8 @@
  *
  * Estrategia:
  * - El iframe y las hitzone divs se renderizan como JSX estático.
- * - Los dos scripts se inyectan con next/script `afterInteractive` para que
- *   corran DESPUÉS de la hidratación de React (garantizando que los elementos
- *   del DOM ya existan al ejecutarse).
+ * - Los dos scripts se inyectan con next/script `lazyOnload` para que no
+ *   compitan con el render inicial/LCP.
  * - Las dos `<link>` de preconexión viven en layout.tsx para que el navegador
  *   resuelva el DNS/TLS lo antes posible.
  */
@@ -83,7 +82,7 @@ export function BotlodeChat() {
       />
 
       {/* ── Lógica principal del widget ─────────────────────── */}
-      <Script id="botlode-main" strategy="afterInteractive">{`
+      <Script id="botlode-main" strategy="lazyOnload">{`
 (function() {
   const iframe = document.getElementById('botlode-player');
   const hitzoneBotEl = document.getElementById('botlode-hitzone-bot');
@@ -304,13 +303,51 @@ export function BotlodeChat() {
     }
   }
 
-  function isNarrowScreen() { return window.innerWidth < 600; }
+  function isNarrowScreen() { return window.innerWidth < 640; }
+
+  function getCollapsedBubbleSize() {
+    if (!isNarrowScreen()) {
+      return { width: bubbleWidth, height: bubbleHeight };
+    }
+
+    if (bubbleHeight === BUBBLE_HEIGHT_OFF) {
+      return { width: 0, height: 0 };
+    }
+
+    if (bubbleHeight === BUBBLE_HEIGHT_WITH_WPP) {
+      return { width: 44, height: 96 };
+    }
+
+    return { width: 44, height: 44 };
+  }
+
+  function applyHitzonePosition() {
+    const mobile = isNarrowScreen();
+    const anchorInset = mobile ? 16 : 28;
+    const hitzoneSize = mobile ? 44 : 100;
+    const wppOffset = mobile ? 68 : 168;
+
+    if (hitzoneBotEl) {
+      hitzoneBotEl.style.right = anchorInset + 'px';
+      hitzoneBotEl.style.bottom = anchorInset + 'px';
+      hitzoneBotEl.style.width = hitzoneSize + 'px';
+      hitzoneBotEl.style.height = hitzoneSize + 'px';
+    }
+
+    if (hitzoneWppEl) {
+      hitzoneWppEl.style.right = anchorInset + 'px';
+      hitzoneWppEl.style.bottom = wppOffset + 'px';
+      hitzoneWppEl.style.width = hitzoneSize + 'px';
+      hitzoneWppEl.style.height = hitzoneSize + 'px';
+    }
+  }
 
   function applyBubblePosition() {
     if (isExpanded) return;
+    const collapsedSize = getCollapsedBubbleSize();
     iframe.style.left = 'auto'; iframe.style.top = 'auto';
     iframe.style.right = '16px'; iframe.style.bottom = '16px';
-    iframe.style.width = bubbleWidth + 'px'; iframe.style.height = bubbleHeight + 'px';
+    iframe.style.width = collapsedSize.width + 'px'; iframe.style.height = collapsedSize.height + 'px';
   }
 
   function primeFirstOpenLayout() {
@@ -476,6 +513,17 @@ export function BotlodeChat() {
     }
   });
 
+  function handleCollapsedResize() {
+    applyHitzonePosition();
+    if (!isExpanded) {
+      applyBubblePosition();
+    }
+  }
+
+  window.addEventListener('resize', handleCollapsedResize, { passive: true });
+  applyHitzonePosition();
+  applyBubblePosition();
+
   setTimeout(function() { if (!iframeReady) activateIframe(); }, 8000);
 
   let lastExpandedCheck = 0;
@@ -545,7 +593,7 @@ export function BotlodeChat() {
       `}</Script>
 
       {/* ── Snackbars de conectividad ────────────────────────── */}
-      <Script id="botlode-connectivity" strategy="afterInteractive">{`
+      <Script id="botlode-connectivity" strategy="lazyOnload">{`
 (function() {
   'use strict';
   var C = 'botlode-connectivity-snackbars', O = 'botlode-snackbar-offline', N = 'botlode-snackbar-online';

@@ -1,13 +1,18 @@
 import { HeroSection } from '@/components/sections/hero'
-import { TechStackSection } from '@/components/sections/tech-stack'
+import { ClientBenefitsSection } from '@/components/sections/client-benefits'
 import { ProjectsSection } from '@/components/sections/projects'
+import { HomeFinalCtaSection } from '@/components/sections/home-final-cta'
+
+/** Shell del home sin datos remotos en SSR; ISR 1h para reducir TTFB en CDN. */
+export const revalidate = 3600
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <TechStackSection />
+      <ClientBenefitsSection />
       <ProjectsSection />
+      <HomeFinalCtaSection />
     </>
   )
 }

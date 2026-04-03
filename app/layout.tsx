@@ -17,6 +17,7 @@ const oxanium = Oxanium({
   subsets: ['latin', 'latin-ext'],
   variable: '--font-oxanium',
   weight: 'variable',
+  preload: true,
   display: 'swap',
   adjustFontFallback: true,
 })

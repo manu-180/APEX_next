@@ -16,6 +16,7 @@ const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
 const NAV_LINKS = [
   { href: ROUTES.home, label: 'Inicio', external: false },
   { href: ROUTES.servicios, label: 'Servicios', external: false },
+  { href: ROUTES.tecnologias, label: 'Tecnologías', external: false },
   { href: ROUTES.about, label: 'Sobre Mí', external: false },
   { href: ROUTES.contact, label: 'Contacto', external: false },
 ] as const

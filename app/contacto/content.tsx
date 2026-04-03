@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,15 +13,12 @@ import {
   SendIcon,
   StarIcon,
   CheckIcon,
-  WhatsAppIcon,
   ArrowRightIcon,
 } from '@/components/ui/icons'
 import { BOOKING_SLOT_HOURS, BLOCKED_WEEKDAYS, formatBookingHour } from '@/lib/constants'
 import { useBooking } from '@/hooks/useBooking'
 import { useGsapReveal } from '@/hooks/useGsapReveal'
 import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client'
-import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
-import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { bookingWhatsappLocalToE164, BOOKING_WA_LOCAL_DIGITS } from '@/lib/booking-phone'
 import { cn } from '@/lib/utils/cn'
 
@@ -34,12 +32,18 @@ const REVIEWS = [
 ]
 
 const AVG_RATING = (REVIEWS.reduce((a, r) => a + r.rating, 0) / REVIEWS.length).toFixed(1)
+const CONTACT_NEED_OPTIONS = [
+  'Página web',
+  'Tienda online',
+  'App móvil',
+  'No sé todavía',
+] as const
 
 /* ────────────────────────────────────────────────────────────────────────
    Shared input class — used for all fields in both forms
    ──────────────────────────────────────────────────────────────────────── */
 const inputBase =
-  'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-all duration-200'
+  'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-all duration-200'
 
 const inputIdle = 'border-[var(--color-surface-high)]'
 const inputFocus = 'focus:border-[rgba(var(--color-primary-rgb),0.5)] focus:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)] focus:ring-0'
@@ -559,7 +563,7 @@ function BookingCalendar() {
                     type="tel"
                     inputMode="numeric"
                     autoComplete="tel-national"
-                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-sm text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)]"
+                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-base md:text-sm text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)]"
                     aria-label="Número de celular sin código de área (8 dígitos)"
                   />
                 </div>
@@ -629,8 +633,14 @@ function BookingCalendar() {
    ContactForm — all logic preserved, field micro-interactions added
    ──────────────────────────────────────────────────────────────────────── */
 function ContactForm() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const router = useRouter()
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    whatsapp: '',
+    need: '',
+    details: '',
+  })
   const [sending, setSending] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -639,16 +649,25 @@ function ContactForm() {
     setFormError(null)
     const name = form.name.trim()
     const email = form.email.trim()
-    const message = form.message.trim()
-    if (name.length < 2) {
-      setFormError('El nombre debe tener al menos 2 caracteres.')
+    const whatsapp = form.whatsapp.trim()
+    const need = form.need.trim()
+    const details = form.details.trim()
+    const whatsappDigits = whatsapp.replace(/\D/g, '')
+    if (whatsappDigits.length < 10) {
+      setFormError('Ingresá un WhatsApp válido para contactarte rápido.')
       return
     }
-    if (!email || !message) return
-    if (message.length < 10) {
-      setFormError('El mensaje debe tener al menos 10 caracteres.')
+    if (!email || !need) {
+      setFormError('Completá WhatsApp, email y el tipo de proyecto.')
       return
     }
+    const generatedMessage = [
+      `Necesidad principal: ${need}`,
+      `WhatsApp de contacto: ${whatsapp}`,
+      details ? `Contexto adicional: ${details}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
     if (!isSupabaseConfigured()) {
       setFormError('Falta configurar Supabase (variables NEXT_PUBLIC_SUPABASE_*).')
       return
@@ -657,42 +676,20 @@ function ContactForm() {
     try {
       const supabase = getSupabaseBrowserClient()
       const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: { name, email, message },
+        body: {
+          name: name || 'Contacto web',
+          email,
+          message: generatedMessage,
+        },
       })
       if (error) throw error
-      setSent(true)
+      router.push('/gracias')
+      return
     } catch {
       setFormError('No pudimos enviar el mensaje. Intentá de nuevo.')
     } finally {
       setSending(false)
     }
-  }
-
-  if (sent) {
-    return (
-      <SectionReveal delay={0.1}>
-        <div
-          className="rounded-2xl glass-card glow-border-active p-8 text-center h-full flex flex-col items-center justify-center"
-          data-hover
-          data-inspector-title="Mensaje enviado"
-          data-inspector-desc="Edge Function send-contact-email (Resend): copia al visitante y notificación al administrador."
-          data-inspector-cat="UX · Formulario"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
-          >
-            <SendIcon className="size-7" />
-          </motion.div>
-          <h3 className="text-xl font-bold text-[var(--color-on-surface)] mb-2">¡Mensaje enviado!</h3>
-          <p className="text-sm text-[var(--color-on-surface-variant)]">
-            Te respondo en menos de 24 horas.
-          </p>
-        </div>
-      </SectionReveal>
-    )
   }
 
   return (
@@ -713,16 +710,17 @@ function ContactForm() {
 
         <FormField className="mb-3">
           <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Tu nombre *"
+            value={form.whatsapp}
+            onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+            placeholder="Tu WhatsApp *"
+            type="tel"
             required
-            minLength={2}
+            inputMode="tel"
+            autoComplete="tel"
             className={inputClassName}
-            autoComplete="name"
             data-hover
-            data-inspector-title="Nombre"
-            data-inspector-desc="Requerido por la función de envío (mín. 2 caracteres). El campo se eleva sutilmente al recibir foco — Framer Motion y: -1."
+            data-inspector-title="WhatsApp *"
+            data-inspector-desc="Canal principal para responder rápido y coordinar próximos pasos."
             data-inspector-cat="UX · Formulario"
           />
         </FormField>
@@ -738,23 +736,51 @@ function ContactForm() {
             autoComplete="email"
             data-hover
             data-inspector-title="Email *"
-            data-inspector-desc="Campo requerido con tipo email nativo: el navegador valida formato básico antes de disparar el submit."
+            data-inspector-desc="Canal secundario para compartir propuesta y seguimiento."
             data-inspector-cat="UX · Formulario"
+          />
+        </FormField>
+
+        <FormField className="mb-3">
+          <select
+            value={form.need}
+            onChange={(e) => setForm({ ...form, need: e.target.value })}
+            required
+            className={cn(inputClassName, 'appearance-none')}
+            data-hover
+            data-inspector-title="¿Qué necesitás? *"
+            data-inspector-desc="Ayuda a clasificar la consulta y responder con una propuesta alineada."
+            data-inspector-cat="UX · Formulario"
+          >
+            <option value="">¿Qué necesitás?</option>
+            {CONTACT_NEED_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </FormField>
+
+        <FormField className="mb-3">
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Nombre (opcional)"
+            className={inputClassName}
+            autoComplete="name"
           />
         </FormField>
 
         <FormField className="mb-3 flex-1">
           <textarea
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-            placeholder="Contame sobre tu proyecto *"
-            required
-            minLength={10}
-            rows={5}
+            value={form.details}
+            onChange={(e) => setForm({ ...form, details: e.target.value })}
+            placeholder="Detalles extra (opcional)"
+            rows={3}
             className={cn(inputClassName, 'h-full resize-none')}
             data-hover
-            data-inspector-title="Mensaje *"
-            data-inspector-desc="Mínimo 10 caracteres para coincidir con la Edge Function."
+            data-inspector-title="Detalles opcionales"
+            data-inspector-desc="Campo opcional para agregar contexto sin fricción."
             data-inspector-cat="UX · Formulario"
           />
         </FormField>
@@ -775,44 +801,25 @@ function ContactForm() {
           )}
         </AnimatePresence>
 
-        <div className="flex gap-3">
-          <Button
-            type="submit"
-            variant="primary"
-            className={cn(
-              'flex-1',
-              'h-12 px-7 text-sm rounded-xl',
-              'transition-all duration-200 ease-out',
-            )}
-            disabled={sending}
-            data-hover
-            data-inspector-title="Enviar mensaje"
-            data-inspector-desc="Invoca send-contact-email en Supabase."
-            data-inspector-cat="UX · Formulario"
-          >
-            {sending ? 'Enviando…' : 'Enviar mensaje'}
-            <SendIcon className="size-4" />
-          </Button>
-
-          <WhatsAppOutboundLink
-            waHref={whatsappUrl(WA_MSG_NAV)}
-            className={cn(
-              'btn-tech flex size-12 shrink-0 items-center justify-center',
-              'border border-[#25D366] bg-[rgba(37,211,102,0.10)] text-[#25D366]',
-              'transition-all duration-200 ease-out',
-              'hover:bg-[rgba(37,211,102,0.16)] hover:shadow-[0_0_18px_-6px_rgba(37,211,102,0.35),0_0_28px_-10px_rgba(37,211,102,0.15)]',
-              'active:scale-[0.97]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-            )}
-            data-hover
-            data-inspector-title="Abrir WhatsApp"
-            data-inspector-desc="Abre wa.me en nueva pestaña y muestra la página de confirmación en esta ventana."
-            data-inspector-cat="Seguridad"
-            aria-label="Abrir WhatsApp"
-          >
-            <WhatsAppIcon className="size-5" />
-          </WhatsAppOutboundLink>
-        </div>
+        <Button
+          type="submit"
+          variant="primary"
+          className={cn(
+            'w-full',
+            'h-12 px-7 text-sm rounded-xl',
+            'transition-all duration-200 ease-out',
+          )}
+          disabled={sending}
+          data-hover
+          data-inspector-title="Enviar presupuesto"
+          data-inspector-desc="Invoca send-contact-email en Supabase."
+          data-inspector-cat="UX · Formulario"
+        >
+          {sending ? 'Enviando…' : 'Quiero mi presupuesto gratis →'}
+        </Button>
+        <p className="mt-3 text-center text-xs text-[var(--color-on-surface-variant)]">
+          Te respondemos en menos de 2 horas por WhatsApp
+        </p>
       </form>
     </SectionReveal>
   )

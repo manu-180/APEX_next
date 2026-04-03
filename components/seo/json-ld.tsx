@@ -40,7 +40,7 @@ export function ServiceJsonLd() {
       name: 'Landing Page',
       price: 300000,
       description:
-        'Página que trabaja 24/7: quien te busca en Google te encuentra, te conoce y te contacta solo.',
+        'Página con diseño premium que trabaja 24/7: quien te busca en Google te encuentra, te conoce y te contacta solo.',
     },
     {
       name: 'Web Interactiva',

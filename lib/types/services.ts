@@ -41,10 +41,10 @@ export const WEB_PLANS: PricingPlan[] = [
     originalPrice: 420000,
     frontHeadline: 'Tu vendedor online, disponible las 24 horas',
     description:
-      'Mientras vos dormís, tu página trabaja. Diseñada para que quien te busca en Google te encuentre, te conozca y te contacte solo.',
+      'Mientras vos dormís, tu página trabaja. Con diseño premium de punta a punta, está pensada para que quien te busca en Google te encuentre, te conozca y te contacte solo.',
     targetAudience: 'Profesionales independientes: coaches, abogados, contadores y consultores',
     features: [
-      'Diseño 100% a medida (sin plantillas genéricas)',
+      'Diseño premium 100% a medida (sin plantillas genéricas)',
       'Secciones de servicios, bio, testimonios y contacto',
       'Botón WhatsApp + formulario con auto-respuesta por email',
       'Carga ultrarrápida optimizada',
@@ -59,7 +59,7 @@ export const WEB_PLANS: PricingPlan[] = [
     ],
     gains: [
       { num: '01', title: 'Más clientes sin esfuerzo', desc: 'Tu web convierte visitas en consultas mientras vos dormís' },
-      { num: '02', title: 'Primera impresión premium', desc: 'Diseño que transmite profesionalismo desde el primer segundo' },
+      { num: '02', title: 'Primera impresión premium', desc: 'Diseño premium que transmite profesionalismo desde el primer segundo' },
       { num: '03', title: 'Aparecer en Google', desc: 'SEO técnico para que te encuentren antes que a la competencia' },
       { num: '04', title: 'Contacto directo', desc: 'WhatsApp + formulario con respuesta automática inmediata' },
     ],
@@ -78,8 +78,7 @@ export const WEB_PLANS: PricingPlan[] = [
     features: [
       'Todo lo del plan Landing Page',
       'Base de datos conectada (Supabase)',
-      'Funcionalidades complejas: stock, cotizadores, reservas, dashboards',
-      'Panel de administración sin tocar código',
+      'Automatización operativa: reservas, cotizadores, formularios con lógica y flujos a medida',
       'Integraciones: WhatsApp, MercadoPago, Google Calendar',
       'Hosting + 3 meses de mantenimiento incluidos',
     ],
@@ -91,8 +90,8 @@ export const WEB_PLANS: PricingPlan[] = [
     ],
     gains: [
       { num: '01', title: 'Automatización total', desc: 'Reservas, cotizaciones y contactos sin intervención manual' },
-      { num: '02', title: 'Cobrá online desde el día 1', desc: 'MercadoPago y más, integrados y listos para facturar' },
-      { num: '03', title: 'Tu panel de control', desc: 'Gestioná todo desde un dashboard sin necesitar un técnico' },
+      { num: '02', title: 'Cobrá online desde el día 1', desc: 'Pagos puntuales (señas, servicios) con MercadoPago u otros medios acordados' },
+      { num: '03', title: 'Datos que trabajan solos', desc: 'Lo que captura la web vive en base de datos: menos Excel y menos ida y vuelta por WhatsApp' },
       { num: '04', title: 'Todo conectado', desc: 'WhatsApp, Google Calendar y tus herramientas sincronizadas' },
     ],
     powerStatement: 'La automatización no es tecnología, es recuperar tu tiempo para lo que importa.',
@@ -111,7 +110,7 @@ export const WEB_PLANS: PricingPlan[] = [
     features: [
       'Catálogo de productos con filtros y búsqueda',
       'Carrito + checkout con MercadoPago / Stripe',
-      'Panel admin para gestionar pedidos, stock y clientes',
+      'Panel administrativo completo: pedidos, stock de productos, clientes y catálogo',
       'Sistema de cuentas con historial de compras',
       'SEO técnico avanzado para tráfico orgánico',
       'Hosting + 3 meses de mantenimiento incluidos',
@@ -149,13 +148,13 @@ export const APP_PLANS: PricingPlan[] = [
       'Tu negocio en el celular de cada cliente. Con tu imagen, tus datos y todo lo que necesitás para fidelizarlos — sin preocuparte por la tecnología.',
     targetAudience: 'Marcas y negocios que quieren su propia app en App Store y Google Play',
     features: [
-      'Incluye el plan web Landing Page (mismo alcance que el plan Esencial de sitios web)',
-      'Android + iOS con Flutter (un solo código base)',
-      'Backend y datos a medida para tu caso (cuentas, reservas, catálogo, etc.)',
+      'Incluye el plan web Landing Page',
+      'Android + iOS con Flutter',
+      'Backend y datos a medida para tu caso',
       'Autenticación segura (email, Google, Apple)',
       'Push notifications',
       'Publicación y actualizaciones en App Store y Play Store',
-      'Fee mensual: desarrollo activo, mejoras y soporte (retainer)',
+      'Fee mensual: desarrollo activo, mejoras y soporte',
     ],
     // Back face
     backHook: 'Tu app en manos de tus clientes',
@@ -164,9 +163,9 @@ export const APP_PLANS: PricingPlan[] = [
     ],
     gains: [
       { num: '01', title: 'Un fee, continuidad', desc: 'No es solo entregar y listo: evolucionamos el producto cada mes' },
-      { num: '02', title: 'iOS + Android real', desc: 'Una base de código, dos tiendas, menos sorpresas' },
+      { num: '02', title: 'iOS + Android real', desc: 'Un solo desarrollo para App Store y Play Store: misma app, sin pagar dos veces ni pelear con dos códigos distintos' },
       { num: '03', title: 'Backend incluido', desc: 'Datos y lógica detrás de la app, acorde a tu escala' },
-      { num: '04', title: 'Publicación cubierta', desc: 'Subidas, rechazos de tienda y ajustes forma parte del trabajo' },
+      { num: '04', title: 'Las tiendas no te las dejo a vos solo', desc: 'Subidas, ida y vuelta con los revisores y los cambios que pidan Apple o Google: si hay rechazo o retoques, lo encaramos entre nosotros' },
     ],
     powerStatement: 'La app es el canal más íntimo con tu cliente; el retainer es que no quede abandonada.',
   },
@@ -181,13 +180,12 @@ export const APP_PLANS: PricingPlan[] = [
       'App para clientes más un panel donde tu equipo gestiona todo: pedidos, roles, pagos y reportes. Nada queda librado al azar.',
     targetAudience: 'Franquicias, servicios con muchos pedidos o equipos que necesitan coordinarse',
     features: [
-      'Incluye el plan web Web Interactiva (mismo alcance que el plan “Más elegido” de sitios web)',
+      'Incluye el plan web Web Interactiva',
       'Todo el alcance del plan App Producto',
       'Panel web de administración (gestión sin depender del desarrollador para el día a día)',
       'Roles y permisos: qué ve y qué hace cada tipo de usuario',
       'Pagos / cobros integrados cuando el flujo lo requiere (MercadoPago, Stripe, etc.)',
       'Reportes y métricas para decisiones operativas',
-      'Fee mensual ampliado según complejidad y horas acordadas',
     ],
     // Back face
     backHook: 'Tu negocio funciona solo, aunque vos no estés mirando',
@@ -195,7 +193,7 @@ export const APP_PLANS: PricingPlan[] = [
       'Franquicias, servicios con muchos pedidos o equipos que necesitan coordinarse',
     ],
     gains: [
-      { num: '01', title: 'Dos caras, un sistema', desc: 'Experiencia pública + herramientas internas alineadas' },
+      { num: '01', title: 'App para clientes, panel para tu equipo', desc: 'Quien compra o pide un servicio usa la app; vos gestionás la operación desde un panel web, con la misma información actualizada' },
       { num: '02', title: 'Gobernanza', desc: 'Roles y permisos para que nadie toque lo que no debe' },
       { num: '03', title: 'Dinero dentro del flujo', desc: 'Cobros integrados donde el recorrido del usuario lo pide' },
       { num: '04', title: 'Números accionables', desc: 'Reportes pensados para operar, no solo para mirar' },

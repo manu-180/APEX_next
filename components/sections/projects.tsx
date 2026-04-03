@@ -3,8 +3,7 @@
 import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { motion } from 'framer-motion'
 import { PROJECTS as PROJECT_DATA, type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
 import { useApexTheme } from '@/hooks/useTheme'
@@ -36,15 +35,13 @@ const fadeUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: i * 0.12 },
+    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: i * 0.12 },
   }),
 }
 
 export function ProjectsSection() {
   const { activeTheme, applyTheme } = useApexTheme()
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
-  const sectionRef = useRef(null)
-  const isInView = useInView(sectionRef, { once: true, margin: '-100px' })
 
   const openDrawer = useCallback((project: ProjectItem) => {
     setSelectedProject(project)
@@ -55,7 +52,7 @@ export function ProjectsSection() {
   }, [])
 
   return (
-    <section id="proyectos" className="relative py-24 md:py-32" ref={sectionRef}>
+    <section id="proyectos" className="relative py-24 md:py-32">
       <GridBackground showRadialLight />
 
       <div
@@ -69,8 +66,10 @@ export function ProjectsSection() {
         {/* ── Section header — LEFT-ALIGNED, asymmetric ──────────── */}
         <motion.div
           initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
           className="mb-16 max-w-2xl"
+          data-motion
         >
           <motion.div custom={0} variants={fadeUp} className="mb-4 flex flex-wrap items-center gap-2">
             <Badge variant="primary">Proyectos</Badge>
@@ -95,8 +94,10 @@ export function ProjectsSection() {
         {/* ── Cuatro cards misma altura — grilla 2×2 en desktop ── */}
         <motion.div
           initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          data-motion
         >
           {PROJECT_DATA.map((project, i) => (
             <motion.div key={project.title} custom={3 + i} variants={fadeUp} className="min-h-0">

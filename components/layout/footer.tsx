@@ -25,6 +25,11 @@ const CONTACTO_LINKS = [
     type: 'whatsapp' as const,
   },
   {
+    label: 'Tecnologías',
+    href: ROUTES.tecnologias,
+    type: 'internal' as const,
+  },
+  {
     label: 'Sobre mí',
     href: ROUTES.about,
     type: 'internal' as const,
@@ -38,7 +43,7 @@ const CONTACTO_LINKS = [
 
 export function Footer() {
   return (
-    <footer style={{ backgroundColor: 'var(--footer-bg)' }}>
+    <footer id="site-footer" style={{ backgroundColor: 'var(--footer-bg)' }}>
       {/* Top gradient separator — theme-aware */}
       <div
         className="h-px"
