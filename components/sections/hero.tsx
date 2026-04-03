@@ -201,11 +201,13 @@ function FeatureCard({
 
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null)
+  const heroCtaAnchorRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const particleMouseRef = useRef<MousePosition>({ x: -9999, y: -9999, active: false })
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const [showMobileStickyCta, setShowMobileStickyCta] = useState(false)
+  const [heroCtaVisible, setHeroCtaVisible] = useState(true)
   const [isFooterVisible, setIsFooterVisible] = useState(false)
   const [isMobileViewport, setIsMobileViewport] = useState(false)
 
@@ -266,44 +268,37 @@ export function HeroSection() {
     }
   }, [])
 
+  /** Barra fija solo cuando el CTA principal ya no se ve — evita dos "Contame tu idea" a la vez. */
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const onScroll = () => {
-      if (!isMobileViewport) {
-        setShowMobileStickyCta(false)
-        return
-      }
-
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight
-      if (scrollable <= 0) {
-        setShowMobileStickyCta(false)
-        return
-      }
-
-      const progress = window.scrollY / scrollable
-      setShowMobileStickyCta(progress > 0.4 && !isFooterVisible)
+    if (!isMobileViewport) {
+      setShowMobileStickyCta(false)
+      return
     }
+    setShowMobileStickyCta(!heroCtaVisible && !isFooterVisible)
+  }, [heroCtaVisible, isFooterVisible, isMobileViewport])
 
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-    }
-  }, [isFooterVisible, isMobileViewport])
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isMobileViewport) return
+    const el = heroCtaAnchorRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => setHeroCtaVisible(entry.isIntersecting),
+      { threshold: 0, rootMargin: '0px 0px 8px 0px' }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [isMobileViewport])
 
   return (
     <section
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={handleMouseLeave}
-      className="relative z-0 -mt-16 min-h-dvh flex items-center overflow-hidden"
+      className="relative z-0 -mt-[calc(4rem+env(safe-area-inset-top,0px))] min-h-dvh flex items-center overflow-hidden"
       style={{
         backgroundColor: 'var(--color-surface-base)',
-        paddingTop: 'calc(4rem + clamp(1.25rem, 3.5vw, 2rem))',
+        paddingTop:
+          'calc(env(safe-area-inset-top, 0px) + 4rem + clamp(1.25rem, 3.5vw, 2rem))',
         paddingBottom: 'var(--section-py-hero)',
       }}
     >
@@ -357,8 +352,8 @@ export function HeroSection() {
 
       {/* ── Main content ────────────────────────────────────────────────── */}
       <motion.div
-        style={{ rotateX, rotateY, perspective: 1200 }}
-        className="relative mx-auto w-full max-w-6xl px-6"
+        style={isMobileViewport ? undefined : { rotateX, rotateY, perspective: 1200 }}
+        className="relative mx-auto w-full min-w-0 max-w-6xl px-4 sm:px-6"
         data-hover
         data-inspector-title="Hero con Física de Spring"
         data-inspector-desc="Todo este bloque gira en 3D siguiendo tu mouse con física de resorte real — masa, amortiguación y velocidad por frame. Framer Motion."
@@ -370,7 +365,7 @@ export function HeroSection() {
           className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-16 items-center"
         >
           {/* ── Left column ─────────────────────────────────────────── */}
-          <div className="max-w-xl">
+          <div className="w-full min-w-0 max-w-none lg:max-w-xl">
             {/* Status badges */}
             <motion.div
               custom={0}
@@ -425,11 +420,12 @@ export function HeroSection() {
               <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300k</span>.
             </motion.p>
 
-            {/* CTAs */}
+            {/* CTAs — en móvil solo "Ver precios" a ancho completo; WhatsApp vía barra fija al scroll */}
             <motion.div
+              ref={heroCtaAnchorRef}
               custom={3}
               variants={fadeUp}
-              className="flex flex-col sm:flex-row items-start gap-4"
+              className="flex w-full flex-col gap-3 lg:flex-row lg:items-start lg:gap-4"
               data-hover
               data-inspector-title="Botones con Microinteracción Spring"
               data-inspector-desc="Escala spring al hover, press a 0.97 con 80ms para sensación de peso real. Framer Motion."
@@ -439,27 +435,29 @@ export function HeroSection() {
                 type="button"
                 onClick={handleCTAClick}
                 className={cn(
-                  'inline-flex items-center justify-center gap-2 font-semibold select-none',
+                  'inline-flex w-full shrink-0 items-center justify-center gap-2 font-semibold select-none lg:w-auto',
                   'transition-all duration-200 ease-out',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                   'btn-tech btn-primary-tech active:scale-[0.97]',
-                  'h-12 px-7 text-sm rounded-xl',
+                  'min-h-12 px-7 py-3 text-sm rounded-xl',
                 )}
                 data-hover
               >
-                Contame tu idea
-                <span className="opacity-70 font-normal">(15 min gratis)</span>
-                <ArrowRightIcon className="size-4" />
+                <span className="text-center leading-snug">
+                  Contame tu idea{' '}
+                  <span className="opacity-70 font-normal">(15 min gratis)</span>
+                </span>
+                <ArrowRightIcon className="size-4 shrink-0" aria-hidden />
               </button>
-              <Link href={ROUTES.servicios}>
+              <Link href={ROUTES.servicios} className="w-full lg:w-auto">
                 <button
                   type="button"
                   className={cn(
-                    'inline-flex items-center justify-center gap-2 font-semibold select-none',
+                    'inline-flex w-full items-center justify-center gap-2 font-semibold select-none',
                     'transition-all duration-200 ease-out',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                     'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
-                    'h-12 px-7 text-sm rounded-xl',
+                    'min-h-12 px-7 py-3 text-sm rounded-xl',
                   )}
                   data-hover
                 >
@@ -528,10 +526,10 @@ export function HeroSection() {
         type="button"
         onClick={handleCTAClick}
         className={cn(
-          'fixed bottom-0 left-0 right-0 z-[100001] sm:hidden',
+          '!fixed bottom-0 left-0 right-0 z-[100001] sm:hidden',
           'h-[52px] w-full rounded-none',
           'inline-flex items-center justify-center gap-2 px-4',
-          'btn-tech btn-primary-tech text-sm font-semibold',
+          'btn-primary-tech text-sm font-semibold',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
           'focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
           showMobileStickyCta ? 'pointer-events-auto' : 'pointer-events-none'

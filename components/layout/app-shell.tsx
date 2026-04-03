@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback, type ReactNode, type MouseEvent } from 'react'
+import { useState, useCallback, useEffect, type ReactNode, type MouseEvent } from 'react'
 import { useTheme } from 'next-themes'
-import { useApexTheme } from '@/hooks/useTheme'
+import { useApexThemeActions } from '@/hooks/useTheme'
 import { useInspector } from '@/hooks/useInspector'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { Navbar } from './navbar'
@@ -18,20 +18,26 @@ export { useInspector } from '@/hooks/useInspector'
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme()
-  const { resetTheme, activeConfig } = useApexTheme()
+  const { resetTheme } = useApexThemeActions()
   const inspector = useInspector()
   const [showShortcuts, setShowShortcuts] = useState(false)
+
+  const getPrimaryRgb = useCallback(() => {
+    if (typeof window === 'undefined') return '100, 116, 139'
+    const value = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-rgb').trim()
+    return value || '100, 116, 139'
+  }, [])
 
   const toggleDarkMode = useCallback((e?: MouseEvent) => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
     if (e) {
       window.dispatchEvent(
         new CustomEvent('apex:wave', {
-          detail: { x: e.clientX, y: e.clientY, colorRgb: activeConfig.primaryRgb },
+          detail: { x: e.clientX, y: e.clientY, colorRgb: getPrimaryRgb() },
         })
       )
     }
-  }, [setTheme, resolvedTheme, activeConfig])
+  }, [setTheme, resolvedTheme, getPrimaryRgb])
 
   const toggleShortcutsDialog = useCallback(() => {
     setShowShortcuts((open) => !open)
@@ -48,6 +54,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     toggleShortcutsDialog,
   })
 
+  useEffect(() => {
+    const blockNativeDrag = (e: DragEvent) => {
+      e.preventDefault()
+    }
+    document.addEventListener('dragstart', blockNativeDrag, true)
+    return () => document.removeEventListener('dragstart', blockNativeDrag, true)
+  }, [])
+
   return (
     <div className={inspector.isActive ? 'inspector-mode' : ''}>
       <Navbar
@@ -59,8 +73,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main
         className={
           inspector.isActive
-            ? 'min-h-dvh pt-[calc(4rem+2.25rem)]'
-            : 'min-h-dvh pt-16'
+            ? 'min-h-dvh pt-[calc(4rem+2.25rem+env(safe-area-inset-top,0px))]'
+            : 'min-h-dvh pt-[calc(4rem+env(safe-area-inset-top,0px))]'
         }
       >
         {children}

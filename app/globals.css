@@ -13,6 +13,13 @@
   -webkit-tap-highlight-color: transparent !important;
 }
 
+/* Sin arrastre nativo de imágenes/enlaces (complemento al listener dragstart en AppShell). */
+img,
+picture img,
+a {
+  -webkit-user-drag: none;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    DESIGN TOKENS — Single source of truth. No arbitrary values in components.
    ─────────────────────────────────────────────────────────────────────────

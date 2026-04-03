@@ -104,7 +104,9 @@ export function ServiceDrawerContent({
 
   return (
     <div className="relative">
-      <div className={`pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b ${accentStyle.glowClassName} opacity-70`} />
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 h-36 rounded-2xl bg-gradient-to-b ${accentStyle.glowClassName} opacity-70`}
+      />
 
       <div className="relative space-y-6 pb-4 md:space-y-7">
         <header className="space-y-3">
@@ -216,7 +218,7 @@ export function ServiceDrawerContent({
       </div>
 
       <div
-        className="sticky bottom-0 z-20 -mx-5 mt-6 border-t border-white/10 px-5 pb-1 pt-3 backdrop-blur-xl md:-mx-6 md:px-6"
+        className="sticky bottom-0 z-20 -mx-5 mt-6 rounded-t-2xl border-t border-white/10 px-5 pb-1 pt-3 backdrop-blur-xl md:-mx-6 md:px-6"
         style={{ backgroundColor: 'color-mix(in srgb, var(--color-surface-lowest) 88%, transparent)' }}
       >
         <WhatsAppOutboundLink

@@ -13,7 +13,12 @@
 
 import Script from 'next/script'
 
+/** false = no se monta el iframe ni el bot flotante del player Flutter (botlode-player). */
+const ENABLE_BOTLODE_PLAYER = false
+
 export function BotlodeChat() {
+  if (!ENABLE_BOTLODE_PLAYER) return null
+
   return (
     <>
       {/* ── Iframe principal ───────────────────────────────── */}

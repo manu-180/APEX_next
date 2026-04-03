@@ -99,17 +99,17 @@ export function Navbar({
     >
       {/* Full-bleed bar; inner row keeps alignment with page max-width */}
       <div
-        className="w-full"
+        className="w-full pt-[env(safe-area-inset-top,0px)]"
         style={{
           backgroundColor: 'var(--color-surface-low)',
           borderBottom: '1px solid var(--glass-border)',
         }}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <div className="mx-auto flex h-14 w-full min-w-0 max-w-6xl flex-row items-center justify-between gap-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] md:h-16">
         {/* Logo — asymmetric: cut-corner badge + Syne heading font */}
         <Link
           href="/"
-          className="flex items-center gap-3 group"
+          className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 group"
           data-hover
           data-inspector-title="Logo con Glow Dinámico"
           data-inspector-desc="El logotipo circular y el texto 'APEX' con Syne usan el tema activo."
@@ -179,8 +179,8 @@ export function Navbar({
           )}
         </div>
 
-        {/* Right side — action cluster */}
-        <div className="flex items-center gap-2">
+        {/* Right side — action cluster (segunda fila en móvil, una columna visual) */}
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 md:w-auto md:flex-none md:justify-start">
           {typeof onlineCount === 'number' && (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-surface-high)]/50 text-xs text-[var(--color-on-surface-variant)] tabular-nums">
               <span className="size-2 rounded-full bg-[var(--color-online)] animate-pulse" />
@@ -278,7 +278,7 @@ export function Navbar({
               borderBottom: '1px solid var(--glass-border)',
             }}
           >
-            <div className="flex flex-col px-6 py-4 gap-1">
+            <div className="flex flex-col gap-1 px-4 py-4 sm:px-6">
               {NAV_LINKS.map((link) =>
                 link.external ? (
                   <a

@@ -26,6 +26,7 @@ const oxanium = Oxanium({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#050508' },
     { media: '(prefers-color-scheme: light)', color: '#F4F5FA' },
@@ -76,9 +77,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WebSiteJsonLd />
         <ServiceJsonLd />
         <AggregateRatingJsonLd />
-        {/* Preconexión al player de BotLode — resuelve DNS/TLS antes del primer render */}
-        <link rel="preconnect" href="https://botlode-player.vercel.app" />
-        <link rel="dns-prefetch" href="https://botlode-player.vercel.app" />
+        {/* Preconexión BotLode — descomentar si ENABLE_BOTLODE_PLAYER en components/floating/botlode-chat.tsx */}
+        {/* <link rel="preconnect" href="https://botlode-player.vercel.app" /> */}
+        {/* <link rel="dns-prefetch" href="https://botlode-player.vercel.app" /> */}
       </head>
       <body className={oxanium.className}>
         <SentryProvider />

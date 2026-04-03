@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useDragControls, useReducedMotion } from 'framer-motion'
 import {
   useCallback,
   useEffect,
@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react'
 import { XIcon } from '@/components/ui/icons'
@@ -45,8 +46,11 @@ export function ServiceDrawer({
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const previousBodyOverflowRef = useRef<string>('')
   const [isDesktop, setIsDesktop] = useState(false)
+  const dragControls = useDragControls()
+  const [maxDragDown, setMaxDragDown] = useState(960)
 
   const primaryColor = accentColor ?? 'var(--color-primary)'
+  const enableMobileSwipeClose = !isDesktop && !shouldReduceMotion
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -61,6 +65,36 @@ export function ServiceDrawer({
       mediaQuery.removeEventListener('change', syncViewportMode)
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const syncMaxDrag = () => setMaxDragDown(Math.max(window.innerHeight, 640))
+    syncMaxDrag()
+    window.addEventListener('resize', syncMaxDrag)
+    return () => window.removeEventListener('resize', syncMaxDrag)
+  }, [])
+
+  const handleMobileChromePointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!enableMobileSwipeClose) return
+      const target = event.target as HTMLElement
+      if (target.closest('button, a[href]')) return
+      dragControls.start(event)
+    },
+    [dragControls, enableMobileSwipeClose],
+  )
+
+  const handleMobileDragEnd = useCallback(
+    (_event: MouseEvent | TouchEvent | PointerEvent, info: { offset: { y: number }; velocity: { y: number } }) => {
+      if (!enableMobileSwipeClose) return
+      const dismissY = 112
+      const dismissVy = 420
+      if (info.offset.y > dismissY || info.velocity.y > dismissVy) {
+        onClose()
+      }
+    },
+    [enableMobileSwipeClose, onClose],
+  )
 
   useEffect(() => {
     if (!isOpen) return
@@ -176,20 +210,16 @@ export function ServiceDrawer({
               animate={{ x: 0, y: 0 }}
               exit={isDesktop ? { x: '100%' } : { y: '100%' }}
               transition={panelTransition}
+              drag={enableMobileSwipeClose ? 'y' : false}
+              dragListener={false}
+              dragControls={dragControls}
+              dragConstraints={{ top: 0, bottom: maxDragDown }}
+              dragElastic={{ top: 0, bottom: 0.2 }}
+              dragSnapToOrigin
+              onDragEnd={handleMobileDragEnd}
               className="pointer-events-auto relative flex w-full flex-col overflow-hidden border md:h-full md:max-w-[480px] md:rounded-none max-md:max-h-[85vh] max-md:rounded-t-3xl"
               style={panelSurfaceStyle}
             >
-              {!isDesktop && (
-                <div className="flex justify-center pb-2 pt-3">
-                  <div
-                    className="h-1.5 w-12 rounded-full"
-                    style={{
-                      backgroundColor: `color-mix(in srgb, ${primaryColor} 24%, var(--color-on-surface-variant))`,
-                    }}
-                  />
-                </div>
-              )}
-
               <div
                 className="pointer-events-none absolute left-0 right-0 top-0 h-px"
                 style={{
@@ -204,27 +234,77 @@ export function ServiceDrawer({
                 }}
               />
 
-              <div className="relative flex items-start justify-between gap-4 border-b border-white/5 px-5 pb-4 pt-4 md:px-6 md:pt-6">
-                <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
-                  {title}
-                </h2>
-                <motion.button
-                  ref={closeButtonRef}
-                  type="button"
-                  aria-label="Cerrar panel"
-                  onClick={onClose}
-                  whileHover={shouldReduceMotion ? undefined : { rotate: 90, scale: 1.06 }}
-                  whileTap={shouldReduceMotion ? undefined : { scale: 0.94 }}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-colors"
-                  style={{
-                    color: 'var(--color-on-surface-variant)',
-                    backgroundColor: `color-mix(in srgb, ${primaryColor} 8%, transparent)`,
-                    borderColor: `color-mix(in srgb, ${primaryColor} 24%, transparent)`,
-                  }}
+              {enableMobileSwipeClose ? (
+                <div
+                  className="relative shrink-0 touch-none select-none"
+                  onPointerDown={handleMobileChromePointerDown}
                 >
-                  <XIcon className="h-4 w-4" />
-                </motion.button>
-              </div>
+                  <div className="flex justify-center pb-2 pt-3">
+                    <div
+                      className="h-1.5 w-12 rounded-full"
+                      style={{
+                        backgroundColor: `color-mix(in srgb, ${primaryColor} 24%, var(--color-on-surface-variant))`,
+                      }}
+                    />
+                  </div>
+                  <div className="relative flex items-start justify-between gap-4 border-b border-white/5 px-5 pb-4 pt-4">
+                    <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
+                      {title}
+                    </h2>
+                    <motion.button
+                      ref={closeButtonRef}
+                      type="button"
+                      aria-label="Cerrar panel"
+                      onClick={onClose}
+                      whileHover={shouldReduceMotion ? undefined : { rotate: 90, scale: 1.06 }}
+                      whileTap={shouldReduceMotion ? undefined : { scale: 0.94 }}
+                      className="inline-flex h-9 w-9 shrink-0 touch-manipulation items-center justify-center rounded-xl border transition-colors"
+                      style={{
+                        color: 'var(--color-on-surface-variant)',
+                        backgroundColor: `color-mix(in srgb, ${primaryColor} 8%, transparent)`,
+                        borderColor: `color-mix(in srgb, ${primaryColor} 24%, transparent)`,
+                      }}
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </motion.button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {!isDesktop && (
+                    <div className="flex justify-center pb-2 pt-3">
+                      <div
+                        className="h-1.5 w-12 rounded-full"
+                        style={{
+                          backgroundColor: `color-mix(in srgb, ${primaryColor} 24%, var(--color-on-surface-variant))`,
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="relative flex items-start justify-between gap-4 border-b border-white/5 px-5 pb-4 pt-4 md:px-6 md:pt-6">
+                    <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
+                      {title}
+                    </h2>
+                    <motion.button
+                      ref={closeButtonRef}
+                      type="button"
+                      aria-label="Cerrar panel"
+                      onClick={onClose}
+                      whileHover={shouldReduceMotion ? undefined : { rotate: 90, scale: 1.06 }}
+                      whileTap={shouldReduceMotion ? undefined : { scale: 0.94 }}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-colors"
+                      style={{
+                        color: 'var(--color-on-surface-variant)',
+                        backgroundColor: `color-mix(in srgb, ${primaryColor} 8%, transparent)`,
+                        borderColor: `color-mix(in srgb, ${primaryColor} 24%, transparent)`,
+                      }}
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </motion.button>
+                  </div>
+                </>
+              )}
 
               <div className="relative overflow-y-auto px-5 pb-6 pt-4 md:px-6 md:pb-7 md:pt-5">
                 {children}

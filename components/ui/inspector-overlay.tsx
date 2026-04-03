@@ -127,7 +127,7 @@ export function InspectorOverlay({ onDisable }: { onDisable: () => void }) {
     <>
       {/* ── Top bar ─────────────────────────────────────────────────── */}
       <div
-        className="fixed top-16 left-0 right-0 z-[45] overflow-hidden border-b backdrop-blur-xl transition-[background-color,border-color] duration-300"
+        className="fixed left-0 right-0 top-[calc(4rem+env(safe-area-inset-top,0px))] z-[45] overflow-hidden border-b backdrop-blur-xl transition-[background-color,border-color] duration-300"
         style={{
           backgroundColor: 'color-mix(in srgb, var(--nav-bg) 94%, transparent)',
           borderColor: 'rgba(var(--color-primary-rgb), 0.22)',

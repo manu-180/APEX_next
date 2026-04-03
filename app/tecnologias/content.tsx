@@ -97,6 +97,10 @@ export function TecnologiasContent() {
           <SectionReveal>
             <div style={{ perspective: 1000 }}>
               <div
+                data-hover
+                data-inspector-title="CTA final — tarjeta con inclinación 3D"
+                data-inspector-desc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y, con transición curva tipo resorte (~420ms); la sombra se estira y se corre un poco para dar profundidad. Encima hay otra capa con un gradiente que se desplaza: simula un reflejo de luz sobre el panel. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; los botones usan los mismos estilos `btn-tech` que en el resto del sitio (primario + contorno WhatsApp)."
+                data-inspector-cat="Física · 3D"
                 className="relative overflow-hidden rounded-3xl border p-7 sm:p-10"
                 style={{
                   borderColor: 'var(--glass-border)',

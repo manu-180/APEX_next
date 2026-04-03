@@ -20,15 +20,31 @@ interface WaveConfig {
 
 export function ThemeWaveOverlay() {
   const [wave, setWave] = useState<WaveConfig | null>(null)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const [simpleMode, setSimpleMode] = useState(false)
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => {
+      setReducedMotion(media.matches)
+      // Conservador: en equipos modestos simplificamos la ola para bajar paint cost.
+      setSimpleMode(media.matches || (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4))
+    }
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    if (reducedMotion) return
     const handler = (e: Event) => {
       const { x, y, colorRgb } = (e as CustomEvent<WaveConfig>).detail
       setWave({ key: Date.now(), x, y, colorRgb })
     }
     window.addEventListener('apex:wave', handler)
     return () => window.removeEventListener('apex:wave', handler)
-  }, [])
+  }, [reducedMotion])
 
   if (!wave) return null
 
@@ -38,6 +54,7 @@ export function ThemeWaveOverlay() {
       x={wave.x}
       y={wave.y}
       colorRgb={wave.colorRgb}
+      simpleMode={simpleMode}
       onDone={() => setWave(null)}
     />
   )
@@ -50,11 +67,13 @@ function WaveEffect({
   x,
   y,
   colorRgb,
+  simpleMode,
   onDone,
 }: {
   x: number
   y: number
   colorRgb: string
+  simpleMode: boolean
   onDone: () => void
 }) {
   return (
@@ -63,105 +82,62 @@ function WaveEffect({
       className="fixed inset-0 pointer-events-none select-none"
       style={{ zIndex: 9998 }}
     >
-      {/* ── Layer 1: Expanding glow wash ─────────────────────────────────── */}
-      {/* clip-path circle expands from click origin; reveals new-theme color  */}
+      {/* Capa principal: flash radial suave (evita clip-path para reducir jank). */}
       <motion.div
-        className="absolute inset-0"
-        initial={{ clipPath: `circle(0px at ${x}px ${y}px)` }}
-        animate={{ clipPath: `circle(200vmax at ${x}px ${y}px)` }}
-        transition={{ duration: 1.0, ease: [0.25, 0.0, 0.25, 1.0] }}
+        className="absolute rounded-full"
         style={{
-          background: `radial-gradient(
-            ellipse 60% 60% at ${x}px ${y}px,
-            rgba(${colorRgb}, 0.13) 0%,
-            rgba(${colorRgb}, 0.06) 35%,
-            rgba(${colorRgb}, 0.02) 60%,
-            transparent 80%
-          )`,
+          left: x - 140,
+          top: y - 140,
+          width: 280,
+          height: 280,
+          background: `radial-gradient(circle, rgba(${colorRgb}, 0.26) 0%, rgba(${colorRgb}, 0.12) 30%, transparent 75%)`,
         }}
+        initial={{ scale: 0.15, opacity: 0.45 }}
+        animate={{ scale: 22, opacity: 0 }}
+        transition={{ duration: 0.78, ease: [0.2, 0, 0.3, 1] }}
         onAnimationComplete={onDone}
       />
 
-      {/* ── Layer 2: Scan-line overlay ────────────────────────────────────── */}
-      {/* Thin horizontal scanlines flash as the wave passes */}
-      <motion.div
-        className="absolute inset-0"
-        initial={{ clipPath: `circle(0px at ${x}px ${y}px)`, opacity: 1 }}
-        animate={{ clipPath: `circle(200vmax at ${x}px ${y}px)`, opacity: 0 }}
-        transition={{ duration: 0.9, ease: [0.2, 0, 0.4, 1] }}
-        style={{
-          backgroundImage: `repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 3px,
-            rgba(${colorRgb}, 0.025) 3px,
-            rgba(${colorRgb}, 0.025) 4px
-          )`,
-        }}
-      />
-
       {/* ── Layer 3: Primary glowing shockwave ring ───────────────────────── */}
-      {/* Scale a 200×200 circle from 0 → 22× to cover the viewport.          */}
-      {/* At scale 22: effective diameter = 4400px — covers any screen.        */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          left: x - 100,
-          top: y - 100,
-          width: 200,
-          height: 200,
+          left: x - 95,
+          top: y - 95,
+          width: 190,
+          height: 190,
           border: `0.7px solid rgba(${colorRgb}, 1)`,
-          boxShadow: [
-            `0 0 0 1px rgba(${colorRgb}, 0.25)`,
-            `0 0 18px 2px rgba(${colorRgb}, 0.55)`,
-            `0 0 50px 5px rgba(${colorRgb}, 0.18)`,
-            `inset 0 0 18px rgba(${colorRgb}, 0.08)`,
-          ].join(', '),
+          boxShadow: `0 0 16px 2px rgba(${colorRgb}, 0.42)`,
         }}
         initial={{ scale: 0, opacity: 1 }}
-        animate={{ scale: 22, opacity: 0 }}
-        transition={{ duration: 0.9, ease: [0.12, 0, 0.30, 1] }}
+        animate={{ scale: simpleMode ? 16 : 20, opacity: 0 }}
+        transition={{ duration: 0.62, ease: [0.12, 0, 0.3, 1] }}
       />
 
-      {/* ── Layer 4: Secondary faster ring ───────────────────────────────── */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          left: x - 70,
-          top: y - 70,
-          width: 140,
-          height: 140,
-          border: `0.5px solid rgba(${colorRgb}, 0.7)`,
-          boxShadow: `0 0 12px 2px rgba(${colorRgb}, 0.35)`,
-        }}
-        initial={{ scale: 0, opacity: 0.8 }}
-        animate={{ scale: 24, opacity: 0 }}
-        transition={{ duration: 0.65, ease: [0.12, 0, 0.30, 1] }}
-      />
-
-      {/* ── Layer 5: Tertiary slow outer ring ────────────────────────────── */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          left: x - 160,
-          top: y - 160,
-          width: 320,
-          height: 320,
-          border: `0.3px solid rgba(${colorRgb}, 0.35)`,
-        }}
-        initial={{ scale: 0, opacity: 0.6 }}
-        animate={{ scale: 16, opacity: 0 }}
-        transition={{ duration: 1.2, ease: [0.08, 0, 0.25, 1] }}
-      />
+      {!simpleMode && (
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            left: x - 65,
+            top: y - 65,
+            width: 130,
+            height: 130,
+            border: `0.5px solid rgba(${colorRgb}, 0.75)`,
+          }}
+          initial={{ scale: 0, opacity: 0.7 }}
+          animate={{ scale: 22, opacity: 0 }}
+          transition={{ duration: 0.7, ease: [0.12, 0, 0.3, 1] }}
+        />
+      )}
 
       {/* ── Layer 6: Origin burst (radial flash) ─────────────────────────── */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          left: x - 50,
-          top: y - 50,
-          width: 100,
-          height: 100,
+          left: x - 44,
+          top: y - 44,
+          width: 88,
+          height: 88,
           background: `radial-gradient(
             circle,
             rgba(${colorRgb}, 0.9) 0%,
@@ -171,8 +147,8 @@ function WaveEffect({
           )`,
         }}
         initial={{ scale: 0, opacity: 1 }}
-        animate={{ scale: 3.5, opacity: 0 }}
-        transition={{ duration: 0.4, ease: [0.0, 0, 0.2, 1] }}
+        animate={{ scale: 3.2, opacity: 0 }}
+        transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
       />
 
       {/* ── Layer 7: Inner hot core (bright point flash) ─────────────────── */}
@@ -184,11 +160,11 @@ function WaveEffect({
           width: 16,
           height: 16,
           background: `rgba(${colorRgb}, 1)`,
-          boxShadow: `0 0 20px 8px rgba(${colorRgb}, 0.6), 0 0 40px 16px rgba(${colorRgb}, 0.2)`,
+          boxShadow: `0 0 16px 6px rgba(${colorRgb}, 0.45)`,
         }}
         initial={{ scale: 0, opacity: 1 }}
         animate={{ scale: 1.5, opacity: 0 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
       />
     </div>
   )

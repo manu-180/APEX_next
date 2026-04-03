@@ -96,83 +96,86 @@ export function Footer() {
             </WhatsAppOutboundLink>
           </div>
 
-          {/* ── Servicios column ──────────────────────────────────── */}
-          <nav aria-label="Servicios">
-            <h4 className="footer-heading mb-5">Servicios</h4>
-            <ul className="space-y-1.5">
-              {SERVICIOS_LINKS.map((l) => (
-                <li key={l.label}>
-                  <Link
-                    href={l.href}
-                    className="footer-link text-sm"
-                    data-hover
-                    data-inspector-title="Navegación a Servicios"
-                    data-inspector-desc="Client-side navigation con Next.js — activa el tab correcto vía query param ?tab=web o ?tab=mobile."
-                    data-inspector-cat="Performance"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* ── Contacto column ───────────────────────────────────── */}
-          <nav aria-label="Contacto">
-            <h4 className="footer-heading mb-5">Contacto</h4>
-            <ul className="space-y-1.5">
-              {CONTACTO_LINKS.map((l) => {
-                if (l.type === 'whatsapp') {
-                  return (
-                    <li key={l.label}>
-                      <WhatsAppOutboundLink
-                        waHref={l.href}
-                        className="footer-link text-sm"
-                        data-hover
-                        data-inspector-title="WhatsApp + página de gracias"
-                        data-inspector-desc="Abre WhatsApp en nueva pestaña y muestra la confirmación en esta misma ventana."
-                        data-inspector-cat="Conversión"
-                      >
-                        {l.label}
-                      </WhatsAppOutboundLink>
-                    </li>
-                  )
-                }
-                if (l.type === 'external') {
-                  return (
-                    <li key={l.label}>
-                      <a
-                        href={l.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="footer-link text-sm"
-                        data-hover
-                        data-inspector-title="Link Externo — Anti-Tabnabbing"
-                        data-inspector-desc="rel=noopener noreferrer evita que la pestaña externa redirija la actual — protección estándar contra tabnabbing."
-                        data-inspector-cat="Seguridad"
-                      >
-                        {l.label}
-                      </a>
-                    </li>
-                  )
-                }
-                return (
+          {/* Móvil: Servicios | Contacto en dos columnas; lg: participan del grid de 3 */}
+          <div className="grid grid-cols-2 gap-x-8 gap-y-0 lg:contents">
+            {/* ── Servicios column ──────────────────────────────────── */}
+            <nav aria-label="Servicios" className="min-w-0">
+              <h4 className="footer-heading mb-5">Servicios</h4>
+              <ul className="space-y-1.5">
+                {SERVICIOS_LINKS.map((l) => (
                   <li key={l.label}>
                     <Link
                       href={l.href}
                       className="footer-link text-sm"
                       data-hover
-                      data-inspector-title="Navegación Interna"
-                      data-inspector-desc="Client-side navigation — sin recarga, estado del tema preservado."
+                      data-inspector-title="Navegación a Servicios"
+                      data-inspector-desc="Client-side navigation con Next.js — activa el tab correcto vía query param ?tab=web o ?tab=mobile."
                       data-inspector-cat="Performance"
                     >
                       {l.label}
                     </Link>
                   </li>
-                )
-              })}
-            </ul>
-          </nav>
+                ))}
+              </ul>
+            </nav>
+
+            {/* ── Contacto column ───────────────────────────────────── */}
+            <nav aria-label="Contacto" className="min-w-0">
+              <h4 className="footer-heading mb-5">Contacto</h4>
+              <ul className="space-y-1.5">
+                {CONTACTO_LINKS.map((l) => {
+                  if (l.type === 'whatsapp') {
+                    return (
+                      <li key={l.label}>
+                        <WhatsAppOutboundLink
+                          waHref={l.href}
+                          className="footer-link text-sm"
+                          data-hover
+                          data-inspector-title="WhatsApp + página de gracias"
+                          data-inspector-desc="Abre WhatsApp en nueva pestaña y muestra la confirmación en esta misma ventana."
+                          data-inspector-cat="Conversión"
+                        >
+                          {l.label}
+                        </WhatsAppOutboundLink>
+                      </li>
+                    )
+                  }
+                  if (l.type === 'external') {
+                    return (
+                      <li key={l.label}>
+                        <a
+                          href={l.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="footer-link text-sm"
+                          data-hover
+                          data-inspector-title="Link Externo — Anti-Tabnabbing"
+                          data-inspector-desc="rel=noopener noreferrer evita que la pestaña externa redirija la actual — protección estándar contra tabnabbing."
+                          data-inspector-cat="Seguridad"
+                        >
+                          {l.label}
+                        </a>
+                      </li>
+                    )
+                  }
+                  return (
+                    <li key={l.label}>
+                      <Link
+                        href={l.href}
+                        className="footer-link text-sm"
+                        data-hover
+                        data-inspector-title="Navegación Interna"
+                        data-inspector-desc="Client-side navigation — sin recarga, estado del tema preservado."
+                        data-inspector-cat="Performance"
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </nav>
+          </div>
         </div>
 
         {/* Bottom bar */}

@@ -1,10 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { CheckIcon } from '@/components/ui/icons'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
+import { WHATSAPP_NUMBER } from '@/lib/constants'
+
+const FALLBACK_WA = `https://wa.me/${WHATSAPP_NUMBER}`
+const REDIRECT_SECONDS = 3
 
 declare global {
   interface Window {
@@ -12,11 +15,61 @@ declare global {
   }
 }
 
+function HomeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
+      <path d="M9 21V12h6v9" />
+    </svg>
+  )
+}
+
+function WhatsAppIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      style={style}
+      aria-hidden="true"
+    >
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  )
+}
+
 export function GraciasContent() {
+  const searchParams = useSearchParams()
+  const waParam = searchParams.get('wa')
+  const waHref = waParam ? decodeURIComponent(waParam) : FALLBACK_WA
+
+  const [countdown, setCountdown] = useState(REDIRECT_SECONDS)
+  const [redirected, setRedirected] = useState(false)
+
   useEffect(() => {
     window.gtag?.('event', 'conversion', { send_to: 'AW-18041789644' })
     window.gtag?.('event', 'generate_lead', { value: 300000, currency: 'ARS' })
   }, [])
+
+  useEffect(() => {
+    if (redirected) return
+    if (countdown <= 0) {
+      setRedirected(true)
+      window.location.href = waHref
+      return
+    }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [countdown, waHref, redirected])
 
   return (
     <main
@@ -25,42 +78,147 @@ export function GraciasContent() {
     >
       <GridBackground showScanline showRadialLight />
 
-      <section className="relative z-10 w-full max-w-2xl rounded-2xl glass-card px-8 py-12 text-center">
+      <section className="relative z-10 w-full max-w-lg text-center">
+
+        {/* WhatsApp icon con glow pulsante */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-          className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full"
+          transition={{ type: 'spring', stiffness: 280, damping: 18 }}
+          className="mx-auto mb-8 flex size-24 items-center justify-center rounded-full"
           style={{
-            background: 'rgba(var(--color-primary-rgb), 0.15)',
-            border: '1px solid rgba(var(--color-primary-rgb), 0.35)',
+            background: 'rgba(37, 211, 102, 0.12)',
+            border: '1.5px solid rgba(37, 211, 102, 0.4)',
+            boxShadow: '0 0 32px rgba(37, 211, 102, 0.18)',
           }}
         >
-          <CheckIcon className="size-8 text-[var(--color-primary)]" />
+          <motion.div
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+          >
+            <WhatsAppIcon className="size-12" style={{ color: '#25D366' }} />
+          </motion.div>
         </motion.div>
 
-        <h1 className="font-heading text-3xl font-extrabold text-[var(--color-on-surface)] sm:text-4xl">
-          ¡Listo! Recibimos tu consulta
-        </h1>
+        {/* Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+          className="font-heading text-5xl font-extrabold tracking-tight text-[var(--color-on-surface)] sm:text-6xl"
+        >
+          ¡Gracias!
+        </motion.h1>
 
-        <p className="mx-auto mt-4 max-w-xl font-heading text-base text-[var(--color-on-surface-variant)] sm:text-lg">
-          Te escribimos en menos de 2 horas por WhatsApp. Mientras tanto, conocé cómo trabajamos.
-        </p>
+        {/* Tagline principal */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mx-auto mt-4 font-heading text-xl font-semibold text-[var(--color-primary)]"
+        >
+          Tomaste la decisión correcta.
+        </motion.p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href="/servicios"
-            className="btn-tech btn-primary-tech inline-flex h-12 w-full items-center justify-center rounded-xl px-7 text-sm font-semibold sm:w-auto"
+        {/* Cuerpo de conversión */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mx-auto mt-3 max-w-md text-base leading-relaxed text-[var(--color-on-surface-variant)]"
+        >
+          Vas a hablar directamente conmigo sin formularios, sin esperas.
+          Contame qué necesitás y arrancamos.
+        </motion.p>
+
+        {/* Separador */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="mx-auto mt-8 h-px w-24 origin-center rounded-full"
+          style={{ background: 'rgba(var(--color-primary-rgb), 0.3)' }}
+        />
+
+        <AnimatePresence mode="wait">
+          {!redirected ? (
+            /* Estado: contando → aún no redirigió */
+            <motion.div
+              key="counting"
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ delay: 0.45 }}
+              className="mt-8 flex flex-col items-center gap-3"
+            >
+              <div
+                className="relative flex size-20 items-center justify-center rounded-full"
+                style={{
+                  background: 'rgba(var(--color-primary-rgb), 0.07)',
+                  border: '2px solid rgba(var(--color-primary-rgb), 0.2)',
+                }}
+              >
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={countdown}
+                    initial={{ opacity: 0, scale: 0.6, y: 6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 1.3, y: -6 }}
+                    transition={{ duration: 0.25 }}
+                    className="font-heading text-3xl font-black text-[var(--color-primary)]"
+                  >
+                    {countdown}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+
+              <p className="text-sm text-[var(--color-on-surface-variant)] opacity-60">
+                {`Abriendo WhatsApp en ${countdown} segundo${countdown !== 1 ? 's' : ''}…`}
+              </p>
+            </motion.div>
+          ) : (
+            /* Estado: ya redirigió → mostrar botón de home */
+            <motion.div
+              key="done"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+              className="mt-8 flex flex-col items-center gap-4"
+            >
+              <p className="text-sm font-medium text-[var(--color-on-surface-variant)] opacity-70">
+                WhatsApp ya debería estar abierto.
+              </p>
+              <a
+                href="/"
+                className="btn-tech btn-outline-tech inline-flex h-11 items-center justify-center gap-2 rounded-xl px-7 text-sm font-semibold text-[var(--color-primary)]"
+              >
+                <HomeIcon className="size-4" />
+                Volver al inicio
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* CTA WhatsApp — siempre visible */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6"
+        >
+          <a
+            href={waHref}
+            className="inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-3 text-sm font-bold text-white transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+              boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)',
+            }}
           >
-            Ver mis servicios
-          </Link>
-          <Link
-            href="/"
-            className="btn-tech btn-outline-tech inline-flex h-12 w-full items-center justify-center rounded-xl px-7 text-sm font-semibold text-[var(--color-primary)] sm:w-auto"
-          >
-            Volver al inicio
-          </Link>
-        </div>
+            <WhatsAppIcon className="size-5" style={{ color: 'white' }} />
+            Ir a WhatsApp ahora
+          </a>
+        </motion.div>
+
       </section>
     </main>
   )
