@@ -1,14 +1,12 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
-import { consumeSkipGraciasWhatsAppAutoOpen } from '@/lib/whatsapp-navigate'
 
 const FALLBACK_WA = `https://wa.me/${WHATSAPP_NUMBER}`
-const REDIRECT_SECONDS = 3
 
 declare global {
   interface Window {
@@ -53,31 +51,14 @@ export function GraciasContent() {
   const waParam = searchParams.get('wa')
   const waHref = waParam ? decodeURIComponent(waParam) : FALLBACK_WA
 
-  const [countdown, setCountdown] = useState(REDIRECT_SECONDS)
-  const [redirected, setRedirected] = useState(false)
-
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
   useEffect(() => {
-    // GA4 recibe el evento → Google Ads lo importa automáticamente (fuente: GA4, sin AW-label)
     window.gtag?.('event', 'conversion', { value: 300000, currency: 'ARS' })
     window.gtag?.('event', 'generate_lead', { value: 300000, currency: 'ARS' })
   }, [])
-
-  useEffect(() => {
-    if (redirected) return
-    if (countdown <= 0) {
-      setRedirected(true)
-      if (!consumeSkipGraciasWhatsAppAutoOpen()) {
-        window.open(waHref, '_blank', 'noopener,noreferrer')
-      }
-      return
-    }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
-  }, [countdown, waHref, redirected])
 
   return (
     <main
@@ -118,7 +99,7 @@ export function GraciasContent() {
           ¡Gracias!
         </motion.h1>
 
-        {/* Tagline principal */}
+        {/* Tagline */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -128,15 +109,14 @@ export function GraciasContent() {
           Tomaste la decisión correcta.
         </motion.p>
 
-        {/* Cuerpo de conversión */}
+        {/* Cuerpo */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="mx-auto mt-3 max-w-md text-base leading-relaxed text-[var(--color-on-surface-variant)]"
         >
-          Vas a hablar directamente conmigo sin formularios, sin esperas.
-          Contame qué necesitás y arrancamos.
+          WhatsApp ya debería estar abierto. Si no, usá el botón de abajo.
         </motion.p>
 
         {/* Separador */}
@@ -148,71 +128,12 @@ export function GraciasContent() {
           style={{ background: 'rgba(var(--color-primary-rgb), 0.3)' }}
         />
 
-        <AnimatePresence mode="wait">
-          {!redirected ? (
-            /* Estado: contando → aún no redirigió */
-            <motion.div
-              key="counting"
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ delay: 0.45 }}
-              className="mt-8 flex flex-col items-center gap-3"
-            >
-              <div
-                className="relative flex size-20 items-center justify-center rounded-full"
-                style={{
-                  background: 'rgba(var(--color-primary-rgb), 0.07)',
-                  border: '2px solid rgba(var(--color-primary-rgb), 0.2)',
-                }}
-              >
-                <AnimatePresence mode="popLayout">
-                  <motion.span
-                    key={countdown}
-                    initial={{ opacity: 0, scale: 0.6, y: 6 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 1.3, y: -6 }}
-                    transition={{ duration: 0.25 }}
-                    className="font-heading text-3xl font-black text-[var(--color-primary)]"
-                  >
-                    {countdown}
-                  </motion.span>
-                </AnimatePresence>
-              </div>
-
-              <p className="text-sm text-[var(--color-on-surface-variant)] opacity-60">
-                {`Abriendo WhatsApp en ${countdown} segundo${countdown !== 1 ? 's' : ''}…`}
-              </p>
-            </motion.div>
-          ) : (
-            /* Estado: ya redirigió → mostrar botón de home */
-            <motion.div
-              key="done"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 240, damping: 22 }}
-              className="mt-8 flex flex-col items-center gap-4"
-            >
-              <p className="text-sm font-medium text-[var(--color-on-surface-variant)] opacity-70">
-                WhatsApp ya debería estar abierto.
-              </p>
-              <a
-                href="/"
-                className="btn-tech btn-outline-tech inline-flex h-11 items-center justify-center gap-2 rounded-xl px-7 text-sm font-semibold text-[var(--color-primary)]"
-              >
-                <HomeIcon className="size-4" />
-                Volver al inicio
-              </a>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* CTA WhatsApp — siempre visible */}
+        {/* Acciones */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-6"
+          transition={{ delay: 0.45, type: 'spring', stiffness: 240, damping: 22 }}
+          className="mt-8 flex flex-col items-center gap-4"
         >
           <a
             href={waHref}
@@ -226,6 +147,14 @@ export function GraciasContent() {
           >
             <WhatsAppIcon className="size-5" style={{ color: 'white' }} />
             Ir a WhatsApp ahora
+          </a>
+
+          <a
+            href="/"
+            className="btn-tech btn-outline-tech inline-flex h-11 items-center justify-center gap-2 rounded-xl px-7 text-sm font-semibold text-[var(--color-primary)]"
+          >
+            <HomeIcon className="size-4" />
+            Volver al inicio
           </a>
         </motion.div>
 
