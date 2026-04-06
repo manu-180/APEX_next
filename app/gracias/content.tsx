@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
+import { consumeSkipGraciasWhatsAppAutoOpen } from '@/lib/whatsapp-navigate'
 
 const FALLBACK_WA = `https://wa.me/${WHATSAPP_NUMBER}`
 const REDIRECT_SECONDS = 3
@@ -55,8 +56,13 @@ export function GraciasContent() {
   const [countdown, setCountdown] = useState(REDIRECT_SECONDS)
   const [redirected, setRedirected] = useState(false)
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   useEffect(() => {
-    window.gtag?.('event', 'conversion', { send_to: 'AW-18041789644' })
+    // GA4 recibe el evento → Google Ads lo importa automáticamente (fuente: GA4, sin AW-label)
+    window.gtag?.('event', 'conversion', { value: 300000, currency: 'ARS' })
     window.gtag?.('event', 'generate_lead', { value: 300000, currency: 'ARS' })
   }, [])
 
@@ -64,7 +70,9 @@ export function GraciasContent() {
     if (redirected) return
     if (countdown <= 0) {
       setRedirected(true)
-      window.location.href = waHref
+      if (!consumeSkipGraciasWhatsAppAutoOpen()) {
+        window.open(waHref, '_blank', 'noopener,noreferrer')
+      }
       return
     }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
@@ -208,6 +216,8 @@ export function GraciasContent() {
         >
           <a
             href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-3 text-sm font-bold text-white transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
             style={{
               background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',

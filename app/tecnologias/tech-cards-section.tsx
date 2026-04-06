@@ -48,19 +48,45 @@ export function TechCardsSection() {
           <div className="mb-8 flex justify-start">
             <div
               ref={hintRef}
-              className="inline-flex max-w-xl items-center gap-3 rounded-full border border-[var(--color-outline)] bg-[var(--color-surface-low)] px-4 py-2.5"
+              className="theme-transition relative inline-flex max-w-xl rounded-full p-px shadow-[0_10px_40px_-16px_rgba(var(--color-primary-rgb),0.55)] ring-1 ring-[rgba(var(--color-primary-rgb),0.12)]"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.55) 0%, rgba(var(--color-accent-rgb), 0.38) 48%, rgba(var(--color-primary-rgb), 0.28) 100%)',
+              }}
             >
-              <motion.span
-                aria-hidden
-                className="size-2.5 rounded-full bg-[var(--color-primary)]"
-                animate={
-                  prefersReducedMotion || !hintInView ? undefined : { scale: [1, 1.18, 1], opacity: [0.72, 1, 0.72] }
-                }
-                transition={{ duration: 1.6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-              />
-              <p className="text-pretty text-sm text-[var(--color-on-surface-variant)]">
-                Hacé click en una card para cambiar el tema de todo el sitio.
-              </p>
+              <div className="relative flex w-full items-center gap-3.5 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-surface-low)_90%,transparent)] px-4 py-2.5 backdrop-blur-xl theme-transition dark:bg-[color-mix(in_srgb,var(--color-surface-low)_82%,transparent)] sm:px-5 sm:py-3">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-8 top-0 z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-[rgba(var(--color-primary-rgb),0.35)] to-transparent"
+                />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -left-1/4 top-1/2 z-0 h-24 w-1/2 -translate-y-1/2 rounded-full opacity-[0.07] blur-2xl theme-transition dark:opacity-[0.12]"
+                  style={{
+                    background:
+                      'radial-gradient(ellipse at center, rgba(var(--color-primary-rgb), 1) 0%, transparent 70%)',
+                  }}
+                />
+                <span aria-hidden className="relative z-[2] flex size-[22px] shrink-0 items-center justify-center">
+                  {!prefersReducedMotion && hintInView ? (
+                    <motion.span
+                      className="absolute inset-0 rounded-full border border-[rgba(var(--color-primary-rgb),0.45)]"
+                      animate={{ scale: [1, 1.28, 1], opacity: [0.55, 0, 0.55] }}
+                      transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+                    />
+                  ) : null}
+                  <span
+                    className="relative size-2 rounded-full shadow-[0_0_14px_rgba(var(--color-primary-rgb),0.75),0_0_4px_rgba(var(--color-accent-rgb),0.45)] ring-1 ring-inset ring-white/30 theme-transition"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95) 0%, var(--color-primary) 42%, color-mix(in srgb, var(--color-primary) 65%, black) 100%)',
+                    }}
+                  />
+                </span>
+                <p className="relative z-[2] text-pretty text-sm leading-snug text-[var(--color-on-surface-variant)] theme-transition">
+                  Hacé click en una card para cambiar el tema de todo el sitio.
+                </p>
+              </div>
             </div>
           </div>
         </SectionReveal>

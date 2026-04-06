@@ -84,7 +84,7 @@ export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
       <Script
         id="google-gtag-src"
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
       <Suspense fallback={null}>
         <GaRoutePageViews gaId={gaId} />

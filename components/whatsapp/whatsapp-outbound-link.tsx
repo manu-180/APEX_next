@@ -10,8 +10,8 @@ export type WhatsAppOutboundLinkProps = Omit<ComponentPropsWithoutRef<'a'>, 'hre
 }
 
 /**
- * Enlace a wa.me: clic abre WhatsApp y navega a /gracias en la pestaña actual.
- * En /gracias usá un `<a href={wa.me}>` normal para no re-redirigir.
+ * Enlace a wa.me: clic abre WhatsApp en pestaña nueva y navega a /gracias en la actual.
+ * En /gracias el enlace manual también usa target _blank.
  */
 export function WhatsAppOutboundLink({
   waHref,

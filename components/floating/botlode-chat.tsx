@@ -227,7 +227,7 @@ export function BotlodeChat() {
     try {
       iframe.contentWindow.postMessage({ type: 'HITZONE_CLICK_WPP', clientX: rect.left + rect.width / 2, clientY: rect.top + 50, iframeX: rect.left, iframeY: rect.top }, '*');
     } catch (e) {}
-    /* Misma UX que WhatsAppOutboundLink: /gracias en esta pestaña (el iframe abre wa.me). Debe coincidir con BotlodeGraciasBridge. */
+    /* Misma UX que WhatsAppOutboundLink: wa.me en pestaña nueva + /gracias en esta. Debe coincidir con BotlodeGraciasBridge. */
     try { window.dispatchEvent(new CustomEvent('apex-botlode-whatsapp')); } catch (e) {}
   }
 

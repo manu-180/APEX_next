@@ -125,7 +125,7 @@ export const WEB_PLANS: PricingPlan[] = [
       { num: '01', title: '0% de comisión', desc: 'Cada venta es 100% tuya. Sin Mercado Libre, sin intermediarios' },
       { num: '02', title: 'Experiencia de compra premium', desc: 'Catálogo, carrito y checkout optimizado para convertir' },
       { num: '03', title: 'Stock en tiempo real', desc: 'Nunca más vendas algo que no tenés en tu depósito' },
-      { num: '04', title: 'Clientes orgánicos gratis', desc: 'SEO avanzado para que Google te traiga compradores sin pagar ads' },
+      { num: '04', title: 'Panel administrativo completo', desc: 'Cargá categorías y productos, y revisá métricas de ventas desde un solo dashboard' },
     ],
     powerStatement: 'Tu tienda. Tus reglas. Tu dinero. Sin intermediarios que se queden con tu margen.',
   },

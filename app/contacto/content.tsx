@@ -683,7 +683,7 @@ function ContactForm() {
         },
       })
       if (error) throw error
-      router.push('/gracias')
+      router.push('/gracias', { scroll: true })
       return
     } catch {
       setFormError('No pudimos enviar el mensaje. Intentá de nuevo.')

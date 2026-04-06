@@ -179,76 +179,20 @@ export function ServiciosContent() {
       <Suspense fallback={null}>
         <ServiciosTabQuerySync onSelectMobile={selectMobileTab} />
       </Suspense>
-      {/* CTA intermedia */}
-      <div className="my-8 mx-auto max-w-4xl px-6">
-        <SectionReveal>
-          <div
-            className="relative rounded-2xl overflow-hidden glass-card text-center py-12 px-6"
-            data-hover
-            data-inspector-title="CTA intermedia"
-            data-inspector-desc="Llamada a la acción intermedia: WhatsApp o ver precios."
-            data-inspector-cat="UX · Conversión"
-          >
-            {/* Radial background glow */}
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(var(--color-primary-rgb), 0.07) 0%, transparent 70%)' }}
-            />
-            {/* Top accent */}
-            <div
-              className="absolute top-0 inset-x-0 h-[2px]"
-              style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.75) 50%, transparent)' }}
-            />
-
-            <div className="relative z-10">
-              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)] mb-2">
-                Siguiente paso
-              </p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-[var(--color-on-surface)] mb-2 tracking-tight">
-                ¿Sabés qué necesitás?
-              </p>
-              <p className="text-sm text-[var(--color-on-surface-variant)] mb-8 opacity-70">
-                Empezá hoy, sin compromisos.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <WhatsAppOutboundLink
-                  waHref={whatsappUrl('Hola, quiero saber más sobre mis opciones')}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
-                  style={{
-                    background: 'var(--color-primary)',
-                    color: 'var(--color-surface-base)',
-                    boxShadow: '0 0 24px rgba(var(--color-primary-rgb), 0.35)',
-                  }}
-                >
-                  Consulta gratis en WhatsApp
-                </WhatsAppOutboundLink>
-                <a
-                  href="#pricing"
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm transition-all duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.08)]"
-                  style={{
-                    border: '1px solid rgba(var(--color-primary-rgb), 0.4)',
-                    color: 'var(--color-primary)',
-                  }}
-                >
-                  Ver precios →
-                </a>
-              </div>
-            </div>
-          </div>
-        </SectionReveal>
-      </div>
-
       {/* Pricing cards */}
-      <section id="pricing" className="pb-24">
+      <section id="pricing" className="py-16 pb-24">
         <div className="mx-auto max-w-6xl px-6">
           <SectionReveal>
-            <div className="max-w-2xl mb-10">
+            <div className="mb-12">
+              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)] mb-3">
+                Precios transparentes
+              </p>
               <h2 className="font-heading text-balance leading-tight mb-3">
-                <span className="text-2xl sm:text-3xl md:text-4xl font-extralight text-[var(--color-on-surface-variant)]">Elegí tu </span>
-                <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)]">plan ideal</span>
+                <span className="block text-2xl sm:text-3xl md:text-4xl font-extralight text-[var(--color-on-surface-variant)]">Elegí tu</span>
+                <span className="block text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)]">plan ideal</span>
               </h2>
-              <p className="text-pretty text-sm text-[var(--color-on-surface-variant)]">
-                Trabajamos con emprendedores y pymes de toda Argentina. Precios en ARS, sin sorpresas.
+              <p className="text-pretty text-sm text-[var(--color-on-surface-variant)] max-w-md">
+                Emprendedores y pymes de toda Argentina. Precios en ARS, sin sorpresas, sin letra chica.
               </p>
             </div>
           </SectionReveal>
@@ -484,59 +428,97 @@ function UnifiedPricingCard({
     <SectionReveal delay={index * 0.1} className="h-full">
       <div
         className={cn(
-          'relative h-full overflow-hidden rounded-2xl glass-card border transition-all duration-300',
+          'relative h-full overflow-hidden rounded-2xl transition-all duration-300',
           plan.isFeatured
-            ? 'border-[rgba(var(--color-primary-rgb),0.55)] shadow-[0_0_40px_rgba(var(--color-primary-rgb),0.14)]'
-            : 'border-[var(--glass-border)]',
+            ? 'border border-[rgba(var(--color-primary-rgb),0.6)] shadow-[0_0_60px_rgba(var(--color-primary-rgb),0.18),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]'
+            : 'glass-card border border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.2)]',
         )}
+        style={plan.isFeatured ? { background: 'var(--color-surface-high, rgba(255,255,255,0.04))' } : undefined}
       >
+        {/* Featured: radial glow background */}
+        {plan.isFeatured && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse 100% 60% at 50% 0%, rgba(var(--color-primary-rgb), 0.1) 0%, transparent 70%)',
+            }}
+          />
+        )}
+
+        {/* Top accent line */}
         <div
           className="absolute top-0 inset-x-0 h-[2px] pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.8) 50%, transparent)' }}
+          style={{
+            background: plan.isFeatured
+              ? 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 1) 50%, transparent)'
+              : 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.5) 50%, transparent)',
+          }}
         />
 
         <div className="relative z-10 flex h-full flex-col p-6 md:p-7">
-          <div className="mb-4 flex items-center gap-2">
-            <Badge variant={plan.isFeatured ? 'primary' : 'outline'}>
-              {plan.isFeatured ? 'Recomendado' : plan.badge}
-            </Badge>
+          {/* Badge row */}
+          <div className="mb-5 flex items-center gap-2">
+            {plan.isFeatured ? (
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.18em]"
+                style={{
+                  background: 'rgba(var(--color-primary-rgb), 0.15)',
+                  border: '1px solid rgba(var(--color-primary-rgb), 0.4)',
+                  color: 'var(--color-primary)',
+                }}
+              >
+                <span className="size-1.5 rounded-full inline-block animate-pulse" style={{ background: 'var(--color-primary)' }} />
+                Recomendado
+              </span>
+            ) : (
+              <Badge variant="outline">{plan.badge}</Badge>
+            )}
           </div>
 
-          <h3 className="mb-2 text-2xl font-bold text-[var(--color-on-surface)]">{plan.name}</h3>
+          {/* Plan name */}
+          <h3
+            className={cn(
+              'mb-4 text-xl font-bold leading-snug',
+              plan.isFeatured ? 'text-[var(--color-on-surface)]' : 'text-[var(--color-on-surface)]',
+            )}
+          >
+            {plan.name}
+          </h3>
 
-          <div className="mb-4">
+          {/* Price block */}
+          <div className="mb-5 pb-5" style={{ borderBottom: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
             {plan.price !== null ? (
               <>
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0">
                   <span
                     className={cn(
-                      'text-3xl font-extrabold',
+                      'text-4xl font-extrabold tracking-tight',
                       plan.isFeatured ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface)]',
                     )}
                   >
                     {formatARS(plan.price)}
                   </span>
                   {plan.billing === 'month' && (
-                    <span className="text-lg font-bold text-[var(--color-on-surface-variant)]">/mes</span>
+                    <span className="text-base font-semibold text-[var(--color-on-surface-variant)]">/mes</span>
                   )}
                 </div>
                 {plan.originalPrice && (
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className="text-sm text-[var(--color-on-surface-variant)] line-through">
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-sm text-[var(--color-on-surface-variant)] line-through opacity-60">
                       {formatARS(plan.originalPrice)}
                     </span>
                     <Badge variant="primary" className="text-[10px]">-{discount}%</Badge>
                   </div>
                 )}
                 {plan.billing === 'month' && (
-                  <p className="mt-1 text-xs text-[var(--color-on-surface-variant)]">
+                  <p className="mt-1.5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
                     Retainer mensual · IVA aparte según facturación
                   </p>
                 )}
               </>
             ) : (
               <div>
-                <span className="text-2xl font-bold text-[var(--color-primary)]">A consultar</span>
+                <span className="text-3xl font-extrabold text-[var(--color-primary)]">A consultar</span>
                 {plan.consultSubtext && (
                   <p className="mt-2 text-sm text-[var(--color-on-surface-variant)]">{plan.consultSubtext}</p>
                 )}
@@ -544,46 +526,55 @@ function UnifiedPricingCard({
             )}
           </div>
 
-          <p className="mb-3 text-base font-semibold leading-snug text-[var(--color-on-surface)]">
+          {/* Headline + description */}
+          <p className="mb-2 text-sm font-bold leading-snug text-[var(--color-on-surface)]">
             {plan.frontHeadline}
           </p>
-
-          <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+          <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-[var(--color-on-surface-variant)] opacity-75">
             {plan.description}
           </p>
 
           {deliveryInfo && (
-            <p className="mb-4 text-xs font-medium" style={{ color: 'rgba(var(--color-primary-rgb), 0.9)' }}>
+            <p
+              className="mb-4 text-xs font-semibold"
+              style={{ color: 'rgba(var(--color-primary-rgb), 0.85)' }}
+            >
               {deliveryInfo}
             </p>
           )}
 
-          <ul className="mb-5 flex-1 space-y-2.5">
+          {/* Features list */}
+          <ul className="mb-6 flex-1 space-y-2.5">
             {visibleFeatures.map((f) => (
-              <li key={f} className="flex items-start gap-2 text-sm text-[var(--color-on-surface-variant)]">
-                <CheckIcon className="mt-0.5 size-4 flex-shrink-0 text-[var(--color-primary)]" />
+              <li key={f} className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface-variant)]">
+                <span
+                  className="mt-0.5 size-4 flex-shrink-0 rounded-full inline-flex items-center justify-center"
+                  style={{ background: 'rgba(var(--color-primary-rgb), 0.12)' }}
+                >
+                  <CheckIcon className="size-2.5 text-[var(--color-primary)]" />
+                </span>
                 {f}
               </li>
             ))}
           </ul>
 
-          <div className="mb-3">
+          {/* Actions */}
+          <div className="space-y-2.5">
             <button
               type="button"
               onClick={onOpenDrawer}
               aria-expanded={isDrawerOpen}
               aria-controls={`service-plan-drawer-${plan.id}`}
-              className="inline-flex h-11 w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-colors hover:bg-[rgba(var(--color-primary-rgb),0.05)]"
+              className="inline-flex h-11 w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-all duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.06)] active:scale-[0.99]"
               style={{
-                borderColor: 'rgba(var(--color-primary-rgb), 0.24)',
-                color: 'var(--color-on-surface)',
+                borderColor: 'rgba(var(--color-primary-rgb), 0.2)',
+                color: 'var(--color-on-surface-variant)',
               }}
             >
-              <span className="text-sm font-semibold">Ver detalle →</span>
+              <span className="text-sm font-medium">Ver detalle completo</span>
+              <ArrowRightIcon className="size-4 opacity-60" />
             </button>
-          </div>
 
-          <div className="mb-1">
             <WhatsAppOutboundLink
               waHref={whatsappUrl(waMsgPlan(plan.name))}
               className={cn(

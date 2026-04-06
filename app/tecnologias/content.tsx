@@ -1,7 +1,14 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { SectionReveal } from '@/components/ui/section-reveal'
@@ -21,16 +28,31 @@ export function TecnologiasContent() {
   const prefersReducedMotion = useReducedMotion()
   const { resolvedTheme } = useTheme()
   const isLight = resolvedTheme === 'light'
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const [glare, setGlare] = useState({ x: 50, y: 50 })
+  const ctaTiltSpring = { stiffness: 88, damping: 19, mass: 0.82 }
+  const tiltXTarget = useMotionValue(0)
+  const tiltYTarget = useMotionValue(0)
+  const glareXTarget = useMotionValue(50)
+  const tiltX = useSpring(tiltXTarget, ctaTiltSpring)
+  const tiltY = useSpring(tiltYTarget, ctaTiltSpring)
+  const glareX = useSpring(glareXTarget, ctaTiltSpring)
 
-  const ctaCardShadow = isLight
-    ? `0 ${12 + Math.abs(tilt.x) * 2}px ${36 + Math.abs(tilt.y) * 4}px rgba(15, 23, 42, 0.08), ${tilt.y * 1.5}px ${-tilt.x * 1.5}px 28px rgba(var(--color-primary-rgb), 0.12)`
-    : `0 ${14 + Math.abs(tilt.x) * 3}px ${42 + Math.abs(tilt.y) * 5}px rgba(0, 0, 0, 0.55), ${tilt.y * 2}px ${-tilt.x * 2}px 38px rgba(var(--color-primary-rgb), 0.16)`
+  const ctaCardShadow = useTransform([tiltX, tiltY], ([rx, ry]) => {
+    const x = rx as number
+    const y = ry as number
+    return isLight
+      ? `0 ${12 + Math.abs(x) * 2}px ${36 + Math.abs(y) * 4}px rgba(15, 23, 42, 0.08), ${y * 1.5}px ${-x * 1.5}px 28px rgba(var(--color-primary-rgb), 0.12)`
+      : `0 ${14 + Math.abs(x) * 3}px ${42 + Math.abs(y) * 5}px rgba(0, 0, 0, 0.55), ${y * 2}px ${-x * 2}px 38px rgba(var(--color-primary-rgb), 0.16)`
+  })
 
-  const ctaGlareGradient = isLight
-    ? `linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) ${glare.x}%, rgba(0,0,0,0.025) ${Math.min(glare.x + 11, 100)}%, rgba(0,0,0,0) ${Math.min(glare.x + 24, 100)}%)`
-    : `linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) ${glare.x}%, rgba(255,255,255,0.06) ${Math.min(glare.x + 11, 100)}%, rgba(255,255,255,0) ${Math.min(glare.x + 24, 100)}%)`
+  const ctaGlareGradient = useTransform(glareX, (gx) =>
+    isLight
+      ? `linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) ${gx}%, rgba(0,0,0,0.025) ${Math.min(gx + 11, 100)}%, rgba(0,0,0,0) ${Math.min(gx + 24, 100)}%)`
+      : `linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) ${gx}%, rgba(255,255,255,0.06) ${Math.min(gx + 11, 100)}%, rgba(255,255,255,0) ${Math.min(gx + 24, 100)}%)`,
+  )
+
+  const ctaCardShadowStatic = isLight
+    ? '0 12px 36px rgba(15, 23, 42, 0.08), 0 0 28px rgba(var(--color-primary-rgb), 0.12)'
+    : '0 14px 42px rgba(0, 0, 0, 0.55), 0 0 38px rgba(var(--color-primary-rgb), 0.16)'
   const { scrollYProgress } = useScroll({ target: headerRef, offset: ['start start', 'end start'] })
   const headerOpacity = useTransform(scrollYProgress, [0.4, 1], [1, 0])
   const headerMask = useTransform(
@@ -96,22 +118,28 @@ export function TecnologiasContent() {
         <div className="mx-auto max-w-6xl px-6">
           <SectionReveal>
             <div style={{ perspective: 1000 }}>
-              <div
+              <motion.div
                 data-hover
                 data-inspector-title="CTA final — tarjeta con inclinación 3D"
-                data-inspector-desc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y, con transición curva tipo resorte (~420ms); la sombra se estira y se corre un poco para dar profundidad. Encima hay otra capa con un gradiente que se desplaza: simula un reflejo de luz sobre el panel. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; los botones usan los mismos estilos `btn-tech` que en el resto del sitio (primario + contorno WhatsApp)."
+                data-inspector-desc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y con resortes de Framer Motion (vuelta al neutro fluida); la sombra y el glare siguen esos valores. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; los botones usan los mismos estilos `btn-tech` que en el resto del sitio (primario + contorno WhatsApp)."
                 data-inspector-cat="Física · 3D"
                 className="relative overflow-hidden rounded-3xl border p-7 sm:p-10"
                 style={{
                   borderColor: 'var(--glass-border)',
                   background:
                     'linear-gradient(155deg, color-mix(in srgb, var(--color-surface-high) 92%, var(--color-primary) 8%) 0%, var(--color-surface-base) 100%)',
-                  transform: prefersReducedMotion ? 'none' : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(0)`,
-                  boxShadow: ctaCardShadow,
-                  transition: prefersReducedMotion
-                    ? 'box-shadow 0.35s ease'
-                    : 'transform 420ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 420ms cubic-bezier(0.23, 1, 0.32, 1)',
-                  transformStyle: 'preserve-3d',
+                  ...(prefersReducedMotion
+                    ? {
+                        transform: 'none',
+                        boxShadow: ctaCardShadowStatic,
+                      }
+                    : {
+                        rotateX: tiltX,
+                        rotateY: tiltY,
+                        translateZ: 0,
+                        boxShadow: ctaCardShadow,
+                        transformStyle: 'preserve-3d',
+                      }),
                 }}
                 onMouseMove={(e) => {
                   if (prefersReducedMotion) return
@@ -119,22 +147,25 @@ export function TecnologiasContent() {
                   const relX = ((e.clientX - rect.left) / rect.width) * 2 - 1
                   const relY = ((e.clientY - rect.top) / rect.height) * 2 - 1
                   const maxTilt = 6
-                  setTilt({ x: relY * -maxTilt, y: relX * maxTilt })
-                  setGlare({
-                    x: ((e.clientX - rect.left) / rect.width) * 100,
-                    y: ((e.clientY - rect.top) / rect.height) * 100,
-                  })
+                  tiltXTarget.set(relY * -maxTilt)
+                  tiltYTarget.set(relX * maxTilt)
+                  glareXTarget.set(((e.clientX - rect.left) / rect.width) * 100)
                 }}
                 onMouseLeave={() => {
-                  setTilt({ x: 0, y: 0 })
-                  setGlare({ x: 50, y: 50 })
+                  tiltXTarget.set(0)
+                  tiltYTarget.set(0)
+                  glareXTarget.set(50)
                 }}
               >
-                <div
+                <motion.div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 rounded-[inherit]"
                   style={{
-                    background: ctaGlareGradient,
+                    background: prefersReducedMotion
+                      ? isLight
+                        ? 'linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.025) 61%, rgba(0,0,0,0) 74%)'
+                        : 'linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.06) 61%, rgba(255,255,255,0) 74%)'
+                      : ctaGlareGradient,
                     opacity: prefersReducedMotion ? (isLight ? 0.45 : 0.35) : isLight ? 0.55 : 0.7,
                     transition: 'opacity 260ms ease',
                   }}
@@ -187,7 +218,7 @@ export function TecnologiasContent() {
                     </WhatsAppOutboundLink>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </SectionReveal>
         </div>

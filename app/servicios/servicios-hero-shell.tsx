@@ -50,7 +50,7 @@ export function ServiciosHeroShell({ children }: { children: ReactNode }) {
     >
       <GridBackground />
       <CircuitBoardBg cursorRef={bgCursorRef} />
-      <div className="relative z-10 mx-auto max-w-4xl px-6">{children}</div>
+      <div className="relative z-10 mx-auto max-w-6xl px-6">{children}</div>
     </motion.section>
   )
 }

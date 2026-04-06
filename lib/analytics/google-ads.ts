@@ -8,15 +8,16 @@ declare global {
 
 const GOOGLE_ADS_ACCOUNT_ID = 'AW-18041789644'
 
-// TODO: Reemplazar con el label real de la conversión "WhatsApp Click" en Google Ads.
-const GOOGLE_ADS_WHATSAPP_LABEL = 'TODO_WHATSAPP_LABEL'
-// TODO: Reemplazar con el label real de la conversión "CTA Hero Click" en Google Ads.
-const GOOGLE_ADS_HERO_CTA_LABEL = 'TODO_HERO_CTA_LABEL'
-// TODO: Reemplazar con el label real de la conversión "Scroll 50%" en Google Ads.
-const GOOGLE_ADS_SCROLL_50_LABEL = 'TODO_SCROLL_50_LABEL'
+// Labels de conversión de Google Ads.
+// Dónde encontrarlos: Google Ads → Conversiones → [conversión] → Tag setup → campo "send_to"
+// El label es la parte después de la barra: AW-18041789644/ESTE_ES_EL_LABEL
+// Mientras estén vacíos (''), las conversiones no se disparan.
+const GOOGLE_ADS_WHATSAPP_LABEL = ''
+const GOOGLE_ADS_HERO_CTA_LABEL = ''
+const GOOGLE_ADS_SCROLL_50_LABEL = ''
 
 function isPlaceholder(label: string): boolean {
-  return label.startsWith('TODO_')
+  return label === '' || label.startsWith('TODO_')
 }
 
 function trackGoogleAdsConversion(label: string) {

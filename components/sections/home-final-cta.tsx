@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { useReducedMotion } from 'framer-motion'
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
@@ -15,36 +14,55 @@ export function HomeFinalCtaSection() {
   const prefersReducedMotion = useReducedMotion()
   const { resolvedTheme } = useTheme()
   const isLight = resolvedTheme === 'light'
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const [glare, setGlare] = useState({ x: 50, y: 50 })
+  const ctaTiltSpring = { stiffness: 88, damping: 19, mass: 0.82 }
+  const tiltXTarget = useMotionValue(0)
+  const tiltYTarget = useMotionValue(0)
+  const glareXTarget = useMotionValue(50)
+  const tiltX = useSpring(tiltXTarget, ctaTiltSpring)
+  const tiltY = useSpring(tiltYTarget, ctaTiltSpring)
+  const glareX = useSpring(glareXTarget, ctaTiltSpring)
 
-  const cardShadow = isLight
-    ? `0 ${12 + Math.abs(tilt.x) * 2}px ${36 + Math.abs(tilt.y) * 4}px rgba(15, 23, 42, 0.08), ${tilt.y * 1.5}px ${-tilt.x * 1.5}px 28px rgba(var(--color-primary-rgb), 0.12)`
-    : `0 ${14 + Math.abs(tilt.x) * 3}px ${42 + Math.abs(tilt.y) * 5}px rgba(0, 0, 0, 0.55), ${tilt.y * 2}px ${-tilt.x * 2}px 38px rgba(var(--color-primary-rgb), 0.16)`
+  const cardShadow = useTransform([tiltX, tiltY], ([rx, ry]) => {
+    const x = rx as number
+    const y = ry as number
+    return isLight
+      ? `0 ${12 + Math.abs(x) * 2}px ${36 + Math.abs(y) * 4}px rgba(15, 23, 42, 0.08), ${y * 1.5}px ${-x * 1.5}px 28px rgba(var(--color-primary-rgb), 0.12)`
+      : `0 ${14 + Math.abs(x) * 3}px ${42 + Math.abs(y) * 5}px rgba(0, 0, 0, 0.55), ${y * 2}px ${-x * 2}px 38px rgba(var(--color-primary-rgb), 0.16)`
+  })
 
-  const glareGradient = isLight
-    ? `linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) ${glare.x}%, rgba(0,0,0,0.025) ${Math.min(glare.x + 11, 100)}%, rgba(0,0,0,0) ${Math.min(glare.x + 24, 100)}%)`
-    : `linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) ${glare.x}%, rgba(255,255,255,0.06) ${Math.min(glare.x + 11, 100)}%, rgba(255,255,255,0) ${Math.min(glare.x + 24, 100)}%)`
+  const glareGradient = useTransform(glareX, (gx) =>
+    isLight
+      ? `linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) ${gx}%, rgba(0,0,0,0.025) ${Math.min(gx + 11, 100)}%, rgba(0,0,0,0) ${Math.min(gx + 24, 100)}%)`
+      : `linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) ${gx}%, rgba(255,255,255,0.06) ${Math.min(gx + 11, 100)}%, rgba(255,255,255,0) ${Math.min(gx + 24, 100)}%)`,
+  )
+
+  const cardShadowStatic = isLight
+    ? '0 12px 36px rgba(15, 23, 42, 0.08), 0 0 28px rgba(var(--color-primary-rgb), 0.12)'
+    : '0 14px 42px rgba(0, 0, 0, 0.55), 0 0 38px rgba(var(--color-primary-rgb), 0.16)'
 
   return (
     <section className="relative pb-24 md:pb-32">
       <div className="mx-auto max-w-6xl px-6">
         <SectionReveal>
           <div style={{ perspective: 1000 }}>
-            <div
+            <motion.div
               className="relative overflow-hidden rounded-3xl border p-7 sm:p-10"
               style={{
                 borderColor: 'var(--glass-border)',
                 background:
                   'linear-gradient(155deg, color-mix(in srgb, var(--color-surface-high) 92%, var(--color-primary) 8%) 0%, var(--color-surface-base) 100%)',
-                transform: prefersReducedMotion
-                  ? 'none'
-                  : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(0)`,
-                boxShadow: cardShadow,
-                transition: prefersReducedMotion
-                  ? 'box-shadow 0.35s ease'
-                  : 'transform 420ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 420ms cubic-bezier(0.23, 1, 0.32, 1)',
-                transformStyle: 'preserve-3d',
+                ...(prefersReducedMotion
+                  ? {
+                      transform: 'none',
+                      boxShadow: cardShadowStatic,
+                    }
+                  : {
+                      rotateX: tiltX,
+                      rotateY: tiltY,
+                      translateZ: 0,
+                      boxShadow: cardShadow,
+                      transformStyle: 'preserve-3d',
+                    }),
               }}
               onMouseMove={(e) => {
                 if (prefersReducedMotion) return
@@ -52,22 +70,25 @@ export function HomeFinalCtaSection() {
                 const relX = ((e.clientX - rect.left) / rect.width) * 2 - 1
                 const relY = ((e.clientY - rect.top) / rect.height) * 2 - 1
                 const maxTilt = 6
-                setTilt({ x: relY * -maxTilt, y: relX * maxTilt })
-                setGlare({
-                  x: ((e.clientX - rect.left) / rect.width) * 100,
-                  y: ((e.clientY - rect.top) / rect.height) * 100,
-                })
+                tiltXTarget.set(relY * -maxTilt)
+                tiltYTarget.set(relX * maxTilt)
+                glareXTarget.set(((e.clientX - rect.left) / rect.width) * 100)
               }}
               onMouseLeave={() => {
-                setTilt({ x: 0, y: 0 })
-                setGlare({ x: 50, y: 50 })
+                tiltXTarget.set(0)
+                tiltYTarget.set(0)
+                glareXTarget.set(50)
               }}
             >
-              <div
+              <motion.div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-[inherit]"
                 style={{
-                  background: glareGradient,
+                  background: prefersReducedMotion
+                    ? isLight
+                      ? 'linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.025) 61%, rgba(0,0,0,0) 74%)'
+                      : 'linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.06) 61%, rgba(255,255,255,0) 74%)'
+                    : glareGradient,
                   opacity: prefersReducedMotion ? (isLight ? 0.45 : 0.35) : isLight ? 0.55 : 0.7,
                   transition: 'opacity 260ms ease',
                 }}
@@ -122,7 +143,7 @@ export function HomeFinalCtaSection() {
                   </WhatsAppOutboundLink>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </SectionReveal>
       </div>
