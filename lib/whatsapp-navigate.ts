@@ -16,6 +16,7 @@ export function openWhatsAppWithThankYouPage(
   router: AppRouterPush,
 ): void {
   if (typeof window !== 'undefined') {
+    window.gtag?.('event', 'conversion')
     window.open(waHref, '_blank', 'noopener,noreferrer')
   }
   const target = `${WHATSAPP_THANK_YOU_ROUTE}?wa=${encodeURIComponent(waHref)}`

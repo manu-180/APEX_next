@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useLayoutEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
@@ -53,11 +53,6 @@ export function GraciasContent() {
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
-  }, [])
-
-  useEffect(() => {
-    window.gtag?.('event', 'conversion', { value: 300000, currency: 'ARS' })
-    window.gtag?.('event', 'generate_lead', { value: 300000, currency: 'ARS' })
   }, [])
 
   return (
