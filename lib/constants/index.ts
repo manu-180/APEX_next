@@ -6,7 +6,7 @@ export const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.theapexw
 export const BRAND_IMAGE_SRC = '/apex-logo.png' as const
 
 // ─── Contact ─────────────────────────────────────────────────────────────────
-export const WHATSAPP_NUMBER = '5491125303794'
+export const WHATSAPP_NUMBER = '5491134272488'
 
 // ─── Owner / Admin ────────────────────────────────────────────────────────────
 export const ADMIN_UUID = '37dad3e9-531c-4657-8db6-ddebbdcfa878'

@@ -71,7 +71,7 @@ export async function POST(req: Request) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID ?? process.env.ACCOUNT_SID
   const apiKeySid = process.env.TWILIO_API_KEY_SID ?? process.env.API_KEY_SID
   const apiKeySecret = process.env.TWILIO_API_KEY_SECRET ?? process.env.API_KEY_SECRET
-  const from = process.env.TWILIO_WHATSAPP_FROM ?? 'whatsapp:+5491125303794'
+  const from = process.env.TWILIO_WHATSAPP_FROM ?? 'whatsapp:+5491134272488'
 
   const templateClientSid =
     process.env.TWILIO_WHATSAPP_TEMPLATE_CLIENT_SID ??
