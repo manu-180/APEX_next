@@ -70,9 +70,9 @@ function ServiciosTabQuerySync({ onSelectMobile }: { onSelectMobile: () => void 
 }
 
 const PLAN_DELIVERY: Record<string, string> = {
-  web_basic:       'Entregada en 3 semanas · Pago 50/50 al iniciar y al entregar',
-  web_interactive: 'Entregada en 5 semanas · Pago en 3 cuotas sin interés',
-  web_premium:     'Entregada en 6 semanas · Incluye capacitación para manejarlo solo',
+  web_basic:       'Entregada en 15 días · Pago 50/50 al iniciar y al entregar',
+  web_interactive: 'Entregada en 15 días · Pago en 3 cuotas sin interés',
+  web_premium:     'Entregada en 15 días · Incluye capacitación para manejarlo solo',
   app_mvp:         'Fee mensual desde el día 1 · Sin contrato de permanencia',
   app_pro:         'Fee mensual · Panel admin incluido · Sin contrato de permanencia',
   app_platform:    'Propuesta personalizada · Fee mensual + implementación',

@@ -6,7 +6,7 @@ import { ServiciosHeroShell } from './servicios-hero-shell'
 export const SERVICIOS_FAQ_ITEMS = [
   {
     q: '¿Cuánto tarda hacer una página web?',
-    a: 'Entre 2 y 4 semanas para una landing page, 15 días para una web completa. Fecha de entrega garantizada desde el día 1.',
+    a: 'Entrega en 15 días para cualquier proyecto web. Fecha garantizada desde el día 1.',
   },
   {
     q: '¿Cuánto cuesta una página web en Argentina?',
@@ -106,7 +106,7 @@ export function ServiciosStaticTop() {
                     },
                     {
                       step: '03',
-                      title: 'Entrega en 2 semanas',
+                      title: 'Entrega en 15 días',
                       sub: 'Garantizado. Si no cumplimos, devolvemos el depósito.',
                       highlight: true,
                     },
@@ -253,7 +253,7 @@ export function ServiciosStaticTop() {
                     {[
                       'Hablar directo conmigo',
                       'Precio fijo pactado',
-                      'Entrega en 2 semanas',
+                      'Entrega en 15 días',
                       '3 meses de soporte incluido',
                       '100% a tu medida',
                     ].map((item) => (

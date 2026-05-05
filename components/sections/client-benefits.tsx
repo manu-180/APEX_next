@@ -41,7 +41,7 @@ const BENEFITS: BenefitItem[] = [
     sizeClass: 'lg:col-span-5 lg:row-span-1',
   },
   {
-    title: 'Entrega en 2 semanas',
+    title: 'Entrega en 15 días',
     description:
       'Proceso agil, foco total y entregables concretos. Evitamos proyectos eternos y salis al mercado mas rapido.',
     anchor: 'Velocidad con calidad visual',

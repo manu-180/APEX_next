@@ -24,7 +24,7 @@ const faqSchema = {
       name: '¿Cuánto tarda hacer una página web?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Entre 2 y 4 semanas para una landing page, 15 días para una web completa. Fecha de entrega garantizada desde el día 1.',
+        text: 'Entrega en 15 días para cualquier proyecto web. Fecha garantizada desde el día 1.',
       },
     },
     {
