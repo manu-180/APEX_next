@@ -62,10 +62,10 @@ const FEATURES = [
   {
     icon: <TimerIcon />,
     tag: 'PLAZO',
-    value: 'Entrega en 15 días',
+    value: 'Entrega en 2 semanas',
     desc: 'Fecha acordada, fecha cumplida. Sin demoras.',
     inspectorTitle: 'Promesa de Entrega Rápida',
-    inspectorDesc: 'Diferenciador clave: la mayoría de agencias tarda 2–3 meses. APEX entrega en 15 días con proceso ágil de iteración.',
+    inspectorDesc: 'Diferenciador clave: la mayoría de agencias tarda 2–3 meses. APEX entrega en 2 semanas con proceso ágil de iteración.',
     inspectorCat: 'Marketing · Conversión',
   },
   {
@@ -371,7 +371,7 @@ export function HeroSection() {
               className="text-pretty text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-10"
             >
               Páginas web y apps móviles para emprendedores y pymes en Argentina.
-              Diseño premium, entrega en 15 días y precios transparentes desde{' '}
+              Diseño premium, entrega en 2 semanas y precios transparentes desde{' '}
               <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300k</span>.
             </motion.p>
 

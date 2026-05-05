@@ -106,7 +106,7 @@ export function ServiciosStaticTop() {
                     },
                     {
                       step: '03',
-                      title: 'Entrega en 15 días',
+                      title: 'Entrega en 2 semanas',
                       sub: 'Garantizado. Si no cumplimos, devolvemos el depósito.',
                       highlight: true,
                     },
@@ -253,7 +253,7 @@ export function ServiciosStaticTop() {
                     {[
                       'Hablar directo conmigo',
                       'Precio fijo pactado',
-                      'Entrega en 15 días',
+                      'Entrega en 2 semanas',
                       '3 meses de soporte incluido',
                       '100% a tu medida',
                     ].map((item) => (
