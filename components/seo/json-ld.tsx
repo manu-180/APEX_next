@@ -11,7 +11,7 @@ export function PersonJsonLd() {
     jobTitle: 'Desarrollador Full-Stack & Mobile',
     url: APP_URL,
     sameAs: [
-      `https://wa.me/5491134272488`,
+      `https://wa.me/5491164707543`,
     ],
     knowsAbout: ['Flutter', 'Next.js', 'Supabase', 'Riverpod', 'TypeScript', 'Tailwind CSS', 'Diseño premium', 'UX'],
     description:
