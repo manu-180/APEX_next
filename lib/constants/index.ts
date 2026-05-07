@@ -13,13 +13,14 @@ export const ADMIN_UUID = '37dad3e9-531c-4657-8db6-ddebbdcfa878'
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 export const ROUTES = {
-  home:      '/',
-  servicios: '/servicios',
+  home:        '/',
+  servicios:   '/servicios',
   tecnologias: '/tecnologias',
-  about:     '/sobre-mi',
-  contact:   '/contacto',
+  proyectos:   '/proyectos',
+  about:       '/sobre-mi',
+  contact:     '/contacto',
   /** Tras abrir WhatsApp desde un CTA del sitio (misma pestaña). */
-  gracias:   '/gracias',
+  gracias:     '/gracias',
 } as const
 
 // ─── Social / External ───────────────────────────────────────────────────────
