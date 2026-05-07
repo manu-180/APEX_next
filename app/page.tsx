@@ -1,6 +1,5 @@
 import { HeroSection } from '@/components/sections/hero'
 import { ClientBenefitsSection } from '@/components/sections/client-benefits'
-import { ProjectsSection } from '@/components/sections/projects'
 import { TrustedClientsSection } from '@/components/sections/trusted-clients'
 import { HomeFinalCtaSection } from '@/components/sections/home-final-cta'
 
@@ -12,7 +11,6 @@ export default function HomePage() {
     <>
       <HeroSection />
       <ClientBenefitsSection />
-      <ProjectsSection />
       <TrustedClientsSection />
       <HomeFinalCtaSection />
     </>

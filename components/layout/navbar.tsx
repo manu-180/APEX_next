@@ -3,7 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
@@ -11,11 +11,13 @@ import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon } from '@/components/ui/icons'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
+import { MobileDrawer } from '@/components/layout/mobile-drawer'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
 
 const NAV_LINKS = [
   { href: ROUTES.home, label: 'Inicio', external: false },
   { href: ROUTES.servicios, label: 'Servicios', external: false },
+  { href: ROUTES.proyectos, label: 'Proyectos', external: false },
   { href: ROUTES.tecnologias, label: 'Tecnologías', external: false },
   { href: ROUTES.about, label: 'Sobre Mí', external: false },
   { href: ROUTES.contact, label: 'Contacto', external: false },
@@ -264,69 +266,17 @@ export function Navbar({
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: [0.33, 1, 0.68, 1] }}
-            className="md:hidden"
-            style={{
-              backgroundColor: 'var(--color-surface-low)',
-              borderBottom: '1px solid var(--glass-border)',
-            }}
-          >
-            <div className="flex flex-col gap-1 px-4 py-4 sm:px-6">
-              {NAV_LINKS.map((link) =>
-                link.external ? (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setMobileOpen(false)}
-                    className="px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]"
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                      pathname === link.href
-                        ? 'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.08)]'
-                        : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]',
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ),
-              )}
-              <div className="mt-2 pt-2 border-t border-[var(--color-surface-high)]">
-                <WhatsAppOutboundLink
-                  waHref={WHATSAPP_NAV_HREF}
-                  onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    'inline-flex w-full items-center justify-center gap-2 font-semibold',
-                    'transition-all duration-200 ease-out',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                    'btn-tech btn-primary-tech active:scale-[0.97]',
-                    'h-11 px-6 text-sm rounded-xl'
-                  )}
-                  data-hover
-                >
-                  Hablemos
-                </WhatsAppOutboundLink>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileDrawer
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        links={NAV_LINKS}
+        currentPath={pathname}
+        whatsappHref={WHATSAPP_NAV_HREF}
+        onToggleTheme={onToggleDarkMode}
+        onShowShortcuts={onShowShortcuts}
+        resolvedTheme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+        onlineCount={onlineCount}
+      />
     </nav>
   )
 }
