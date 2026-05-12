@@ -1,6 +1,7 @@
 'use client'
 
 import { ROUTES } from '@/lib/constants'
+import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
 
 /** Misma ruta que usan los CTAs al abrir WhatsApp desde la web. */
 export const WHATSAPP_THANK_YOU_ROUTE = ROUTES.gracias
@@ -16,7 +17,7 @@ export function openWhatsAppWithThankYouPage(
   router: AppRouterPush,
 ): void {
   if (typeof window !== 'undefined') {
-    window.gtag?.('event', 'conversion')
+    trackGoogleAdsWhatsAppClick()
     window.open(waHref, '_blank', 'noopener,noreferrer')
   }
   const target = `${WHATSAPP_THANK_YOU_ROUTE}?wa=${encodeURIComponent(waHref)}`
