@@ -1032,3 +1032,34 @@ a {
 .inspector-mode [data-hover][data-inspector-title] {
   cursor: crosshair;
 }
+
+/* Nota: la animación de entrada en el heading se eliminó intencionalmente
+   para no degradar el LCP (Largest Contentful Paint).
+   El navegador solo cuenta como LCP cuando el elemento está visualmente
+   estable; cualquier opacity:0 inicial pospone esa medición. */
+
+/* ── Hero — animaciones cuidadosas que NO afectan el LCP ─────────────────── */
+/* La columna izquierda (donde vive el h1 LCP) se sirve visible desde el
+   primer paint. Solo aplicamos una animación leve a la columna derecha que
+   no es candidata a LCP. */
+.apex-feature-card {
+  transition: transform 0.18s ease-out;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: apex-hero-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.apex-feature-card:nth-child(1) { animation-delay: 0.05s; }
+.apex-feature-card:nth-child(2) { animation-delay: 0.13s; }
+.apex-feature-card:nth-child(3) { animation-delay: 0.21s; }
+.apex-feature-card:hover { transform: scale(1.018); }
+
+@keyframes apex-hero-rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apex-feature-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

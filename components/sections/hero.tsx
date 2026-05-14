@@ -3,10 +3,9 @@
 import dynamic from 'next/dynamic'
 import { useRef, useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion'
+import type { MousePosition } from '@/components/ui/particle-field'
 import { TextReveal } from '@/components/ui/text-reveal'
 import { GridBackground } from '@/components/ui/grid-background'
-import type { MousePosition } from '@/components/ui/particle-field'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRightIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
@@ -20,18 +19,6 @@ const ParticleField = dynamic(
   () => import('@/components/ui/particle-field').then((m) => m.ParticleField),
   { ssr: false },
 )
-
-const STAGGER_BASE = 0.08
-const stagger = (i: number) => ({ delay: i * STAGGER_BASE })
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], ...stagger(i) },
-  }),
-}
 
 /* ── Micro-icons for feature tags ── */
 function TimerIcon() {
@@ -63,68 +50,36 @@ function DiamondIcon() {
   )
 }
 
-/* Features shown on the right column — conversion-focused */
 const FEATURES = [
   {
     icon: <TimerIcon />,
     tag: 'PLAZO',
     value: 'Entrega en 15 días',
     desc: 'Fecha acordada, fecha cumplida. Sin demoras.',
-    inspectorTitle: 'Promesa de Entrega Rápida',
-    inspectorDesc: 'Diferenciador clave: la mayoría de agencias tarda 2–3 meses. APEX entrega en 15 días con proceso ágil de iteración.',
-    inspectorCat: 'Marketing · Conversión',
   },
   {
     icon: <PriceTagIcon />,
     tag: 'PRECIO',
     value: 'Desde ARS 300k',
     desc: 'Precios transparentes. Sin sorpresas al final.',
-    inspectorTitle: 'Precio Visible desde el Primer Momento',
-    inspectorDesc: 'Mostrar precio reduce la fricción: el visitante califica o descalifica solo, sin perder tiempo en reuniones iniciales.',
-    inspectorCat: 'Marketing · Conversión',
   },
   {
     icon: <DiamondIcon />,
     tag: 'DISEÑO PREMIUM',
     value: 'Diseño premium',
     desc: 'Todo a medida. No templates, no rellenos.',
-    inspectorTitle: 'Diseño premium a medida vs plantillas',
-    inspectorDesc: 'Cada proyecto parte de cero: wireframe → diseño premium → código. Ninguna página APEX se parece a otra.',
-    inspectorCat: 'Propuesta de Valor',
   },
 ]
 
-/* ── Variant sets for FeatureCard — propagated from parent whileHover ── */
-const featureCardVariants = {
-  rest: { scale: 1 },
-  hover: { scale: 1.018, transition: { duration: 0.15, ease: 'easeOut' } },
-}
-const fillLineVariants = {
-  rest: { scaleX: 0, opacity: 0 },
-  hover: { scaleX: 1, opacity: 1, transition: { duration: 0.28, ease: 'easeOut' } },
-}
-
-function FeatureCard({
-  f,
-}: {
-  f: (typeof FEATURES)[number]
-}) {
+function FeatureCard({ f }: { f: (typeof FEATURES)[number] }) {
   return (
-    <motion.div
-      className="group relative overflow-hidden rounded-lg backdrop-blur-[20px] saturate-150"
+    <div
+      className="apex-feature-card group relative overflow-hidden rounded-lg backdrop-blur-[20px] saturate-150"
       style={{
         backgroundColor: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
       }}
-      initial="rest"
-      whileHover="hover"
-      variants={featureCardVariants}
-      data-hover
-      data-inspector-title={f.inspectorTitle}
-      data-inspector-desc={f.inspectorDesc}
-      data-inspector-cat={f.inspectorCat}
     >
-      {/* ── Dot grid — da textura "HUD" al fondo ── */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.07]"
         style={{
@@ -133,24 +88,14 @@ function FeatureCard({
         }}
         aria-hidden="true"
       />
-
-      {/* ── Radial glow desde arriba al hacer hover ── */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-20 opacity-0 transition-opacity duration-400 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-x-0 top-0 h-20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: 'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(var(--color-primary-rgb), 0.14), transparent)',
+          background:
+            'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(var(--color-primary-rgb), 0.14), transparent)',
         }}
         aria-hidden="true"
       />
-
-      {/* ── Left accent bar ── */}
-      <div
-        className="pointer-events-none absolute left-0 top-0 h-full w-px opacity-0 transition-opacity duration-200 group-hover:opacity-60"
-        style={{ backgroundColor: 'var(--color-primary)' }}
-        aria-hidden="true"
-      />
-
-      {/* ── Corner brackets ── */}
       <span
         className="pointer-events-none absolute left-2.5 top-2.5 size-3 border-l border-t opacity-25 transition-opacity duration-200 group-hover:opacity-90"
         style={{ borderColor: 'var(--color-primary)' }}
@@ -171,18 +116,7 @@ function FeatureCard({
         style={{ borderColor: 'var(--color-primary)' }}
         aria-hidden="true"
       />
-
-      {/* ── Bottom fill line ── */}
-      <motion.div
-        className="pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left"
-        style={{ backgroundColor: 'var(--color-primary)' }}
-        variants={fillLineVariants}
-        aria-hidden="true"
-      />
-
-      {/* ── Content ── */}
       <div className="relative px-5 py-4">
-        {/* Icon + monospace tag — reemplaza el contador 01/03 */}
         <div className="flex items-center gap-1.5 mb-2.5">
           <span
             className="opacity-50 transition-opacity duration-150 group-hover:opacity-100"
@@ -197,37 +131,34 @@ function FeatureCard({
             {f.tag}
           </p>
         </div>
-        {/* Value */}
         <p className="text-sm font-bold text-[var(--color-on-surface)] mb-1">{f.value}</p>
         <p className="text-xs text-[var(--color-on-surface-variant)] leading-relaxed">{f.desc}</p>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
+/**
+ * Hero — render server-friendly:
+ * - HTML completo se sirve estático (sin framer wrapper); LCP es el heading.
+ * - Animaciones de entrada con CSS keyframes (no esperan hidratación).
+ * - ParticleField se monta sólo post-idle (requestIdleCallback).
+ */
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const particleMouseRef = useRef<MousePosition>({ x: -9999, y: -9999, active: false })
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const [isMobileViewport, setIsMobileViewport] = useState(false)
   const [particlesReady, setParticlesReady] = useState(false)
-
-  const rotateX = useSpring(useTransform(mouseY, [-300, 300], [2, -2]), { stiffness: 150, damping: 25 })
-  const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-2, 2]), { stiffness: 150, damping: 25 })
 
   const handleMouse = useCallback((e: React.MouseEvent) => {
     if (!ref.current) return
     const rect = ref.current.getBoundingClientRect()
-    mouseX.set(e.clientX - rect.left - rect.width / 2)
-    mouseY.set(e.clientY - rect.top - rect.height / 2)
     particleMouseRef.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
       active: true,
     }
-  }, [mouseX, mouseY])
+  }, [])
 
   const handleMouseLeave = useCallback(() => {
     particleMouseRef.current.active = false
@@ -240,21 +171,6 @@ export function HeroSection() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-
-    const mediaQuery = window.matchMedia('(max-width: 639px)')
-    const onChange = (event: MediaQueryListEvent) => setIsMobileViewport(event.matches)
-    setIsMobileViewport(mediaQuery.matches)
-    mediaQuery.addEventListener('change', onChange)
-
-    return () => {
-      mediaQuery.removeEventListener('change', onChange)
-    }
-  }, [])
-
-  useEffect(() => {
-    // Diferimos las partículas: solo se montan después del LCP/idle del browser
-    // para no competir con el render principal del hero.
-    if (typeof window === 'undefined') return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     if (window.innerWidth < 768) return
 
@@ -265,7 +181,7 @@ export function HeroSection() {
     if (typeof ric === 'function') {
       ric(trigger, { timeout: 2500 })
     } else {
-      const t = window.setTimeout(trigger, 1200)
+      const t = window.setTimeout(trigger, 1500)
       return () => window.clearTimeout(t)
     }
   }, [])
@@ -283,20 +199,13 @@ export function HeroSection() {
         paddingBottom: 'var(--section-py-hero)',
       }}
     >
-      {/* ── Background layers ──────────────────────────────────────────── */}
       <GridBackground showScanline showRadialLight />
 
       {particlesReady && (
-        <div
-          className="pointer-events-none absolute inset-0"
-          data-hover
-          data-inspector-title="Campo de Partículas Reactivo"
-          data-inspector-desc="300 partículas con física de repulsión en Canvas 2D puro — huyen del cursor calculando vectores a 60fps con requestAnimationFrame. Sin WebGL."
-          data-inspector-cat="Animación"
-        >
+        <div className="pointer-events-none absolute inset-0">
           <ParticleField
             externalMouse={particleMouseRef}
-            particleCount={180}
+            particleCount={150}
             connectionDistance={140}
             mouseForce={1.45}
             mouseImpulseScale={0.58}
@@ -321,7 +230,6 @@ export function HeroSection() {
         }}
       />
 
-      {/* Structural decorative lines */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute left-[15%] top-0 h-full w-px"
@@ -333,35 +241,12 @@ export function HeroSection() {
         />
       </div>
 
-      {/* ── Main content ────────────────────────────────────────────────── */}
-      <motion.div
-        style={isMobileViewport ? undefined : { rotateX, rotateY, perspective: 1200 }}
-        className="relative mx-auto w-full min-w-0 max-w-6xl px-4 sm:px-6"
-        data-hover
-        data-inspector-title="Hero con Física de Spring"
-        data-inspector-desc="Todo este bloque gira en 3D siguiendo tu mouse con física de resorte real — masa, amortiguación y velocidad por frame. Framer Motion."
-        data-inspector-cat="Física · 3D"
-      >
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-16 items-center"
-        >
+      <div className="relative mx-auto w-full min-w-0 max-w-6xl px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-16 items-center">
           {/* ── Left column ─────────────────────────────────────────── */}
-          <div className="w-full min-w-0 max-w-none lg:max-w-xl">
-            {/* Status badges */}
-            <motion.div
-              custom={0}
-              variants={fadeUp}
-              className="mb-8 flex flex-wrap items-center gap-2"
-            >
-              <div
-                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 glass-card glow-border"
-                data-hover
-                data-inspector-title="Badge de Disponibilidad en Vivo"
-                data-inspector-desc="Punto verde con pulse CSS puro. Borde glass morphism con backdrop-filter difuminando el fondo en tiempo real."
-                data-inspector-cat="CSS · Ambiance"
-              >
+          <div className="apex-hero-col-left w-full min-w-0 max-w-none lg:max-w-xl">
+            <div className="mb-8 flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 glass-card glow-border">
                 <span
                   className="size-2 rounded-full animate-pulse"
                   style={{ backgroundColor: 'var(--color-online)', boxShadow: '0 0 8px var(--color-online)' }}
@@ -373,14 +258,9 @@ export function HeroSection() {
               <Badge variant="outline" className="rounded-full px-4 py-1.5 text-xs font-semibold">
                 Diseño premium
               </Badge>
-            </motion.div>
+            </div>
 
-            {/* Heading — Oxanium weight contrast, reasonable size */}
-            <motion.h1
-              custom={1}
-              variants={fadeUp}
-              className="font-heading text-balance leading-tight mb-6"
-            >
+            <h1 className="font-heading text-balance leading-tight mb-6">
               <span className="block text-3xl sm:text-4xl md:text-5xl font-light text-[var(--color-on-surface-variant)]">
                 <TextReveal text="Tu negocio" delay={0.1} />
               </span>
@@ -390,29 +270,15 @@ export function HeroSection() {
               <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-gradient-primary pb-1">
                 <TextReveal text="hecho para vender." delay={0.26} />
               </span>
-            </motion.h1>
+            </h1>
 
-            {/* Marketing tagline */}
-            <motion.p
-              custom={2}
-              variants={fadeUp}
-              className="text-pretty text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-10"
-            >
+            <p className="text-pretty text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-10">
               Páginas web y apps móviles para emprendedores y pymes en Argentina.
               Diseño premium, entrega en 15 días y precios transparentes desde{' '}
               <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300k</span>.
-            </motion.p>
+            </p>
 
-            {/* CTAs */}
-            <motion.div
-              custom={3}
-              variants={fadeUp}
-              className="flex w-full flex-col gap-3 lg:flex-row lg:items-start lg:gap-4"
-              data-hover
-              data-inspector-title="Botones con Microinteracción Spring"
-              data-inspector-desc="Escala spring al hover, press a 0.97 con 80ms para sensación de peso real. Framer Motion."
-              data-inspector-cat="UX · Motion"
-            >
+            <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
               <button
                 type="button"
                 onClick={handleCTAClick}
@@ -423,7 +289,6 @@ export function HeroSection() {
                   'btn-tech btn-primary-tech active:scale-[0.97]',
                   'min-h-12 px-7 py-3 text-sm rounded-xl',
                 )}
-                data-hover
               >
                 <span className="text-center leading-snug">
                   Contame tu idea{' '}
@@ -431,7 +296,7 @@ export function HeroSection() {
                 </span>
                 <ArrowRightIcon className="size-4 shrink-0" aria-hidden />
               </button>
-              <Link href={ROUTES.servicios} className="w-full lg:w-auto">
+              <Link href={ROUTES.servicios} className="w-full lg:w-auto" prefetch={false}>
                 <button
                   type="button"
                   className={cn(
@@ -441,52 +306,37 @@ export function HeroSection() {
                     'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
                     'min-h-12 px-7 py-3 text-sm rounded-xl',
                   )}
-                  data-hover
                 >
                   Ver precios
                 </button>
               </Link>
-            </motion.div>
+            </div>
 
-            {/* Trust micro-copy */}
-            <motion.p
-              custom={4}
-              variants={fadeUp}
-              className="mt-5 text-xs text-[var(--color-on-surface-variant)] opacity-60"
-            >
+            <p className="mt-5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
               Respondemos en menos de 2 horas · Sin compromiso
-            </motion.p>
+            </p>
           </div>
 
-          {/* ── Right column: tech feature cards ─────────────────── */}
-          <motion.div
-            custom={3}
-            variants={fadeUp}
-            className="hidden lg:flex flex-col gap-2.5"
-          >
+          {/* ── Right column ─────────────────── */}
+          <div className="apex-hero-col-right hidden lg:flex flex-col gap-2.5">
             {FEATURES.map((f) => (
               <FeatureCard key={f.value} f={f} />
             ))}
 
-            {/* ── Stat row ── */}
             <div className="mt-1 grid grid-cols-3 gap-2">
               {[
                 { value: '+15', label: 'Proyectos' },
                 { value: '4.9', label: 'Rating' },
                 { value: '15d', label: 'Entrega' },
               ].map((stat) => (
-                <motion.div
+                <div
                   key={stat.label}
                   className="group relative overflow-hidden rounded-md px-3 py-2.5 text-center stat-card-shine backdrop-blur-[20px] saturate-150"
                   style={{
                     backgroundColor: 'var(--glass-bg)',
                     border: '1px solid var(--glass-border)',
                   }}
-                  initial="rest"
-                  whileHover="hover"
-                  variants={{ rest: { scale: 1 }, hover: { scale: 1.06, transition: { duration: 0.15, ease: 'easeOut' } } }}
                 >
-                  {/* Tiny corner brackets */}
                   <span className="pointer-events-none absolute left-1 top-1 size-2 border-l border-t opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
                   <span className="pointer-events-none absolute right-1 top-1 size-2 border-r border-t opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
                   <span className="pointer-events-none absolute bottom-1 left-1 size-2 border-b border-l opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
@@ -497,12 +347,12 @@ export function HeroSection() {
                   <div className="relative text-[10px] text-[var(--color-on-surface-variant)] uppercase tracking-wide">
                     {stat.label}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }
