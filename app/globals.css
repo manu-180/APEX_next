@@ -1063,3 +1063,8 @@ a {
     transform: none;
   }
 }
+
+/* ── Nav underline transition (CSS, sin framer-motion) ─────────────────── */
+.apex-nav-underline {
+  transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}

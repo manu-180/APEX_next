@@ -3,8 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/providers/theme-mode-provider'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
@@ -99,7 +98,6 @@ export function Navbar({
       className="fixed top-0 left-0 right-0"
       style={{ zIndex: 'var(--z-sticky)' } as React.CSSProperties}
     >
-      {/* Full-bleed bar; inner row keeps alignment with page max-width */}
       <div
         className="w-full pt-[env(safe-area-inset-top,0px)]"
         style={{
@@ -108,14 +106,10 @@ export function Navbar({
         }}
       >
         <div className="mx-auto flex h-14 w-full min-w-0 max-w-6xl flex-row items-center justify-between gap-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] md:h-16">
-        {/* Logo — asymmetric: cut-corner badge + Syne heading font */}
         <Link
           href="/"
           className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 group"
-          data-hover
-          data-inspector-title="Logo con Glow Dinámico"
-          data-inspector-desc="El logotipo circular y el texto 'APEX' con Syne usan el tema activo."
-          data-inspector-cat="Tema Dinámico"
+          prefetch={false}
         >
           <ApexLogoMark priority />
           <span className="hidden sm:block font-heading text-lg font-extrabold text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)]">
@@ -123,7 +117,6 @@ export function Navbar({
           </span>
         </Link>
 
-        {/* Desktop links — spring-animated underline */}
         <div ref={navLinksRef} className="relative hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
             const active = !link.external && pathname === link.href
@@ -140,7 +133,6 @@ export function Navbar({
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-hover
                   className={navClass}
                 >
                   {link.label}
@@ -155,10 +147,7 @@ export function Navbar({
                   else delete linkRefs.current[link.href]
                 }}
                 href={link.href}
-                data-hover
-                data-inspector-title="Nav Link con Underline Spring"
-                data-inspector-desc="El subrayado se mueve con física de resorte — un único elemento DOM que anima su posición X y ancho."
-                data-inspector-cat="Motion · Spring"
+                prefetch={false}
                 className={navClass}
               >
                 {link.label}
@@ -166,22 +155,20 @@ export function Navbar({
             )
           })}
           {underline !== null && underline.width > 0 && (
-            <motion.div
+            <span
               aria-hidden
-              className="pointer-events-none absolute left-0 h-[2px] rounded-full"
+              className="pointer-events-none absolute left-0 h-[2px] rounded-full apex-nav-underline"
               style={{
                 top: underline.top,
+                left: underline.left,
+                width: underline.width,
                 backgroundColor: 'var(--color-primary)',
                 boxShadow: '0 0 12px rgba(var(--color-primary-rgb), 0.6)',
               }}
-              initial={false}
-              animate={{ left: underline.left, width: underline.width }}
-              transition={{ type: 'spring', stiffness: 480, damping: 38 }}
             />
           )}
         </div>
 
-        {/* Right side — action cluster (segunda fila en móvil, una columna visual) */}
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 md:w-auto md:flex-none md:justify-start">
           {typeof onlineCount === 'number' && (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-surface-high)]/50 text-xs text-[var(--color-on-surface-variant)] tabular-nums">
@@ -194,10 +181,6 @@ export function Navbar({
             onClick={(e) => onToggleDarkMode(e)}
             className="flex size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
             aria-label="Toggle tema claro/oscuro"
-            data-hover
-            data-inspector-title="Toggle Claro/Oscuro con Ola"
-            data-inspector-desc="Una ola circular nace desde tu click y se expande usando clip-path animado — el origen se pasa como variable CSS desde JavaScript."
-            data-inspector-cat="CSS · Ambiance"
           >
             {!mounted ? (
               <span className="block size-4" aria-hidden />
@@ -230,10 +213,6 @@ export function Navbar({
             onClick={onShowShortcuts}
             className="hidden md:flex size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
             aria-label="Atajos de teclado"
-            data-hover
-            data-inspector-title="Centro de Atajos de Teclado"
-            data-inspector-desc="Ctrl+I inspector, Ctrl+Y claro/oscuro, Ctrl+Shift+H WhatsApp, Ctrl+R reset tema, Ctrl+K panel de atajos."
-            data-inspector-cat="UX · Accesibilidad"
           >
             <KeyboardIcon className="size-4" />
           </button>
@@ -247,10 +226,6 @@ export function Navbar({
               'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
               'h-9 px-4 text-sm rounded-xl'
             )}
-            data-hover
-            data-inspector-title="CTA Principal con Conversión Directa"
-            data-inspector-desc="Abre WhatsApp con un mensaje corto que indica que te escriben desde tu sitio."
-            data-inspector-cat="UX · Motion"
           >
             Hablemos
           </WhatsAppOutboundLink>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/providers/theme-mode-provider'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'

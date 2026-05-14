@@ -1,7 +1,7 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import type { PostHog } from 'posthog-js';
 
 const posthogToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
@@ -9,6 +9,15 @@ const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 
 let posthogInstance: PostHog | null = null;
 let posthogLoadPromise: Promise<PostHog | null> | null = null;
+let interactionDetected = false;
+
+const FIRST_INTERACTION_EVENTS: Array<keyof WindowEventMap> = [
+  'pointerdown',
+  'touchstart',
+  'keydown',
+  'scroll',
+  'mousemove',
+];
 
 function loadPosthog(): Promise<PostHog | null> {
   if (posthogInstance) return Promise.resolve(posthogInstance);
@@ -34,86 +43,66 @@ function loadPosthog(): Promise<PostHog | null> {
   return posthogLoadPromise;
 }
 
-function whenIdle(cb: () => void): () => void {
+function whenFirstInteraction(cb: () => void): () => void {
   if (typeof window === 'undefined') return () => {};
-  const ric = (window as Window & {
-    requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number;
-    cancelIdleCallback?: (handle: number) => void;
-  }).requestIdleCallback;
-  if (typeof ric === 'function') {
-    const id = ric(() => cb(), { timeout: 3000 });
-    return () => {
-      const cic = (window as Window & {
-        cancelIdleCallback?: (handle: number) => void;
-      }).cancelIdleCallback;
-      if (typeof cic === 'function') cic(id);
-    };
+  if (interactionDetected) {
+    cb();
+    return () => {};
   }
-  const t = window.setTimeout(cb, 2000);
-  return () => window.clearTimeout(t);
+  let invoked = false;
+  const handler = () => {
+    if (invoked) return;
+    invoked = true;
+    interactionDetected = true;
+    FIRST_INTERACTION_EVENTS.forEach((evt) =>
+      window.removeEventListener(evt, handler, { capture: true } as EventListenerOptions),
+    );
+    if (timer != null) window.clearTimeout(timer);
+    cb();
+  };
+  FIRST_INTERACTION_EVENTS.forEach((evt) =>
+    window.addEventListener(evt, handler, { passive: true, capture: true, once: false }),
+  );
+  // Failsafe: si no hay interacción en 15s, cargamos igual.
+  const timer = window.setTimeout(handler, 15000);
+  return () => {
+    if (timer != null) window.clearTimeout(timer);
+    FIRST_INTERACTION_EVENTS.forEach((evt) =>
+      window.removeEventListener(evt, handler, { capture: true } as EventListenerOptions),
+    );
+  };
 }
 
-function PostHogPageViewInner() {
+export function PostHogPageView() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!pathname || typeof window === 'undefined' || !posthogToken) return;
     loadPosthog().then((ph) => {
       if (!ph) return;
-      let url = window.location.origin + pathname;
-      const q = searchParams?.toString();
-      if (q) url += `?${q}`;
+      const url = window.location.origin + pathname + window.location.search;
       ph.capture('$pageview', { $current_url: url });
     });
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return null;
 }
 
-export function PostHogPageView() {
-  return (
-    <Suspense fallback={null}>
-      <PostHogPageViewInner />
-    </Suspense>
-  );
-}
-
+/**
+ * PostHog se carga después de la PRIMERA interacción del usuario o tras
+ * 15s sin interacción (failsafe). Ningún JS de analytics pesa en el LCP/FCP.
+ */
 export function PostHogProviderWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [ready, setReady] = useState(false);
-
   useEffect(() => {
     if (!posthogToken) return;
-    const cancel = whenIdle(() => {
-      loadPosthog().then(() => setReady(true));
-    });
-    return cancel;
-  }, []);
-
-  // En vez de cargar el provider de posthog-js/react al inicio (~50KB),
-  // diferimos completamente hasta que el browser quede idle.
-  // Los children se renderizan inmediatamente sin esperar al provider.
-  if (!ready) return <>{children}</>;
-
-  return <PosthogProviderLazy>{children}</PosthogProviderLazy>;
-}
-
-function PosthogProviderLazy({ children }: { children: React.ReactNode }) {
-  const [Provider, setProvider] = useState<React.ComponentType<{
-    client: PostHog;
-    children: React.ReactNode;
-  }> | null>(null);
-
-  useEffect(() => {
-    import('posthog-js/react').then((mod) => {
-      setProvider(() => mod.PostHogProvider);
+    return whenFirstInteraction(() => {
+      void loadPosthog();
     });
   }, []);
 
-  if (!Provider || !posthogInstance) return <>{children}</>;
-  return <Provider client={posthogInstance}>{children}</Provider>;
+  return <>{children}</>;
 }

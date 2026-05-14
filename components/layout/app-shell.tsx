@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useState, useCallback, useEffect, type ReactNode, type MouseEvent } from 'react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/providers/theme-mode-provider'
 import { useApexThemeActions } from '@/hooks/useTheme'
 import { useInspector } from '@/hooks/useInspector'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'

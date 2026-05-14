@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Oxanium } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
+import { ThemeModeProvider } from '@/components/providers/theme-mode-provider'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
@@ -17,9 +17,16 @@ const oxanium = Oxanium({
   variable: '--font-oxanium',
   weight: ['300', '400', '600', '700', '800'],
   preload: true,
-  display: 'swap',
+  /**
+   * `display: 'optional'` impide que el navegador retrase el primer paint
+   * esperando la WebFont. Si la fuente no está cacheada y no carga en ~100ms,
+   * se usa la fallback del sistema para SIEMPRE (sin FOUT en el texto LCP).
+   * Tradeoff aceptado: usuarios first-visit ven Oxanium recién en la 2da visita.
+   * Esto convierte una solicitud render-blocking de ~200ms en cero.
+   */
+  display: 'optional',
   adjustFontFallback: true,
-  fallback: ['system-ui', 'sans-serif'],
+  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
 
 
@@ -71,7 +78,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning className={oxanium.variable}>
+    <html lang="es" suppressHydrationWarning className={`dark ${oxanium.variable}`}>
       <head>
         {/* Preconnect a dominios críticos de third-party — TLS handshake en paralelo */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -84,11 +91,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={oxanium.className}>
         <PostHogProviderWrapper>
           <PostHogPageView />
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
+          <ThemeModeProvider>
             <ApexThemeProvider>
               <AppShell>{children}</AppShell>
             </ApexThemeProvider>
-          </ThemeProvider>
+          </ThemeModeProvider>
         </PostHogProviderWrapper>
         <SentryProvider />
         {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}

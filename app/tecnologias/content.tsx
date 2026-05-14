@@ -10,7 +10,7 @@ import {
   useTransform,
 } from 'framer-motion'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/providers/theme-mode-provider'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'

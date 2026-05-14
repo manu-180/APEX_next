@@ -2,20 +2,29 @@
 
 import { useEffect } from 'react';
 
+const FIRST_INTERACTION_EVENTS: Array<keyof WindowEventMap> = [
+  'pointerdown',
+  'touchstart',
+  'keydown',
+  'scroll',
+  'mousemove',
+];
+
 /**
- * Inicializa Sentry dynamically (no impacta el bundle inicial).
- * Solo se ejecuta si NEXT_PUBLIC_SENTRY_DSN está configurado.
+ * Sentry se inicializa dynamically tras la primera interacción del usuario
+ * (o 20s después como failsafe). No impacta el bundle inicial ni el critical path.
  */
 export function SentryProvider() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return;
 
-    const ric = (window as Window & {
-      requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number;
-    }).requestIdleCallback;
+    let triggered = false;
 
     const init = async () => {
+      if (triggered) return;
+      triggered = true;
+      cleanup();
       try {
         const Sentry = await import('@sentry/nextjs');
         Sentry.init({
@@ -29,15 +38,23 @@ export function SentryProvider() {
           },
         });
       } catch {
-        // Silent: si falla la carga de Sentry, no rompemos el sitio.
+        // Si falla, no rompemos el sitio.
       }
     };
 
-    if (typeof ric === 'function') {
-      ric(() => { void init(); }, { timeout: 5000 });
-    } else {
-      window.setTimeout(() => { void init(); }, 3000);
-    }
+    const cleanup = () => {
+      FIRST_INTERACTION_EVENTS.forEach((evt) =>
+        window.removeEventListener(evt, init, { capture: true } as EventListenerOptions),
+      );
+      if (timer != null) window.clearTimeout(timer);
+    };
+
+    FIRST_INTERACTION_EVENTS.forEach((evt) =>
+      window.addEventListener(evt, init, { passive: true, capture: true }),
+    );
+    const timer = window.setTimeout(init, 20000);
+
+    return cleanup;
   }, []);
 
   return null;
