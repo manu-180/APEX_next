@@ -1,11 +1,12 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useRef, useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion'
 import { TextReveal } from '@/components/ui/text-reveal'
 import { GridBackground } from '@/components/ui/grid-background'
-import { ParticleField, type MousePosition } from '@/components/ui/particle-field'
+import type { MousePosition } from '@/components/ui/particle-field'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRightIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
@@ -14,6 +15,11 @@ import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { trackGoogleAdsHeroCtaClick } from '@/lib/analytics/google-ads'
 import Link from 'next/link'
+
+const ParticleField = dynamic(
+  () => import('@/components/ui/particle-field').then((m) => m.ParticleField),
+  { ssr: false },
+)
 
 const STAGGER_BASE = 0.08
 const stagger = (i: number) => ({ delay: i * STAGGER_BASE })
@@ -206,6 +212,7 @@ export function HeroSection() {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const [isMobileViewport, setIsMobileViewport] = useState(false)
+  const [particlesReady, setParticlesReady] = useState(false)
 
   const rotateX = useSpring(useTransform(mouseY, [-300, 300], [2, -2]), { stiffness: 150, damping: 25 })
   const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-2, 2]), { stiffness: 150, damping: 25 })
@@ -244,6 +251,25 @@ export function HeroSection() {
     }
   }, [])
 
+  useEffect(() => {
+    // Diferimos las partículas: solo se montan después del LCP/idle del browser
+    // para no competir con el render principal del hero.
+    if (typeof window === 'undefined') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.innerWidth < 768) return
+
+    const ric = (window as Window & {
+      requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number
+    }).requestIdleCallback
+    const trigger = () => setParticlesReady(true)
+    if (typeof ric === 'function') {
+      ric(trigger, { timeout: 2500 })
+    } else {
+      const t = window.setTimeout(trigger, 1200)
+      return () => window.clearTimeout(t)
+    }
+  }, [])
+
   return (
     <section
       ref={ref}
@@ -260,28 +286,30 @@ export function HeroSection() {
       {/* ── Background layers ──────────────────────────────────────────── */}
       <GridBackground showScanline showRadialLight />
 
-      <div
-        className="pointer-events-none absolute inset-0"
-        data-hover
-        data-inspector-title="Campo de Partículas Reactivo"
-        data-inspector-desc="300 partículas con física de repulsión en Canvas 2D puro — huyen del cursor calculando vectores a 60fps con requestAnimationFrame. Sin WebGL."
-        data-inspector-cat="Animación"
-      >
-        <ParticleField
-          externalMouse={particleMouseRef}
-          particleCount={300}
-          connectionDistance={152}
-          mouseForce={1.45}
-          mouseImpulseScale={0.58}
-          returnDelayMs={3000}
-          particleRadiusMin={1.05}
-          particleRadiusMax={3.35}
-          particleAlphaMin={0.3}
-          particleAlphaMax={0.78}
-          lineAlphaMax={0.28}
-          lineWidth={1.1}
-        />
-      </div>
+      {particlesReady && (
+        <div
+          className="pointer-events-none absolute inset-0"
+          data-hover
+          data-inspector-title="Campo de Partículas Reactivo"
+          data-inspector-desc="300 partículas con física de repulsión en Canvas 2D puro — huyen del cursor calculando vectores a 60fps con requestAnimationFrame. Sin WebGL."
+          data-inspector-cat="Animación"
+        >
+          <ParticleField
+            externalMouse={particleMouseRef}
+            particleCount={180}
+            connectionDistance={140}
+            mouseForce={1.45}
+            mouseImpulseScale={0.58}
+            returnDelayMs={3000}
+            particleRadiusMin={1.05}
+            particleRadiusMax={3.35}
+            particleAlphaMin={0.3}
+            particleAlphaMax={0.78}
+            lineAlphaMax={0.28}
+            lineWidth={1.1}
+          />
+        </div>
+      )}
 
       <div
         className="pointer-events-none absolute inset-0"

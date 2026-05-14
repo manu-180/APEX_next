@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import { BRAND_IMAGE_SRC } from '@/lib/constants'
 import { cn } from '@/lib/utils/cn'
 
 type ApexLogoMarkProps = {
@@ -16,13 +15,14 @@ export function ApexLogoMark({ className, priority = false }: ApexLogoMarkProps)
       )}
     >
       <Image
-        src={BRAND_IMAGE_SRC}
+        src="/apex-logo.png"
         alt="APEX"
         width={32}
         height={32}
         className="h-full w-full object-cover"
         priority={priority}
         sizes="32px"
+        fetchPriority={priority ? 'high' : 'auto'}
       />
     </span>
   )

@@ -3,7 +3,6 @@ import { Oxanium } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
-import { BotlodeChat } from '@/components/floating/botlode-chat'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
 import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
 import { SentryProvider } from '@/components/providers/sentry-provider'
@@ -14,12 +13,13 @@ import './globals.css'
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
 const oxanium = Oxanium({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   variable: '--font-oxanium',
-  weight: 'variable',
+  weight: ['300', '400', '600', '700', '800'],
   preload: true,
   display: 'swap',
   adjustFontFallback: true,
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 
@@ -73,27 +73,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning className={oxanium.variable}>
       <head>
+        {/* Preconnect a dominios críticos de third-party — TLS handshake en paralelo */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {gaMeasurementId ? <link rel="dns-prefetch" href="https://www.googletagmanager.com" /> : null}
         <PersonJsonLd />
         <WebSiteJsonLd />
         <ServiceJsonLd />
         <AggregateRatingJsonLd />
-        {/* Preconexión BotLode — descomentar si ENABLE_BOTLODE_PLAYER en components/floating/botlode-chat.tsx */}
-        {/* <link rel="preconnect" href="https://botlode-player.vercel.app" /> */}
-        {/* <link rel="dns-prefetch" href="https://botlode-player.vercel.app" /> */}
       </head>
       <body className={oxanium.className}>
-        <SentryProvider />
         <PostHogProviderWrapper>
           <PostHogPageView />
-          {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
             <ApexThemeProvider>
               <AppShell>{children}</AppShell>
             </ApexThemeProvider>
           </ThemeProvider>
-          {/* BotLode Chat — posición fixed, fuera del flujo de la app */}
-          <BotlodeChat />
         </PostHogProviderWrapper>
+        <SentryProvider />
+        {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
       </body>
     </html>
   )

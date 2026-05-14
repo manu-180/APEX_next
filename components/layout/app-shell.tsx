@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useState, useCallback, useEffect, type ReactNode, type MouseEvent } from 'react'
 import { useTheme } from 'next-themes'
 import { useApexThemeActions } from '@/hooks/useTheme'
@@ -7,10 +8,26 @@ import { useInspector } from '@/hooks/useInspector'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { Navbar } from './navbar'
 import { Footer } from './footer'
-import { ShortcutsModal } from './shortcuts-modal'
-import { InspectorOverlay } from '@/components/ui/inspector-overlay'
-import { ThemeWaveOverlay } from '@/components/ui/theme-wave-overlay'
-import { BotlodeGraciasBridge } from '@/components/whatsapp/botlode-gracias-bridge'
+
+const ShortcutsModal = dynamic(
+  () => import('./shortcuts-modal').then((m) => m.ShortcutsModal),
+  { ssr: false },
+)
+
+const InspectorOverlay = dynamic(
+  () => import('@/components/ui/inspector-overlay').then((m) => m.InspectorOverlay),
+  { ssr: false },
+)
+
+const ThemeWaveOverlay = dynamic(
+  () => import('@/components/ui/theme-wave-overlay').then((m) => m.ThemeWaveOverlay),
+  { ssr: false },
+)
+
+const BotlodeGraciasBridge = dynamic(
+  () => import('@/components/whatsapp/botlode-gracias-bridge').then((m) => m.BotlodeGraciasBridge),
+  { ssr: false },
+)
 
 // Context exports for child components
 export { useApexTheme } from '@/hooks/useTheme'
@@ -21,6 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { resetTheme } = useApexThemeActions()
   const inspector = useInspector()
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [enhancementsReady, setEnhancementsReady] = useState(false)
 
   const getPrimaryRgb = useCallback(() => {
     if (typeof window === 'undefined') return '100, 116, 139'
@@ -55,6 +73,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   })
 
   useEffect(() => {
+    // Diferimos enhancements no críticos (overlays, bridge) hasta que el browser quede idle.
+    if (typeof window === 'undefined') return
+    const ric = (window as Window & {
+      requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number
+    }).requestIdleCallback
+    const trigger = () => setEnhancementsReady(true)
+    if (typeof ric === 'function') {
+      ric(trigger, { timeout: 2500 })
+    } else {
+      const t = window.setTimeout(trigger, 1500)
+      return () => window.clearTimeout(t)
+    }
+  }, [])
+
+  useEffect(() => {
     const blockNativeDrag = (e: DragEvent) => {
       e.preventDefault()
     }
@@ -81,9 +114,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       </main>
       <Footer />
       {inspector.isActive && <InspectorOverlay onDisable={inspector.disable} />}
-      <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
-      <ThemeWaveOverlay />
-      <BotlodeGraciasBridge />
+      {showShortcuts && <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />}
+      {enhancementsReady && (
+        <>
+          <ThemeWaveOverlay />
+          <BotlodeGraciasBridge />
+        </>
+      )}
     </div>
   )
 }

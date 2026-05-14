@@ -65,26 +65,26 @@ function GoogleAdsScrollTracking() {
 }
 
 /**
- * GA4 + Google Ads con carga diferida:
- * - bootstrap mínimo `afterInteractive` para no perder eventos tempranos
- * - `gtag.js` en `lazyOnload` para sacarlo del critical path
+ * GA4 + Google Ads completamente diferidos al `lazyOnload` para no bloquear
+ * el critical path. Stub inline garantiza no perder eventos tempranos antes
+ * de descargar gtag.js.
  */
 export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
   return (
     <>
-      {/* Stub temprana para encolar eventos antes de descargar gtag.js */}
-      <Script id="google-gtag-bootstrap" strategy="afterInteractive">{`
+      {/* Stub previa: encola comandos hasta que se cargue gtag.js */}
+      <Script id="google-gtag-bootstrap" strategy="lazyOnload">{`
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         window.gtag = window.gtag || gtag;
         window.gtag('js', new Date());
-        window.gtag('config', '${gaId}');
-        window.gtag('config', '${AW_ID}');
+        window.gtag('config', '${gaId}', { transport_type: 'beacon' });
+        window.gtag('config', '${AW_ID}', { transport_type: 'beacon' });
       `}</Script>
       <Script
         id="google-gtag-src"
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <Suspense fallback={null}>
         <GaRoutePageViews gaId={gaId} />
