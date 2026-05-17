@@ -3,7 +3,6 @@
 import Script from 'next/script'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { trackGoogleAdsScroll50 } from '@/lib/analytics/google-ads'
 
 declare global {
   interface Window {
@@ -39,35 +38,6 @@ function GaRoutePageViews({ gaId }: { gaId: string }) {
 
     window.gtag('config', gaId, { page_path: pagePath })
   }, [gaId, pathname, searchParams])
-
-  return null
-}
-
-function GoogleAdsScrollTracking() {
-  const hasTrackedScroll50 = useRef(false)
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (hasTrackedScroll50.current) return
-
-      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight
-      if (scrollableHeight <= 0) return
-
-      const progress = window.scrollY / scrollableHeight
-      if (progress < 0.5) return
-
-      hasTrackedScroll50.current = true
-      trackGoogleAdsScroll50()
-      window.removeEventListener('scroll', onScroll)
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [])
 
   return null
 }
@@ -126,9 +96,6 @@ export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
       />
       <Suspense fallback={null}>
         <GaRoutePageViews gaId={gaId} />
-      </Suspense>
-      <Suspense fallback={null}>
-        <GoogleAdsScrollTracking />
       </Suspense>
     </>
   )

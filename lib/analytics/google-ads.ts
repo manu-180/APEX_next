@@ -14,7 +14,6 @@ const GOOGLE_ADS_ACCOUNT_ID = 'AW-18041789644'
 // Mientras estén vacíos (''), las conversiones no se disparan.
 const GOOGLE_ADS_WHATSAPP_LABEL = 'o7p6CL2CwaccEMy5_5pD'
 const GOOGLE_ADS_HERO_CTA_LABEL = 'UoGWCML-wKccEMy5_5pD'
-const GOOGLE_ADS_SCROLL_50_LABEL = 'yP-_CKrq16ccEMy5_5pD'
 
 function isPlaceholder(label: string): boolean {
   return label === '' || label.startsWith('TODO_')
@@ -36,8 +35,4 @@ export const trackGoogleAdsWhatsAppClick = () => {
 
 export const trackGoogleAdsHeroCtaClick = () => {
   trackGoogleAdsConversion(GOOGLE_ADS_HERO_CTA_LABEL)
-}
-
-export const trackGoogleAdsScroll50 = () => {
-  trackGoogleAdsConversion(GOOGLE_ADS_SCROLL_50_LABEL)
 }
