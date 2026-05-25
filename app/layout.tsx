@@ -3,14 +3,16 @@ import { Oxanium } from 'next/font/google'
 import { ThemeModeProvider } from '@/components/providers/theme-mode-provider'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
-import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, AggregateRatingJsonLd } from '@/components/seo/json-ld'
+import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
+import { MetaPixel } from '@/components/analytics/meta-pixel'
 import { SentryProvider } from '@/components/providers/sentry-provider'
 import { PostHogProviderWrapper, PostHogPageView } from '@/components/providers/posthog-provider'
 import { APP_URL, BRAND_IMAGE_SRC } from '@/lib/constants'
 import './globals.css'
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
 
 const oxanium = Oxanium({
   subsets: ['latin'],
@@ -86,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PersonJsonLd />
         <WebSiteJsonLd />
         <ServiceJsonLd />
-        <AggregateRatingJsonLd />
+        <LocalBusinessJsonLd />
       </head>
       <body className={oxanium.className}>
         <PostHogProviderWrapper>
@@ -99,6 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </PostHogProviderWrapper>
         <SentryProvider />
         {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
+        {metaPixelId ? <MetaPixel pixelId={metaPixelId} /> : null}
       </body>
     </html>
   )

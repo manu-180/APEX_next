@@ -41,17 +41,41 @@ export function TypeScriptIcon({ className }: { className?: string }) {
   )
 }
 
-export function ArrowRightIcon({ className }: { className?: string }) {
+export function ArrowRightIcon({
+  className,
+  style,
+  'aria-hidden': ariaHidden,
+}: {
+  className?: string
+  style?: React.CSSProperties
+  'aria-hidden'?: boolean | 'true' | 'false'
+}) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      style={style}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden={ariaHidden}
+    >
       <path d="m9 18 6-6-6-6"/>
     </svg>
   )
 }
 
-export function CheckIcon({ className }: { className?: string }) {
+export function CheckIcon({
+  className,
+  style,
+}: {
+  className?: string
+  style?: React.CSSProperties
+}) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" className={className} style={style} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12"/>
     </svg>
   )

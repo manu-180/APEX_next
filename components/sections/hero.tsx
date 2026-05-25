@@ -13,6 +13,8 @@ import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { trackGoogleAdsHeroCtaClick } from '@/lib/analytics/google-ads'
+import { trackMetaLead } from '@/components/analytics/meta-pixel'
+import { getAvailabilityText } from '@/lib/data/availability'
 import Link from 'next/link'
 
 const ParticleField = dynamic(
@@ -166,6 +168,7 @@ export function HeroSection() {
 
   const handleCTAClick = useCallback(() => {
     trackGoogleAdsHeroCtaClick()
+    trackMetaLead()
     openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
   }, [router])
 
@@ -252,7 +255,8 @@ export function HeroSection() {
                   style={{ backgroundColor: 'var(--color-online)', boxShadow: '0 0 8px var(--color-online)' }}
                 />
                 <span className="text-xs font-medium text-[var(--color-on-surface-variant)]">
-                  Disponible para proyectos
+                  {/* Scarcity real: el texto sale de CURRENT_AVAILABILITY (lib/data/availability) */}
+                  {getAvailabilityText().text}
                 </span>
               </div>
               <Badge variant="outline" className="rounded-full px-4 py-1.5 text-xs font-semibold">
@@ -313,7 +317,7 @@ export function HeroSection() {
             </div>
 
             <p className="mt-5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
-              Respondemos en menos de 2 horas · Sin compromiso
+              Plazo en fecha o devolvemos · NDA si lo pedís · Respuesta en menos de 2 hs
             </p>
           </div>
 

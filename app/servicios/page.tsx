@@ -1,77 +1,61 @@
 import type { Metadata } from 'next'
 import { ServiciosContent } from './content'
-import { ServiciosHero, ServiciosStaticTop, ServiciosStaticFaq } from './static-sections'
+import {
+  ServiciosHero,
+  ServiciosStaticTop,
+  ServiciosStaticFaq,
+  ServiciosComparisonTable,
+  VerticalsBridge,
+  SERVICIOS_FAQ_ITEMS,
+} from './static-sections'
 import { ServiciosFinalCta } from './servicios-final-cta'
+import { SafeJsonLd } from '@/components/seo/safe-json-ld'
+import { LeadMagnetSection } from '@/components/sections/lead-magnet'
+import { BudgetCalculatorSection } from '@/components/sections/budget-calculator'
+import { AfipAddonSection } from '@/components/sections/afip-addon'
 
 export const metadata: Metadata = {
   title: 'Desarrollo de software Argentina | Precios | Manuel Navarro',
   description:
-    'Desarrollo de software a medida para empresas y emprendedores. Precio fijo, entrega garantizada. Presupuestos desde ARS 300k.',
+    'Desarrollo de software a medida para empresas y emprendedores. Precio fijo, entrega garantizada en 15 días. Web, e-commerce y apps móviles desde ARS 300k.',
   keywords: [
     'desarrollo de software argentina',
+    'desarrollo web argentina',
+    'precio página web argentina',
+    'cuánto cuesta una app',
     'software a medida',
     'desarrollador de software',
     'desarrollador full stack',
+    'flutter argentina',
+    'next.js argentina',
   ],
 }
 
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿Cuánto tarda hacer una página web?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Entrega en 15 días para cualquier proyecto web. Fecha garantizada desde el día 1.',
-      },
+  mainEntity: SERVICIOS_FAQ_ITEMS.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
     },
-    {
-      '@type': 'Question',
-      name: '¿Cuánto cuesta una página web en Argentina?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Nuestros proyectos arrancan desde ARS 300.000 con precio fijo. Sin sorpresas al final.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué pasa si no me gusta el resultado?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Trabajamos con revisiones incluidas. Si al finalizar no estás conforme, devolvemos el depósito sin discusiones.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Puedo hablar con alguien antes de contratar?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Sí. Tenemos una consulta inicial gratuita de 15 minutos, sin compromiso, por WhatsApp.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Trabajan solo en Buenos Aires?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'No, trabajamos con clientes de toda Argentina de forma 100% remota.',
-      },
-    },
-  ],
+  })),
 }
 
 export default function ServiciosPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      <SafeJsonLd data={faqSchema} />
       <ServiciosHero />
       <ServiciosContent />
       <ServiciosStaticTop />
+      <BudgetCalculatorSection />
+      <AfipAddonSection />
+      <ServiciosComparisonTable />
+      <VerticalsBridge />
+      <LeadMagnetSection variant="full" source="servicios" />
       <ServiciosStaticFaq />
       <ServiciosFinalCta />
     </>

@@ -1,0 +1,572 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
+import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
+import { trackMetaLead } from '@/components/analytics/meta-pixel'
+import { whatsappUrl } from '@/lib/whatsapp'
+import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
+import { cn } from '@/lib/utils/cn'
+
+/**
+ * Calculadora de presupuesto interactiva.
+ *
+ * Why: mecanismo de calificación + lead capture activo. El visitante responde
+ * 5 preguntas, ve un rango realista, y va a WhatsApp con el contexto ya armado
+ * (Manuel responde más rápido, deal cierra más fácil).
+ *
+ * No reemplaza el presupuesto real. Es un anchor + lead qualification.
+ */
+
+type ProjectType = 'web-simple' | 'web-interactiva' | 'ecommerce' | 'app' | 'unsure'
+type Timeline = 'urgent' | 'normal' | 'flexible'
+type ContentState = 'ready' | 'partial' | 'none'
+
+interface Question<T extends string> {
+  id: string
+  title: string
+  subtitle?: string
+  options: { value: T; label: string; description?: string }[]
+}
+
+const Q_PROJECT_TYPE: Question<ProjectType> = {
+  id: 'project',
+  title: '¿Qué tipo de proyecto tenés en mente?',
+  subtitle: 'Si no estás seguro, elegí "Todavía no sé" y lo definimos juntos.',
+  options: [
+    { value: 'web-simple', label: 'Página web simple', description: 'Landing o sitio con 3-5 secciones' },
+    { value: 'web-interactiva', label: 'Web interactiva', description: 'Booking, formularios, calculadoras' },
+    { value: 'ecommerce', label: 'Tienda online', description: 'Catálogo, carrito y pagos' },
+    { value: 'app', label: 'App móvil', description: 'iOS + Android, con o sin backend' },
+    { value: 'unsure', label: 'Todavía no sé', description: 'Lo definimos en la consulta' },
+  ],
+}
+
+const Q_TIMELINE: Question<Timeline> = {
+  id: 'timeline',
+  title: '¿Cuál es tu plazo?',
+  options: [
+    { value: 'urgent', label: 'Urgente · 2-3 semanas', description: 'Hay un lanzamiento o evento cerca' },
+    { value: 'normal', label: 'Normal · 1-2 meses', description: 'Plazo cómodo, sin estresarse' },
+    { value: 'flexible', label: 'Flexible · sin apuro', description: 'Lo importante es que salga bien' },
+  ],
+}
+
+const Q_INTEGRATIONS = {
+  id: 'integrations',
+  title: '¿Algún requerimiento específico?',
+  subtitle: 'Podés elegir más de uno o ninguno.',
+  options: [
+    { value: 'afip', label: 'Integración AFIP', description: 'Facturación electrónica automática' },
+    { value: 'payments', label: 'Pagos online', description: 'MercadoPago, Stripe, etc.' },
+    { value: 'multilang', label: 'Multi-idioma', description: 'Español + Inglés u otros' },
+    { value: 'crm', label: 'Integración con sistema actual', description: 'CRM, ERP, sheets, etc.' },
+    { value: 'realtime', label: 'Tiempo real', description: 'Chat, notificaciones, dashboard live' },
+    { value: 'none', label: 'Ninguno', description: 'Algo simple y directo' },
+  ] as const,
+}
+
+const Q_CONTENT: Question<ContentState> = {
+  id: 'content',
+  title: '¿Ya tenés contenido (textos, fotos, branding)?',
+  options: [
+    { value: 'ready', label: 'Sí, todo listo', description: 'Textos, fotos y marca prontos' },
+    { value: 'partial', label: 'Parcial', description: 'Tengo lo básico, falta pulir' },
+    { value: 'none', label: 'Nada todavía', description: 'Necesito ayuda con el contenido también' },
+  ],
+}
+
+interface CalculatorAnswers {
+  project?: ProjectType
+  timeline?: Timeline
+  integrations: string[]
+  content?: ContentState
+}
+
+/** Heurística de pricing — coincide con los planes oficiales del sitio. */
+function calculateRange(answers: CalculatorAnswers): {
+  min: number
+  max: number
+  baseLabel: string
+  notes: string[]
+} {
+  const notes: string[] = []
+  let min = 0
+  let max = 0
+  let baseLabel = ''
+
+  switch (answers.project) {
+    case 'web-simple':
+      baseLabel = 'Landing / Web simple'
+      min = 300_000
+      max = 500_000
+      break
+    case 'web-interactiva':
+      baseLabel = 'Web interactiva'
+      min = 600_000
+      max = 900_000
+      break
+    case 'ecommerce':
+      baseLabel = 'Tienda online'
+      min = 900_000
+      max = 1_500_000
+      break
+    case 'app':
+      baseLabel = 'App móvil'
+      min = 580_000
+      max = 1_150_000
+      break
+    case 'unsure':
+      baseLabel = 'Proyecto a definir'
+      min = 300_000
+      max = 1_500_000
+      notes.push('Definimos el tipo exacto en la consulta gratis de 15 min.')
+      break
+  }
+
+  // Ajustes por integraciones
+  const ints = new Set(answers.integrations)
+  if (ints.has('afip')) {
+    min += 200_000
+    max += 400_000
+    notes.push('Integración AFIP suma entre $200k y $400k según volumen.')
+  }
+  if (ints.has('payments')) {
+    min += 80_000
+    max += 200_000
+    notes.push('Pasarela de pagos (MercadoPago + checkout): $80k-$200k.')
+  }
+  if (ints.has('multilang')) {
+    min += 120_000
+    max += 280_000
+    notes.push('Multi-idioma agrega entre $120k y $280k según cantidad de pages.')
+  }
+  if (ints.has('crm')) {
+    min += 150_000
+    max += 400_000
+    notes.push('Integración con sistema actual: depende mucho del API existente.')
+  }
+  if (ints.has('realtime')) {
+    min += 200_000
+    max += 500_000
+    notes.push('Funcionalidad realtime suma entre $200k y $500k.')
+  }
+
+  // Ajuste por plazo (urgencia premium)
+  if (answers.timeline === 'urgent') {
+    min = Math.round(min * 1.15)
+    max = Math.round(max * 1.15)
+    notes.push('Plazo urgente (2-3 semanas) tiene un +15% sobre el precio base.')
+  }
+
+  // Ajuste por contenido (si Manuel ayuda con copy/branding)
+  if (answers.content === 'none') {
+    min += 100_000
+    max += 250_000
+    notes.push('Si necesitás ayuda con contenido y branding, se suman $100k-$250k.')
+  } else if (answers.content === 'partial') {
+    min += 50_000
+    max += 100_000
+    notes.push('Refinamiento de contenido existente: $50k-$100k.')
+  }
+
+  return { min, max, baseLabel, notes }
+}
+
+function formatARS(value: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+export function BudgetCalculatorSection() {
+  const prefersReducedMotion = useReducedMotion()
+  const router = useRouter()
+  const [step, setStep] = useState(0)
+  const [answers, setAnswers] = useState<CalculatorAnswers>({ integrations: [] })
+
+  const totalSteps = 4
+  const isLastStep = step === totalSteps
+  const result = useMemo(() => (isLastStep ? calculateRange(answers) : null), [isLastStep, answers])
+
+  const handleSelectSingle = <T extends string>(field: keyof CalculatorAnswers, value: T) => {
+    setAnswers((prev) => ({ ...prev, [field]: value }))
+    setTimeout(() => setStep((s) => Math.min(s + 1, totalSteps)), 200)
+  }
+
+  const toggleIntegration = (value: string) => {
+    setAnswers((prev) => {
+      const next = new Set(prev.integrations)
+      if (value === 'none') {
+        return { ...prev, integrations: ['none'] }
+      }
+      if (next.has(value)) {
+        next.delete(value)
+      } else {
+        next.add(value)
+        next.delete('none')
+      }
+      return { ...prev, integrations: Array.from(next) }
+    })
+  }
+
+  const goToWhatsApp = () => {
+    if (!result) return
+    trackGoogleAdsWhatsAppClick()
+    trackMetaLead()
+
+    const summary = [
+      `Hola Manuel, hice la calculadora y me dio:`,
+      `Tipo: ${result.baseLabel}`,
+      `Rango estimado: ${formatARS(result.min)} - ${formatARS(result.max)}`,
+      answers.timeline ? `Plazo: ${Q_TIMELINE.options.find((o) => o.value === answers.timeline)?.label}` : '',
+      answers.integrations.length > 0
+        ? `Integraciones: ${answers.integrations
+            .map((i) => Q_INTEGRATIONS.options.find((o) => o.value === i)?.label)
+            .filter(Boolean)
+            .join(', ')}`
+        : '',
+      `Quiero confirmar el presupuesto real.`,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    openWhatsAppWithThankYouPage(whatsappUrl(summary), router)
+  }
+
+  const reset = () => {
+    setStep(0)
+    setAnswers({ integrations: [] })
+  }
+
+  const canAdvance = (() => {
+    if (step === 0) return !!answers.project
+    if (step === 1) return !!answers.timeline
+    if (step === 2) return answers.integrations.length > 0
+    if (step === 3) return !!answers.content
+    return false
+  })()
+
+  return (
+    <section className="relative py-20 sm:py-24">
+      <div className="mx-auto max-w-3xl px-6">
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.55 }}
+          className="mb-10 text-center"
+        >
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+            <Badge variant="primary">Calculadora</Badge>
+            <Badge variant="outline">5 preguntas · 90 segundos</Badge>
+          </div>
+          <h2 className="font-heading text-balance text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)] mb-3">
+            <span className="font-extralight text-[var(--color-on-surface-variant)]">¿Cuánto te</span>{' '}
+            sale tu proyecto?
+          </h2>
+          <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-xl mx-auto">
+            Respondé 5 preguntas y te muestro un rango realista en pesos.
+            Sin email, sin compromiso. Si querés, después seguimos en WhatsApp.
+          </p>
+        </motion.div>
+
+        {/* ── Progress bar ──────────────────────────────────────────── */}
+        <div className="mb-8">
+          <div className="h-1 w-full rounded-full overflow-hidden bg-[var(--color-surface-high)]">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: 'var(--color-primary)' }}
+              initial={{ width: '0%' }}
+              animate={{ width: `${(step / totalSteps) * 100}%` }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-[10px] uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-60">
+            <span>{isLastStep ? 'Listo' : `Paso ${step + 1} de ${totalSteps}`}</span>
+            {!isLastStep && (
+              <button
+                type="button"
+                onClick={reset}
+                className="hover:text-[var(--color-primary)] transition-colors"
+                disabled={step === 0}
+              >
+                {step > 0 ? 'Reiniciar' : ''}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Step container ───────────────────────────────────────── */}
+        <div
+          className="rounded-2xl border p-6 sm:p-8"
+          style={{
+            backgroundColor: 'var(--color-surface-low)',
+            borderColor: 'var(--glass-border)',
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {step === 0 && (
+              <motion.div
+                key="q0"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
+                  {Q_PROJECT_TYPE.title}
+                </h3>
+                {Q_PROJECT_TYPE.subtitle && (
+                  <p className="text-sm text-[var(--color-on-surface-variant)] mb-5">
+                    {Q_PROJECT_TYPE.subtitle}
+                  </p>
+                )}
+                <div className="grid gap-2.5">
+                  {Q_PROJECT_TYPE.options.map((opt) => (
+                    <OptionButton
+                      key={opt.value}
+                      label={opt.label}
+                      description={opt.description}
+                      selected={answers.project === opt.value}
+                      onClick={() => handleSelectSingle('project', opt.value)}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === 1 && (
+              <motion.div
+                key="q1"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-5">
+                  {Q_TIMELINE.title}
+                </h3>
+                <div className="grid gap-2.5">
+                  {Q_TIMELINE.options.map((opt) => (
+                    <OptionButton
+                      key={opt.value}
+                      label={opt.label}
+                      description={opt.description}
+                      selected={answers.timeline === opt.value}
+                      onClick={() => handleSelectSingle('timeline', opt.value)}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                key="q2"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
+                  {Q_INTEGRATIONS.title}
+                </h3>
+                <p className="text-sm text-[var(--color-on-surface-variant)] mb-5">
+                  {Q_INTEGRATIONS.subtitle}
+                </p>
+                <div className="grid gap-2.5 sm:grid-cols-2">
+                  {Q_INTEGRATIONS.options.map((opt) => (
+                    <OptionButton
+                      key={opt.value}
+                      label={opt.label}
+                      description={opt.description}
+                      selected={answers.integrations.includes(opt.value)}
+                      onClick={() => toggleIntegration(opt.value)}
+                      multiple
+                    />
+                  ))}
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    disabled={!canAdvance}
+                    className={cn(
+                      'btn-tech btn-primary-tech inline-flex items-center gap-2 min-h-11 px-6 text-sm font-semibold rounded-xl',
+                      !canAdvance && 'opacity-50 cursor-not-allowed',
+                    )}
+                  >
+                    Siguiente
+                    <ArrowRightIcon className="size-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div
+                key="q3"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-5">
+                  {Q_CONTENT.title}
+                </h3>
+                <div className="grid gap-2.5">
+                  {Q_CONTENT.options.map((opt) => (
+                    <OptionButton
+                      key={opt.value}
+                      label={opt.label}
+                      description={opt.description}
+                      selected={answers.content === opt.value}
+                      onClick={() => handleSelectSingle('content', opt.value)}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {isLastStep && result && (
+              <motion.div
+                key="result"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+              >
+                <div className="mb-1 flex items-center gap-2">
+                  <span
+                    className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    Estimado
+                  </span>
+                </div>
+                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
+                  {result.baseLabel}
+                </h3>
+                <div
+                  className="font-heading text-4xl sm:text-5xl font-extrabold tabular-nums mb-1"
+                  style={{ color: 'var(--color-primary)' }}
+                >
+                  {formatARS(result.min)}
+                </div>
+                <div className="text-sm text-[var(--color-on-surface-variant)] mb-6">
+                  hasta{' '}
+                  <span className="font-bold text-[var(--color-on-surface)] tabular-nums">
+                    {formatARS(result.max)}
+                  </span>{' '}
+                  según alcance final
+                </div>
+
+                {result.notes.length > 0 && (
+                  <div
+                    className="rounded-xl p-4 mb-6"
+                    style={{
+                      backgroundColor: 'rgba(var(--color-primary-rgb), 0.04)',
+                      border: '1px solid rgba(var(--color-primary-rgb), 0.12)',
+                    }}
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-wider mb-2 text-[var(--color-primary)]">
+                      Detalles que mueven el rango
+                    </p>
+                    <ul className="space-y-1.5">
+                      {result.notes.map((n, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-[var(--color-on-surface-variant)]">
+                          <CheckIcon
+                            className="size-3 mt-0.5 shrink-0"
+                            style={{ color: 'var(--color-primary)' }}
+                          />
+                          <span>{n}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={goToWhatsApp}
+                    className="btn-tech btn-primary-tech inline-flex items-center justify-center gap-2 min-h-12 px-6 text-sm font-semibold rounded-xl flex-1"
+                  >
+                    Validar con Manuel por WhatsApp
+                    <ArrowRightIcon className="size-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="inline-flex items-center justify-center gap-2 min-h-12 px-6 text-sm font-semibold rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
+                  >
+                    Empezar de nuevo
+                  </button>
+                </div>
+
+                <p className="mt-5 text-xs text-[var(--color-on-surface-variant)] opacity-60 italic">
+                  Este número es una estimación basada en tus respuestas. El presupuesto real se
+                  pacta después de una charla de 15 min, donde definimos alcance exacto.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function OptionButton({
+  label,
+  description,
+  selected,
+  onClick,
+  multiple = false,
+}: {
+  label: string
+  description?: string
+  selected: boolean
+  onClick: () => void
+  multiple?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'group relative flex items-start gap-3 rounded-xl border p-4 text-left transition-all',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-low)]',
+        selected
+          ? 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.06)]'
+          : 'border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.3)]',
+      )}
+    >
+      <span
+        className={cn(
+          'flex shrink-0 size-5 items-center justify-center rounded-full border mt-0.5 transition-colors',
+          multiple ? 'rounded-md' : '',
+          selected
+            ? 'bg-[var(--color-primary)] border-[var(--color-primary)]'
+            : 'border-[var(--color-surface-high)]',
+        )}
+      >
+        {selected && (
+          <CheckIcon
+            className="size-3"
+            style={{ color: 'var(--color-surface-base)' }}
+          />
+        )}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold text-[var(--color-on-surface)]">{label}</span>
+        {description && (
+          <span className="mt-0.5 block text-xs text-[var(--color-on-surface-variant)] opacity-80">
+            {description}
+          </span>
+        )}
+      </span>
+    </button>
+  )
+}

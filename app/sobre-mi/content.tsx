@@ -65,19 +65,25 @@ export function SobreMiContent() {
         <CodeRainBg cursorRef={bgCursorRef} />
         <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
           <SectionReveal>
-            <Badge variant="primary" className="mb-4">Sobre Mí</Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[var(--color-on-surface)] mb-6">
-              Manuel Navarro
-            </h1>
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(var(--color-primary-rgb),0.12)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary)]">
-                <span className="text-xs">⚡</span> {YEARS_EXP} años de experiencia
+            <Badge variant="primary" className="mb-4">Manifesto</Badge>
+            <h1 className="font-heading text-balance leading-[0.95] mb-5">
+              <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
+                Por qué existe
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-surface-high)] px-3 py-1.5 text-sm text-[var(--color-on-surface-variant)]">
-                Full-Stack & Mobile
+              <span className="block text-4xl sm:text-5xl md:text-6xl font-extrabold text-[var(--color-on-surface)]">
+                APEX.
+              </span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-pretty text-base sm:text-lg text-[var(--color-on-surface-variant)] mb-6">
+              No soy una agencia. Soy Manuel — un ingeniero argentino que diseña, programa y entrega
+              cada proyecto end-to-end. Esta página explica cómo trabajo y a quién le sirvo.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(var(--color-primary-rgb),0.12)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary)]">
+                {YEARS_EXP}+ años · 1-2 clientes en simultáneo
               </span>
               <Badge variant="outline" className="rounded-lg px-3 py-1.5 text-sm">
-                Diseño premium
+                Buenos Aires · Argentina
               </Badge>
             </div>
           </SectionReveal>
@@ -87,29 +93,119 @@ export function SobreMiContent() {
       {/* Content */}
       <section className="pb-16">
         <div className="mx-auto max-w-4xl px-6">
-          {/* Bio */}
+          {/* Bio — manifesto directo */}
           <SectionReveal delay={0.15}>
             <div
               className="rounded-2xl glass-card glow-border p-6 md:p-10 mb-8"
               data-hover
-              data-inspector-title="Biografía en vidrio"
-              data-inspector-desc="Bloque de texto principal con vidrio esmerilado y borde luminoso: la lectura queda centrada y el fondo no compite."
-              data-inspector-cat="CSS · Ambiance"
+              data-inspector-title="Manifesto founder"
+              data-inspector-desc="Bio directo en primera persona, sin clichés agencia."
+              data-inspector-cat="Copy · Conversion"
             >
-              <p className="text-base md:text-lg text-[var(--color-on-surface)] leading-relaxed mb-6">
-                Programar es mucho más que tirar líneas de código, para mí es una disciplina de constancia
-                diaria. Llevo {YEARS_EXP} años dedicándole cada día a entender cómo construir soluciones que
-                realmente funcionen. Estoy convencido de que hoy no existen límites técnicos: cualquier idea
-                se puede materializar si se tiene el compromiso de entender el problema y la destreza para
-                construir la solución que el usuario realmente necesita.
+              <p className="text-base md:text-lg text-[var(--color-on-surface)] leading-relaxed mb-5">
+                Arranqué APEX porque me cansé de ver PyMEs argentinas pagando $400 USD/mes por sitios
+                que no convierten, contratando agencias que tardan 6 meses para entregar una landing, o
+                quedando atadas a Wix con sus datos secuestrados después de 3 años de suscripción.
               </p>
-              <p className="text-sm md:text-base text-[var(--color-on-surface-variant)] leading-relaxed">
-                Considero que la verdadera brecha entre un programador junior y un arquitecto de software
-                de alto nivel radica en la capacidad de resolución de problemas bajo cualquier circunstancia.
-                Mi filosofía es clara: no existe desafío técnico que no tenga solución. He perfeccionado mi
-                capacidad para desglosar problemas complejos mediante el uso estratégico de herramientas de
-                vanguardia, transformando obstáculos críticos en procesos lógicos y ejecutables.
+              <p className="text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-5">
+                Mi propuesta es simple: la persona que charlás conmigo en WhatsApp es la misma que
+                diseña, programa y entrega tu proyecto. Sin project managers, sin vendedores, sin
+                cuentas tercerizadas. Cuando hay un cambio, lo hago yo. Cuando hay un bug en producción
+                a las 11 de la noche, lo arreglo yo.
               </p>
+              <p className="text-base text-[var(--color-on-surface-variant)] leading-relaxed">
+                Por eso trabajo con 1-2 clientes en simultáneo. No es escalable como modelo de
+                agencia — y está bien. No quiero ser una agencia. Quiero hacer 10 productos por año
+                que se sientan como un partner técnico te ayudó a ganar plata, no como un proveedor te
+                vendió un servicio.
+              </p>
+            </div>
+          </SectionReveal>
+
+          {/* Manifesto bullets — qué sí / qué no */}
+          <SectionReveal delay={0.18}>
+            <div className="grid gap-4 md:grid-cols-2 mb-12">
+              {/* QUÉ SÍ */}
+              <div
+                className="rounded-2xl p-6"
+                style={{
+                  background: 'rgba(var(--color-primary-rgb), 0.05)',
+                  border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
+                }}
+              >
+                <p
+                  className="text-[10px] font-bold uppercase tracking-[0.22em] mb-4"
+                  style={{ color: 'var(--color-primary)' }}
+                >
+                  Lo que SÍ hago
+                </p>
+                <ul className="space-y-3">
+                  {[
+                    'Trabajo directo con vos. Sin intermediarios.',
+                    'Plazo en fecha o devolvemos. Sin asteriscos.',
+                    'El código queda 100% a tu nombre desde día 1.',
+                    'Acepto factura A o B. MEP/cripto si exportás.',
+                    'Stack que entiendo profundo: Flutter, Next.js, Supabase, Riverpod.',
+                    'Te digo "no" si tu proyecto no encaja conmigo.',
+                  ].map((line) => (
+                    <li
+                      key={line}
+                      className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface)]"
+                    >
+                      <span
+                        className="inline-flex size-4 shrink-0 items-center justify-center rounded-full mt-0.5 text-[10px] font-bold"
+                        style={{
+                          backgroundColor: 'rgba(var(--color-primary-rgb), 0.2)',
+                          color: 'var(--color-primary)',
+                        }}
+                        aria-hidden
+                      >
+                        ✓
+                      </span>
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* QUÉ NO */}
+              <div
+                className="rounded-2xl p-6"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.04)',
+                  border: '1px solid rgba(239, 68, 68, 0.18)',
+                }}
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] mb-4 text-red-400">
+                  Lo que NO hago
+                </p>
+                <ul className="space-y-3">
+                  {[
+                    'WordPress con plugins. (Otro dev lo hace mejor que yo.)',
+                    'Cobrar mantenimiento mensual a sitios que no cambian.',
+                    'Prometer plazos imposibles para cerrar el deal.',
+                    'Subcontratar tu proyecto a un equipo offshore.',
+                    'Diseñar sin entender qué problema resuelve.',
+                    'Tomar más proyectos de los que puedo atender bien.',
+                  ].map((line) => (
+                    <li
+                      key={line}
+                      className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface-variant)]"
+                    >
+                      <span
+                        className="inline-flex size-4 shrink-0 items-center justify-center rounded-full mt-0.5 text-[10px] font-bold text-red-400"
+                        style={{
+                          backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                        }}
+                        aria-hidden
+                      >
+                        ✕
+                      </span>
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </SectionReveal>
 

@@ -1027,6 +1027,23 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                   </motion.a>
                 )}
 
+                {/* Caso completo — link a página individual (SEO + lectura profunda) */}
+                <motion.a
+                  variants={fadeUpVariants}
+                  href={`/proyectos/${project.themeId}`}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200"
+                  style={{
+                    background: 'rgba(var(--color-primary-rgb), 0.07)',
+                    color: 'var(--color-primary)',
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.22)',
+                  }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  Leer caso completo
+                  <ExternalLinkIcon className="h-3.5 w-3.5 opacity-70" />
+                </motion.a>
+
                 {/* Primary CTA — always visible */}
                 <motion.a
                   variants={fadeUpVariants}

@@ -29,6 +29,14 @@ const BotlodeGraciasBridge = dynamic(
   { ssr: false },
 )
 
+const WhatsAppFloatingButton = dynamic(
+  () =>
+    import('@/components/floating/whatsapp-floating-button').then(
+      (m) => m.WhatsAppFloatingButton,
+    ),
+  { ssr: false },
+)
+
 // Context exports for child components
 export { useApexTheme } from '@/hooks/useTheme'
 export { useInspector } from '@/hooks/useInspector'
@@ -119,6 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <>
           <ThemeWaveOverlay />
           <BotlodeGraciasBridge />
+          <WhatsAppFloatingButton />
         </>
       )}
     </div>

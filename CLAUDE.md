@@ -71,7 +71,7 @@ Mobile: Profesional $1.2M | Empresarial $2.7M | Plataforma: consultar
 ## Admin
 
 ADMIN_UUID = `37dad3e9-531c-4657-8db6-ddebbdcfa878`
-WhatsApp: `5491164707543`
+WhatsApp: `5491168049457`
 
 ## Diseño Visual — Reglas de Estética (NO IGNORAR)
 

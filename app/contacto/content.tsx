@@ -22,16 +22,8 @@ import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/c
 import { bookingWhatsappLocalToE164, BOOKING_WA_LOCAL_DIGITS } from '@/lib/booking-phone'
 import { cn } from '@/lib/utils/cn'
 
-// Mock reviews data (in production, comes from Supabase)
-const REVIEWS = [
-  { id: 1, name: 'Sebastián M.', rating: 5, text: 'Excelente profesional. Entregó mi app antes de tiempo y con calidad impecable.', date: '2025-11-12' },
-  { id: 2, name: 'Laura P.', rating: 5, text: 'La landing que me hizo duplicó mis consultas en el primer mes. Recomendado 100%.', date: '2025-10-28' },
-  { id: 3, name: 'Martín G.', rating: 5, text: 'Gran capacidad técnica y excelente comunicación. Mi app funciona perfecto en ambas tiendas.', date: '2025-09-15' },
-  { id: 4, name: 'Carolina D.', rating: 4, text: 'Muy satisfecha con el resultado. Atención personalizada y cumplimiento de plazos.', date: '2025-08-22' },
-  { id: 5, name: 'Nicolás R.', rating: 5, text: 'BotLode es un producto increíble. Manuel entiende el problema antes de programar.', date: '2025-07-10' },
-]
+import { REVIEWS, AVG_RATING } from '@/lib/data/reviews'
 
-const AVG_RATING = (REVIEWS.reduce((a, r) => a + r.rating, 0) / REVIEWS.length).toFixed(1)
 const CONTACT_NEED_OPTIONS = [
   'Página web',
   'Tienda online',
@@ -223,41 +215,54 @@ function ReviewsSection() {
                 </p>
 
                 {/* Author row */}
-                <div className="flex items-center gap-3">
-                  {/* Avatar */}
+                <div className="flex items-start gap-3">
+                  {/* Avatar — ring con color del tema dinámico */}
                   <div
-                    className="size-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                    className="size-11 rounded-full flex items-center justify-center text-base font-extrabold flex-shrink-0 ring-2 ring-offset-2 ring-offset-[var(--color-surface-base)]"
                     style={{
-                      backgroundColor: 'rgba(var(--color-primary-rgb), 0.12)',
+                      background:
+                        'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.18), rgba(var(--color-primary-rgb), 0.06))',
                       color: 'var(--color-primary)',
+                      // @ts-expect-error CSS var en propiedad nativa
+                      '--tw-ring-color': 'rgba(var(--color-primary-rgb), 0.35)',
                     }}
                     aria-hidden
                   >
                     {r.name[0]}
                   </div>
 
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-[var(--color-on-surface)]">{r.name}</span>
-                    <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    {/* Línea 1: nombre + estrellas + fecha */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-[var(--color-on-surface)]">{r.name}</span>
+                      <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
 
-                    {/* Stars */}
-                    <div className="flex" aria-label={`${r.rating} de 5 estrellas`}>
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <StarIcon
-                          key={s}
-                          className="size-3 text-amber-400"
-                          filled={s <= r.rating}
-                        />
-                      ))}
+                      {/* Stars */}
+                      <div className="flex" aria-label={`${r.rating} de 5 estrellas`}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <StarIcon
+                            key={s}
+                            className="size-3 text-amber-400"
+                            filled={s <= r.rating}
+                          />
+                        ))}
+                      </div>
+
+                      <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
+                      <time
+                        dateTime={r.date}
+                        className="text-xs text-[var(--color-on-surface-variant)] opacity-60 tabular-nums"
+                      >
+                        {new Date(r.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
+                      </time>
                     </div>
 
-                    <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
-                    <time
-                      dateTime={r.date}
-                      className="text-xs text-[var(--color-on-surface-variant)] opacity-60 tabular-nums"
-                    >
-                      {new Date(r.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
-                    </time>
+                    {/* Línea 2: rol/empresa para credibilidad */}
+                    {r.role && (
+                      <span className="text-xs text-[var(--color-on-surface-variant)] opacity-75">
+                        {r.role}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

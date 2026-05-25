@@ -6,7 +6,9 @@ export const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.theapexw
 export const BRAND_IMAGE_SRC = '/apex-logo.png' as const
 
 // ─── Contact ─────────────────────────────────────────────────────────────────
-export const WHATSAPP_NUMBER = '5491164707543'
+export const WHATSAPP_NUMBER = '5491168049457'
+/** Formato E.164 para schema/SEO/clic-to-call (`tel:`). */
+export const WHATSAPP_PHONE_DISPLAY = '+54 9 11 6804 9457'
 
 // ─── Owner / Admin ────────────────────────────────────────────────────────────
 export const ADMIN_UUID = '37dad3e9-531c-4657-8db6-ddebbdcfa878'

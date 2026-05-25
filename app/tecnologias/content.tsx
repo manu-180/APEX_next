@@ -18,9 +18,16 @@ import { CircuitBoardBg } from '@/components/ui/circuit-board-bg'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { ROUTES } from '@/lib/constants'
+import { TECH_STACK } from '@/lib/types/theme'
 import { cn } from '@/lib/utils/cn'
 import { WA_MSG_GENERIC, whatsappUrl } from '@/lib/whatsapp'
 import { TechCardsSection } from './tech-cards-section'
+
+const HERO_STATS = [
+  { value: '5', label: 'Tecnologías core' },
+  { value: '8+', label: 'Productos en prod' },
+  { value: '15d', label: 'Plazo medio' },
+] as const
 
 export function TecnologiasContent() {
   const headerRef = useRef<HTMLElement>(null)
@@ -68,16 +75,16 @@ export function TecnologiasContent() {
     <>
       <motion.section
         ref={headerRef}
-        className="relative pt-20 pb-12 overflow-hidden"
+        className="relative pt-28 sm:pt-32 md:pt-40 pb-12 md:pb-16 overflow-hidden"
         style={{
           opacity: headerOpacity,
           maskImage: headerMask,
           WebkitMaskImage: headerMask,
         }}
         data-hover
-        data-inspector-title="Hero que respira con el scroll"
-        data-inspector-desc="Cabecera de la página de tecnologías: se desvanece al bajar y el fondo de circuito reacciona al cursor, alineado con la estética de Servicios."
-        data-inspector-cat="Performance"
+        data-inspector-title="Hero editorial /tecnologias"
+        data-inspector-desc="Headline en escala dramática, asimetría con stats verticales, marquee de stack y CircuitBoardBg reaccionando al cursor."
+        data-inspector-cat="Tipografía · Layout"
         onMouseMove={(e) => {
           const rect = headerRef.current?.getBoundingClientRect()
           if (rect) bgCursorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top, active: true }
@@ -86,29 +93,140 @@ export function TecnologiasContent() {
           bgCursorRef.current = { x: -1, y: -1, active: false }
         }}
       >
-        <GridBackground />
+        <GridBackground showRadialLight />
         <CircuitBoardBg cursorRef={bgCursorRef} />
-        <div className="relative z-10 mx-auto max-w-4xl px-6">
+
+        {/* Glow editorial top-left */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 60% 50% at 18% -5%, rgba(var(--color-primary-rgb), 0.16), transparent 60%)',
+          }}
+        />
+
+        {/* Top accent line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background:
+              'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.16), transparent)',
+          }}
+        />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-6">
           <SectionReveal>
-            <div className="max-w-2xl">
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <Badge variant="primary">Stack</Badge>
-                <Badge variant="outline">Full-Stack &amp; Mobile</Badge>
+            <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+              {/* ── Left column ──────────────────────────────────── */}
+              <div className="max-w-3xl">
+                {/* Section meta */}
+                <div className="mb-6 flex items-center gap-3">
+                  <span
+                    className="font-mono text-[10px] font-bold tracking-[0.32em] uppercase"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    / Stack · Decisiones técnicas
+                  </span>
+                  <span
+                    aria-hidden
+                    className="h-px flex-1 max-w-[120px]"
+                    style={{
+                      background:
+                        'linear-gradient(to right, rgba(var(--color-primary-rgb), 0.5), transparent)',
+                    }}
+                  />
+                </div>
+
+                <div className="mb-6 flex flex-wrap items-center gap-2">
+                  <Badge variant="primary">Stack 2026</Badge>
+                  <Badge variant="outline">Full-Stack &amp; Mobile</Badge>
+                  <Badge variant="outline">Production-ready</Badge>
+                </div>
+
+                {/* Headline editorial — escala dramática */}
+                <h1 className="font-heading text-balance leading-[0.92] mb-7">
+                  <span className="block text-4xl sm:text-6xl md:text-7xl font-extralight text-[var(--color-on-surface-variant)]">
+                    Cada herramienta
+                  </span>
+                  <span className="block text-5xl sm:text-7xl md:text-[5.5rem] font-extrabold text-[var(--color-on-surface)] tracking-tight -mt-1">
+                    es una decisión.
+                  </span>
+                  <span className="block text-4xl sm:text-6xl md:text-7xl font-extralight italic glow-text mt-2"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    no un capricho.
+                  </span>
+                </h1>
+
+                <p className="text-pretty text-base md:text-lg text-[var(--color-on-surface-variant)] max-w-xl leading-relaxed">
+                  Flutter, Next.js, Supabase, Riverpod, TypeScript. Stack opinado: pocas piezas,
+                  cada una elegida por una razón concreta. Productos sólidos sin sobre-ingeniería.
+                </p>
               </div>
-              <h1 className="font-heading text-balance leading-tight mb-4">
-                <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
-                  Mi stack
-                </span>
-                <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                  tecnológico.
-                </span>
-              </h1>
-              <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-xl">
-                Cada herramienta cumple un rol específico. Estas son las tecnologías que uso para construir
-                productos de clase mundial.
-              </p>
+
+              {/* ── Right column: stats ───────────────────────────── */}
+              <aside className="lg:min-w-[200px]" aria-label="Métricas del stack">
+                <div className="grid grid-cols-3 lg:grid-cols-1 gap-3 lg:gap-4">
+                  {HERO_STATS.map((stat, i) => (
+                    <motion.div
+                      key={stat.label}
+                      initial={prefersReducedMotion ? false : { opacity: 0, x: 16 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.5 }}
+                      transition={{ duration: 0.5, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      className="lg:border-l-2 lg:pl-4 lg:py-1"
+                      style={{ borderColor: 'rgba(var(--color-primary-rgb), 0.3)' }}
+                    >
+                      <div
+                        className="font-heading text-2xl lg:text-3xl font-extrabold tabular-nums"
+                        style={{ color: 'var(--color-primary)' }}
+                      >
+                        {stat.value}
+                      </div>
+                      <div className="text-[10px] uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-75 leading-tight mt-0.5">
+                        {stat.label}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </aside>
             </div>
           </SectionReveal>
+
+          {/* ── Marquee con nombres del stack ──────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-12 sm:mt-16 overflow-hidden border-y py-4"
+            style={{ borderColor: 'rgba(var(--color-primary-rgb), 0.12)' }}
+            aria-hidden
+          >
+            <motion.div
+              className="flex gap-12 whitespace-nowrap"
+              animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
+              transition={
+                prefersReducedMotion ? undefined : { duration: 28, repeat: Infinity, ease: 'linear' }
+              }
+            >
+              {[...TECH_STACK, ...TECH_STACK, ...TECH_STACK].map((t, i) => (
+                <div key={`${t.title}-${i}`} className="flex items-center gap-12 shrink-0">
+                  <span
+                    className="font-heading text-2xl sm:text-3xl font-extrabold opacity-60"
+                    style={{ color: 'var(--color-on-surface-variant)' }}
+                  >
+                    {t.title}
+                  </span>
+                  <span
+                    className="size-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
         </div>
       </motion.section>
 
