@@ -14,7 +14,6 @@ import { BlogBlockRenderer } from '@/components/blog/blog-block-renderer'
 import { BreadcrumbJsonLd } from '@/components/seo/json-ld'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
 import { APP_URL } from '@/lib/constants'
-import { LeadMagnetSection } from '@/components/sections/lead-magnet'
 
 export const dynamic = 'force-static'
 export const dynamicParams = false
@@ -281,9 +280,6 @@ export default async function BlogPostPage({
           </div>
         </div>
       </article>
-
-      {/* ── Lead magnet inline ──────────────────────────────────────── */}
-      <LeadMagnetSection variant="compact" source={`blog-${post.slug}`} />
 
       {/* ── Posts relacionados ──────────────────────────────────────── */}
       {related.length > 0 && (

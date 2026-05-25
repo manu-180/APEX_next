@@ -10,7 +10,6 @@ import {
 } from './static-sections'
 import { ServiciosFinalCta } from './servicios-final-cta'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
-import { LeadMagnetSection } from '@/components/sections/lead-magnet'
 import { BudgetCalculatorSection } from '@/components/sections/budget-calculator'
 import { AfipAddonSection } from '@/components/sections/afip-addon'
 
@@ -55,7 +54,6 @@ export default function ServiciosPage() {
       <AfipAddonSection />
       <ServiciosComparisonTable />
       <VerticalsBridge />
-      <LeadMagnetSection variant="full" source="servicios" />
       <ServiciosStaticFaq />
       <ServiciosFinalCta />
     </>

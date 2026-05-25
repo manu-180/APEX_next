@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
@@ -13,12 +12,8 @@ import { ROUTES } from '@/lib/constants'
  *
  * Why: founder-led brands convierten 12-18% mejor en deals high-ticket de
  * servicios profesionales. Hace falta cara, nombre y enlace a perfil/LinkedIn.
- *
- * Placeholder de foto: por defecto usa /apex-logo.png. Cuando Manuel suba una
- * foto real, reemplazar `MANUEL_PHOTO_SRC` o agregar una imagen en /public.
  */
-const MANUEL_PHOTO_SRC = '/manuel-profile.jpg' // pendiente: cargar foto real
-const MANUEL_PHOTO_FALLBACK = '/apex-logo.png'
+const YEARS_EXP = new Date().getFullYear() - 2021
 const MANUEL_LINKEDIN_URL = 'https://www.linkedin.com/in/manuel-navarro-dev' // pendiente: ajustar al URL real
 
 export function FounderSection() {
@@ -46,67 +41,102 @@ export function FounderSection() {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="grid gap-10 md:grid-cols-[280px_1fr] md:items-center"
         >
-          {/* ── Photo column ───────────────────────────────────────── */}
-          <div className="relative mx-auto md:mx-0">
-            <div
-              className="relative h-[280px] w-[280px] overflow-hidden rounded-2xl"
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.18), rgba(var(--color-primary-rgb), 0.03))',
-                border: '1px solid rgba(var(--color-primary-rgb), 0.2)',
-                boxShadow:
-                  '0 24px 60px -16px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(255,255,255,0.04) inset',
-              }}
-            >
-              <Image
-                src={MANUEL_PHOTO_SRC}
-                alt="Manuel Navarro, founder de APEX"
-                fill
-                sizes="280px"
-                className="object-cover"
-                onError={(e) => {
-                  // Si no hay foto real, fallback elegante al logo APEX
-                  ;(e.target as HTMLImageElement).src = MANUEL_PHOTO_FALLBACK
-                }}
-              />
-
-              {/* Frame decoration */}
-              <span
-                aria-hidden
-                className="absolute left-2 top-2 size-4 border-l border-t"
-                style={{ borderColor: 'var(--color-primary)' }}
-              />
-              <span
-                aria-hidden
-                className="absolute right-2 top-2 size-4 border-r border-t"
-                style={{ borderColor: 'var(--color-primary)' }}
-              />
-              <span
-                aria-hidden
-                className="absolute bottom-2 left-2 size-4 border-b border-l"
-                style={{ borderColor: 'var(--color-primary)' }}
-              />
-              <span
-                aria-hidden
-                className="absolute bottom-2 right-2 size-4 border-b border-r"
-                style={{ borderColor: 'var(--color-primary)' }}
-              />
+          {/* ── Profile card column ───────────────────────────────── */}
+          <div
+            className="relative mx-auto md:mx-0 flex flex-col gap-4 w-full max-w-[280px] rounded-xl p-5"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow:
+                '0 24px 60px -16px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(255,255,255,0.04) inset',
+            }}
+          >
+            {/* Avatar + nombre */}
+            <div className="flex flex-col items-center gap-2.5">
+              <div className="relative">
+                <div
+                  className="h-14 w-14 rounded-full flex items-center justify-center text-base font-bold select-none"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.28), rgba(6, 182, 212, 0.18))',
+                    border: '2px solid rgba(var(--color-primary-rgb), 0.38)',
+                    color: 'var(--color-primary)',
+                  }}
+                >
+                  MN
+                </div>
+                <span
+                  className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 animate-pulse"
+                  style={{
+                    backgroundColor: 'var(--color-online)',
+                    borderColor: 'var(--color-surface-low)',
+                    boxShadow: '0 0 6px var(--color-online)',
+                  }}
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-semibold text-[var(--color-on-surface)]">Manuel Navarro</p>
+                <p className="text-xs text-[var(--color-on-surface-variant)]">Full-Stack · Mobile</p>
+              </div>
             </div>
 
-            {/* Available badge sobre la foto */}
+            {/* Divisor */}
             <div
-              className="absolute -bottom-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 glass-card glow-border whitespace-nowrap"
-            >
-              <span
-                className="size-1.5 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: 'var(--color-online)',
-                  boxShadow: '0 0 6px var(--color-online)',
-                }}
-              />
-              <span className="text-[10px] font-semibold text-[var(--color-on-surface)] uppercase tracking-wider">
-                Disponible
-              </span>
+              className="h-px"
+              style={{
+                background:
+                  'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.22), transparent)',
+              }}
+            />
+
+            {/* Mini stats */}
+            <div className="grid grid-cols-2 gap-2 text-center">
+              {[
+                { v: `${YEARS_EXP}+`, l: 'Años exp.' },
+                { v: '150+', l: 'Proyectos' },
+                { v: '100%', l: 'Satisfechos' },
+                { v: '<2h', l: 'Respuesta' },
+              ].map((s) => (
+                <div key={s.l}>
+                  <p
+                    className="text-base font-extrabold glow-text"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    {s.v}
+                  </p>
+                  <p className="text-[9px] leading-tight text-[var(--color-on-surface-variant)]">
+                    {s.l}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Divisor */}
+            <div
+              className="h-px"
+              style={{
+                background:
+                  'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.22), transparent)',
+              }}
+            />
+
+            {/* Tech tags */}
+            <div className="flex flex-wrap gap-1 justify-center">
+              {['Next.js', 'Flutter', 'Supabase'].map((t) => (
+                <span
+                  key={t}
+                  className="rounded px-1.5 py-0.5 text-[9px] font-mono font-semibold"
+                  style={{
+                    background: 'rgba(var(--color-primary-rgb), 0.08)',
+                    color: 'rgba(var(--color-primary-rgb), 0.8)',
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
             </div>
           </div>
 

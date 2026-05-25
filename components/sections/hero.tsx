@@ -329,7 +329,7 @@ export function HeroSection() {
 
             <div className="mt-1 grid grid-cols-3 gap-2">
               {[
-                { value: '+15', label: 'Proyectos' },
+                { value: '+150', label: 'Proyectos' },
                 { value: '4.9', label: 'Rating' },
                 { value: '15d', label: 'Entrega' },
               ].map((stat) => (

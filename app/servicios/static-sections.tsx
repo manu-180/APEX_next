@@ -11,7 +11,7 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto cuesta una página web en Argentina?',
-    a: 'Los proyectos arrancan desde ARS 300.000 con precio fijo pactado al inicio. Landing 300k, web interactiva 600k, e-commerce 900k. Apps móviles desde ARS 580.000. Podés pagarlo en 3 cuotas sin interés. Sin sorpresas al final.',
+    a: 'Las páginas arrancan desde ARS 300.000 con precio fijo pactado al inicio: Landing 300k, web interactiva 600k, e-commerce 900k. Antes de cobrarte nada hago un boceto gratis del proyecto — recién cuando lo aprobás avanzás con la primera de 3 cuotas sin interés. Las apps móviles funcionan distinto: son ARS 580.000 por mes (no es un pago único ni en cuotas, es una suscripción mensual mientras la app está activa). Sin sorpresas al final.',
   },
   {
     q: '¿El hosting y el dominio están incluidos?',
@@ -22,12 +22,8 @@ export const SERVICIOS_FAQ_ITEMS = [
     a: 'El código es 100% tuyo desde el día uno. Lo subo a un repositorio (GitHub) con tu cuenta como propietaria. No hay lock-in: si en algún momento querés cambiar de proveedor, te llevás todo sin perder un solo archivo.',
   },
   {
-    q: '¿Aceptan factura A o B?',
-    a: 'Sí, emitimos factura A o B según corresponda. Inscripción en AFIP al día. Ideal para empresas que necesitan computar el IVA y deducir el gasto.',
-  },
-  {
     q: '¿Cuál es la forma de pago?',
-    a: '50% al arrancar (que activa el calendario de 15 días) y 50% al entregar. Aceptamos transferencia bancaria, MercadoPago, MEP/CCL para clientes que paguen en dólares, y cripto (USDT) para clientes del exterior.',
+    a: 'Primero hago un boceto del proyecto 100% gratis y sin compromiso. Si te gusta, recién ahí abonás la primera de 3 cuotas sin interés (cada una un tercio del total) — la primera activa el calendario de 15 días, la segunda durante el desarrollo y la última al entregar. Aceptamos transferencia bancaria, MercadoPago, MEP/CCL para clientes que paguen en dólares, y cripto (USDT) para clientes del exterior.',
   },
   {
     q: '¿Qué pasa si no me gusta el resultado?',
@@ -50,16 +46,12 @@ export const SERVICIOS_FAQ_ITEMS = [
     a: 'Sí. MercadoPago para checkout, AFIP para facturación electrónica automática (vía SDK oficial), y WhatsApp Business API para notificaciones y conversaciones. La integración fiscal AFIP suma ARS 200-400k según complejidad.',
   },
   {
-    q: '¿Pueden migrar mi sitio actual de WordPress o Wix?',
-    a: 'Sí. Migramos el contenido, las imágenes y la estructura SEO (redirects 301 incluidos para no perder ranking). El sitio nuevo arranca con todo lo que ya tenías, pero corriendo mucho más rápido y sin pagar mantenimiento mensual a una agencia.',
-  },
-  {
     q: '¿Qué incluye el mantenimiento post-entrega?',
     a: 'Los primeros 3 meses post-entrega tenés soporte incluido: bugs, ajustes menores, dudas de uso. Después podés contratar un plan de mantenimiento mensual (desde ARS 50k/mes) que cubre updates de seguridad, monitoreo de errores y cambios menores.',
   },
   {
     q: '¿Qué necesitan de mí para empezar?',
-    a: 'Para arrancar sólo necesito: un brief corto del proyecto (lo armamos juntos en la consulta), el contenido que ya tengas (textos, fotos, logo si hay), y el 50% inicial. Si no tenés contenido todavía, te ayudo a estructurarlo.',
+    a: 'Para arrancar sólo necesito: un brief corto del proyecto (lo armamos juntos en la consulta) y el contenido que ya tengas (textos, fotos, logo si hay). El boceto te lo hago gratis y sin compromiso — recién después de que lo apruebes pagás la primera cuota. Si no tenés contenido todavía, te ayudo a estructurarlo.',
   },
 ] as const
 
@@ -591,7 +583,7 @@ export function VerticalsBridge() {
               Verticales
             </span>
             <h3 className="text-lg sm:text-xl font-bold text-[var(--color-on-surface)]">
-              ¿Sos un profesional con dolor específico?
+              ¿Sos un profesional con un problema específico?
             </h3>
           </div>
           <p className="text-sm text-[var(--color-on-surface-variant)] mb-5">

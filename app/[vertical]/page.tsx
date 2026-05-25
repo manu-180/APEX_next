@@ -8,7 +8,6 @@ import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
 import { BreadcrumbJsonLd } from '@/components/seo/json-ld'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
 import { APP_URL, WHATSAPP_NUMBER } from '@/lib/constants'
-import { LeadMagnetSection } from '@/components/sections/lead-magnet'
 import { formatARS } from '@/lib/types/services'
 
 export const dynamic = 'force-static'
@@ -179,12 +178,6 @@ export default async function VerticalLandingPage({
               Hablemos de tu caso
               <ArrowRightIcon className="size-4" />
             </a>
-            <Link
-              href="/proyectos"
-              className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
-            >
-              Ver proyectos similares →
-            </Link>
           </div>
         </div>
       </section>
@@ -384,9 +377,6 @@ export default async function VerticalLandingPage({
           </div>
         </div>
       </section>
-
-      {/* ── Lead magnet ─────────────────────────────────────────────── */}
-      <LeadMagnetSection variant="compact" source={`vertical-${v.slug}`} />
     </>
   )
 }

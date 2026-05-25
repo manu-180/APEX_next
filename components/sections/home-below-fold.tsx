@@ -20,10 +20,6 @@ const FounderSection = dynamic(
   () => import('./founder').then((m) => m.FounderSection),
 )
 
-const VideoTestimonialSection = dynamic(
-  () => import('./video-testimonial').then((m) => m.VideoTestimonialSection),
-)
-
 const HomeFinalCtaSection = dynamic(
   () => import('./home-final-cta').then((m) => m.HomeFinalCtaSection),
 )
@@ -34,7 +30,6 @@ export function HomeBelowFold() {
       <ClientBenefitsSection />
       <TrustedClientsSection />
       <FounderSection />
-      <VideoTestimonialSection />
       <HomeFinalCtaSection />
     </>
   )

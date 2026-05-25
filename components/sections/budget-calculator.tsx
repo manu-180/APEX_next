@@ -86,94 +86,79 @@ interface CalculatorAnswers {
   content?: ContentState
 }
 
-/** Heurística de pricing — coincide con los planes oficiales del sitio. */
+/** Heurística de pricing — precios fijos accesibles, extras se charlan en la consulta. */
 function calculateRange(answers: CalculatorAnswers): {
-  min: number
-  max: number
+  base: number
   baseLabel: string
+  installment: number
+  hasFixedPrice: boolean
   notes: string[]
 } {
   const notes: string[] = []
-  let min = 0
-  let max = 0
+  let base = 0
   let baseLabel = ''
+  let hasFixedPrice = true
 
   switch (answers.project) {
     case 'web-simple':
       baseLabel = 'Landing / Web simple'
-      min = 300_000
-      max = 500_000
+      base = 300_000
+      notes.push('Sitio profesional con 3-5 secciones, diseño a medida y optimización mobile.')
       break
     case 'web-interactiva':
       baseLabel = 'Web interactiva'
-      min = 600_000
-      max = 900_000
+      base = 600_000
+      notes.push('Algo más útil que una landing: booking, formularios inteligentes, calculadoras o paneles dinámicos.')
       break
     case 'ecommerce':
       baseLabel = 'Tienda online'
-      min = 900_000
-      max = 1_500_000
+      base = 900_000
+      notes.push('Catálogo, carrito y pagos integrados, listo para vender.')
       break
     case 'app':
       baseLabel = 'App móvil'
-      min = 580_000
-      max = 1_150_000
+      base = 1_200_000
+      notes.push('App nativa iOS + Android con backend incluido.')
       break
     case 'unsure':
       baseLabel = 'Proyecto a definir'
-      min = 300_000
-      max = 1_500_000
+      base = 0
+      hasFixedPrice = false
       notes.push('Definimos el tipo exacto en la consulta gratis de 15 min.')
       break
   }
 
-  // Ajustes por integraciones
+  // Integraciones — no inflan el precio mostrado; se charlan en la consulta
   const ints = new Set(answers.integrations)
   if (ints.has('afip')) {
-    min += 200_000
-    max += 400_000
-    notes.push('Integración AFIP suma entre $200k y $400k según volumen.')
+    notes.push('Integración AFIP: se cotiza aparte según volumen de facturación.')
   }
   if (ints.has('payments')) {
-    min += 80_000
-    max += 200_000
-    notes.push('Pasarela de pagos (MercadoPago + checkout): $80k-$200k.')
+    notes.push('Pasarela de pagos (MercadoPago / Stripe): incluida sin costo adicional.')
   }
   if (ints.has('multilang')) {
-    min += 120_000
-    max += 280_000
-    notes.push('Multi-idioma agrega entre $120k y $280k según cantidad de pages.')
+    notes.push('Multi-idioma: lo charlamos por WhatsApp según cantidad de páginas.')
   }
   if (ints.has('crm')) {
-    min += 150_000
-    max += 400_000
-    notes.push('Integración con sistema actual: depende mucho del API existente.')
+    notes.push('Integración con tu sistema actual: depende del API existente.')
   }
   if (ints.has('realtime')) {
-    min += 200_000
-    max += 500_000
-    notes.push('Funcionalidad realtime suma entre $200k y $500k.')
+    notes.push('Funcionalidad realtime (chat, notificaciones live): la sumamos según el caso.')
   }
 
-  // Ajuste por plazo (urgencia premium)
+  // Plazo urgente
   if (answers.timeline === 'urgent') {
-    min = Math.round(min * 1.15)
-    max = Math.round(max * 1.15)
-    notes.push('Plazo urgente (2-3 semanas) tiene un +15% sobre el precio base.')
+    notes.push('Plazo urgente (2-3 semanas): puede tener un ajuste menor, lo confirmamos en la charla.')
   }
 
-  // Ajuste por contenido (si Manuel ayuda con copy/branding)
+  // Contenido
   if (answers.content === 'none') {
-    min += 100_000
-    max += 250_000
-    notes.push('Si necesitás ayuda con contenido y branding, se suman $100k-$250k.')
-  } else if (answers.content === 'partial') {
-    min += 50_000
-    max += 100_000
-    notes.push('Refinamiento de contenido existente: $50k-$100k.')
+    notes.push('Te ayudo con contenido y branding básico sin costo extra significativo.')
   }
 
-  return { min, max, baseLabel, notes }
+  const installment = hasFixedPrice ? Math.round(base / 3) : 0
+
+  return { base, baseLabel, installment, hasFixedPrice, notes }
 }
 
 function formatARS(value: number): string {
@@ -223,7 +208,9 @@ export function BudgetCalculatorSection() {
     const summary = [
       `Hola Manuel, hice la calculadora y me dio:`,
       `Tipo: ${result.baseLabel}`,
-      `Rango estimado: ${formatARS(result.min)} - ${formatARS(result.max)}`,
+      result.hasFixedPrice
+        ? `Estimado: ${formatARS(result.base)} (3 cuotas sin interés de ${formatARS(result.installment)})`
+        : `Estimado: a definir en la consulta`,
       answers.timeline ? `Plazo: ${Q_TIMELINE.options.find((o) => o.value === answers.timeline)?.label}` : '',
       answers.integrations.length > 0
         ? `Integraciones: ${answers.integrations
@@ -242,6 +229,10 @@ export function BudgetCalculatorSection() {
   const reset = () => {
     setStep(0)
     setAnswers({ integrations: [] })
+  }
+
+  const goBack = () => {
+    setStep((s) => Math.max(s - 1, 0))
   }
 
   const canAdvance = (() => {
@@ -287,16 +278,30 @@ export function BudgetCalculatorSection() {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             />
           </div>
-          <div className="mt-2 flex justify-between text-[10px] uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-60">
-            <span>{isLastStep ? 'Listo' : `Paso ${step + 1} de ${totalSteps}`}</span>
-            {!isLastStep && (
+          <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-wider text-[var(--color-on-surface-variant)]">
+            <div className="flex items-center gap-3">
+              {step > 0 && !isLastStep && (
+                <button
+                  type="button"
+                  onClick={goBack}
+                  className="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-[var(--color-primary)] transition-all"
+                  aria-label="Volver al paso anterior"
+                >
+                  <ArrowRightIcon className="size-3 rotate-180" aria-hidden />
+                  Atrás
+                </button>
+              )}
+              <span className="opacity-60">
+                {isLastStep ? 'Listo' : `Paso ${step + 1} de ${totalSteps}`}
+              </span>
+            </div>
+            {!isLastStep && step > 0 && (
               <button
                 type="button"
                 onClick={reset}
-                className="hover:text-[var(--color-primary)] transition-colors"
-                disabled={step === 0}
+                className="opacity-60 hover:opacity-100 hover:text-[var(--color-primary)] transition-all"
               >
-                {step > 0 ? 'Reiniciar' : ''}
+                Reiniciar
               </button>
             )}
           </div>
@@ -389,7 +394,15 @@ export function BudgetCalculatorSection() {
                     />
                   ))}
                 </div>
-                <div className="mt-6 flex justify-end">
+                <div className="mt-6 flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    className="inline-flex items-center gap-2 min-h-11 px-4 text-sm font-semibold rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
+                  >
+                    <ArrowRightIcon className="size-4 rotate-180" aria-hidden />
+                    Atrás
+                  </button>
                   <button
                     type="button"
                     onClick={() => setStep(3)}
@@ -448,19 +461,35 @@ export function BudgetCalculatorSection() {
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
                   {result.baseLabel}
                 </h3>
-                <div
-                  className="font-heading text-4xl sm:text-5xl font-extrabold tabular-nums mb-1"
-                  style={{ color: 'var(--color-primary)' }}
-                >
-                  {formatARS(result.min)}
-                </div>
-                <div className="text-sm text-[var(--color-on-surface-variant)] mb-6">
-                  hasta{' '}
-                  <span className="font-bold text-[var(--color-on-surface)] tabular-nums">
-                    {formatARS(result.max)}
-                  </span>{' '}
-                  según alcance final
-                </div>
+                {result.hasFixedPrice ? (
+                  <>
+                    <div
+                      className="font-heading text-4xl sm:text-5xl font-extrabold tabular-nums mb-2"
+                      style={{ color: 'var(--color-primary)' }}
+                    >
+                      {formatARS(result.base)}
+                    </div>
+                    <div
+                      className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-6 text-xs font-semibold"
+                      style={{
+                        backgroundColor: 'rgba(var(--color-primary-rgb), 0.08)',
+                        color: 'var(--color-primary)',
+                        border: '1px solid rgba(var(--color-primary-rgb), 0.2)',
+                      }}
+                    >
+                      <CheckIcon className="size-3.5" />
+                      3 cuotas sin interés de{' '}
+                      <span className="tabular-nums">{formatARS(result.installment)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    className="font-heading text-2xl sm:text-3xl font-extrabold mb-6"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    Lo definimos juntos
+                  </div>
+                )}
 
                 {result.notes.length > 0 && (
                   <div
@@ -471,7 +500,7 @@ export function BudgetCalculatorSection() {
                     }}
                   >
                     <p className="text-[11px] font-bold uppercase tracking-wider mb-2 text-[var(--color-primary)]">
-                      Detalles que mueven el rango
+                      Qué incluye y qué charlamos aparte
                     </p>
                     <ul className="space-y-1.5">
                       {result.notes.map((n, i) => (

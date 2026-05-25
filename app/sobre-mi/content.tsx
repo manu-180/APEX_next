@@ -25,7 +25,7 @@ const YEARS_EXP = new Date().getFullYear() - 2021
 
 const STATS = [
   { value: `${YEARS_EXP}+`, label: 'Años de experiencia' },
-  { value: '15+', label: 'Proyectos creados' },
+  { value: '150+', label: 'Proyectos creados' },
   { value: '8+', label: 'Tecnologías dominadas' },
   { value: '100%', label: 'Clientes satisfechos' },
 ]
@@ -144,7 +144,6 @@ export function SobreMiContent() {
                     'Trabajo directo con vos. Sin intermediarios.',
                     'Plazo en fecha o devolvemos. Sin asteriscos.',
                     'El código queda 100% a tu nombre desde día 1.',
-                    'Acepto factura A o B. MEP/cripto si exportás.',
                     'Stack que entiendo profundo: Flutter, Next.js, Supabase, Riverpod.',
                     'Te digo "no" si tu proyecto no encaja conmigo.',
                   ].map((line) => (
@@ -360,7 +359,7 @@ export function SobreMiContent() {
                     <div className="grid grid-cols-2 gap-2 text-center">
                       {[
                         { v: `${YEARS_EXP}+`, l: 'Años exp.' },
-                        { v: '15+', l: 'Proyectos' },
+                        { v: '150+', l: 'Proyectos' },
                         { v: '100%', l: 'Satisfechos' },
                         { v: '<2h', l: 'Respuesta' },
                       ].map((s) => (

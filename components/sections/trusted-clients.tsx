@@ -47,6 +47,41 @@ const CLIENTS: ClientSite[] = [
     category: 'Eventos',
     screenshot: '/images/clients/bylumainvita.png',
   },
+  {
+    name: 'Mi Lugar en el Mundo',
+    domain: 'moda.theapexweb.com',
+    url: 'https://moda.theapexweb.com',
+    category: 'Moda',
+    screenshot: '/images/clients/mi-lugar.png',
+  },
+  {
+    name: 'Apostillas Ya',
+    domain: 'apostillasargentinasonline.com',
+    url: 'https://www.apostillasargentinasonline.com',
+    category: 'Trámites',
+    screenshot: '/images/clients/apostillas-ya.png',
+  },
+  {
+    name: 'DG Studio',
+    domain: 'dg.theapexweb.com',
+    url: 'https://dg.theapexweb.com',
+    category: 'Wellness',
+    screenshot: '/images/clients/dg-studio.png',
+  },
+  {
+    name: 'Imaginate',
+    domain: 'imaginate.theapexweb.com',
+    url: 'https://imaginate.theapexweb.com',
+    category: 'Lencería',
+    screenshot: '/images/clients/imaginate.png',
+  },
+  {
+    name: 'Handy',
+    domain: 'handy.theapexweb.com',
+    url: 'https://handy.theapexweb.com',
+    category: 'Marketplace',
+    screenshot: '/images/clients/handy.png',
+  },
 ]
 
 const fadeUp = {
@@ -350,7 +385,7 @@ export function TrustedClientsSection() {
               'flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none',
               '-mx-6 px-6',
               'sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0',
-              'lg:grid-cols-4',
+              'lg:grid-cols-3',
             )}
             data-motion
           >
