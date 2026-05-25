@@ -2,6 +2,7 @@ import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils/cn'
 import { ServiciosHeroShell } from './servicios-hero-shell'
+import { FaqAccordion } from './faq-accordion'
 
 export const SERVICIOS_FAQ_ITEMS = [
   {
@@ -10,7 +11,7 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto cuesta una página web en Argentina?',
-    a: 'Los proyectos arrancan desde ARS 300.000 con precio fijo pactado al inicio. Landing 300k, web interactiva 600k, e-commerce 900k. Apps móviles desde ARS 580.000. Sin sorpresas al final.',
+    a: 'Los proyectos arrancan desde ARS 300.000 con precio fijo pactado al inicio. Landing 300k, web interactiva 600k, e-commerce 900k. Apps móviles desde ARS 580.000. Podés pagarlo en 3 cuotas sin interés. Sin sorpresas al final.',
   },
   {
     q: '¿El hosting y el dominio están incluidos?',
@@ -30,11 +31,11 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Qué pasa si no me gusta el resultado?',
-    a: 'Cada proyecto tiene revisiones incluidas en cada hito. Si al finalizar no estás conforme con el resultado pactado, devolvemos el depósito sin discusiones. No usamos esa garantía porque presentamos diseño aprobado antes de programar.',
+    a: 'Hacemos el boceto completo del proyecto 100% gratis y sin compromiso. Recién cuando lo aprobás y te encanta, avanzás con la primer cuota. Si el diseño no te convence, no pagás nada — nos despedimos como amigos y listo.',
   },
   {
     q: '¿Puedo hablar con alguien antes de contratar?',
-    a: 'Sí. Hay una consulta inicial gratuita de 15 minutos por WhatsApp, sin compromiso. Te explico el proceso, qué necesitamos para arrancar, y si tu proyecto encaja con lo que hacemos. Si no encaja, te digo a quién recomendar.',
+    a: 'Sí, conmigo. Soy Manuel, fundador de APEX, y siempre voy a estar disponible directamente por WhatsApp para responder cualquier consulta — antes, durante y después del proyecto. Sin vendedores, sin intermediarios, sin filtros. La primera charla son 15 minutos gratuitos y sin compromiso.',
   },
   {
     q: '¿Trabajan solo en Buenos Aires?',
@@ -647,42 +648,7 @@ export function ServiciosStaticFaq() {
           </h2>
         </div>
 
-        <div className="space-y-3">
-          {SERVICIOS_FAQ_ITEMS.map((item, i) => (
-            <details
-              key={item.q}
-              name="servicios-faq"
-              className="group rounded-xl overflow-hidden"
-              style={{
-                border: '1px solid var(--glass-border)',
-                backgroundColor: 'var(--color-surface-high)',
-              }}
-              open={i === 0}
-            >
-              <summary className="w-full flex items-center justify-between px-5 py-4 text-left gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                <span className="text-sm font-semibold text-[var(--color-on-surface)]">{item.q}</span>
-                <span
-                  className="flex-shrink-0 inline-flex text-[var(--color-primary)] select-none transition-transform duration-200 group-open:rotate-180"
-                  aria-hidden
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.25}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-5"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </span>
-              </summary>
-              <p className="px-5 pb-4 text-sm text-[var(--color-on-surface-variant)] leading-relaxed">{item.a}</p>
-            </details>
-          ))}
-        </div>
+        <FaqAccordion items={SERVICIOS_FAQ_ITEMS} />
       </SectionReveal>
     </section>
   )

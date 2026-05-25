@@ -37,3 +37,7 @@ next-env.d.ts
 
 # Vercel
 .vercel/
+
+# Claude Code runtime locks
+.claude/scheduled_tasks.lock
+.claude/*.lock
