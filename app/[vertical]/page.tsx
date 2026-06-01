@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { VERTICALS, getVertical, getVerticalSlugs } from '@/lib/data/verticals'
+import { getPostsByKeywords } from '@/lib/data/blog-posts'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
@@ -71,6 +72,10 @@ export default async function VerticalLandingPage({
     `Hola Manuel, vengo de la landing de "${v.nounPlural}" y quiero saber más.`,
   )
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`
+
+  // Internal linking: otras verticals + guías del blog relevantes al rubro.
+  const otherVerticals = VERTICALS.filter((x) => x.slug !== v.slug)
+  const relatedPosts = getPostsByKeywords(v.keywords, 3)
 
   // FAQ schema para AEO
   const faqSchema = {
@@ -375,6 +380,88 @@ export default async function VerticalLandingPage({
               </details>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Seguí explorando · internal linking ─────────────────────── */}
+      <section className="relative py-16 sm:py-20" style={{ backgroundColor: 'var(--color-surface-base)' }}>
+        <div className="mx-auto max-w-5xl px-6">
+          <span
+            className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            Seguí explorando
+          </span>
+          <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)] mb-10">
+            Antes de decidir
+          </h2>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Link
+              href="/servicios"
+              className="group rounded-xl p-6 border transition-all md:col-span-2"
+              style={{ backgroundColor: 'var(--color-surface-low)', borderColor: 'var(--glass-border)' }}
+            >
+              <span
+                className="text-[10px] font-bold uppercase tracking-wider"
+                style={{ color: 'var(--color-primary)' }}
+              >
+                Servicios y precios
+              </span>
+              <h3 className="font-heading text-lg font-extrabold text-[var(--color-on-surface)] mt-1 mb-1 group-hover:text-[var(--color-primary)] transition-colors">
+                Todos los planes de desarrollo web y apps
+              </h3>
+              <p className="text-sm text-[var(--color-on-surface-variant)]">
+                Compará Landing, Web Interactiva, Tienda Online y apps — con precios en pesos.
+              </p>
+            </Link>
+
+            {otherVerticals.map((o) => (
+              <Link
+                key={o.slug}
+                href={`/${o.slug}`}
+                className="group rounded-xl p-5 border transition-all"
+                style={{ backgroundColor: 'var(--color-surface-low)', borderColor: 'var(--glass-border)' }}
+              >
+                <Badge variant="outline" className="mb-3 text-[10px]">
+                  {o.category}
+                </Badge>
+                <h3 className="font-heading text-base font-extrabold text-[var(--color-on-surface)] leading-tight mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                  Web para {o.nounPlural}
+                </h3>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)]">
+                  Ver landing
+                  <ArrowRightIcon className="size-3 transition-transform duration-200 group-hover:translate-x-1" />
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {relatedPosts.length > 0 && (
+            <>
+              <h3 className="font-heading text-xl font-bold text-[var(--color-on-surface)] mt-12 mb-5">
+                Guías que te pueden servir
+              </h3>
+              <div className="grid gap-4 md:grid-cols-3">
+                {relatedPosts.map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/blog/${p.slug}`}
+                    className="group block rounded-xl p-5 border transition-all"
+                    style={{ backgroundColor: 'var(--color-surface-low)', borderColor: 'var(--glass-border)' }}
+                  >
+                    <h4 className="font-heading text-sm font-extrabold text-[var(--color-on-surface)] leading-tight mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                      {p.title}
+                    </h4>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)]">
+                      Leer
+                      <ArrowRightIcon className="size-3 transition-transform duration-200 group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
     </>

@@ -96,7 +96,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Heurística sencilla por volumen de ventas mensuales: hasta $500k facturás cada mes, Tiendanube te alcanza ($35/mes). Entre $500k y $3M, conviene Tiendanube + custom skin. Arriba de $3M/mes, el e-commerce custom paga su diferencia en 6-12 meses por: velocidad real, sin comisión por venta, propiedad del código.',
+        text: 'Heurística sencilla por volumen de ventas mensuales: hasta $500k facturás cada mes, Tiendanube te alcanza ($35/mes). Entre $500k y $3M, conviene Tiendanube + custom skin. Arriba de $3M/mes, el e-commerce custom paga su diferencia en 6-12 meses por: velocidad real, sin comisión por venta, propiedad del código. Lo comparo a fondo en [Tiendanube vs Shopify vs e-commerce custom](/blog/tiendanube-vs-shopify-vs-ecommerce-custom-argentina).',
       },
       {
         type: 'callout',
@@ -110,11 +110,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting profesional el primer año, integración formulario de contacto con email, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días.',
+        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting profesional el primer año, integración formulario de contacto con email, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días. Es lo que ofrezco como [plan Landing](/servicios).',
       },
       {
         type: 'paragraph',
-        text: 'Un proyecto de $600k agrega: hasta 5-7 páginas adicionales, panel admin para que cambies textos/imágenes vos, integración WhatsApp + email automático, booking/calendario online, analytics avanzado, y soporte 3 meses post-entrega.',
+        text: 'Un proyecto de $600k agrega: hasta 5-7 páginas adicionales, panel admin para que cambies textos/imágenes vos, integración WhatsApp + email automático, booking/calendario online, analytics avanzado, y soporte 3 meses post-entrega. Es el [plan Web Interactiva](/servicios).',
       },
       {
         type: 'heading',
@@ -965,4 +965,29 @@ export function getRelatedPosts(slug: string, limit = 3): BlogPost[] {
   return BLOG_POSTS.filter(
     (p) => p.slug !== slug && p.category === current.category,
   ).slice(0, limit)
+}
+
+/**
+ * Posts más relevantes para un conjunto de keywords. Usado para internal
+ * linking desde las landings verticales (/[vertical]) hacia el blog.
+ * Puntúa por overlap de tokens (>3 chars) en tags + título; ordena desc.
+ * Fallback estable: primeros `limit` posts si no hay match.
+ */
+export function getPostsByKeywords(keywords: string[], limit = 3): BlogPost[] {
+  const tokens = new Set(
+    keywords
+      .flatMap((k) => k.toLowerCase().split(/\s+/))
+      .filter((t) => t.length > 3),
+  )
+  return BLOG_POSTS.map((p) => {
+    const haystack = `${p.tags.join(' ')} ${p.title}`.toLowerCase()
+    let score = 0
+    tokens.forEach((t) => {
+      if (haystack.includes(t)) score += 1
+    })
+    return { post: p, score }
+  })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((s) => s.post)
 }

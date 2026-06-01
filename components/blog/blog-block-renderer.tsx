@@ -1,27 +1,58 @@
+import Link from 'next/link'
 import type { BlogBlock } from '@/lib/data/blog-posts'
 
 /**
  * Render simple de bloques de blog post. Soporta los tipos definidos en
  * BlogBlock — paragraphs, headings, listas, quotes, callouts, tablas, CTAs.
  *
- * Markdown inline básico: **negrita** se convierte a <strong>.
+ * Markdown inline soportado:
+ *  - **negrita** → <strong>
+ *  - [texto](/ruta) → <Link> interno (next/link) para internal linking SEO
+ *  - [texto](https://…) → <a target="_blank" rel="noopener noreferrer">
  */
+const INLINE_LINK_CLASS =
+  'font-medium text-[var(--color-primary)] underline decoration-[var(--color-primary)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-primary)]'
+
 function renderInline(text: string): React.ReactNode {
   const parts: React.ReactNode[] = []
   let lastIndex = 0
-  const boldRegex = /\*\*([^*]+)\*\*/g
-  let match: RegExpExecArray | null
   let key = 0
-  while ((match = boldRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
+  // Matchea **negrita** O [texto](url) en una sola pasada (sin estado global).
+  const inlineRegex = /\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)]+)\)/g
+  for (const match of text.matchAll(inlineRegex)) {
+    const idx = match.index ?? 0
+    if (idx > lastIndex) {
+      parts.push(text.slice(lastIndex, idx))
     }
-    parts.push(
-      <strong key={`b${key++}`} className="font-bold text-[var(--color-on-surface)]">
-        {match[1]}
-      </strong>,
-    )
-    lastIndex = match.index + match[0].length
+    if (match[1] !== undefined) {
+      parts.push(
+        <strong key={`b${key++}`} className="font-bold text-[var(--color-on-surface)]">
+          {match[1]}
+        </strong>,
+      )
+    } else {
+      const label = match[2]
+      const href = match[3]
+      const isInternal = href.startsWith('/') || href.startsWith('#')
+      parts.push(
+        isInternal ? (
+          <Link key={`l${key++}`} href={href} className={INLINE_LINK_CLASS}>
+            {label}
+          </Link>
+        ) : (
+          <a
+            key={`l${key++}`}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={INLINE_LINK_CLASS}
+          >
+            {label}
+          </a>
+        ),
+      )
+    }
+    lastIndex = idx + match[0].length
   }
   if (lastIndex < text.length) {
     parts.push(text.slice(lastIndex))

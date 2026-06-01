@@ -7,6 +7,7 @@ import {
   getBlogSlugs,
   getRelatedPosts,
 } from '@/lib/data/blog-posts'
+import { VERTICALS } from '@/lib/data/verticals'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon } from '@/components/ui/icons'
@@ -280,6 +281,65 @@ export default async function BlogPostPage({
           </div>
         </div>
       </article>
+
+      {/* ── CTA + internal linking a páginas money ───────────────────── */}
+      <section className="relative pb-4">
+        <div className="mx-auto max-w-3xl px-6">
+          <div
+            className="rounded-2xl p-6 sm:p-8 border"
+            style={{
+              backgroundColor: 'rgba(var(--color-primary-rgb), 0.06)',
+              borderColor: 'rgba(var(--color-primary-rgb), 0.22)',
+            }}
+          >
+            <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-2">
+              ¿Lo querés para tu negocio?
+            </h2>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mb-5 leading-relaxed">
+              Desarrollo webs y apps a medida para PyMEs argentinas, con precio fijo y fecha
+              garantizada. Mirá los planes o escribime y lo charlamos.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/servicios"
+                className="btn-tech btn-primary-tech inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl min-h-12"
+              >
+                Ver servicios y precios
+                <ArrowRightIcon className="size-4" />
+              </Link>
+              <Link
+                href="/contacto"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl min-h-12 border transition-colors hover:bg-[var(--color-surface-low)]"
+                style={{ borderColor: 'var(--glass-border)', color: 'var(--color-on-surface)' }}
+              >
+                Agendá una consulta gratis
+              </Link>
+            </div>
+
+            <div className="mt-6 pt-5 border-t" style={{ borderColor: 'var(--glass-border)' }}>
+              <p className="text-xs text-[var(--color-on-surface-variant)] mb-3">
+                Páginas pensadas por rubro:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {VERTICALS.map((v) => (
+                  <Link
+                    key={v.slug}
+                    href={`/${v.slug}`}
+                    className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors hover:text-[var(--color-primary)]"
+                    style={{
+                      backgroundColor: 'var(--color-surface-low)',
+                      color: 'var(--color-on-surface)',
+                      border: '1px solid var(--glass-border)',
+                    }}
+                  >
+                    Web para {v.nounPlural}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── Posts relacionados ──────────────────────────────────────── */}
       {related.length > 0 && (
