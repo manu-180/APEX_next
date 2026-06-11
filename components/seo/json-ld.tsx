@@ -18,7 +18,11 @@ export function PersonJsonLd() {
         name: 'Manuel Navarro',
         jobTitle: 'Desarrollador Full-Stack & Mobile',
         url: APP_URL,
-        sameAs: [`https://wa.me/${WHATSAPP_NUMBER}`],
+        sameAs: [
+          `https://wa.me/${WHATSAPP_NUMBER}`,
+          'https://www.instagram.com/apex.stack/',
+          'https://www.linkedin.com/in/manuel-navarro-dev',
+        ],
         knowsAbout: [
           'Flutter',
           'Next.js',
@@ -53,6 +57,11 @@ export function WebSiteJsonLd() {
         publisher: { '@id': ORG_ID },
         author: { '@id': PERSON_ID },
         image: ABSOLUTE_BRAND_IMAGE,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: { '@type': 'EntryPoint', urlTemplate: `${APP_URL}/?q={search_term_string}` },
+          'query-input': 'required name=search_term_string',
+        },
       }}
     />
   )
@@ -158,7 +167,11 @@ export function LocalBusinessJsonLd() {
           },
         ],
         founder: { '@id': PERSON_ID },
-        sameAs: [`https://wa.me/${WHATSAPP_NUMBER}`],
+        sameAs: [
+          `https://wa.me/${WHATSAPP_NUMBER}`,
+          'https://www.instagram.com/apex.stack/',
+          'https://www.linkedin.com/in/manuel-navarro-dev',
+        ],
         aggregateRating: {
           '@type': 'AggregateRating',
           ratingValue: AVG_RATING,

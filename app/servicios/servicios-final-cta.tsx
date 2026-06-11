@@ -49,10 +49,10 @@ export function ServiciosFinalCta() {
             </div>
 
             <h3 className="text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)] mb-3 tracking-tight">
-              ¿Todavía tenés dudas?
+              Contame tu proyecto
             </h3>
             <p className="text-sm text-[var(--color-on-surface-variant)] mb-8 max-w-sm mx-auto leading-relaxed opacity-80">
-              No hay compromiso. En 15 minutos te cuento exactamente qué conviene para tu caso y cuánto cuesta.
+              Sin compromiso. En 15 minutos te doy un presupuesto real y un plan concreto para tu caso.
             </p>
 
             <WhatsAppOutboundLink

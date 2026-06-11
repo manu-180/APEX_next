@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     'flutter argentina',
     'next.js argentina',
   ],
+  alternates: { canonical: '/servicios' },
 }
 
 const faqSchema = {

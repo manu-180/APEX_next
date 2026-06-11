@@ -4,14 +4,16 @@ import { BLOG_POSTS } from '@/lib/data/blog-posts'
 import { VERTICALS } from '@/lib/data/verticals'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date()
+  // Fecha de último deploy — para blog posts y verticals sin fecha propia.
+  const now = new Date('2026-06-09')
+  // Fechas reales por página estática — evita que Google vea todo con el mismo timestamp.
   const base: MetadataRoute.Sitemap = [
-    { url: APP_URL, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${APP_URL}/servicios`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${APP_URL}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
-    { url: `${APP_URL}/tecnologias`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/sobre-mi`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/contacto`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: APP_URL,                      lastModified: new Date('2026-06-09'), changeFrequency: 'weekly',  priority: 1    },
+    { url: `${APP_URL}/servicios`,        lastModified: new Date('2026-06-09'), changeFrequency: 'weekly',  priority: 0.9  },
+    { url: `${APP_URL}/blog`,             lastModified: new Date('2026-06-09'), changeFrequency: 'daily',   priority: 0.85 },
+    { url: `${APP_URL}/tecnologias`,      lastModified: new Date('2026-05-15'), changeFrequency: 'monthly', priority: 0.7  },
+    { url: `${APP_URL}/sobre-mi`,         lastModified: new Date('2026-05-15'), changeFrequency: 'monthly', priority: 0.7  },
+    { url: `${APP_URL}/contacto`,         lastModified: new Date('2026-05-15'), changeFrequency: 'monthly', priority: 0.8  },
   ]
 
   const blogUrls: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({

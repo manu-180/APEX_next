@@ -4,8 +4,6 @@ import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
-import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
-import { trackMetaLead } from '@/components/analytics/meta-pixel'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 
@@ -24,8 +22,6 @@ export function AfipAddonSection() {
   const router = useRouter()
 
   const handleCtaClick = () => {
-    trackGoogleAdsWhatsAppClick()
-    trackMetaLead()
     openWhatsAppWithThankYouPage(
       whatsappUrl(
         'Hola Manuel, vi el addon de integración fiscal AFIP/ARCA y quiero saber si aplica a mi caso.',

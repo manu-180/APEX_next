@@ -1068,3 +1068,110 @@ a {
 .apex-nav-underline {
   transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NOT FOUND PAGE (404) — app/not-found.tsx
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes nf-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes nf-flicker {
+  0%,  93%, 100% { opacity: 1;    }
+  94%            { opacity: 0.72; }
+  95%            { opacity: 1;    }
+  97%            { opacity: 0.48; }
+  98%            { opacity: 1;    }
+}
+
+@keyframes nf-scale-x {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes nf-scale-y {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@keyframes nf-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Entry stagger */
+.nf-badge { animation: nf-fade-up 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-four  {
+  animation:
+    nf-fade-up 0.65s 0.18s cubic-bezier(0.22,1,0.36,1) both,
+    nf-flicker 10s  ease-in-out 1.2s infinite;
+}
+.nf-sub   { animation: nf-fade-up 0.6s 0.28s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-desc  { animation: nf-fade-up 0.6s 0.36s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-ctas  { animation: nf-fade-up 0.6s 0.44s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-nav   { animation: nf-fade-up 0.6s 0.54s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-term  { animation: nf-fade-up 0.6s 0.62s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-cur   { animation: nf-cursor  1s   step-end infinite; }
+
+/* Nav link hover */
+.nf-nav-link { transition: color 0.2s ease; }
+.nf-nav-link:hover { color: var(--color-primary); }
+
+/* Corner brackets */
+.nf-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+}
+.nf-corner::before,
+.nf-corner::after {
+  content: '';
+  position: absolute;
+  background: rgba(var(--color-primary-rgb), 0.5);
+}
+.nf-corner::before { height: 2px; width: 100%; }
+.nf-corner::after  { width: 2px;  height: 100%; }
+
+/* top-left */
+.nf-tl { top: 0; left: 0; }
+.nf-tl::before { top: 0; left: 0; transform-origin: left center;
+  animation: nf-scale-x 0.35s 0.72s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-tl::after  { top: 0; left: 0; transform-origin: center top;
+  animation: nf-scale-y 0.35s 0.72s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* top-right */
+.nf-tr { top: 0; right: 0; }
+.nf-tr::before { top: 0; right: 0; transform-origin: right center;
+  animation: nf-scale-x 0.35s 0.78s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-tr::after  { top: 0; right: 0; transform-origin: center top;
+  animation: nf-scale-y 0.35s 0.78s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* bottom-left */
+.nf-bl { bottom: 0; left: 0; }
+.nf-bl::before { bottom: 0; left: 0; transform-origin: left center;
+  animation: nf-scale-x 0.35s 0.84s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-bl::after  { bottom: 0; left: 0; transform-origin: center bottom;
+  animation: nf-scale-y 0.35s 0.84s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* bottom-right */
+.nf-br { bottom: 0; right: 0; }
+.nf-br::before { bottom: 0; right: 0; transform-origin: right center;
+  animation: nf-scale-x 0.35s 0.90s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-br::after  { bottom: 0; right: 0; transform-origin: center bottom;
+  animation: nf-scale-y 0.35s 0.90s cubic-bezier(0.22,1,0.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-badge, .nf-four, .nf-sub, .nf-desc, .nf-ctas, .nf-nav, .nf-term {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .nf-cur { animation: none !important; }
+  .nf-corner::before, .nf-corner::after {
+    animation: none !important;
+    transform: scale(1) !important;
+  }
+}

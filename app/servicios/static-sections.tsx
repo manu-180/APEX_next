@@ -73,7 +73,7 @@ export function ServiciosHero() {
             </span>
           </h1>
           <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg mb-6 sm:mb-8">
-            Precio fijo, entrega garantizada, sin agencias. Hablás directo conmigo.
+            Precio fijo desde el arranque, entrega en 15 días garantizada. Sin agencias — hablás directo con quien hace el trabajo.
           </p>
         </div>
       </SectionReveal>
@@ -126,11 +126,11 @@ export function ServiciosStaticTop() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center mb-6">
                   {[
-                    { step: '01', title: 'Consulta gratis', sub: '15 minutos', highlight: false },
+                    { step: '01', title: 'Consulta gratis', sub: 'Me contás tu proyecto — 15 min sin compromiso', highlight: false },
                     {
                       step: '02',
-                      title: 'Presupuesta en 24 hs',
-                      sub: 'Precio fijo, sin sorpresas',
+                      title: 'Precio fijo en 24 hs',
+                      sub: 'Acordado por escrito antes de arrancar',
                       highlight: false,
                     },
                     {
@@ -209,7 +209,7 @@ export function ServiciosStaticTop() {
                 </div>
 
                 <p className="text-center text-[11px] tracking-[0.2em] uppercase opacity-50 text-[var(--color-on-surface-variant)]">
-                  Sin vueltas · Sin letra chica
+                  Sin vueltas · Sin sorpresas · Sin letra chica
                 </p>
               </div>
             </div>
@@ -240,7 +240,7 @@ export function ServiciosStaticTop() {
                   Comparativa
                 </span>
                 <h3 className="text-xl font-bold text-[var(--color-on-surface)]">
-                  ¿Por qué APEX y no una agencia?
+                  ¿Por qué APEX y no una agencia tradicional?
                 </h3>
               </div>
 
@@ -280,11 +280,11 @@ export function ServiciosStaticTop() {
                   </p>
                   <ul className="space-y-3">
                     {[
-                      'Hablar directo conmigo',
-                      'Precio fijo pactado',
-                      'Entrega en 15 días',
+                      'Hablás directo con el desarrollador',
+                      'Precio fijo pactado por escrito',
+                      'Entrega en 15 días o devolvemos el depósito',
                       '3 meses de soporte incluido',
-                      '100% a tu medida',
+                      'Diseño y lógica 100% a tu medida',
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-3">
                         <span
@@ -309,7 +309,7 @@ export function ServiciosStaticTop() {
                   style={{ background: 'var(--color-primary)', minHeight: '2.5rem' }}
                 />
                 <p className="text-sm italic text-[var(--color-on-surface-variant)] leading-relaxed">
-                  &quot;Trabajo con vos, no para vos. Cuando tenés una duda, te respondo yo — no un asistente.&quot;
+                  &quot;Trabajo con vos, no para vos. Cada consulta llega directo a mí — sin intermediarios, sin demoras.&quot;
                 </p>
               </div>
             </div>
@@ -583,12 +583,11 @@ export function VerticalsBridge() {
               Verticales
             </span>
             <h3 className="text-lg sm:text-xl font-bold text-[var(--color-on-surface)]">
-              ¿Sos un profesional con un problema específico?
+              ¿Sos médico, abogado o contador?
             </h3>
           </div>
           <p className="text-sm text-[var(--color-on-surface-variant)] mb-5">
-            Estas landings cubren los 3 nichos que más subatendidos están en Argentina, con
-            features específicas (turnos, agenda, AFIP, portal cliente) y precios definidos.
+            Tenemos soluciones específicas para tu profesión: con los módulos que realmente usás (turnos, agenda, AFIP, portal de clientes) y precios definidos desde el arranque.
           </p>
           <ul className="grid gap-3 sm:grid-cols-3">
             {VERTICALS_LIST.map((v) => (
@@ -636,7 +635,7 @@ export function ServiciosStaticFaq() {
         <div className="text-center mb-10">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)] mb-3">FAQ</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-on-surface)]">
-            Preguntas frecuentes
+            Todo lo que querés saber antes de arrancar
           </h2>
         </div>
 

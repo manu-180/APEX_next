@@ -99,18 +99,18 @@ export function ContactoContent() {
             <div className="max-w-2xl">
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <Badge variant="primary">Contacto</Badge>
-                <Badge variant="outline">Respuesta &lt; 2 hs</Badge>
+                <Badge variant="outline">Respondo en &lt; 2 hs</Badge>
               </div>
               <h1 className="font-heading text-balance leading-tight mb-4">
                 <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
-                  Hablemos
+                  Contame tu idea.
                 </span>
                 <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                  de tu proyecto.
+                  Arrancamos en 24 hs.
                 </span>
               </h1>
               <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-md">
-                Agendá una reunión gratuita o mandame un mensaje. Sin formularios kilométricos.
+                Una llamada de 30 minutos o un mensaje directo. Sin compromiso, sin formularios eternos.
               </p>
             </div>
           </SectionReveal>
@@ -158,8 +158,8 @@ function ReviewsSection() {
           <div className="max-w-xl mb-14">
             <Badge variant="primary" className="mb-4">Opiniones</Badge>
             <h2 className="font-heading text-balance leading-tight mb-3">
-              <span className="text-2xl sm:text-3xl font-extralight text-[var(--color-on-surface-variant)]">Lo que dicen </span>
-              <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-on-surface)]">mis clientes</span>
+              <span className="text-2xl sm:text-3xl font-extralight text-[var(--color-on-surface-variant)]">No lo digo yo. </span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-on-surface)]">Lo dicen ellos.</span>
             </h2>
             {/* Rating summary inline */}
             <div className="flex items-center gap-2">
@@ -346,7 +346,7 @@ function BookingCalendar() {
           className="rounded-2xl glass-card glow-border-active p-8 text-center"
           data-hover
           data-inspector-title="Confirmación de agenda"
-          data-inspector-desc="Reserva guardada en Supabase; notificación por email (Resend) o plantilla WhatsApp (Twilio) según el canal."
+          data-inspector-desc="Reserva guardada en Supabase; notificación por email (Resend) o WhatsApp (Evolution API) según el canal."
           data-inspector-cat="UX · Motion"
         >
           <motion.div
@@ -357,9 +357,9 @@ function BookingCalendar() {
           >
             <CheckIcon className="size-8" />
           </motion.div>
-          <h3 className="text-xl font-bold text-[var(--color-on-surface)] mb-2">¡Reunión agendada!</h3>
+          <h3 className="text-xl font-bold text-[var(--color-on-surface)] mb-2">¡Listo, te espero!</h3>
           <p className="text-sm text-[var(--color-on-surface-variant)] mb-6">
-            Te contactaré brevemente para confirmar los detalles.
+            Te mando confirmación por WhatsApp antes de la reunión.
           </p>
           <Button
             variant="outline"
@@ -372,7 +372,7 @@ function BookingCalendar() {
             }}
             type="button"
           >
-            Agendar otra
+            Reservar otro turno
           </Button>
         </div>
       </SectionReveal>
@@ -390,9 +390,9 @@ function BookingCalendar() {
       >
         <h3 className="text-lg font-bold text-[var(--color-on-surface)] mb-1 flex items-center gap-2">
           <CalendarIcon className="size-5 text-[var(--color-primary)]" />
-          Agenda inteligente
+          Reunión gratuita
         </h3>
-        <p className="text-xs text-[var(--color-on-surface-variant)] mb-5">Seleccioná fecha y horario</p>
+        <p className="text-xs text-[var(--color-on-surface-variant)] mb-5">30 min sin costo. Sin compromiso.</p>
 
         {!supabaseReady && (
           <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
@@ -442,7 +442,7 @@ function BookingCalendar() {
 
         {isSunday ? (
           <div className="mb-5 rounded-xl border border-[var(--color-surface-high)] bg-[var(--color-surface-lowest)]/50 py-8 text-center text-sm text-[var(--color-on-surface-variant)]">
-            Domingos cerrados por descanso.
+            Los domingos descanso. Elegí otro día.
           </div>
         ) : (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
@@ -526,7 +526,7 @@ function BookingCalendar() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Tu nombre (opcional)"
+            placeholder="¿Cómo te llamo? (opcional)"
             className={inputClassName}
             autoComplete="name"
           />
@@ -574,7 +574,7 @@ function BookingCalendar() {
                 </div>
               </FormField>
               <p className="mt-1.5 text-[11px] text-[var(--color-on-surface-variant)]">
-                Completá los {BOOKING_WA_LOCAL_DIGITS} dígitos de tu celular; se arma +54 9 11… automáticamente.
+                Solo los {BOOKING_WA_LOCAL_DIGITS} dígitos. Te confirmo por WhatsApp al toque.
               </p>
             </motion.div>
           ) : (
@@ -626,7 +626,7 @@ function BookingCalendar() {
           data-inspector-title="Confirmar reunión"
           data-inspector-cat="UX · Formulario"
         >
-          {submitting ? 'Reservando…' : 'Agendar reunión'}
+          {submitting ? 'Reservando…' : 'Confirmar turno gratis'}
           <ArrowRightIcon className="size-4" />
         </Button>
       </div>
@@ -659,11 +659,11 @@ function ContactForm() {
     const details = form.details.trim()
     const whatsappDigits = whatsapp.replace(/\D/g, '')
     if (whatsappDigits.length < 10) {
-      setFormError('Ingresá un WhatsApp válido para contactarte rápido.')
+      setFormError('Ingresá tu WhatsApp para que pueda responderte rápido.')
       return
     }
     if (!email || !need) {
-      setFormError('Completá WhatsApp, email y el tipo de proyecto.')
+      setFormError('Necesito tu WhatsApp, email y el tipo de proyecto.')
       return
     }
     const generatedMessage = [
@@ -691,7 +691,7 @@ function ContactForm() {
       router.push('/gracias', { scroll: true })
       return
     } catch {
-      setFormError('No pudimos enviar el mensaje. Intentá de nuevo.')
+      setFormError('No se pudo enviar. Revisá tu conexión e intentá de nuevo.')
     } finally {
       setSending(false)
     }
@@ -709,15 +709,15 @@ function ContactForm() {
       >
         <h3 className="text-lg font-bold text-[var(--color-on-surface)] mb-1 flex items-center gap-2">
           <SendIcon className="size-5 text-[var(--color-primary)]" />
-          Mensaje directo
+          Mandame un mensaje
         </h3>
-        <p className="text-xs text-[var(--color-on-surface-variant)] mb-5">O escribime directamente</p>
+        <p className="text-xs text-[var(--color-on-surface-variant)] mb-5">Contame qué necesitás y te armo una propuesta.</p>
 
         <FormField className="mb-3">
           <input
             value={form.whatsapp}
             onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-            placeholder="Tu WhatsApp *"
+            placeholder="WhatsApp * (para responderte rápido)"
             type="tel"
             required
             inputMode="tel"
@@ -757,7 +757,7 @@ function ContactForm() {
             data-inspector-desc="Ayuda a clasificar la consulta y responder con una propuesta alineada."
             data-inspector-cat="UX · Formulario"
           >
-            <option value="">¿Qué necesitás?</option>
+            <option value="">¿Qué proyecto tenés en mente?</option>
             {CONTACT_NEED_OPTIONS.map((option) => (
               <option key={option} value={option}>
                 {option}
@@ -770,7 +770,7 @@ function ContactForm() {
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Nombre (opcional)"
+            placeholder="¿Cómo te llamo? (opcional)"
             className={inputClassName}
             autoComplete="name"
           />
@@ -780,7 +780,7 @@ function ContactForm() {
           <textarea
             value={form.details}
             onChange={(e) => setForm({ ...form, details: e.target.value })}
-            placeholder="Detalles extra (opcional)"
+            placeholder="Plazos, presupuesto, referentes... (opcional)"
             rows={3}
             className={cn(inputClassName, 'h-full resize-none')}
             data-hover
@@ -823,7 +823,7 @@ function ContactForm() {
           {sending ? 'Enviando…' : 'Quiero mi presupuesto gratis →'}
         </Button>
         <p className="mt-3 text-center text-xs text-[var(--color-on-surface-variant)]">
-          Te respondemos en menos de 2 horas por WhatsApp
+          Respondo en menos de 2 hs, siempre por WhatsApp.
         </p>
       </form>
     </SectionReveal>

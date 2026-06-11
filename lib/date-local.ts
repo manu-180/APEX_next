@@ -6,7 +6,7 @@ export function formatLocalDateYMD(d: Date): string {
   return `${y}-${m}-${day}`
 }
 
-/** ISO estable al mediodía local para emails / Twilio (evita corrimientos UTC al parsear). */
+/** ISO estable al mediodía local para emails / Evolution API (evita corrimientos UTC al parsear). */
 export function localDayToMiddayIso(d: Date): string {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0).toISOString()
 }

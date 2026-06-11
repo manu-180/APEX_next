@@ -40,8 +40,8 @@ job seekers (`remoto`, `remote`, `freelance`, `frontend`, `backend`, `fullstack`
 Motivo: search terms recientes filtraban `frontend remote` y `wireframe`.
 
 ### 4. Número de WhatsApp asentado  ✅
-Número oficial único: **`5491164707543`**. El código ya lo usaba bien. Corregidos
-los docs desactualizados que tenían el viejo `5491124842720` (`CLAUDE.md` raíz +
+Número oficial único: **`5491168049457`**. El código ya lo usa. Corregidos
+los docs desactualizados que tenían el viejo `5491164707543` (`CLAUDE.md` raíz +
 `ANALISIS.md`).
 
 ## Pendiente manual en la UI (el MCP no lo permite)

@@ -102,15 +102,15 @@ export function HomeFinalCtaSection() {
               <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
                 <div>
                   <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]">
-                    Siguiente paso
+                    ¿Listo para arrancar?
                   </p>
                   <h2 className="font-heading text-balance text-3xl font-light leading-tight text-[var(--color-on-surface-variant)] sm:text-4xl md:text-5xl">
-                    Si queres crecer online,
-                    <span className="block font-extrabold text-[var(--color-on-surface)]">arranquemos esta semana.</span>
+                    Arrancá esta semana.
+                    <span className="block font-extrabold text-[var(--color-on-surface)]">Tu web lista en 15 días.</span>
                   </h2>
                   <p className="mt-4 max-w-2xl text-pretty text-[var(--color-on-surface-variant)]">
-                    Definimos alcance, fecha de entrega y precio cerrado desde el inicio. Sin vueltas, sin humo y con una
-                    propuesta clara para tu negocio.
+                    Una charla corta para entender tu idea. Una propuesta con alcance, fecha y precio cerrado.
+                    Sin vueltas, sin sorpresas.
                   </p>
                 </div>
 

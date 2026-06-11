@@ -13,21 +13,21 @@ import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-li
 import { cn } from '@/lib/utils/cn'
 
 const SKILLS = [
-  { label: 'Resolución de Problemas', icon: '🧩' },
-  { label: 'Arquitectura Limpia', icon: '📚' },
-  { label: 'Constancia Diaria', icon: '📅' },
-  { label: 'Pensamiento Lógico', icon: '🧠' },
-  { label: 'Enfoque en Resultados', icon: '🎯' },
-  { label: 'Adaptabilidad', icon: '🔧' },
+  { label: 'Fecha pactada = fecha entregada', icon: '📅' },
+  { label: 'WhatsApp directo, sin filtros', icon: '💬' },
+  { label: 'Tu código. Tuyo. Para siempre.', icon: '🔐' },
+  { label: 'Diseño + código, un solo dueño', icon: '⚡' },
+  { label: 'Primero el problema. Luego el código.', icon: '🎯' },
+  { label: 'Sin costos ocultos ni sorpresas', icon: '🛡️' },
 ]
 
 const YEARS_EXP = new Date().getFullYear() - 2021
 
 const STATS = [
-  { value: `${YEARS_EXP}+`, label: 'Años de experiencia' },
-  { value: '150+', label: 'Proyectos creados' },
-  { value: '8+', label: 'Tecnologías dominadas' },
-  { value: '100%', label: 'Clientes satisfechos' },
+  { value: `${YEARS_EXP}+`, label: 'Años en producción' },
+  { value: '150+', label: 'Proyectos entregados' },
+  { value: '<2h', label: 'Tiempo de respuesta' },
+  { value: '100%', label: 'Clientes con código propio' },
 ]
 
 export function SobreMiContent() {
@@ -75,12 +75,12 @@ export function SobreMiContent() {
               </span>
             </h1>
             <p className="mx-auto max-w-2xl text-pretty text-base sm:text-lg text-[var(--color-on-surface-variant)] mb-6">
-              No soy una agencia. Soy Manuel — un ingeniero argentino que diseña, programa y entrega
-              cada proyecto end-to-end. Esta página explica cómo trabajo y a quién le sirvo.
+              No soy una agencia ni un freelancer más. Soy Manuel — el mismo que atiende tu
+              WhatsApp, diseña tu producto y lo sube a producción. Sin intermediarios, sin excusas.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(var(--color-primary-rgb),0.12)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary)]">
-                {YEARS_EXP}+ años · 1-2 clientes en simultáneo
+                {YEARS_EXP}+ años · Solo 1-2 lugares por vez
               </span>
               <Badge variant="outline" className="rounded-lg px-3 py-1.5 text-sm">
                 Buenos Aires · Argentina
@@ -103,21 +103,20 @@ export function SobreMiContent() {
               data-inspector-cat="Copy · Conversion"
             >
               <p className="text-base md:text-lg text-[var(--color-on-surface)] leading-relaxed mb-5">
-                Arranqué APEX porque me cansé de ver PyMEs argentinas pagando $400 USD/mes por sitios
-                que no convierten, contratando agencias que tardan 6 meses para entregar una landing, o
-                quedando atadas a Wix con sus datos secuestrados después de 3 años de suscripción.
+                ¿Pagaste cientos de dólares por un sitio que no vende? ¿Esperaste meses para
+                recibir algo que no era lo que pediste? ¿Tu "solución web" es en realidad una
+                plantilla de Wix con suscripción eterna y tus datos rehenes? Por eso existe APEX.
               </p>
               <p className="text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-5">
-                Mi propuesta es simple: la persona que charlás conmigo en WhatsApp es la misma que
-                diseña, programa y entrega tu proyecto. Sin project managers, sin vendedores, sin
-                cuentas tercerizadas. Cuando hay un cambio, lo hago yo. Cuando hay un bug en producción
-                a las 11 de la noche, lo arreglo yo.
+                La propuesta es directa: la persona que te atiende por WhatsApp es la misma que
+                diseña, programa y sube a producción. Sin project managers, sin vendedores, sin
+                equipos que no conocés. Si hay un cambio, lo hago yo. Si hay un bug a las 11 de
+                la noche, lo arreglo yo. Siempre.
               </p>
               <p className="text-base text-[var(--color-on-surface-variant)] leading-relaxed">
-                Por eso trabajo con 1-2 clientes en simultáneo. No es escalable como modelo de
-                agencia — y está bien. No quiero ser una agencia. Quiero hacer 10 productos por año
-                que se sientan como un partner técnico te ayudó a ganar plata, no como un proveedor te
-                vendió un servicio.
+                Por eso trabajo con 1-2 clientes a la vez. No escala como modelo de agencia —
+                y no quiero que escale. Prefiero que cada cliente sienta que tiene un socio
+                técnico de su lado, no un proveedor que desaparece después de cobrar.
               </p>
             </div>
           </SectionReveal>
@@ -141,11 +140,11 @@ export function SobreMiContent() {
                 </p>
                 <ul className="space-y-3">
                   {[
-                    'Trabajo directo con vos. Sin intermediarios.',
-                    'Plazo en fecha o devolvemos. Sin asteriscos.',
-                    'El código queda 100% a tu nombre desde día 1.',
-                    'Stack que entiendo profundo: Flutter, Next.js, Supabase, Riverpod.',
-                    'Te digo "no" si tu proyecto no encaja conmigo.',
+                    'Trabajo directo con vos. Sin intermediarios ni capas de comunicación.',
+                    'Fecha de entrega en contrato o devolvemos. Sin asteriscos.',
+                    'El código queda 100% a tu nombre desde el día 1.',
+                    'Tecnología que conozco profundo: menos bugs, más velocidad, menos sorpresas.',
+                    'Si tu proyecto no encaja, te lo digo antes de cobrar — no después.',
                   ].map((line) => (
                     <li
                       key={line}
@@ -180,12 +179,12 @@ export function SobreMiContent() {
                 </p>
                 <ul className="space-y-3">
                   {[
-                    'WordPress con plugins. (Otro dev lo hace mejor que yo.)',
-                    'Cobrar mantenimiento mensual a sitios que no cambian.',
-                    'Prometer plazos imposibles para cerrar el deal.',
-                    'Subcontratar tu proyecto a un equipo offshore.',
-                    'Diseñar sin entender qué problema resuelve.',
-                    'Tomar más proyectos de los que puedo atender bien.',
+                    'WordPress con plugins. Si eso buscás, hay devs que lo hacen mejor que yo.',
+                    'Cobrar mantenimiento mensual por un sitio estático que no cambia.',
+                    'Prometer plazos imposibles para cerrar el deal — y desaparecer después.',
+                    'Subcontratarte a un equipo offshore que no conocés.',
+                    'Arrancar a diseñar sin entender qué problema tiene que resolver.',
+                    'Tomar más proyectos de los que puedo hacer bien.',
                   ].map((line) => (
                     <li
                       key={line}
@@ -233,7 +232,7 @@ export function SobreMiContent() {
 
           {/* Skills */}
           <SectionReveal delay={0.3}>
-            <h2 className="text-xl font-bold text-[var(--color-on-surface)] mb-6">Habilidades clave</h2>
+            <h2 className="text-xl font-bold text-[var(--color-on-surface)] mb-6">Cómo trabajo</h2>
             <div className="flex flex-wrap gap-3 mb-16">
               {SKILLS.map((s, i) => (
                 <motion.div
@@ -403,7 +402,7 @@ export function SobreMiContent() {
                       viewport={{ once: true }}
                       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      ¿Listo para llevar tu proyecto al siguiente nivel?
+                      Trabajo con 1-2 clientes a la vez. ¿El próximo sos vos?
                     </motion.h2>
                     <motion.p
                       className="text-[var(--color-on-surface-variant)] mb-8 max-w-md md:mx-0 mx-auto"
@@ -412,7 +411,8 @@ export function SobreMiContent() {
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
                     >
-                      Agendá una reunión gratuita y validamos tu idea con foco en resultados.
+                      Contame en qué estás trabajando. En 20 minutos te digo si puedo ayudarte,
+                      cómo lo haría y cuánto costaría. Sin rodeos, sin compromiso.
                     </motion.p>
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -435,7 +435,7 @@ export function SobreMiContent() {
                         )}
                       >
                         <CalendarIcon className="h-4 w-4" />
-                        Agendar consulta gratis
+                        Reservar mi consulta gratis
                         <ArrowRightIcon className="h-4 w-4" />
                       </WhatsAppOutboundLink>
                     </motion.div>

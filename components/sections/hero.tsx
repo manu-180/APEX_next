@@ -13,7 +13,6 @@ import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { trackGoogleAdsHeroCtaClick } from '@/lib/analytics/google-ads'
-import { trackMetaLead } from '@/components/analytics/meta-pixel'
 import { getAvailabilityText } from '@/lib/data/availability'
 import Link from 'next/link'
 
@@ -57,19 +56,19 @@ const FEATURES = [
     icon: <TimerIcon />,
     tag: 'PLAZO',
     value: 'Entrega en 15 días',
-    desc: 'Fecha acordada, fecha cumplida. Sin demoras.',
+    desc: 'Pactamos una fecha. La cumplimos. Sin excusas.',
   },
   {
     icon: <PriceTagIcon />,
     tag: 'PRECIO',
     value: 'Desde ARS 300k',
-    desc: 'Precios transparentes. Sin sorpresas al final.',
+    desc: 'Precio cerrado desde el inicio. Lo que cotizamos, pagás.',
   },
   {
     icon: <DiamondIcon />,
-    tag: 'DISEÑO PREMIUM',
-    value: 'Diseño premium',
-    desc: 'Todo a medida. No templates, no rellenos.',
+    tag: 'DISEÑO',
+    value: 'A medida, siempre',
+    desc: 'Sin templates ni atajos. Todo pensado para tu marca.',
   },
 ]
 
@@ -168,7 +167,6 @@ export function HeroSection() {
 
   const handleCTAClick = useCallback(() => {
     trackGoogleAdsHeroCtaClick()
-    trackMetaLead()
     openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
   }, [router])
 
@@ -269,16 +267,16 @@ export function HeroSection() {
                 <TextReveal text="Tu negocio" delay={0.1} />
               </span>
               <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                <TextReveal text="en internet," delay={0.18} />
+                <TextReveal text="online en 15 días," delay={0.18} />
               </span>
               <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-gradient-primary pb-1">
-                <TextReveal text="hecho para vender." delay={0.26} />
+                <TextReveal text="listo para vender." delay={0.26} />
               </span>
             </h1>
 
             <p className="text-pretty text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-10">
-              Páginas web y apps móviles para emprendedores y pymes en Argentina.
-              Diseño premium, entrega en 15 días y precios transparentes desde{' '}
+              Páginas web y apps móviles para emprendedores y pymes argentinas que quieren vender más.
+              Diseño premium, entrega garantizada en 15 días y precio cerrado desde{' '}
               <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300k</span>.
             </p>
 
@@ -317,7 +315,7 @@ export function HeroSection() {
             </div>
 
             <p className="mt-5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
-              Plazo en fecha o devolvemos · NDA si lo pedís · Respuesta en menos de 2 hs
+              Respuesta en menos de 2 hs · Plazo garantizado o devolvemos · NDA disponible
             </p>
           </div>
 

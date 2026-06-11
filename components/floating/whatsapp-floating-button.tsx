@@ -4,8 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
-import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
-import { trackMetaLead } from '@/components/analytics/meta-pixel'
 import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils/cn'
 
@@ -23,6 +21,9 @@ export function WhatsAppFloatingButton() {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [hovered, setHovered] = useState(false)
+
+  const isExpanded = !scrolled || hovered
 
   useEffect(() => {
     setMounted(true)
@@ -45,8 +46,6 @@ export function WhatsAppFloatingButton() {
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault()
-      trackGoogleAdsWhatsAppClick()
-      trackMetaLead()
       openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
     },
     [router],
@@ -67,14 +66,17 @@ export function WhatsAppFloatingButton() {
       <button
         type="button"
         onClick={handleClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         aria-label="Abrir WhatsApp con Manuel"
         className={cn(
-          'pointer-events-auto group relative inline-flex items-center gap-3',
-          'rounded-full pl-2 pr-4 py-2 sm:pr-5',
+          'pointer-events-auto group relative inline-flex items-center',
+          'rounded-full',
           'min-h-[3.5rem]',
-          'transition-[transform,box-shadow,border-color] duration-300 ease-out',
+          'transition-all duration-300 ease-out',
           'hover:scale-[1.02] active:scale-[0.98]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+          isExpanded ? 'pl-2 pr-4 py-2 sm:pr-5 gap-3' : 'p-2 gap-0',
         )}
         style={{
           background:
@@ -146,7 +148,7 @@ export function WhatsAppFloatingButton() {
           className={cn(
             'relative flex flex-col items-start overflow-hidden transition-[max-width,opacity,margin] duration-300 ease-out',
             'hidden xs:flex sm:flex',
-            scrolled ? 'max-w-0 opacity-0 -ml-3' : 'max-w-[12rem] opacity-100',
+            isExpanded ? 'max-w-[12rem] opacity-100' : 'max-w-0 opacity-0 -ml-3',
           )}
         >
           <span
@@ -165,7 +167,7 @@ export function WhatsAppFloatingButton() {
           aria-hidden
           className={cn(
             'relative ml-1 hidden xs:inline-flex sm:inline-flex transition-transform duration-300 ease-out group-hover:translate-x-0.5',
-            scrolled ? 'max-w-0 opacity-0 ml-0' : 'opacity-100',
+            isExpanded ? 'opacity-100' : 'max-w-0 opacity-0 ml-0',
           )}
           style={{ color: 'var(--color-primary)' }}
         >

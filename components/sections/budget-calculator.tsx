@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
-import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
-import { trackMetaLead } from '@/components/analytics/meta-pixel'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { cn } from '@/lib/utils/cn'
@@ -202,8 +200,6 @@ export function BudgetCalculatorSection() {
 
   const goToWhatsApp = () => {
     if (!result) return
-    trackGoogleAdsWhatsAppClick()
-    trackMetaLead()
 
     const summary = [
       `Hola Manuel, hice la calculadora y me dio:`,

@@ -153,16 +153,15 @@ export function FounderSection() {
             </h2>
 
             <p className="text-pretty text-base leading-relaxed text-[var(--color-on-surface-variant)] mb-4">
-              No soy una agencia. Soy un ingeniero argentino que diseña, programa y entrega
-              cada proyecto end-to-end. Eso significa que la persona con la que arrancás la
-              charla es la misma que escribe el código y la que te entrega la app o el sitio.
+              No soy una agencia. Soy Manuel, un ingeniero argentino que diseña, programa y
+              entrega cada proyecto de principio a fin — sin intermediarios, sin sorpresas.
+              La persona que atiende tu consulta es la misma que escribe el código.
             </p>
 
             <p className="text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)] opacity-80 mb-7">
-              Más de 8 productos en producción usados todos los días. Hablo Flutter, Next.js,
-              Supabase, Riverpod y TypeScript desde el primer commit. Si lo que necesitás se
-              puede construir bien, lo construimos. Si no, te digo por qué — y a veces te
-              ahorro plata.
+              Más de 8 productos propios en producción que gente real usa todos los días.
+              Si tu proyecto tiene sentido técnico y comercial, lo construimos. Si no, te lo
+              digo — y te ahorro el tiempo y la plata.
             </p>
 
             {/* Manifesto inline */}

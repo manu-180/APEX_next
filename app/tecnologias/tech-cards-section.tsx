@@ -84,7 +84,7 @@ export function TechCardsSection() {
                   />
                 </span>
                 <p className="relative z-[2] text-pretty text-sm leading-snug text-[var(--color-on-surface-variant)] theme-transition">
-                  Hacé click en una card para cambiar el tema de todo el sitio.
+                  Hacé click en cualquier card — el sitio entero cambia de tema en tiempo real.
                 </p>
               </div>
             </div>

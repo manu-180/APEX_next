@@ -41,3 +41,8 @@ next-env.d.ts
 # Claude Code runtime locks
 .claude/scheduled_tasks.lock
 .claude/*.lock
+
+# Artefactos locales de tooling (no commitear)
+.playwright-mcp/
+graphify-out/
+404-page.png

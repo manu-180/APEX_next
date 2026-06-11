@@ -354,8 +354,8 @@ export function TrustedClientsSection() {
               <Badge variant="outline">Sitios entregados</Badge>
             </div>
             <h2 className="font-heading text-balance text-3xl leading-tight sm:text-4xl md:text-5xl">
-              <span className="font-light text-[var(--color-on-surface-variant)]">Confían en </span>
-              <span className="font-extrabold text-[var(--color-on-surface)]">APEX</span>
+              <span className="font-light text-[var(--color-on-surface-variant)]">Más de 150 sitios </span>
+              <span className="font-extrabold text-[var(--color-on-surface)]">en producción.</span>
             </h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -364,8 +364,8 @@ export function TrustedClientsSection() {
               transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               className="mt-4 max-w-lg text-pretty text-[var(--color-on-surface-variant)]"
             >
-              Sitios diseñados, desarrollados y entregados. En producción y generando resultados
-              para sus negocios.
+              De emprendedores y pymes argentinas que eligieron crecer con presencia online real.
+              Diseñados, desarrollados y entregados por APEX.
             </motion.p>
           </div>
         </SectionReveal>

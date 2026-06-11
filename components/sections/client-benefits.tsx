@@ -21,51 +21,51 @@ type BenefitItem = {
 
 const BENEFITS: BenefitItem[] = [
   {
-    title: 'Mas clientes desde Google',
+    title: 'Más clientes desde Google',
     description:
-      'SEO tecnico y contenido comercial desde el dia uno. Tu web nace preparada para aparecer cuando te buscan en Argentina.',
+      'SEO técnico desde el primer deploy. Tu web aparece cuando alguien te busca en Argentina — sin esperar meses.',
     anchor: 'SEO desde el lanzamiento',
     sizeClass: 'lg:col-span-7 lg:row-span-2',
     highlights: [
-      'Indexacion, sitemap y robots listos desde el deploy',
-      'Schema y metadatos alineados a intencion de busqueda en tu zona',
-      'Rendimiento y buenas practicas pensadas para Core Web Vitals',
-      'Estructura de contenidos y titulos orientados a convertir visitas en consultas',
+      'Indexación, sitemap y robots configurados desde el lanzamiento',
+      'Schema y metadatos optimizados para búsquedas locales en Argentina',
+      'Core Web Vitals en verde: velocidad que Google premia con posiciones',
+      'Estructura de contenido orientada a convertir visitas en consultas reales',
     ],
   },
   {
-    title: 'Tu negocio vendiendo 24/7',
+    title: 'Tu vendedor que no duerme',
     description:
-      'Mientras dormis, tu sitio sigue mostrando servicios, respondiendo dudas y capturando contactos listos para comprar.',
+      'Mientras dormís, tu sitio muestra servicios, responde preguntas y captura contactos listos para comprar.',
     anchor: 'Canal de ventas siempre activo',
     sizeClass: 'lg:col-span-5 lg:row-span-1',
   },
   {
-    title: 'Entrega en 15 días',
+    title: 'Entrega en 15 días, garantizado',
     description:
-      'Proceso agil, foco total y entregables concretos. Evitamos proyectos eternos y salis al mercado mas rapido.',
+      'Proceso ágil y foco total. Salís al mercado rápido, sin proyectos eternos que nunca terminan.',
     anchor: 'Velocidad con calidad visual',
     sizeClass: 'lg:col-span-5 lg:row-span-1',
   },
   {
-    title: 'Diseno que genera confianza',
+    title: 'Diseño que genera confianza',
     description:
-      'Interfaz premium, copy claro y jerarquia visual que posiciona tu marca como una empresa seria, moderna y vendible.',
-    anchor: 'Primera impresion que vende',
+      'Un sitio amateur cuesta ventas antes de que el cliente hable con vos. El diseño premium es parte del pitch.',
+    anchor: 'Primera impresión que vende',
     sizeClass: 'lg:col-span-7 lg:row-span-1',
   },
   {
-    title: 'Sin sorpresas en el precio',
+    title: 'Precio cerrado desde el inicio',
     description:
-      'Presupuesto cerrado, alcance claro y decisiones transparentes. Sabes cuanto invertis antes de empezar.',
+      'Presupuesto definido, alcance claro, cero asteriscos. Sabés exactamente cuánto invertís antes de arrancar.',
     anchor: 'Costo definido desde el inicio',
     sizeClass: 'lg:col-span-4 lg:row-span-1',
   },
   {
-    title: 'Soporte post-entrega',
+    title: 'No desaparecemos al entregar',
     description:
-      'No desaparecemos despues del lanzamiento. Tenes acompanamiento para ajustes, mejoras y proximos pasos del negocio.',
-    anchor: 'Continuidad real despues del go-live',
+      'Acompañamiento real post-lanzamiento para ajustes, mejoras y los próximos pasos de tu negocio digital.',
+    anchor: 'Continuidad real después del go-live',
     sizeClass: 'lg:col-span-8 lg:row-span-1',
   },
 ]
@@ -266,7 +266,7 @@ export function ClientBenefitsSection() {
               </div>
               <h2 className="font-heading text-balance leading-tight">
                 <span className="block text-3xl font-light text-[var(--color-on-surface-variant)] sm:text-4xl md:text-5xl">
-                  No vendemos codigo.
+                  No vendemos código.
                 </span>
                 <span className="block text-3xl font-extrabold text-[var(--color-on-surface)] sm:text-4xl md:text-5xl">
                   Vendemos resultados.
@@ -276,8 +276,7 @@ export function ClientBenefitsSection() {
 
             <div className="space-y-4">
               <p className="max-w-xl text-pretty text-[var(--color-on-surface-variant)]">
-                Esta seccion esta pensada para emprendedores y dueños de pymes que quieren crecer sin perder tiempo en
-                tecnicismos. Cada decision de diseno y estrategia esta orientada a facturar mejor.
+                Para emprendedores y dueños de pymes argentinas que quieren crecer online. Cada decisión de diseño y estrategia está pensada para que factures más — sin perderte en tecnicismos.
               </p>
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <AnimatedMetric value={15} suffix="d" label="Entrega inicial" />
@@ -312,7 +311,7 @@ export function ClientBenefitsSection() {
                 'h-12 px-7 text-sm rounded-xl',
               )}
             >
-              Ver como aplicarlo a tu negocio
+              Quiero estos resultados
               <ArrowRightIcon className="size-4" />
             </Link>
           </div>

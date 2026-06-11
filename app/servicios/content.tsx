@@ -188,11 +188,11 @@ export function ServiciosContent() {
                 Precios transparentes
               </p>
               <h2 className="font-heading text-balance leading-tight mb-3">
-                <span className="block text-2xl sm:text-3xl md:text-4xl font-extralight text-[var(--color-on-surface-variant)]">Elegí tu</span>
-                <span className="block text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)]">plan ideal</span>
+                <span className="block text-2xl sm:text-3xl md:text-4xl font-extralight text-[var(--color-on-surface-variant)]">Encontrá el plan</span>
+                <span className="block text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)]">que hace crecer tu negocio</span>
               </h2>
               <p className="text-pretty text-sm text-[var(--color-on-surface-variant)] max-w-md">
-                Emprendedores y pymes de toda Argentina. Precios en ARS, sin sorpresas, sin letra chica.
+                Precios en ARS, pactados antes de arrancar. Sin sorpresas ni letra chica. Para emprendedores y pymes de todo el país.
               </p>
             </div>
           </SectionReveal>
@@ -278,9 +278,9 @@ export function ServiciosContent() {
           <div className="mx-auto mt-10 min-h-[4.75rem] max-w-2xl flex items-start justify-center">
             {tab === 'mobile' ? (
               <p className="text-center text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
-                <span className="font-semibold text-[var(--color-on-surface)]">Apps en fee mensual:</span>{' '}
-                me contratás como desarrollador del producto (evolución, soporte y nuevas funcionalidades).
-                Los planes de sitio web son proyecto cerrado; en apps la relación es continua.
+                <span className="font-semibold text-[var(--color-on-surface)]">Apps: producto vivo, no proyecto cerrado.</span>{' '}
+                El fee mensual incluye mejoras, soporte y nuevas funcionalidades cada mes.
+                A diferencia de los sitios web, en apps la relación es continua: la app sigue evolucionando después de la entrega.
               </p>
             ) : null}
           </div>

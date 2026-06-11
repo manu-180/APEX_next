@@ -80,7 +80,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning className={`dark ${oxanium.variable}`}>
+    <html lang="es-AR" suppressHydrationWarning className={`dark ${oxanium.variable}`}>
       <head>
         {/* Preconnect a dominios críticos de third-party — TLS handshake en paralelo */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

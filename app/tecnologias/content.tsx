@@ -24,9 +24,9 @@ import { WA_MSG_GENERIC, whatsappUrl } from '@/lib/whatsapp'
 import { TechCardsSection } from './tech-cards-section'
 
 const HERO_STATS = [
-  { value: '5', label: 'Tecnologías core' },
-  { value: '8+', label: 'Productos en prod' },
-  { value: '15d', label: 'Plazo medio' },
+  { value: '5', label: 'herramientas en total' },
+  { value: '8+', label: 'proyectos en producción' },
+  { value: '15d', label: 'de idea a live' },
 ] as const
 
 export function TecnologiasContent() {
@@ -126,7 +126,7 @@ export function TecnologiasContent() {
                     className="font-mono text-[10px] font-bold tracking-[0.32em] uppercase"
                     style={{ color: 'var(--color-primary)' }}
                   >
-                    / Stack · Decisiones técnicas
+                    / Por qué estas herramientas
                   </span>
                   <span
                     aria-hidden
@@ -160,8 +160,9 @@ export function TecnologiasContent() {
                 </h1>
 
                 <p className="text-pretty text-base md:text-lg text-[var(--color-on-surface-variant)] max-w-xl leading-relaxed">
-                  Flutter, Next.js, Supabase, Riverpod, TypeScript. Stack opinado: pocas piezas,
-                  cada una elegida por una razón concreta. Productos sólidos sin sobre-ingeniería.
+                  No elijo herramientas para impresionar. Elijo las que hacen que tu web o app sea
+                  rápida, confiable y fácil de mantener. Cinco piezas que se conocen entre sí —
+                  sin complejidad innecesaria que te cueste más después.
                 </p>
               </div>
 
@@ -296,14 +297,14 @@ export function TecnologiasContent() {
                 <div className="relative grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
                   <div>
                     <Badge variant="outline" className="mb-3">
-                      ¿Listo para construir?
+                      Siguiente paso
                     </Badge>
                     <h2 className="font-heading text-balance text-2xl font-bold text-[var(--color-on-surface)] sm:text-3xl md:text-4xl">
-                      Transformemos tu idea en un producto premium.
+                      Llevemos este stack a tu proyecto.
                     </h2>
                     <p className="mt-3 max-w-2xl text-pretty text-[var(--color-on-surface-variant)]">
-                      Si ya viste cómo reacciona el sistema de temas, podemos llevar esa misma calidad a tu web o app.
-                      Coordinamos una llamada y te propongo arquitectura, tiempos y roadmap.
+                      Ya viste cómo funciona en la práctica. Si tenés una idea — web, app o los dos —
+                      coordinamos una llamada y te propongo arquitectura, plazos y presupuesto sin rodeos.
                     </p>
                   </div>
 
@@ -318,7 +319,7 @@ export function TecnologiasContent() {
                         'h-12 px-7 text-sm rounded-xl',
                       )}
                     >
-                      Ir a contacto
+                      Empezar mi proyecto
                       <ArrowRightIcon className="size-4" />
                     </Link>
                     <WhatsAppOutboundLink

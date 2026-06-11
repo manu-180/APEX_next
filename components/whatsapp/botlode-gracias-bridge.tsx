@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
-import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
 
 const EVENT = 'apex-botlode-whatsapp'
 
@@ -21,7 +20,6 @@ export function BotlodeGraciasBridge() {
   useEffect(() => {
     const go = () => {
       if (pathname === ROUTES.gracias) return
-      trackGoogleAdsWhatsAppClick()
       openWhatsAppWithThankYouPage(waHref, router)
     }
     window.addEventListener(EVENT, go)

@@ -41,13 +41,13 @@ export const WEB_PLANS: PricingPlan[] = [
     originalPrice: 420000,
     frontHeadline: 'Tu vendedor online, disponible las 24 horas',
     description:
-      'Mientras vos dormís, tu página trabaja. Con diseño premium de punta a punta, está pensada para que quien te busca en Google te encuentre, te conozca y te contacte solo.',
+      'Mientras vos dormís, tu página trabaja: atrae visitas de Google y las convierte en consultas concretas. Sin intermediarios ni costos mensuales que te drenen el margen.',
     targetAudience: 'Profesionales independientes: coaches, abogados, contadores y consultores',
     features: [
       'Diseño premium 100% a medida (sin plantillas genéricas)',
       'Secciones de servicios, bio, testimonios y contacto',
       'Botón WhatsApp + formulario con auto-respuesta por email',
-      'Carga ultrarrápida optimizada',
+      'Velocidad real: carga en menos de 2 segundos (Google te premia con mejor posicionamiento)',
       'SEO técnico para aparecer en Google',
       'Hosting + 3 meses de mantenimiento incluidos',
     ],
@@ -59,7 +59,7 @@ export const WEB_PLANS: PricingPlan[] = [
     ],
     gains: [
       { num: '01', title: 'Más clientes sin esfuerzo', desc: 'Tu web convierte visitas en consultas mientras vos dormís' },
-      { num: '02', title: 'Primera impresión premium', desc: 'Diseño premium que transmite profesionalismo desde el primer segundo' },
+      { num: '02', title: 'Primera impresión premium', desc: 'Diseño que no parece el de todos: genera confianza desde la primera pantalla' },
       { num: '03', title: 'Aparecer en Google', desc: 'SEO técnico para que te encuentren antes que a la competencia' },
       { num: '04', title: 'Contacto directo', desc: 'WhatsApp + formulario con respuesta automática inmediata' },
     ],
@@ -78,7 +78,7 @@ export const WEB_PLANS: PricingPlan[] = [
     features: [
       'Todo lo del plan Landing Page',
       'Base de datos conectada (Supabase)',
-      'Automatización operativa: reservas, cotizadores, formularios con lógica y flujos a medida',
+      'Reservas online, cotizadores automáticos y formularios con lógica y flujos propios',
       'Integraciones: WhatsApp, MercadoPago, Google Calendar',
       'Hosting + 3 meses de mantenimiento incluidos',
     ],
@@ -91,7 +91,7 @@ export const WEB_PLANS: PricingPlan[] = [
     gains: [
       { num: '01', title: 'Automatización total', desc: 'Reservas, cotizaciones y contactos sin intervención manual' },
       { num: '02', title: 'Cobrá online desde el día 1', desc: 'Pagos puntuales (señas, servicios) con MercadoPago u otros medios acordados' },
-      { num: '03', title: 'Datos que trabajan solos', desc: 'Lo que captura la web vive en base de datos: menos Excel y menos ida y vuelta por WhatsApp' },
+      { num: '03', title: 'Datos que trabajan solos', desc: 'Datos centralizados: menos Excel, menos mensajes de WhatsApp para coordinar cada venta' },
       { num: '04', title: 'Todo conectado', desc: 'WhatsApp, Google Calendar y tus herramientas sincronizadas' },
     ],
     powerStatement: 'La automatización no es tecnología, es recuperar tu tiempo para lo que importa.',
@@ -105,12 +105,12 @@ export const WEB_PLANS: PricingPlan[] = [
     isFeatured: true,
     frontHeadline: 'Vendé todos los días, sin depender de Instagram ni comisiones',
     description:
-      'Tu propio canal de ventas con catálogo, carrito y pagos. Sin que MercadoLibre o ninguna otra plataforma se quede con tu ganancia.',
+      'Cada venta entra directo a tu bolsillo. Tu tienda propia, con tu marca, sin pagar comisiones a ninguna plataforma ni seguir sus reglas.',
     targetAudience: 'Comercios y emprendimientos con productos propios',
     features: [
       'Catálogo de productos con filtros y búsqueda',
       'Carrito + checkout con MercadoPago / Stripe',
-      'Panel administrativo completo: pedidos, stock de productos, clientes y catálogo',
+      'Panel de gestión propio: pedidos, stock, clientes y catálogo en un solo lugar',
       'Sistema de cuentas con historial de compras',
       'SEO técnico avanzado para tráfico orgánico',
       'Hosting + 3 meses de mantenimiento incluidos',
@@ -143,9 +143,9 @@ export const APP_PLANS: PricingPlan[] = [
     name: 'App Producto',
     price: 580000,
     billing: 'month',
-    frontHeadline: 'Tu app en manos de tus clientes',
+    frontHeadline: 'Tu marca en el bolsillo de tus clientes',
     description:
-      'Tu negocio en el celular de cada cliente. Con tu imagen, tus datos y todo lo que necesitás para fidelizarlos — sin preocuparte por la tecnología.',
+      'Tu negocio en el celular de cada cliente. Con tu imagen, tus datos y todo lo que necesitás para fidelizarlos — sin que la tecnología sea tu problema.',
     targetAudience: 'Marcas y negocios que quieren su propia app en App Store y Google Play',
     features: [
       'Incluye el plan web Landing Page',
@@ -157,17 +157,17 @@ export const APP_PLANS: PricingPlan[] = [
       'Fee mensual: desarrollo activo, mejoras y soporte',
     ],
     // Back face
-    backHook: 'Tu app en manos de tus clientes',
+    backHook: 'Tu marca en el bolsillo de tus clientes',
     idealFor: [
       'Marcas y negocios que quieren su propia app en App Store y Google Play',
     ],
     gains: [
-      { num: '01', title: 'Un fee, continuidad', desc: 'No es solo entregar y listo: evolucionamos el producto cada mes' },
+      { num: '01', title: 'Un fee, continuidad', desc: 'Entrego la app y sigo trabajando: mejoras, ajustes y nuevas funcionalidades cada mes' },
       { num: '02', title: 'iOS + Android real', desc: 'Un solo desarrollo para App Store y Play Store: misma app, sin pagar dos veces ni pelear con dos códigos distintos' },
       { num: '03', title: 'Backend incluido', desc: 'Datos y lógica detrás de la app, acorde a tu escala' },
-      { num: '04', title: 'Las tiendas no te las dejo a vos solo', desc: 'Subidas, ida y vuelta con los revisores y los cambios que pidan Apple o Google: si hay rechazo o retoques, lo encaramos entre nosotros' },
+      { num: '04', title: 'Me encargo de las tiendas', desc: 'Publicación, revisiones y actualizaciones en App Store y Play Store: si Apple o Google piden cambios, lo resolvemos juntos' },
     ],
-    powerStatement: 'La app es el canal más íntimo con tu cliente; el retainer es que no quede abandonada.',
+    powerStatement: 'Una app que deja de actualizarse pierde usuarios en semanas. El fee mensual garantiza que la tuya siempre mejore.',
   },
   {
     id: 'app_pro',
@@ -177,7 +177,7 @@ export const APP_PLANS: PricingPlan[] = [
     billing: 'month',
     frontHeadline: 'Tu negocio funciona solo, aunque vos no estés mirando',
     description:
-      'App para clientes más un panel donde tu equipo gestiona todo: pedidos, roles, pagos y reportes. Nada queda librado al azar.',
+      'App para tus clientes más un panel donde tu equipo gestiona todo: pedidos, roles, pagos y reportes. Vos supervisás sin tener que intervenir en cada operación.',
     targetAudience: 'Franquicias, servicios con muchos pedidos o equipos que necesitan coordinarse',
     features: [
       'Incluye el plan web Web Interactiva',
@@ -196,9 +196,9 @@ export const APP_PLANS: PricingPlan[] = [
       { num: '01', title: 'App para clientes, panel para tu equipo', desc: 'Quien compra o pide un servicio usa la app; vos gestionás la operación desde un panel web, con la misma información actualizada' },
       { num: '02', title: 'Gobernanza', desc: 'Roles y permisos para que nadie toque lo que no debe' },
       { num: '03', title: 'Dinero dentro del flujo', desc: 'Cobros integrados donde el recorrido del usuario lo pide' },
-      { num: '04', title: 'Números accionables', desc: 'Reportes pensados para operar, no solo para mirar' },
+      { num: '04', title: 'Datos para decidir, no para admirar', desc: 'Reportes que te dicen qué hacer, no solo qué pasó' },
     ],
-    powerStatement: 'Cuando crece el volumen, el panel admin es lo que te salva de caos operativo.',
+    powerStatement: 'Sin gestión centralizada, el crecimiento trae caos. Con un panel propio, escalar es ordenado.',
   },
   {
     id: 'app_platform',
@@ -232,7 +232,7 @@ export const APP_PLANS: PricingPlan[] = [
       { num: '04', title: 'Partner, no proveedor', desc: 'Roadmap y decisiones técnicas alineadas al negocio' },
     ],
     powerStatement:
-      'En productos de alta complejidad, la arquitectura tiene que estar pensada para escalar: que el sistema acompañe el crecimiento sin convertirse en un freno operativo.',
+      'Una arquitectura mal diseñada frena el crecimiento antes que la falta de clientes. En productos complejos, la base técnica es parte de la estrategia.',
   },
 ]
 
