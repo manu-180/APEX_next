@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { ServiciosContent } from './content'
 import {
   ServiciosHero,
-  ServiciosStaticTop,
+  ServiciosProcess,
+  ServiciosWhyApex,
   ServiciosStaticFaq,
   ServiciosComparisonTable,
   VerticalsBridge,
@@ -14,7 +15,7 @@ import { BudgetCalculatorSection } from '@/components/sections/budget-calculator
 import { AfipAddonSection } from '@/components/sections/afip-addon'
 
 export const metadata: Metadata = {
-  title: 'Desarrollo de software Argentina | Precios | Manuel Navarro',
+  title: 'Desarrollo de software Argentina | Precios',
   description:
     'Desarrollo de software a medida para empresas y emprendedores. Precio fijo, entrega garantizada en 15 días. Web, e-commerce y apps móviles desde ARS 300k.',
   keywords: [
@@ -48,10 +49,13 @@ export default function ServiciosPage() {
   return (
     <>
       <SafeJsonLd data={faqSchema} />
+      {/* Orden DESIGN_BRIEF §3: hero corto → pricing → calculadora → proceso →
+          diferenciador → AFIP → comparativa única → verticales → FAQ → CTA final */}
       <ServiciosHero />
       <ServiciosContent />
-      <ServiciosStaticTop />
       <BudgetCalculatorSection />
+      <ServiciosProcess />
+      <ServiciosWhyApex />
       <AfipAddonSection />
       <ServiciosComparisonTable />
       <VerticalsBridge />

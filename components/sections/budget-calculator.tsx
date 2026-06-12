@@ -3,11 +3,17 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
-import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
+import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { cn } from '@/lib/utils/cn'
+
+/**
+ * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
+ * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
+ */
+const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
+const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
 
 /**
  * Calculadora de presupuesto interactiva.
@@ -240,27 +246,35 @@ export function BudgetCalculatorSection() {
   })()
 
   return (
-    <section className="relative py-20 sm:py-24">
+    <section id="calculadora" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-3xl px-6">
         <motion.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.55 }}
-          className="mb-10 text-center"
+          className="mb-10 flex items-end justify-between gap-6"
         >
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-            <Badge variant="primary">Calculadora</Badge>
-            <Badge variant="outline">5 preguntas · 90 segundos</Badge>
+          <div>
+            <p className="editorial-label editorial-label--primary mb-4">
+              Calculadora · 5 preguntas · 90 segundos
+            </p>
+            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl mb-3">
+              <span className="block text-[var(--color-on-surface-variant)]">¿Cuánto te sale</span>
+              <strong className="block text-[var(--color-on-surface)]">tu proyecto?</strong>
+            </h2>
+            <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-xl">
+              Respondé 5 preguntas y te muestro un rango realista en pesos.
+              Sin email, sin compromiso. Si querés, después seguimos en WhatsApp.
+            </p>
           </div>
-          <h2 className="font-heading text-balance text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)] mb-3">
-            <span className="font-extralight text-[var(--color-on-surface-variant)]">¿Cuánto te</span>{' '}
-            sale tu proyecto?
-          </h2>
-          <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-xl mx-auto">
-            Respondé 5 preguntas y te muestro un rango realista en pesos.
-            Sin email, sin compromiso. Si querés, después seguimos en WhatsApp.
-          </p>
+          <span
+            aria-hidden="true"
+            className="section-number hidden sm:block"
+            style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}
+          >
+            03
+          </span>
         </motion.div>
 
         {/* ── Progress bar ──────────────────────────────────────────── */}
@@ -304,20 +318,14 @@ export function BudgetCalculatorSection() {
         </div>
 
         {/* ── Step container ───────────────────────────────────────── */}
-        <div
-          className="rounded-2xl border p-6 sm:p-8"
-          style={{
-            backgroundColor: 'var(--color-surface-low)',
-            borderColor: 'var(--glass-border)',
-          }}
-        >
+        <div className="bento-surface p-6 sm:p-8">
           <AnimatePresence mode="wait">
             {step === 0 && (
               <motion.div
                 key="q0"
-                initial={{ opacity: 0, y: 8 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
                   {Q_PROJECT_TYPE.title}
@@ -344,9 +352,9 @@ export function BudgetCalculatorSection() {
             {step === 1 && (
               <motion.div
                 key="q1"
-                initial={{ opacity: 0, y: 8 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-5">
                   {Q_TIMELINE.title}
@@ -368,9 +376,9 @@ export function BudgetCalculatorSection() {
             {step === 2 && (
               <motion.div
                 key="q2"
-                initial={{ opacity: 0, y: 8 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
                   {Q_INTEGRATIONS.title}
@@ -418,9 +426,9 @@ export function BudgetCalculatorSection() {
             {step === 3 && (
               <motion.div
                 key="q3"
-                initial={{ opacity: 0, y: 8 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-5">
                   {Q_CONTENT.title}
@@ -442,9 +450,9 @@ export function BudgetCalculatorSection() {
             {isLastStep && result && (
               <motion.div
                 key="result"
-                initial={{ opacity: 0, y: 12 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -12 }}
               >
                 <div className="mb-1 flex items-center gap-2">
                   <span
@@ -516,10 +524,15 @@ export function BudgetCalculatorSection() {
                   <button
                     type="button"
                     onClick={goToWhatsApp}
-                    className="btn-tech btn-primary-tech inline-flex items-center justify-center gap-2 min-h-12 px-6 text-sm font-semibold rounded-xl flex-1"
+                    className={cn(
+                      'btn-tech inline-flex flex-1 items-center justify-center gap-2.5 min-h-12 rounded-xl px-6 text-sm font-semibold text-white select-none',
+                      'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                    )}
+                    style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
                   >
+                    <WhatsAppIcon className="size-4" />
                     Validar con Manuel por WhatsApp
-                    <ArrowRightIcon className="size-4" />
                   </button>
                   <button
                     type="button"

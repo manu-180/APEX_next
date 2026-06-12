@@ -1,57 +1,84 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { useMemo, useRef, useState } from 'react'
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'framer-motion'
+import type { CSSProperties } from 'react'
 import { SectionReveal } from '@/components/ui/section-reveal'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { GridBackground } from '@/components/ui/grid-background'
 import { SonarWavesBg } from '@/components/ui/sonar-waves-bg'
 import {
-  CalendarIcon,
-  SendIcon,
-  StarIcon,
-  CheckIcon,
   ArrowRightIcon,
+  CalendarIcon,
+  CheckIcon,
+  StarIcon,
+  WhatsAppIcon,
 } from '@/components/ui/icons'
-import { BOOKING_SLOT_HOURS, BLOCKED_WEEKDAYS, formatBookingHour } from '@/lib/constants'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import {
+  BOOKING_SLOT_HOURS,
+  BLOCKED_WEEKDAYS,
+  formatBookingHour,
+  WHATSAPP_PHONE_DISPLAY,
+} from '@/lib/constants'
 import { useBooking } from '@/hooks/useBooking'
 import { useGsapReveal } from '@/hooks/useGsapReveal'
-import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client'
 import { bookingWhatsappLocalToE164, BOOKING_WA_LOCAL_DIGITS } from '@/lib/booking-phone'
+import { whatsappUrl } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils/cn'
 
-import { REVIEWS, AVG_RATING } from '@/lib/data/reviews'
-
-const CONTACT_NEED_OPTIONS = [
-  'Página web',
-  'Tienda online',
-  'App móvil',
-  'No sé todavía',
-] as const
+import { REVIEWS, AVG_RATING, type Review } from '@/lib/data/reviews'
 
 /* ────────────────────────────────────────────────────────────────────────
-   Shared input class — used for all fields in both forms
+   Copy / data local de la página
    ──────────────────────────────────────────────────────────────────────── */
+
+/** Mensaje prellenado contextual de /contacto (decisión: arrancar ahora). */
+const WA_MSG_CONTACT_NOW =
+  'Hola Manuel, tengo un proyecto y quiero arrancar. ¿Lo charlamos?'
+
+/** Las replies viven en la DB (tabla reviews); el dataset estático aún no las
+ *  trae. El render ya las soporta: si el día de mañana llegan, se anidan. */
+type ReviewReply = { name: string; text: string; date?: string; isAdmin?: boolean }
+type ReviewWithReplies = Review & { replies?: ReviewReply[] }
+const REVIEW_ITEMS: ReviewWithReplies[] = REVIEWS
+
+/* ────────────────────────────────────────────────────────────────────────
+   Clases compartidas
+   ──────────────────────────────────────────────────────────────────────── */
+
+const focusRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]'
+
 const inputBase =
   'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-all duration-200'
 
 const inputIdle = 'border-[var(--color-surface-high)]'
-const inputFocus = 'focus:border-[rgba(var(--color-primary-rgb),0.5)] focus:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)] focus:ring-0'
+const inputFocus =
+  'focus:border-[rgba(var(--color-primary-rgb),0.5)] focus:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)] focus:ring-0'
 
 const inputClassName = cn(inputBase, inputIdle, inputFocus)
 
+const microLabel =
+  'mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-on-surface-variant)]'
+
 /* ────────────────────────────────────────────────────────────────────────
-   FormField — adds motion micro-interaction on focus for each input
+   FormField — micro-interacción de foco (respeta reduced motion)
    ──────────────────────────────────────────────────────────────────────── */
 function FormField({ children, className }: { children: React.ReactNode; className?: string }) {
   const [focused, setFocused] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <motion.div
       className={cn('relative', className)}
-      animate={focused ? { y: -1 } : { y: 0 }}
+      animate={!prefersReducedMotion && focused ? { y: -1 } : { y: 0 }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={() => setFocused(false)}
@@ -61,9 +88,14 @@ function FormField({ children, className }: { children: React.ReactNode; classNa
   )
 }
 
+/* ────────────────────────────────────────────────────────────────────────
+   Página
+   ──────────────────────────────────────────────────────────────────────── */
 export function ContactoContent() {
   const headerRef = useRef<HTMLElement>(null)
   const bgCursorRef = useRef({ x: -1, y: -1, active: false })
+  const prefersReducedMotion = useReducedMotion()
+
   const { scrollYProgress } = useScroll({ target: headerRef, offset: ['start start', 'end start'] })
   const headerOpacity = useTransform(scrollYProgress, [0.4, 1], [1, 0])
   const headerMask = useTransform(scrollYProgress, [0.2, 0.8],
@@ -73,18 +105,18 @@ export function ContactoContent() {
 
   return (
     <>
-      {/* ── Header ────────────────────────────────────────────────────── */}
+      {/* ── Header editorial ──────────────────────────────────────────── */}
       <motion.section
         ref={headerRef}
-        className="relative pt-20 pb-10 overflow-hidden"
-        style={{
-          opacity: headerOpacity,
-          maskImage: headerMask,
-          WebkitMaskImage: headerMask,
-        }}
+        className="relative overflow-hidden pt-24 pb-12 md:pt-32 md:pb-16"
+        style={
+          prefersReducedMotion
+            ? undefined
+            : { opacity: headerOpacity, maskImage: headerMask, WebkitMaskImage: headerMask }
+        }
         data-hover
         data-inspector-title="Hero que respira con el scroll"
-        data-inspector-desc="Esta cabecera se desvanece al bajar y la máscara suaviza el corte con el contenido. El fondo de ondas tipo sónar sigue el cursor: anillos que se expanden como un radar, coherente con la idea de 'contacto y alcance'."
+        data-inspector-desc="La cabecera se desvanece al bajar y la máscara suaviza el corte. El fondo de ondas tipo sónar sigue el cursor: anillos que se expanden como un radar, coherente con la idea de 'contacto y alcance'. Todo se apaga con prefers-reduced-motion."
         data-inspector-cat="Performance"
         onMouseMove={(e) => {
           const rect = headerRef.current?.getBoundingClientRect()
@@ -94,188 +126,142 @@ export function ContactoContent() {
       >
         <GridBackground />
         <SonarWavesBg cursorRef={bgCursorRef} />
-        <div className="relative z-10 mx-auto max-w-4xl px-6">
+        <div className="relative z-10 mx-auto max-w-6xl px-6">
           <SectionReveal>
             <div className="max-w-2xl">
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <Badge variant="primary">Contacto</Badge>
-                <Badge variant="outline">Respondo en &lt; 2 hs</Badge>
-              </div>
-              <h1 className="font-heading text-balance leading-tight mb-4">
-                <span className="block text-3xl sm:text-4xl md:text-5xl font-extralight text-[var(--color-on-surface-variant)]">
-                  Contame tu idea.
-                </span>
-                <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                  Arrancamos en 24 hs.
-                </span>
+              <p className="editorial-label editorial-label--primary mb-6">Contacto directo</p>
+              <h1 className="heading-display text-balance text-4xl sm:text-5xl md:text-6xl mb-5">
+                <span className="block text-[var(--color-on-surface-variant)]">Tenés el proyecto.</span>
+                <strong className="block text-[var(--color-on-surface)]">Elegí cómo arrancamos.</strong>
               </h1>
-              <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-md">
-                Una llamada de 30 minutos o un mensaje directo. Sin compromiso, sin formularios eternos.
+              <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg">
+                Dos caminos, cero vueltas: me escribís por WhatsApp ahora, o agendás
+                una reunión de 15 minutos. Sin formularios eternos.
               </p>
             </div>
           </SectionReveal>
         </div>
       </motion.section>
 
-      {/* ── Booking + Form ──────────────────────────────────────────────── */}
-      <section className="pb-16">
-        <div className="mx-auto max-w-4xl px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <BookingCalendar />
-          <ContactForm />
+      {/* ── Decisión binaria: WhatsApp ahora · o · agendar ────────────── */}
+      <section className="pb-20 md:pb-28" aria-label="Elegí cómo contactarme">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[1.1fr_auto_1fr] lg:gap-8">
+            <WhatsAppNowPanel />
+
+            {/* Divisor "o" — vertical en desktop */}
+            <div aria-hidden="true" className="hidden flex-col items-center gap-3 self-stretch py-8 lg:flex">
+              <div className="w-px flex-1 bg-gradient-to-b from-transparent via-[rgba(var(--color-primary-rgb),0.3)] to-transparent" />
+              <span className="flex size-10 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--color-surface-low)] font-heading text-sm font-extrabold uppercase text-[var(--color-on-surface-variant)]">
+                o
+              </span>
+              <div className="w-px flex-1 bg-gradient-to-b from-transparent via-[rgba(var(--color-primary-rgb),0.3)] to-transparent" />
+            </div>
+
+            {/* Divisor "o" — horizontal en mobile */}
+            <div aria-hidden="true" className="flex items-center gap-4 lg:hidden">
+              <div className="divider-theme flex-1" />
+              <span className="flex size-9 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--color-surface-low)] font-heading text-xs font-extrabold uppercase text-[var(--color-on-surface-variant)]">
+                o
+              </span>
+              <div className="divider-theme flex-1" />
+            </div>
+
+            <BookingCalendar />
+          </div>
         </div>
       </section>
 
-      {/* ── Reviews — editorial layout ──────────────────────────────────── */}
+      {/* ── Opiniones (social proof) ──────────────────────────────────── */}
       <ReviewsSection />
     </>
   )
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   ReviewsSection — editorial style with GSAP ScrollTrigger stagger
+   Opción A — WhatsApp ahora (CTA primario de la página)
    ──────────────────────────────────────────────────────────────────────── */
-function ReviewsSection() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const listRef = useRef<HTMLDivElement>(null)
+const WA_PANEL_CLAIMS = [
+  'Te respondo en menos de 1 hora',
+  'Propuesta con alcance, fecha y precio cerrado',
+  'Sin compromiso',
+] as const
 
-  // GSAP stagger on the review items
-  useGsapReveal(listRef, {
-    selector: '[data-review-item]',
-    y: 32,
-    stagger: 0.12,
-    start: 'top 80%',
-  })
-
+function WhatsAppNowPanel() {
   return (
-    <section
-      ref={sectionRef}
-      className="py-24"
-      style={{ backgroundColor: 'var(--color-surface-base)' }}
-    >
-      <div className="mx-auto max-w-4xl px-6">
-        {/* Section header — asymmetric */}
-        <SectionReveal>
-          <div className="max-w-xl mb-14">
-            <Badge variant="primary" className="mb-4">Opiniones</Badge>
-            <h2 className="font-heading text-balance leading-tight mb-3">
-              <span className="text-2xl sm:text-3xl font-extralight text-[var(--color-on-surface-variant)]">No lo digo yo. </span>
-              <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-on-surface)]">Lo dicen ellos.</span>
-            </h2>
-            {/* Rating summary inline */}
-            <div className="flex items-center gap-2">
-              <div className="flex" aria-label={`${AVG_RATING} de 5 estrellas`}>
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <StarIcon
-                    key={s}
-                    className="size-4 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.4)]"
-                    filled={s <= Math.round(Number(AVG_RATING))}
-                  />
-                ))}
-              </div>
-              <span className="text-base font-bold tabular-nums text-[var(--color-on-surface)]">{AVG_RATING}</span>
-              <span className="text-sm text-[var(--color-on-surface-variant)]">({REVIEWS.length} opiniones)</span>
-            </div>
-          </div>
-        </SectionReveal>
-
-        {/* Review list — editorial / quote style */}
-        <div
-          ref={listRef}
-          className="space-y-0 divide-y"
-          style={{ borderColor: 'var(--glass-border)' }}
-          data-hover
-          data-inspector-title="Reviews editoriales con GSAP"
-          data-inspector-desc="Cada reseña entra escalonada (stagger 120ms) con ScrollTrigger de GSAP. La animación respeta prefers-reduced-motion."
-          data-inspector-cat="Animación · GSAP"
+    <SectionReveal className="h-full">
+      <article
+        className="bento-surface relative flex h-full flex-col p-7 sm:p-9"
+        data-hover
+        data-inspector-title="La vía rápida"
+        data-inspector-desc="CTA primario de la página: abre WhatsApp con mensaje prellenado y deja esta pestaña en /gracias. El tracking de conversión vive centralizado en openWhatsAppWithThankYouPage."
+        data-inspector-cat="UX · Conversión"
+      >
+        <span
+          aria-hidden="true"
+          className="section-number absolute right-5 top-4"
+          style={{ '--sn-stroke-alpha': '0.14', fontSize: '3.25rem' } as CSSProperties}
         >
-          {REVIEWS.map((r) => (
-            <article
-              key={r.id}
-              data-review-item
-              className="py-8 first:pt-0 last:pb-0 grid grid-cols-[3px_1fr] gap-5"
-            >
-              {/* Accent bar */}
-              <div
-                className="rounded-full self-stretch"
-                style={{ background: 'var(--color-primary)' }}
-                aria-hidden
-              />
+          01
+        </span>
 
-              <div>
-                {/* Quote text */}
-                <p className="text-pretty text-base text-[var(--color-on-surface)] leading-relaxed mb-4">
-                  <span
-                    className="font-heading text-3xl font-extrabold leading-none mr-1 align-text-bottom"
-                    style={{ color: 'var(--color-primary)' }}
-                    aria-hidden
-                  >
-                    &ldquo;
-                  </span>
-                  {r.text}
-                </p>
+        <p className="editorial-label editorial-label--primary mb-5">La vía rápida</p>
 
-                {/* Author row */}
-                <div className="flex items-start gap-3">
-                  {/* Avatar — ring con color del tema dinámico */}
-                  <div
-                    className="size-11 rounded-full flex items-center justify-center text-base font-extrabold flex-shrink-0 ring-2 ring-offset-2 ring-offset-[var(--color-surface-base)]"
-                    style={{
-                      background:
-                        'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.18), rgba(var(--color-primary-rgb), 0.06))',
-                      color: 'var(--color-primary)',
-                      // @ts-expect-error CSS var en propiedad nativa
-                      '--tw-ring-color': 'rgba(var(--color-primary-rgb), 0.35)',
-                    }}
-                    aria-hidden
-                  >
-                    {r.name[0]}
-                  </div>
+        <h2 className="heading-display text-2xl sm:text-3xl mb-3">
+          <span className="text-[var(--color-on-surface-variant)]">WhatsApp, </span>
+          <strong className="text-[var(--color-on-surface)]">ahora.</strong>
+        </h2>
 
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    {/* Línea 1: nombre + estrellas + fecha */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-[var(--color-on-surface)]">{r.name}</span>
-                      <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
+        <p className="mb-6 max-w-md text-pretty text-sm text-[var(--color-on-surface-variant)]">
+          Me contás tu idea con tus palabras, sin campos obligatorios. Yo te
+          respondo con los próximos pasos concretos.
+        </p>
 
-                      {/* Stars */}
-                      <div className="flex" aria-label={`${r.rating} de 5 estrellas`}>
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <StarIcon
-                            key={s}
-                            className="size-3 text-amber-400"
-                            filled={s <= r.rating}
-                          />
-                        ))}
-                      </div>
-
-                      <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
-                      <time
-                        dateTime={r.date}
-                        className="text-xs text-[var(--color-on-surface-variant)] opacity-60 tabular-nums"
-                      >
-                        {new Date(r.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
-                      </time>
-                    </div>
-
-                    {/* Línea 2: rol/empresa para credibilidad */}
-                    {r.role && (
-                      <span className="text-xs text-[var(--color-on-surface-variant)] opacity-75">
-                        {r.role}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </article>
+        <ul className="mb-8 space-y-2.5">
+          {WA_PANEL_CLAIMS.map((claim) => (
+            <li key={claim} className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface)]">
+              <CheckIcon className="mt-0.5 size-4 shrink-0 text-[var(--color-primary)]" />
+              {claim}
+            </li>
           ))}
+        </ul>
+
+        <div className="mt-auto">
+          <WhatsAppOutboundLink
+            waHref={whatsappUrl(WA_MSG_CONTACT_NOW)}
+            className={cn(
+              'group inline-flex w-full select-none items-center justify-center gap-3',
+              'h-14 rounded-2xl px-6 text-base font-bold text-white sm:h-16 sm:text-lg',
+              'transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
+              focusRing,
+            )}
+            style={{
+              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+              boxShadow: '0 14px 34px -12px rgba(37, 211, 102, 0.5)',
+            }}
+            data-hover
+            data-inspector-title="Escribirme por WhatsApp"
+            data-inspector-desc="Mensaje prellenado contextual de /contacto. Abre wa.me en pestaña nueva y esta queda en /gracias."
+            data-inspector-cat="UX · Conversión"
+          >
+            <WhatsAppIcon className="size-5 sm:size-6" />
+            Escribirme por WhatsApp
+            <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </WhatsAppOutboundLink>
+
+          <p className="mt-3 text-center text-xs text-[var(--color-on-surface-variant)]">
+            <span className="tabular-nums">{WHATSAPP_PHONE_DISPLAY}</span>
+            <span aria-hidden="true" className="mx-2 opacity-40">·</span>
+            Atiendo yo, no un call center.
+          </p>
         </div>
-      </div>
-    </section>
+      </article>
+    </SectionReveal>
   )
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   BookingCalendar — all Supabase logic preserved, motion micro-interactions added
+   Opción B — Agendar reunión (booking existente, lógica intacta)
    ──────────────────────────────────────────────────────────────────────── */
 function BookingCalendar() {
   const {
@@ -296,11 +282,18 @@ function BookingCalendar() {
     reset,
   } = useBooking()
 
+  const prefersReducedMotion = useReducedMotion()
   const [contactMethod, setContactMethod] = useState<'whatsapp' | 'email'>('whatsapp')
   const [name, setName] = useState('')
   const [contact, setContact] = useState('')
   /** Solo los 8 dígitos después del 11; +54 9 se arma al enviar. */
   const [waLocalDigits, setWaLocalDigits] = useState('')
+  /** Snapshot para la pantalla de éxito (el hook limpia selectedHour al refrescar slots). */
+  const [lastBooking, setLastBooking] = useState<{
+    date: Date
+    hour: number
+    method: 'whatsapp' | 'email'
+  } | null>(null)
 
   const dates = useMemo(() => {
     const days: Date[] = []
@@ -319,6 +312,7 @@ function BookingCalendar() {
     if (contactMethod === 'whatsapp' && waLocalDigits.replace(/\D/g, '').length !== BOOKING_WA_LOCAL_DIGITS)
       return
     setSubmitError(null)
+    setLastBooking({ date: selectedDate, hour: selectedHour, method: contactMethod })
     const contactInfo =
       contactMethod === 'whatsapp'
         ? bookingWhatsappLocalToE164(waLocalDigits)!
@@ -341,26 +335,45 @@ function BookingCalendar() {
 
   if (success) {
     return (
-      <SectionReveal>
+      <SectionReveal className="h-full">
         <div
-          className="rounded-2xl glass-card glow-border-active p-8 text-center"
+          className="bento-surface flex h-full flex-col items-center justify-center p-8 text-center sm:p-10"
           data-hover
           data-inspector-title="Confirmación de agenda"
-          data-inspector-desc="Reserva guardada en Supabase; notificación por email (Resend) o WhatsApp (Evolution API) según el canal."
+          data-inspector-desc="Reserva guardada en Supabase; la notificación sale por email (Resend) o WhatsApp (Evolution API) según el canal elegido."
           data-inspector-cat="UX · Motion"
         >
           <motion.div
-            initial={{ scale: 0 }}
+            initial={prefersReducedMotion ? false : { scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
+            className="mb-5 flex size-16 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-glow-sm"
           >
             <CheckIcon className="size-8" />
           </motion.div>
-          <h3 className="text-xl font-bold text-[var(--color-on-surface)] mb-2">¡Listo, te espero!</h3>
-          <p className="text-sm text-[var(--color-on-surface-variant)] mb-6">
-            Te mando confirmación por WhatsApp antes de la reunión.
+
+          <h3 className="heading-display text-2xl mb-2">
+            <strong className="text-[var(--color-on-surface)]">¡Listo, quedó agendado!</strong>
+          </h3>
+
+          {lastBooking && (
+            <p className="mb-1 text-sm font-semibold capitalize text-[var(--color-primary)]">
+              {lastBooking.date.toLocaleDateString('es-AR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+              {' · '}
+              <span className="tabular-nums">{formatBookingHour(lastBooking.hour)} hs</span>
+            </p>
+          )}
+
+          <p className="mb-7 text-sm text-[var(--color-on-surface-variant)]">
+            {lastBooking?.method === 'email'
+              ? 'Te llega la confirmación por email.'
+              : 'Te llega la confirmación por WhatsApp.'}
           </p>
+
           <Button
             variant="outline"
             className="w-full"
@@ -369,6 +382,7 @@ function BookingCalendar() {
               setName('')
               setContact('')
               setWaLocalDigits('')
+              setLastBooking(null)
             }}
             type="button"
           >
@@ -380,49 +394,72 @@ function BookingCalendar() {
   }
 
   return (
-    <SectionReveal>
-      <div
-        className="rounded-2xl glass-card glow-border p-6"
+    <SectionReveal className="h-full" delay={0.08}>
+      <article
+        className="bento-surface relative flex h-full flex-col p-6 sm:p-7"
         data-hover
         data-inspector-title="Panel de agenda"
-        data-inspector-desc="Días y horarios sincronizados con Supabase; tiempo real y restricción única evitan doble reserva."
+        data-inspector-desc="Días y horarios sincronizados con Supabase; tiempo real y restricción única evitan la doble reserva. Domingos bloqueados por constantes."
         data-inspector-cat="UX · Motion"
       >
-        <h3 className="text-lg font-bold text-[var(--color-on-surface)] mb-1 flex items-center gap-2">
-          <CalendarIcon className="size-5 text-[var(--color-primary)]" />
-          Reunión gratuita
-        </h3>
-        <p className="text-xs text-[var(--color-on-surface-variant)] mb-5">30 min sin costo. Sin compromiso.</p>
+        <span
+          aria-hidden="true"
+          className="section-number absolute right-5 top-4"
+          style={{ '--sn-stroke-alpha': '0.14', fontSize: '3.25rem' } as CSSProperties}
+        >
+          02
+        </span>
+
+        <p className="editorial-label mb-5">Si preferís agendar</p>
+
+        <h2 className="heading-display text-2xl sm:text-3xl mb-1 flex items-center gap-2.5">
+          <CalendarIcon className="size-6 shrink-0 text-[var(--color-primary)]" />
+          <span>
+            <span className="text-[var(--color-on-surface-variant)]">Reunión de 15 min, </span>
+            <strong className="text-[var(--color-on-surface)]">gratis.</strong>
+          </span>
+        </h2>
+        <p className="mb-6 text-xs text-[var(--color-on-surface-variant)]">
+          Lunes a sábado, de 9 a 19. Sin compromiso.
+        </p>
 
         {!supabaseReady && (
-          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-200">
             Falta configurar <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_SUPABASE_URL</code> y{' '}
             <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> para reservas en vivo.
           </div>
         )}
 
-        {/* Date picker */}
-        <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar mb-5">
+        {/* Selector de día */}
+        <div
+          role="group"
+          aria-label="Elegí un día"
+          className="no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-3"
+        >
           {dates.map((d) => {
             const isSelected = selectedDate.toDateString() === d.toDateString()
+            const longLabel = d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
             return (
               <motion.button
                 key={d.toISOString()}
                 type="button"
-                whileTap={{ scale: 0.93 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.93 }}
                 onClick={() => setSelectedDate(d)}
+                aria-pressed={isSelected}
+                aria-label={longLabel}
                 className={cn(
-                  'flex-shrink-0 flex flex-col items-center rounded-xl px-3 py-2 text-center transition-all border min-w-[52px]',
+                  'flex min-w-[52px] flex-shrink-0 flex-col items-center rounded-xl border px-3 py-2 text-center transition-all',
+                  focusRing,
                   isSelected
                     ? 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)] shadow-glow-sm'
-                    : 'border-[var(--color-surface-high)] hover:border-[rgba(var(--color-primary-rgb),0.3)] text-[var(--color-on-surface-variant)]'
+                    : 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:border-[rgba(var(--color-primary-rgb),0.3)]'
                 )}
                 data-hover
-                data-inspector-title={d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })}
+                data-inspector-title={longLabel}
                 data-inspector-desc="Día disponible; domingos excluidos por constantes."
                 data-inspector-cat="UX · Motion"
               >
-                <span className="text-[10px] uppercase font-medium">
+                <span className="text-[10px] font-medium uppercase">
                   {d.toLocaleDateString('es-AR', { weekday: 'short' })}
                 </span>
                 <span className="text-lg font-bold tabular-nums">{d.getDate()}</span>
@@ -432,9 +469,9 @@ function BookingCalendar() {
         </div>
 
         {slotsError && (
-          <div className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+          <div className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-200">
             <span>{slotsError}</span>
-            <button type="button" className="shrink-0 underline" onClick={reloadSlots}>
+            <button type="button" className={cn('shrink-0 underline', focusRing)} onClick={reloadSlots}>
               Reintentar
             </button>
           </div>
@@ -445,9 +482,12 @@ function BookingCalendar() {
             Los domingos descanso. Elegí otro día.
           </div>
         ) : (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+          <motion.div
+            initial={prefersReducedMotion ? false : { opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+          >
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-[var(--color-on-surface-variant)]">Horario</p>
+              <p className={cn(microLabel, 'mb-0')}>Horario</p>
               <div className="flex items-center gap-3 text-[10px] text-[var(--color-on-surface-variant)]">
                 <span className="inline-flex items-center gap-1">
                   <span className="size-2 rounded-sm bg-[var(--color-surface-high)]" /> Ocupado
@@ -464,7 +504,7 @@ function BookingCalendar() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-4 gap-2 mb-5">
+              <div role="group" aria-label="Horarios disponibles" className="mb-5 grid grid-cols-4 gap-2">
                 {BOOKING_SLOT_HOURS.map((h) => {
                   const ok = isHourSelectable(h)
                   const sel = selectedHour === h
@@ -474,11 +514,14 @@ function BookingCalendar() {
                       type="button"
                       disabled={!ok}
                       onClick={() => ok && setSelectedHour(h)}
-                      whileHover={ok && !sel ? { scale: 1.04 } : {}}
-                      whileTap={ok ? { scale: 0.95 } : {}}
+                      whileHover={!prefersReducedMotion && ok && !sel ? { scale: 1.04 } : undefined}
+                      whileTap={!prefersReducedMotion && ok ? { scale: 0.95 } : undefined}
                       transition={{ duration: 0.12 }}
+                      aria-pressed={sel}
+                      aria-label={`${formatBookingHour(h)}${ok ? '' : ' — no disponible'}`}
                       className={cn(
                         'rounded-lg border px-2 py-2 text-xs font-medium transition-colors',
+                        focusRing,
                         !ok && 'cursor-not-allowed opacity-40 line-through',
                         ok && !sel && 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:border-[rgba(var(--color-primary-rgb),0.3)]',
                         sel && 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)] shadow-glow-sm'
@@ -496,8 +539,11 @@ function BookingCalendar() {
           </motion.div>
         )}
 
-        {/* Contact method toggle */}
-        <div className="flex gap-2 mb-4">
+        {/* Canal de confirmación */}
+        <p className={microLabel} id="booking-channel-label">
+          ¿Por dónde te confirmo?
+        </p>
+        <div role="group" aria-labelledby="booking-channel-label" className="mb-4 flex gap-2">
           {(['whatsapp', 'email'] as const).map((m) => (
             <button
               key={m}
@@ -506,8 +552,10 @@ function BookingCalendar() {
                 setContactMethod(m)
                 setSubmitError(null)
               }}
+              aria-pressed={contactMethod === m}
               className={cn(
-                'flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-all capitalize',
+                'flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-all',
+                focusRing,
                 contactMethod === m
                   ? 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)]'
                   : 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)]'
@@ -521,29 +569,36 @@ function BookingCalendar() {
           ))}
         </div>
 
-        {/* Name field */}
+        {/* Nombre (opcional) */}
         <FormField className="mb-3">
+          <label htmlFor="booking-name" className={microLabel}>
+            Tu nombre <span className="opacity-60">(opcional)</span>
+          </label>
           <input
+            id="booking-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="¿Cómo te llamo? (opcional)"
+            placeholder="¿Cómo te llamo?"
             className={inputClassName}
             autoComplete="name"
           />
         </FormField>
 
-        {/* Contact field */}
-        <AnimatePresence mode="wait">
+        {/* Contacto según canal */}
+        <AnimatePresence mode="wait" initial={false}>
           {contactMethod === 'whatsapp' ? (
             <motion.div
               key="wa"
-              initial={{ opacity: 0, y: -8 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
+              exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
               transition={{ duration: 0.18 }}
               className="mb-3"
             >
               <FormField>
+                <label htmlFor="booking-wa" className={microLabel}>
+                  Tu WhatsApp
+                </label>
                 <div
                   className={cn(
                     inputBase,
@@ -559,6 +614,7 @@ function BookingCalendar() {
                     11
                   </span>
                   <input
+                    id="booking-wa"
                     value={waLocalDigits}
                     onChange={(e) => {
                       const x = e.target.value.replace(/\D/g, '').slice(0, BOOKING_WA_LOCAL_DIGITS)
@@ -568,29 +624,33 @@ function BookingCalendar() {
                     type="tel"
                     inputMode="numeric"
                     autoComplete="tel-national"
-                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-base md:text-sm text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)]"
-                    aria-label="Número de celular sin código de área (8 dígitos)"
+                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-base text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] md:text-sm"
+                    aria-describedby="booking-wa-help"
                   />
                 </div>
               </FormField>
-              <p className="mt-1.5 text-[11px] text-[var(--color-on-surface-variant)]">
-                Solo los {BOOKING_WA_LOCAL_DIGITS} dígitos. Te confirmo por WhatsApp al toque.
+              <p id="booking-wa-help" className="mt-1.5 text-[11px] text-[var(--color-on-surface-variant)]">
+                Solo los {BOOKING_WA_LOCAL_DIGITS} dígitos después del 11. Te confirmo al toque.
               </p>
             </motion.div>
           ) : (
             <motion.div
               key="email"
-              initial={{ opacity: 0, y: -8 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
+              exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
               transition={{ duration: 0.18 }}
               className="mb-3"
             >
               <FormField>
+                <label htmlFor="booking-email" className={microLabel}>
+                  Tu email
+                </label>
                 <input
+                  id="booking-email"
                   value={contact}
                   onChange={(e) => setContact(e.target.value)}
-                  placeholder="Tu email"
+                  placeholder="nombre@correo.com"
                   type="email"
                   className={inputClassName}
                   autoComplete="email"
@@ -600,16 +660,16 @@ function BookingCalendar() {
           )}
         </AnimatePresence>
 
-        {/* Submit error */}
+        {/* Error de envío */}
         <AnimatePresence>
           {submitError && (
             <motion.p
               role="alert"
-              initial={{ opacity: 0, y: -6 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
+              exit={prefersReducedMotion ? undefined : { opacity: 0, y: -6 }}
               transition={{ duration: 0.18 }}
-              className="mb-3 text-xs font-medium text-red-400"
+              className="mb-3 text-xs font-medium text-red-500 dark:text-red-400"
             >
               {submitError}
             </motion.p>
@@ -620,7 +680,7 @@ function BookingCalendar() {
           onClick={handleSubmit}
           disabled={!canSubmit}
           variant="primary"
-          className="w-full"
+          className="mt-auto w-full"
           type="button"
           data-hover
           data-inspector-title="Confirmar reunión"
@@ -629,203 +689,221 @@ function BookingCalendar() {
           {submitting ? 'Reservando…' : 'Confirmar turno gratis'}
           <ArrowRightIcon className="size-4" />
         </Button>
-      </div>
+      </article>
     </SectionReveal>
   )
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   ContactForm — all logic preserved, field micro-interactions added
+   Opiniones — social proof con jerarquía de estrellas en Amber
    ──────────────────────────────────────────────────────────────────────── */
-function ContactForm() {
-  const router = useRouter()
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    whatsapp: '',
-    need: '',
-    details: '',
-  })
-  const [sending, setSending] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
+function ReviewsSection() {
+  const listRef = useRef<HTMLDivElement>(null)
+  const hasReviews = REVIEW_ITEMS.length > 0
+  const filledStars = Math.round(Number(AVG_RATING))
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormError(null)
-    const name = form.name.trim()
-    const email = form.email.trim()
-    const whatsapp = form.whatsapp.trim()
-    const need = form.need.trim()
-    const details = form.details.trim()
-    const whatsappDigits = whatsapp.replace(/\D/g, '')
-    if (whatsappDigits.length < 10) {
-      setFormError('Ingresá tu WhatsApp para que pueda responderte rápido.')
-      return
-    }
-    if (!email || !need) {
-      setFormError('Necesito tu WhatsApp, email y el tipo de proyecto.')
-      return
-    }
-    const generatedMessage = [
-      `Necesidad principal: ${need}`,
-      `WhatsApp de contacto: ${whatsapp}`,
-      details ? `Contexto adicional: ${details}` : null,
-    ]
-      .filter(Boolean)
-      .join('\n')
-    if (!isSupabaseConfigured()) {
-      setFormError('Falta configurar Supabase (variables NEXT_PUBLIC_SUPABASE_*).')
-      return
-    }
-    setSending(true)
-    try {
-      const supabase = getSupabaseBrowserClient()
-      const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: {
-          name: name || 'Contacto web',
-          email,
-          message: generatedMessage,
-        },
-      })
-      if (error) throw error
-      router.push('/gracias', { scroll: true })
-      return
-    } catch {
-      setFormError('No se pudo enviar. Revisá tu conexión e intentá de nuevo.')
-    } finally {
-      setSending(false)
-    }
-  }
+  // Stagger GSAP sobre cada reseña (el hook respeta prefers-reduced-motion)
+  useGsapReveal(listRef, {
+    selector: '[data-review-item]',
+    y: 32,
+    stagger: 0.12,
+    start: 'top 80%',
+  })
 
   return (
-    <SectionReveal delay={0.1}>
-      <form
-        onSubmit={handleSubmit}
-        className="rounded-2xl glass-card glow-border p-6 h-full flex flex-col"
-        data-hover
-        data-inspector-title="Formulario de mensaje directo"
-        data-inspector-desc="Nombre, email y mensaje; envío por submit nativo interceptado en React. El botón de WhatsApp al lado abre conversación externa sin abandonar el layout."
-        data-inspector-cat="UX · Formulario"
-      >
-        <h3 className="text-lg font-bold text-[var(--color-on-surface)] mb-1 flex items-center gap-2">
-          <SendIcon className="size-5 text-[var(--color-primary)]" />
-          Mandame un mensaje
-        </h3>
-        <p className="text-xs text-[var(--color-on-surface-variant)] mb-5">Contame qué necesitás y te armo una propuesta.</p>
+    <section className="py-20 md:py-28" style={{ backgroundColor: 'var(--color-surface-base)' }}>
+      <div className="mx-auto max-w-5xl px-6">
+        {/* Header asimétrico: título a la izquierda, rating gigante a la derecha */}
+        <SectionReveal>
+          <div className="mb-14 grid grid-cols-1 items-end gap-8 md:grid-cols-[1.2fr_auto]">
+            <div className="max-w-xl">
+              <p className="editorial-label mb-5">Opiniones</p>
+              <h2 className="heading-display text-balance text-3xl sm:text-4xl">
+                <span className="text-[var(--color-on-surface-variant)]">No lo digo yo. </span>
+                <strong className="text-[var(--color-on-surface)]">Lo dicen ellos.</strong>
+              </h2>
+            </div>
 
-        <FormField className="mb-3">
-          <input
-            value={form.whatsapp}
-            onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-            placeholder="WhatsApp * (para responderte rápido)"
-            type="tel"
-            required
-            inputMode="tel"
-            autoComplete="tel"
-            className={inputClassName}
-            data-hover
-            data-inspector-title="WhatsApp *"
-            data-inspector-desc="Canal principal para responder rápido y coordinar próximos pasos."
-            data-inspector-cat="UX · Formulario"
-          />
-        </FormField>
+            {hasReviews && (
+              <div className="flex items-end gap-4 md:justify-end">
+                <span
+                  aria-hidden="true"
+                  className="section-number leading-none"
+                  style={{ '--sn-stroke-alpha': '0.5', fontSize: 'clamp(3.5rem, 7vw, 5.5rem)' } as CSSProperties}
+                >
+                  {AVG_RATING}
+                </span>
+                <div className="pb-1.5">
+                  <div
+                    className="flex"
+                    role="img"
+                    aria-label={`Promedio ${AVG_RATING} de 5 estrellas, ${REVIEW_ITEMS.length} opiniones`}
+                  >
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <StarIcon
+                        key={s}
+                        className="size-5 text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.45)]"
+                        filled={s <= filledStars}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-1 text-xs text-[var(--color-on-surface-variant)]">
+                    {REVIEW_ITEMS.length} opiniones reales
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </SectionReveal>
 
-        <FormField className="mb-3">
-          <input
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="Tu email *"
-            type="email"
-            required
-            className={inputClassName}
-            autoComplete="email"
+        {!hasReviews ? (
+          /* Estado vacío honesto */
+          <SectionReveal>
+            <div className="bento-surface p-10 text-center sm:p-14">
+              <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-[rgba(251,191,36,0.12)]">
+                <StarIcon className="size-6 text-amber-400" filled={false} />
+              </div>
+              <h3 className="mb-2 text-lg font-bold text-[var(--color-on-surface)]">
+                Todavía no hay opiniones publicadas.
+              </h3>
+              <p className="mx-auto mb-6 max-w-md text-sm text-[var(--color-on-surface-variant)]">
+                Las primeras reseñas están en camino. Mientras tanto, contame tu
+                proyecto y comprobalo de primera mano.
+              </p>
+              <WhatsAppOutboundLink
+                waHref={whatsappUrl(WA_MSG_CONTACT_NOW)}
+                className={cn(
+                  'inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] underline-offset-4 hover:underline',
+                  focusRing,
+                )}
+              >
+                <WhatsAppIcon className="size-4" />
+                Escribime y sé el primero
+              </WhatsAppOutboundLink>
+            </div>
+          </SectionReveal>
+        ) : (
+          /* Lista editorial con stagger GSAP */
+          <div
+            ref={listRef}
+            className="space-y-0 divide-y"
+            style={{ borderColor: 'var(--glass-border)' }}
             data-hover
-            data-inspector-title="Email *"
-            data-inspector-desc="Canal secundario para compartir propuesta y seguimiento."
-            data-inspector-cat="UX · Formulario"
-          />
-        </FormField>
-
-        <FormField className="mb-3">
-          <select
-            value={form.need}
-            onChange={(e) => setForm({ ...form, need: e.target.value })}
-            required
-            className={cn(inputClassName, 'appearance-none')}
-            data-hover
-            data-inspector-title="¿Qué necesitás? *"
-            data-inspector-desc="Ayuda a clasificar la consulta y responder con una propuesta alineada."
-            data-inspector-cat="UX · Formulario"
+            data-inspector-title="Reviews editoriales con GSAP"
+            data-inspector-desc="Cada reseña entra escalonada (stagger 120ms) con ScrollTrigger de GSAP. La animación respeta prefers-reduced-motion."
+            data-inspector-cat="Animación · GSAP"
           >
-            <option value="">¿Qué proyecto tenés en mente?</option>
-            {CONTACT_NEED_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
+            {REVIEW_ITEMS.map((r) => (
+              <article
+                key={r.id}
+                data-review-item
+                className="grid grid-cols-[3px_1fr] gap-5 py-8 first:pt-0 last:pb-0"
+              >
+                {/* Barra de acento del tema */}
+                <div
+                  className="self-stretch rounded-full"
+                  style={{ background: 'var(--color-primary)' }}
+                  aria-hidden
+                />
+
+                <div>
+                  {/* Texto de la reseña */}
+                  <p className="mb-4 text-pretty text-base leading-relaxed text-[var(--color-on-surface)]">
+                    <span
+                      className="mr-1 align-text-bottom font-heading text-3xl font-extrabold leading-none"
+                      style={{ color: 'var(--color-primary)' }}
+                      aria-hidden
+                    >
+                      &ldquo;
+                    </span>
+                    {r.text}
+                  </p>
+
+                  {/* Autor */}
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="flex size-11 flex-shrink-0 items-center justify-center rounded-full text-base font-extrabold ring-2 ring-offset-2 ring-offset-[var(--color-surface-base)]"
+                      style={{
+                        background:
+                          'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.18), rgba(var(--color-primary-rgb), 0.06))',
+                        color: 'var(--color-primary)',
+                        // @ts-expect-error CSS var en propiedad nativa
+                        '--tw-ring-color': 'rgba(var(--color-primary-rgb), 0.35)',
+                      }}
+                      aria-hidden
+                    >
+                      {r.name[0]}
+                    </div>
+
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-[var(--color-on-surface)]">{r.name}</span>
+                        <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
+
+                        <div
+                          className="flex"
+                          role="img"
+                          aria-label={`${r.rating} de 5 estrellas`}
+                        >
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <StarIcon key={s} className="size-3 text-amber-400" filled={s <= r.rating} />
+                          ))}
+                        </div>
+
+                        <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden>·</span>
+                        <time
+                          dateTime={r.date}
+                          className="text-xs tabular-nums text-[var(--color-on-surface-variant)] opacity-60"
+                        >
+                          {new Date(r.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
+                        </time>
+                      </div>
+
+                      {r.role && (
+                        <span className="text-xs text-[var(--color-on-surface-variant)] opacity-75">
+                          {r.role}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Replies anidadas (cuando el dataset las traiga) */}
+                  {r.replies && r.replies.length > 0 && (
+                    <div
+                      className="mt-5 space-y-4 border-l-2 pl-5"
+                      style={{ borderColor: 'rgba(var(--color-primary-rgb), 0.25)' }}
+                    >
+                      {r.replies.map((reply, i) => (
+                        <div key={i} className="text-sm">
+                          <p className="mb-1 flex flex-wrap items-center gap-2">
+                            <span className="font-semibold text-[var(--color-on-surface)]">{reply.name}</span>
+                            {reply.isAdmin && (
+                              <span className="rounded-md bg-[rgba(var(--color-primary-rgb),0.12)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-primary)]">
+                                Respuesta
+                              </span>
+                            )}
+                            {reply.date && (
+                              <time
+                                dateTime={reply.date}
+                                className="text-xs tabular-nums text-[var(--color-on-surface-variant)] opacity-60"
+                              >
+                                {new Date(reply.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
+                              </time>
+                            )}
+                          </p>
+                          <p className="text-pretty leading-relaxed text-[var(--color-on-surface-variant)]">
+                            {reply.text}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </article>
             ))}
-          </select>
-        </FormField>
-
-        <FormField className="mb-3">
-          <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="¿Cómo te llamo? (opcional)"
-            className={inputClassName}
-            autoComplete="name"
-          />
-        </FormField>
-
-        <FormField className="mb-3 flex-1">
-          <textarea
-            value={form.details}
-            onChange={(e) => setForm({ ...form, details: e.target.value })}
-            placeholder="Plazos, presupuesto, referentes... (opcional)"
-            rows={3}
-            className={cn(inputClassName, 'h-full resize-none')}
-            data-hover
-            data-inspector-title="Detalles opcionales"
-            data-inspector-desc="Campo opcional para agregar contexto sin fricción."
-            data-inspector-cat="UX · Formulario"
-          />
-        </FormField>
-
-        {/* Form error — animated */}
-        <AnimatePresence>
-          {formError && (
-            <motion.p
-              role="alert"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="mb-3 text-xs font-medium text-red-400"
-            >
-              {formError}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        <Button
-          type="submit"
-          variant="primary"
-          className={cn(
-            'w-full',
-            'h-12 px-7 text-sm rounded-xl',
-            'transition-all duration-200 ease-out',
-          )}
-          disabled={sending}
-          data-hover
-          data-inspector-title="Enviar presupuesto"
-          data-inspector-desc="Invoca send-contact-email en Supabase."
-          data-inspector-cat="UX · Formulario"
-        >
-          {sending ? 'Enviando…' : 'Quiero mi presupuesto gratis →'}
-        </Button>
-        <p className="mt-3 text-center text-xs text-[var(--color-on-surface-variant)]">
-          Respondo en menos de 2 hs, siempre por WhatsApp.
-        </p>
-      </form>
-    </SectionReveal>
+          </div>
+        )}
+      </div>
+    </section>
   )
 }

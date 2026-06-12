@@ -36,14 +36,29 @@
 - `env.example` → reemplazado bloque Evolution por `APEX_LEADS_URL` / `APEX_LEADS_BOOKING_SECRET`.
 - `.env.local` → agregadas ambas (secret = CRON_SECRET de apex-leads, copiado sin exponer).
 
-## 3. PENDIENTE
+## 3. FUNNEL — CERRADO ✅ (2026-06-11 ~02:00)
 
-- [ ] **Push apex_hunter master** (commit 8c5c54c hecho; primer push falló por rama main vs master — reintentado).
-- [ ] **INPUT MANUEL (Vercel `apex-next`)**: agregar env vars de producción: `APEX_LEADS_BOOKING_SECRET` (= CRON_SECRET de apex-leads, está en `APEX_next/.env.local`) y opcional `APEX_LEADS_URL=https://leads.theapexweb.com`. Sin esto el booking prod sigue 503 (ahora con mensaje claro).
-- [ ] E2E del bridge contra prod una vez deployado (POST de prueba → debe llegar WhatsApp self + lead en inbox).
-- [ ] Build APEX_next (corriendo) → commit checkpoint + push (deploya fixes de click-path/tracking ya).
-- [ ] Tareas #3-#8: dirección de diseño premium, auditoría visual (screenshots dev server), refactor Home / Servicios+Contacto / Sobre-mí+Tecnologías+shared, verificación final.
-- [ ] Research de landings: informe completo ya generado (estructura PAS, WhatsApp-first, pricing 3 tiers con entregables, social proof con pocos clientes, anti-patterns). Está en el historial de sesión; sintetizar en `docs/DESIGN_BRIEF.md` antes de refactorizar.
+- [x] apex_hunter master pusheado: bridge (8c5c54c) + allowlist middleware (c2033c8 — el middleware cookie-auth bloqueaba /api/* con 401) + fallback admin phone (a8b92d9).
+- [x] Env vars prod de apex-next agregadas POR CLI (`vercel env add`): `APEX_LEADS_BOOKING_SECRET` + `APEX_LEADS_URL` + redeploy (4850bce). **Manuel no tiene que tocar nada.**
+- [x] **E2E VERDE en producción**: bridge directo `{ok,sent_client:true,sent_admin:true}` y camino público completo `theapexweb.com/api/booking/whatsapp → {ok,client:true,admin:true}`. Leads de test visibles en inbox WA (lead_id 9ee97145…, dedup por teléfono OK).
+- [x] APEX_next checkpoint commiteado/pusheado (a99c77b): proxy booking + click-path robusto + dedupe tracking + SEO previo.
+- Gotcha descubierto: PowerShell Invoke-RestMethod manglea el header Bearer en este setup — testear con curl/fetch.
+- Pendiente menor: verificar en Google Ads que la conversión del hero (`UoGWCML…`) esté como SECUNDARIA (si es primaria, un click de hero cuenta 2 conversiones junto con la de WhatsApp).
+
+## 4. REFACTOR PREMIUM — COMPLETADO ✅ (2026-06-12 ~00:35)
+
+Ejecutado con 1 agente de fundación + 4 agentes de páginas (+3 finalizadores tras corte por límite de sesión) + integración del orquestador. Contratos en `docs/DESIGN_BRIEF.md` + `docs/refactor/AUDIT_ADDENDUM.md` (verdades canónicas); notas por página en `docs/refactor/*_NOTES.md`.
+
+**Hecho:** fundación (utilidades editorial-label/section-number/bento-surface/divider-theme/heading-display/.btn-wa + navbar glass + footer editorial) · Home (hero asimétrico outcome-driven, portfolio SIN blur, founder con slot foto, CTA final estilo /gracias con review real) · Servicios (precios above-the-fold, sin tachados ni "-36%", badge único "Más elegido", entregables por tier, UNA tabla comparativa, CTAs verdes con waMsgPlan) · Contacto (decisión binaria WhatsApp/booking, form 5 campos eliminado, reviews 4.8·5) · Sobre-mí (asimétrico, manifesto preservado, CTA verde arriba) · Tecnologías (beneficios de negocio, callout theme-switcher) · Jerarquía CTA global: WhatsApp = verde sólido en los 7 temas · Números canónicos en todo el sitio (<1 hora, 15 min, 8+ productos, sin "+150"/"4.9") · Títulos sin duplicar "| Manuel Navarro" · Contraste H1 hero fixed.
+
+**Verificado:** tsc 0 · build prod EXIT 0 · consola limpia en server fresco (el warning de hidratación era SOLO staleness HMR del dev server, imposible en prod) · temas OK (supabase → #3ECF8E propagado, .btn-wa sigue verde) · blur=0 imgs · screenshots home+servicios.
+
+**Pendientes manuales para Manuel:**
+- [ ] Subir foto real a `public/manuel.jpg` (retrato ~4:5) — hoy se ve el avatar "MN" de fallback.
+- [ ] Google Ads: verificar que la conversión del hero (`UoGWCML-wKccEMy5_5pD`) sea SECUNDARIA (si es primaria, 1 click de hero = 2 conversiones).
+- [ ] `CLAUDE.md` (raíz y APEX_next) tienen el pricing viejo de apps ($1.2M one-time); el sitio publica el modelo actual $580k/mes — actualizar docs cuando confirmes el modelo.
+- [ ] Menor: en /servicios mobile el botón flotante tapa ~27px del borde del toggle Web/Mobile durante un instante del scroll (elemento en flujo, no sticky — baja prioridad).
+- [ ] Edge function `send-contact-email` quedó sin caller (el form de contacto se eliminó a propósito) — decidir si se da de baja.
 
 ## 4. DECISIONES
 

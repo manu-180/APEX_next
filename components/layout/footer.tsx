@@ -1,9 +1,16 @@
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
-import { ROUTES } from '@/lib/constants'
+import { ROUTES, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_FOOTER_LINK } from '@/lib/whatsapp'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
+import { WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+
+const WHATSAPP_FOOTER_HREF = whatsappUrl(WA_MSG_FOOTER_LINK)
+
+/** Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2). */
+const WHATSAPP_GREEN = '#25D366'
 
 const SERVICIOS_LINKS = [
   { label: 'Landing Page',     href: `${ROUTES.servicios}?tab=web` },
@@ -13,74 +20,68 @@ const SERVICIOS_LINKS = [
   { label: 'Automatizaciones', href: `${ROUTES.servicios}?tab=mobile` },
 ]
 
-const CONTACTO_LINKS = [
-  {
-    label: 'Agendar reunión',
-    href: ROUTES.contact,
-    type: 'internal' as const,
-  },
-  {
-    label: 'WhatsApp',
-    href: whatsappUrl(WA_MSG_FOOTER_LINK),
-    type: 'whatsapp' as const,
-  },
-  {
-    label: 'Tecnologías',
-    href: ROUTES.tecnologias,
-    type: 'internal' as const,
-  },
-  {
-    label: 'Sobre mí',
-    href: ROUTES.about,
-    type: 'internal' as const,
-  },
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/apex.stack/',
-    type: 'external' as const,
-  },
+const EXPLORAR_LINKS = [
+  { label: 'Agendar reunión', href: ROUTES.contact,      external: false },
+  { label: 'Tecnologías',     href: ROUTES.tecnologias,  external: false },
+  { label: 'Sobre mí',        href: ROUTES.about,        external: false },
+  { label: 'Instagram',       href: 'https://www.instagram.com/apex.stack/', external: true },
 ]
 
 export function Footer() {
   return (
-    <footer id="site-footer" style={{ backgroundColor: 'var(--footer-bg)' }}>
-      {/* Top gradient separator — theme-aware */}
+    <footer
+      id="site-footer"
+      className="relative overflow-hidden"
+      style={{ backgroundColor: 'var(--footer-bg)' }}
+    >
+      {/* Separador superior con gradiente del tema */}
+      <div className="divider-theme" aria-hidden="true" />
+
+      {/* Watermark de marca: outline gigante del tema, puramente decorativo */}
       <div
-        className="h-px"
-        style={{
-          background:
-            'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.25), transparent)',
-        }}
-      />
+        aria-hidden="true"
+        className="section-number absolute -bottom-8 right-0 z-0 hidden select-none lg:block"
+        style={
+          {
+            '--sn-stroke-alpha': '0.07',
+            fontSize: 'clamp(9rem, 16vw, 14rem)',
+          } as CSSProperties
+        }
+      >
+        APEX
+      </div>
 
-      <div className="mx-auto max-w-6xl px-6 pt-16 pb-10">
-        {/* Main — 3-column: editorial CTA (wide) + Servicios + Contacto */}
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-12 lg:gap-8">
+      <div className="relative z-10 mx-auto max-w-6xl px-6 pt-20 pb-10">
+        {/* Main — asimétrico: bloque editorial ancho + 2 columnas discretas */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[2fr_1fr_1fr] lg:gap-8">
 
-          {/* ── Left: statement + CTA ─────────────────────────────── */}
+          {/* ── Bloque editorial: CTA WhatsApp prominente ─────────── */}
           <div>
-            <div
-              className="w-10 h-0.5 mb-6 rounded-full"
-              style={{ backgroundColor: 'var(--color-primary)' }}
-            />
-            <h2 className="font-heading leading-tight mb-5">
-              <span className="block text-4xl sm:text-5xl font-light text-[var(--color-on-surface-variant)]">
-                ¿Listo para construir
-              </span>
-              <span className="block text-4xl sm:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                algo increíble?
-              </span>
-            </h2>
-            <p className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed max-w-sm mb-8">
-              Full-Stack & Mobile. Apps con diseño premium que resuelven problemas reales — entregadas a tiempo.
+            <p className="editorial-label editorial-label--primary mb-6">
+              Contacto directo
             </p>
+
+            <h2 className="heading-display mb-5 text-4xl sm:text-5xl">
+              <span className="block text-[var(--color-on-surface-variant)]">
+                ¿Arrancamos con
+              </span>
+              <strong className="block text-[var(--color-on-surface)]">
+                tu proyecto?
+              </strong>
+            </h2>
+
+            <p className="mb-8 max-w-sm text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+              Contame tu idea por WhatsApp. Te respondo en menos de 1 hora con
+              los próximos pasos, sin compromiso.
+            </p>
+
             <WhatsAppOutboundLink
-              waHref={whatsappUrl(WA_MSG_FOOTER_LINK)}
+              waHref={WHATSAPP_FOOTER_HREF}
               className={cn(
                 'inline-flex items-center justify-center gap-2 font-semibold select-none',
                 'transition-all duration-200 ease-out',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                'btn-tech btn-primary-tech active:scale-[0.97]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                'btn-wa active:scale-[0.97]',
                 'h-12 px-7 text-sm rounded-xl',
               )}
               data-hover
@@ -88,17 +89,32 @@ export function Footer() {
               data-inspector-desc="Abre WhatsApp con mensaje pre-armado y muestra la página de confirmación en esta ventana — mismo patrón que el CTA del Hero."
               data-inspector-cat="Conversión"
             >
-              <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden="true">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.557 4.118 1.529 5.845L.057 23.57a.5.5 0 0 0 .614.614l5.718-1.472A11.953 11.953 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.523-5.22-1.435l-.374-.22-3.876.997.997-3.876-.22-.374A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
-              </svg>
+              <WhatsAppIcon className="size-4" />
               Escribime por WhatsApp
+            </WhatsAppOutboundLink>
+
+            {/* Contacto visible: número real, clic abre WhatsApp */}
+            <WhatsAppOutboundLink
+              waHref={WHATSAPP_FOOTER_HREF}
+              className="group mt-5 flex w-fit items-center gap-2.5 text-sm text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:text-[var(--color-on-surface)]"
+              data-hover
+              data-inspector-title="Número visible"
+              data-inspector-desc="Contacto a la vista, sin formularios de por medio — el clic abre la misma conversación de WhatsApp."
+              data-inspector-cat="Conversión"
+            >
+              {/* Verde WhatsApp: excepción única de hex permitida por el brief */}
+              <span aria-hidden="true" className="flex-none" style={{ color: WHATSAPP_GREEN }}>
+                <WhatsAppIcon className="size-4" />
+              </span>
+              <span className="font-heading font-semibold tracking-wide tabular-nums">
+                {WHATSAPP_PHONE_DISPLAY}
+              </span>
             </WhatsAppOutboundLink>
           </div>
 
-          {/* Móvil: Servicios | Contacto en dos columnas; lg: participan del grid de 3 */}
+          {/* Móvil: 2 columnas lado a lado; lg: integran el grid de 3 */}
           <div className="grid grid-cols-2 gap-x-8 gap-y-0 lg:contents">
-            {/* ── Servicios column ──────────────────────────────────── */}
+            {/* ── Servicios ─────────────────────────────────────────── */}
             <nav aria-label="Servicios" className="min-w-0">
               <h4 className="footer-heading mb-5">Servicios</h4>
               <ul className="space-y-1.5">
@@ -119,46 +135,27 @@ export function Footer() {
               </ul>
             </nav>
 
-            {/* ── Contacto column ───────────────────────────────────── */}
-            <nav aria-label="Contacto" className="min-w-0">
-              <h4 className="footer-heading mb-5">Contacto</h4>
+            {/* ── Explorar ──────────────────────────────────────────── */}
+            <nav aria-label="Explorar" className="min-w-0">
+              <h4 className="footer-heading mb-5">Explorar</h4>
               <ul className="space-y-1.5">
-                {CONTACTO_LINKS.map((l) => {
-                  if (l.type === 'whatsapp') {
-                    return (
-                      <li key={l.label}>
-                        <WhatsAppOutboundLink
-                          waHref={l.href}
-                          className="footer-link text-sm"
-                          data-hover
-                          data-inspector-title="WhatsApp + página de gracias"
-                          data-inspector-desc="Abre WhatsApp en nueva pestaña y muestra la confirmación en esta misma ventana."
-                          data-inspector-cat="Conversión"
-                        >
-                          {l.label}
-                        </WhatsAppOutboundLink>
-                      </li>
-                    )
-                  }
-                  if (l.type === 'external') {
-                    return (
-                      <li key={l.label}>
-                        <a
-                          href={l.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="footer-link text-sm"
-                          data-hover
-                          data-inspector-title="Link Externo — Anti-Tabnabbing"
-                          data-inspector-desc="rel=noopener noreferrer evita que la pestaña externa redirija la actual — protección estándar contra tabnabbing."
-                          data-inspector-cat="Seguridad"
-                        >
-                          {l.label}
-                        </a>
-                      </li>
-                    )
-                  }
-                  return (
+                {EXPLORAR_LINKS.map((l) =>
+                  l.external ? (
+                    <li key={l.label}>
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="footer-link text-sm"
+                        data-hover
+                        data-inspector-title="Link Externo — Anti-Tabnabbing"
+                        data-inspector-desc="rel=noopener noreferrer evita que la pestaña externa redirija la actual — protección estándar contra tabnabbing."
+                        data-inspector-cat="Seguridad"
+                      >
+                        {l.label}
+                      </a>
+                    </li>
+                  ) : (
                     <li key={l.label}>
                       <Link
                         href={l.href}
@@ -171,25 +168,26 @@ export function Footer() {
                         {l.label}
                       </Link>
                     </li>
-                  )
-                })}
+                  ),
+                )}
               </ul>
             </nav>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div
-          className="mt-14 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4"
-          style={{
-            borderTop: '1px solid',
-            borderImage:
-              'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.12), transparent) 1',
-          }}
-        >
-          <div className="flex items-center gap-2">
+        {/* Bottom bar: marca + año + stack */}
+        <div className="divider-theme mt-14" aria-hidden="true" />
+        <div className="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
+          <div className="flex items-center gap-2.5">
             <ApexLogoMark />
-            <span className="font-bold text-[var(--color-on-surface)] glow-text">APEX</span>
+            <div className="flex flex-col">
+              <span className="font-heading font-extrabold leading-tight text-[var(--color-on-surface)] glow-text">
+                APEX
+              </span>
+              <span className="text-[11px] leading-tight text-[var(--color-on-surface-variant)]">
+                Web y apps a medida — Buenos Aires
+              </span>
+            </div>
           </div>
           <p className="text-xs text-[var(--color-on-surface-variant)] opacity-60">
             &copy; {new Date().getFullYear()} Manuel Navarro. Todos los derechos reservados.

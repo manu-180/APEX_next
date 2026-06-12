@@ -1,151 +1,210 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
-import { useTheme } from '@/components/providers/theme-mode-provider'
-import { SectionReveal } from '@/components/ui/section-reveal'
-import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRightIcon, CheckIcon, StarIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { whatsappUrl } from '@/lib/whatsapp'
 import { ROUTES } from '@/lib/constants'
+import { REVIEWS } from '@/lib/data/reviews'
 import { cn } from '@/lib/utils/cn'
-import { WA_MSG_GENERIC, whatsappUrl } from '@/lib/whatsapp'
+
+/**
+ * Sección 05 — CTA final de la home, estilo /gracias (blueprint del addendum):
+ * UNA acción dominante (WhatsApp sólido verde), de-riskers reales al lado y
+ * una review real de /contacto como cierre de prueba social.
+ *
+ * Tracking: WhatsAppOutboundLink ya navega vía openWhatsAppWithThankYouPage
+ * (Google Ads + Meta centralizados) — acá NO se agrega tracking manual.
+ */
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+/**
+ * Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2).
+ * AUDIT_ADDENDUM: el CTA de dinero es SIEMPRE sólido verde WhatsApp.
+ */
+const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
+const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+
+const WA_MSG_FINAL =
+  'Hola Manuel, recorrí tu web y quiero arrancar mi proyecto. ¿Coordinamos 15 minutos?'
+
+/** De-riskers — verdades canónicas del AUDIT_ADDENDUM. */
+const DE_RISKERS = [
+  'Boceto gratis en 24-48 h',
+  'Respuesta en menos de 1 hora',
+  'Precio cerrado por escrito',
+]
+
+/** Review real de lib/data/reviews (la misma fuente que /contacto). */
+const FEATURED_REVIEW = REVIEWS.find((r) => r.id === 2) ?? REVIEWS[0]
 
 export function HomeFinalCtaSection() {
   const prefersReducedMotion = useReducedMotion()
-  const { resolvedTheme } = useTheme()
-  const isLight = resolvedTheme === 'light'
-  const ctaTiltSpring = { stiffness: 88, damping: 19, mass: 0.82 }
-  const tiltXTarget = useMotionValue(0)
-  const tiltYTarget = useMotionValue(0)
-  const glareXTarget = useMotionValue(50)
-  const tiltX = useSpring(tiltXTarget, ctaTiltSpring)
-  const tiltY = useSpring(tiltYTarget, ctaTiltSpring)
-  const glareX = useSpring(glareXTarget, ctaTiltSpring)
-
-  const cardShadow = useTransform([tiltX, tiltY], ([rx, ry]) => {
-    const x = rx as number
-    const y = ry as number
-    return isLight
-      ? `0 ${12 + Math.abs(x) * 2}px ${36 + Math.abs(y) * 4}px rgba(15, 23, 42, 0.08), ${y * 1.5}px ${-x * 1.5}px 28px rgba(var(--color-primary-rgb), 0.12)`
-      : `0 ${14 + Math.abs(x) * 3}px ${42 + Math.abs(y) * 5}px rgba(0, 0, 0, 0.55), ${y * 2}px ${-x * 2}px 38px rgba(var(--color-primary-rgb), 0.16)`
-  })
-
-  const glareGradient = useTransform(glareX, (gx) =>
-    isLight
-      ? `linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) ${gx}%, rgba(0,0,0,0.025) ${Math.min(gx + 11, 100)}%, rgba(0,0,0,0) ${Math.min(gx + 24, 100)}%)`
-      : `linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) ${gx}%, rgba(255,255,255,0.06) ${Math.min(gx + 11, 100)}%, rgba(255,255,255,0) ${Math.min(gx + 24, 100)}%)`,
-  )
-
-  const cardShadowStatic = isLight
-    ? '0 12px 36px rgba(15, 23, 42, 0.08), 0 0 28px rgba(var(--color-primary-rgb), 0.12)'
-    : '0 14px 42px rgba(0, 0, 0, 0.55), 0 0 38px rgba(var(--color-primary-rgb), 0.16)'
 
   return (
-    <section className="relative pb-24 md:pb-32">
-      <div className="mx-auto max-w-6xl px-6">
-        <SectionReveal>
-          <div style={{ perspective: 1000 }}>
-            <motion.div
-              className="relative overflow-hidden rounded-3xl border p-7 sm:p-10"
-              style={{
-                borderColor: 'var(--glass-border)',
-                background:
-                  'linear-gradient(155deg, color-mix(in srgb, var(--color-surface-high) 92%, var(--color-primary) 8%) 0%, var(--color-surface-base) 100%)',
-                ...(prefersReducedMotion
-                  ? {
-                      transform: 'none',
-                      boxShadow: cardShadowStatic,
-                    }
-                  : {
-                      rotateX: tiltX,
-                      rotateY: tiltY,
-                      translateZ: 0,
-                      boxShadow: cardShadow,
-                      transformStyle: 'preserve-3d',
-                    }),
-              }}
-              onMouseMove={(e) => {
-                if (prefersReducedMotion) return
-                const rect = e.currentTarget.getBoundingClientRect()
-                const relX = ((e.clientX - rect.left) / rect.width) * 2 - 1
-                const relY = ((e.clientY - rect.top) / rect.height) * 2 - 1
-                const maxTilt = 6
-                tiltXTarget.set(relY * -maxTilt)
-                tiltYTarget.set(relX * maxTilt)
-                glareXTarget.set(((e.clientX - rect.left) / rect.width) * 100)
-              }}
-              onMouseLeave={() => {
-                tiltXTarget.set(0)
-                tiltYTarget.set(0)
-                glareXTarget.set(50)
-              }}
+    <section className="relative overflow-hidden pb-28 pt-24 md:pb-36 md:pt-32">
+      <div
+        className="absolute left-0 right-0 top-0 h-px"
+        style={{
+          background:
+            'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.12), transparent)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Numeración editorial — cierra la serie 01-05 por el borde derecho */}
+      <span
+        aria-hidden="true"
+        className="section-number absolute -right-4 top-10 hidden lg:block"
+        style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
+      >
+        05
+      </span>
+
+      {/* Glow de cierre, sutil, del tema */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 55% 50% at 18% 70%, rgba(var(--color-primary-rgb), 0.08), transparent 70%)',
+        }}
+      />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
+          {/* ── Acción ────────────────────────────────────────────── */}
+          <motion.div
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+            whileInView={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } }
+            }
+            viewport={{ once: true, amount: 0.3 }}
+            className="lg:col-span-7"
+          >
+            <p className="editorial-label editorial-label--primary mb-6">Último paso</p>
+
+            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl">
+              <span className="block text-[var(--color-on-surface-variant)]">
+                Arrancá esta semana.
+              </span>
+              <strong className="block text-[var(--color-on-surface)]">
+                Tu web, online en 15 días.
+              </strong>
+            </h2>
+
+            <p className="mt-5 max-w-xl text-pretty leading-relaxed text-[var(--color-on-surface-variant)]">
+              Me escribís, charlamos 15 minutos sobre tu negocio y en 24-48 h ves un boceto
+              gratis de tu web. Recién ahí decidís — con alcance, fecha y precio por escrito.
+            </p>
+
+            {/* De-riskers */}
+            <ul className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2.5">
+              {DE_RISKERS.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-2 text-sm text-[var(--color-on-surface-variant)]"
+                >
+                  <CheckIcon
+                    className="size-3.5 shrink-0"
+                    style={{ color: 'var(--color-primary)' }}
+                    aria-hidden
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA dominante — único botón de la sección */}
+            <div className="mt-9">
+              <WhatsAppOutboundLink
+                waHref={whatsappUrl(WA_MSG_FINAL)}
+                data-hover
+                data-inspector-title="CTA final WhatsApp"
+                data-inspector-desc="Acción dominante de cierre de la home. Abre WhatsApp con mensaje contextual y navega a /gracias; tracking centralizado."
+                data-inspector-cat="Conversión"
+                className={cn(
+                  'btn-tech inline-flex w-full items-center justify-center gap-2.5 rounded-xl font-bold select-none sm:w-auto',
+                  'h-14 px-8 text-base text-white',
+                  'transition-all duration-200 ease-out hover:brightness-110 hover:scale-[1.02] active:scale-[0.97]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                )}
+                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+              >
+                <WhatsAppIcon className="size-5" />
+                Empezar mi proyecto por WhatsApp
+              </WhatsAppOutboundLink>
+
+              <p className="mt-4 text-xs text-[var(--color-on-surface-variant)] opacity-80">
+                Te respondo yo, en menos de 1 hora. ¿Preferís agendar?{' '}
+                <Link
+                  href={ROUTES.contact}
+                  className="group inline-flex items-center gap-1 font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
+                >
+                  Reunión de 15 minutos, gratis
+                  <ArrowRightIcon
+                    className="size-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </Link>
+              </p>
+            </div>
+          </motion.div>
+
+          {/* ── Prueba social de cierre: review real ──────────────── */}
+          <motion.figure
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+            whileInView={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT, delay: 0.12 } }
+            }
+            viewport={{ once: true, amount: 0.3 }}
+            className="bento-surface relative p-6 sm:p-7 lg:col-span-4 lg:col-start-9"
+          >
+            <div
+              className="flex items-center gap-1"
+              role="img"
+              aria-label={`${FEATURED_REVIEW.rating} de 5 estrellas`}
             >
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-[inherit]"
-                style={{
-                  background: prefersReducedMotion
-                    ? isLight
-                      ? 'linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.025) 61%, rgba(0,0,0,0) 74%)'
-                      : 'linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.06) 61%, rgba(255,255,255,0) 74%)'
-                    : glareGradient,
-                  opacity: prefersReducedMotion ? (isLight ? 0.45 : 0.35) : isLight ? 0.55 : 0.7,
-                  transition: 'opacity 260ms ease',
-                }}
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -left-20 bottom-0 h-48 w-48 rounded-full opacity-45 blur-3xl"
-                style={{ background: 'rgba(var(--color-primary-rgb), 0.2)' }}
-              />
+              {Array.from({ length: 5 }).map((_, i) => (
+                <StarIcon
+                  key={i}
+                  filled={i < FEATURED_REVIEW.rating}
+                  className="size-3.5 text-[var(--color-primary)]"
+                />
+              ))}
+            </div>
 
-              <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-                <div>
-                  <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]">
-                    ¿Listo para arrancar?
-                  </p>
-                  <h2 className="font-heading text-balance text-3xl font-light leading-tight text-[var(--color-on-surface-variant)] sm:text-4xl md:text-5xl">
-                    Arrancá esta semana.
-                    <span className="block font-extrabold text-[var(--color-on-surface)]">Tu web lista en 15 días.</span>
-                  </h2>
-                  <p className="mt-4 max-w-2xl text-pretty text-[var(--color-on-surface-variant)]">
-                    Una charla corta para entender tu idea. Una propuesta con alcance, fecha y precio cerrado.
-                    Sin vueltas, sin sorpresas.
-                  </p>
-                </div>
+            <blockquote className="mt-4 text-pretty text-sm leading-relaxed text-[var(--color-on-surface)]">
+              “{FEATURED_REVIEW.text}”
+            </blockquote>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-stretch">
-                  <Link
-                    href={ROUTES.contact}
-                    className={cn(
-                      'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                      'transition-all duration-200 ease-out',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                      'btn-tech btn-primary-tech active:scale-[0.97]',
-                      'h-12 px-7 text-sm rounded-xl',
-                    )}
-                  >
-                    Agendar una llamada
-                    <ArrowRightIcon className="size-4" />
-                  </Link>
-                  <WhatsAppOutboundLink
-                    waHref={whatsappUrl(WA_MSG_GENERIC)}
-                    className={cn(
-                      'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                      'transition-all duration-200 ease-out',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                      'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
-                      'h-12 px-7 text-sm rounded-xl',
-                    )}
-                  >
-                    <WhatsAppIcon className="size-4" />
-                    Escribirme por WhatsApp
-                  </WhatsAppOutboundLink>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </SectionReveal>
+            <figcaption className="mt-4 text-xs text-[var(--color-on-surface-variant)]">
+              <span className="font-semibold text-[var(--color-on-surface)]">
+                {FEATURED_REVIEW.name}
+              </span>
+              {FEATURED_REVIEW.role ? ` · ${FEATURED_REVIEW.role}` : null}
+            </figcaption>
+
+            <div className="divider-theme my-4" aria-hidden="true" />
+
+            <Link
+              href={ROUTES.contact}
+              className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
+            >
+              Ver todas las opiniones
+              <ArrowRightIcon
+                className="size-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </Link>
+          </motion.figure>
+        </div>
       </div>
     </section>
   )

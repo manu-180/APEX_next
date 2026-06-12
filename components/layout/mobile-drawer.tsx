@@ -278,7 +278,7 @@ export function MobileDrawer({
               <WhatsAppOutboundLink
                 waHref={whatsappHref}
                 onClick={() => onClose()}
-                className="btn-tech btn-primary-tech w-full flex items-center justify-center gap-2 text-center"
+                className="btn-wa w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm text-center"
               >
                 Hablemos
               </WhatsAppOutboundLink>

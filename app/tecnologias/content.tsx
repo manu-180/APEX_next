@@ -12,7 +12,6 @@ import {
 import Link from 'next/link'
 import { useTheme } from '@/components/providers/theme-mode-provider'
 import { SectionReveal } from '@/components/ui/section-reveal'
-import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CircuitBoardBg } from '@/components/ui/circuit-board-bg'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
@@ -20,13 +19,17 @@ import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-li
 import { ROUTES } from '@/lib/constants'
 import { TECH_STACK } from '@/lib/types/theme'
 import { cn } from '@/lib/utils/cn'
-import { WA_MSG_GENERIC, whatsappUrl } from '@/lib/whatsapp'
+import { whatsappUrl } from '@/lib/whatsapp'
 import { TechCardsSection } from './tech-cards-section'
 
+/** Mensaje prellenado propio de esta página (tracking centralizado en WhatsAppOutboundLink). */
+const WA_MSG_TECNOLOGIAS =
+  'Hola Manuel, vi el stack que usás en tu web y quiero saber si encaja con mi proyecto. ¿Lo charlamos?'
+
 const HERO_STATS = [
-  { value: '5', label: 'herramientas en total' },
-  { value: '8+', label: 'proyectos en producción' },
-  { value: '15d', label: 'de idea a live' },
+  { value: '5', label: 'piezas — cero relleno' },
+  { value: '8+', label: 'productos y sitios en producción' },
+  { value: '15d', label: 'de idea a online' },
 ] as const
 
 export function TecnologiasContent() {
@@ -121,41 +124,22 @@ export function TecnologiasContent() {
               {/* ── Left column ──────────────────────────────────── */}
               <div className="max-w-3xl">
                 {/* Section meta */}
-                <div className="mb-6 flex items-center gap-3">
-                  <span
-                    className="font-mono text-[10px] font-bold tracking-[0.32em] uppercase"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
-                    / Por qué estas herramientas
-                  </span>
-                  <span
-                    aria-hidden
-                    className="h-px flex-1 max-w-[120px]"
-                    style={{
-                      background:
-                        'linear-gradient(to right, rgba(var(--color-primary-rgb), 0.5), transparent)',
-                    }}
-                  />
-                </div>
+                <p className="editorial-label editorial-label--primary mb-7">
+                  Por qué estas herramientas
+                </p>
 
-                <div className="mb-6 flex flex-wrap items-center gap-2">
-                  <Badge variant="primary">Stack 2026</Badge>
-                  <Badge variant="outline">Full-Stack &amp; Mobile</Badge>
-                  <Badge variant="outline">Production-ready</Badge>
-                </div>
-
-                {/* Headline editorial — escala dramática */}
-                <h1 className="font-heading text-balance leading-[0.92] mb-7">
-                  <span className="block text-4xl sm:text-6xl md:text-7xl font-extralight text-[var(--color-on-surface-variant)]">
+                {/* Headline editorial — escala dramática, peso 200/800 */}
+                <h1 className="heading-display text-balance leading-[0.92] mb-7">
+                  <span className="block text-4xl sm:text-6xl md:text-7xl text-[var(--color-on-surface-variant)]">
                     Cada herramienta
                   </span>
-                  <span className="block text-5xl sm:text-7xl md:text-[5.5rem] font-extrabold text-[var(--color-on-surface)] tracking-tight -mt-1">
+                  <strong className="block text-5xl sm:text-7xl md:text-[5.5rem] text-[var(--color-on-surface)] tracking-tight -mt-1">
                     es una decisión.
-                  </span>
-                  <span className="block text-4xl sm:text-6xl md:text-7xl font-extralight italic glow-text mt-2"
+                  </strong>
+                  <span className="block text-4xl sm:text-6xl md:text-7xl italic glow-text mt-2"
                     style={{ color: 'var(--color-primary)' }}
                   >
-                    no un capricho.
+                    No un capricho.
                   </span>
                 </h1>
 
@@ -240,7 +224,7 @@ export function TecnologiasContent() {
               <motion.div
                 data-hover
                 data-inspector-title="CTA final — tarjeta con inclinación 3D"
-                data-inspector-desc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y con resortes de Framer Motion (vuelta al neutro fluida); la sombra y el glare siguen esos valores. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; los botones usan los mismos estilos `btn-tech` que en el resto del sitio (primario + contorno WhatsApp)."
+                data-inspector-desc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y con resortes de Framer Motion (vuelta al neutro fluida); la sombra y el glare siguen esos valores. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; el botón de WhatsApp es el sólido verde oficial (el CTA de dinero de todo el sitio) y el secundario es contorno con el primario del tema."
                 data-inspector-cat="Física · 3D"
                 className="relative overflow-hidden rounded-3xl border p-7 sm:p-10"
                 style={{
@@ -296,34 +280,38 @@ export function TecnologiasContent() {
                 />
                 <div className="relative grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
                   <div>
-                    <Badge variant="outline" className="mb-3">
-                      Siguiente paso
-                    </Badge>
-                    <h2 className="font-heading text-balance text-2xl font-bold text-[var(--color-on-surface)] sm:text-3xl md:text-4xl">
-                      Llevemos este stack a tu proyecto.
+                    <p className="editorial-label editorial-label--primary mb-5">Siguiente paso</p>
+                    <h2 className="heading-display text-balance text-2xl sm:text-3xl md:text-4xl">
+                      <span className="block text-[var(--color-on-surface-variant)]">Este stack,</span>
+                      <strong className="block text-[var(--color-on-surface)]">aplicado a tu negocio.</strong>
                     </h2>
                     <p className="mt-3 max-w-2xl text-pretty text-[var(--color-on-surface-variant)]">
-                      Ya viste cómo funciona en la práctica. Si tenés una idea — web, app o los dos —
-                      coordinamos una llamada y te propongo arquitectura, plazos y presupuesto sin rodeos.
+                      Contame qué necesitás — web, app o los dos — y te digo qué piezas lleva,
+                      en cuánto tiempo y a qué precio. Sin vueltas.
                     </p>
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-stretch">
-                    <Link
-                      href={ROUTES.contact}
-                      className={cn(
-                        'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                        'transition-all duration-200 ease-out',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                        'btn-tech btn-primary-tech active:scale-[0.97]',
-                        'h-12 px-7 text-sm rounded-xl',
-                      )}
-                    >
-                      Empezar mi proyecto
-                      <ArrowRightIcon className="size-4" />
-                    </Link>
+                    {/* CTA de dinero: sólido verde WhatsApp (jerarquía del addendum).
+                        #25D366/#128C7E = única excepción de hex (elemento WhatsApp). */}
                     <WhatsAppOutboundLink
-                      waHref={whatsappUrl(WA_MSG_GENERIC)}
+                      waHref={whatsappUrl(WA_MSG_TECNOLOGIAS)}
+                      className={cn(
+                        'inline-flex items-center justify-center gap-2.5 rounded-xl font-bold text-white select-none',
+                        'transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                        'h-12 px-7 text-sm',
+                      )}
+                      style={{
+                        background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                        boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)',
+                      }}
+                    >
+                      <WhatsAppIcon className="size-4" />
+                      Escribime por WhatsApp
+                    </WhatsAppOutboundLink>
+                    <Link
+                      href={ROUTES.servicios}
                       className={cn(
                         'inline-flex items-center justify-center gap-2 font-semibold select-none',
                         'transition-all duration-200 ease-out',
@@ -332,9 +320,12 @@ export function TecnologiasContent() {
                         'h-12 px-7 text-sm rounded-xl',
                       )}
                     >
-                      <WhatsAppIcon className="size-4" />
-                      Escribirme por WhatsApp
-                    </WhatsAppOutboundLink>
+                      Ver planes y precios
+                      <ArrowRightIcon className="size-4" />
+                    </Link>
+                    <p className="text-xs text-[var(--color-on-surface-variant)] opacity-80 sm:ml-1 lg:ml-0 lg:text-center">
+                      Te respondo en menos de 1 hora.
+                    </p>
                   </div>
                 </div>
               </motion.div>

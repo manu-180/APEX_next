@@ -25,10 +25,12 @@ const HomeFinalCtaSection = dynamic(
 )
 
 export function HomeBelowFold() {
+  // Orden objetivo (DESIGN_BRIEF §3): prueba social inmediata (01) →
+  // problema/solución/proceso (02-03) → founder (04) → CTA final (05).
   return (
     <>
-      <ClientBenefitsSection />
       <TrustedClientsSection />
+      <ClientBenefitsSection />
       <FounderSection />
       <HomeFinalCtaSection />
     </>

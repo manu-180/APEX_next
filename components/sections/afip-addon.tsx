@@ -2,10 +2,16 @@
 
 import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
-import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
+import { CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
+
+/**
+ * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
+ * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
+ */
+const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
+const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
 
 /**
  * Sección addon "+ Integración Fiscal AFIP/ARCA".
@@ -54,17 +60,22 @@ export function AfipAddonSection() {
 
           <div className="relative grid gap-8 p-8 sm:p-10 md:grid-cols-[1fr_auto] md:items-center">
             <div className="max-w-2xl">
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge variant="primary">Addon</Badge>
-                <Badge variant="outline">Argentina-only</Badge>
-                <Badge variant="outline">+$200k-$400k ARS</Badge>
+              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <p className="editorial-label editorial-label--primary">Addon · Solo Argentina</p>
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold tabular-nums text-[var(--color-primary)]"
+                  style={{
+                    background: 'rgba(var(--color-primary-rgb), 0.1)',
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.3)',
+                  }}
+                >
+                  +$200K-$400K ARS según complejidad
+                </span>
               </div>
 
-              <h2 className="font-heading text-balance text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)] mb-3">
-                <span className="font-extralight text-[var(--color-on-surface-variant)]">
-                  Integración fiscal
-                </span>{' '}
-                AFIP / ARCA
+              <h2 className="heading-display text-balance text-2xl sm:text-3xl md:text-4xl mb-3">
+                <span className="text-[var(--color-on-surface-variant)]">Integración fiscal</span>{' '}
+                <strong className="text-[var(--color-on-surface)]">AFIP / ARCA</strong>
               </h2>
 
               <p className="text-pretty text-[var(--color-on-surface-variant)] leading-relaxed mb-5">
@@ -100,10 +111,11 @@ export function AfipAddonSection() {
               <button
                 type="button"
                 onClick={handleCtaClick}
-                className="btn-tech btn-primary-tech inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-xl"
+                className="btn-tech inline-flex items-center gap-2.5 rounded-xl px-6 py-3 text-sm font-semibold text-white select-none transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
               >
+                <WhatsAppIcon className="size-4" />
                 Ver si aplica a mi caso
-                <ArrowRightIcon className="size-3.5" />
               </button>
             </div>
 

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import {
   CheckIcon,
   ArrowRightIcon,
+  WhatsAppIcon,
   BotLodeIcon,
   AssistifyIcon,
   ContactEngineIcon,
@@ -69,13 +70,27 @@ function ServiciosTabQuerySync({ onSelectMobile }: { onSelectMobile: () => void 
   return null
 }
 
-const PLAN_DELIVERY: Record<string, string> = {
-  web_basic:       'Entregada en 15 días · Boceto gratis + 3 cuotas sin interés',
-  web_interactive: 'Entregada en 15 días · Boceto gratis + 3 cuotas sin interés',
-  web_premium:     'Entregada en 15 días · Boceto gratis + 3 cuotas sin interés',
-  app_mvp:         'Fee mensual desde el día 1 · Sin contrato de permanencia',
-  app_pro:         'Fee mensual · Panel admin incluido · Sin contrato de permanencia',
-  app_platform:    'Propuesta personalizada · Fee mensual + implementación',
+/**
+ * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
+ * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
+ */
+const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
+const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+
+/**
+ * Tier ancla por pestaña (AUDIT_ADDENDUM: UN solo badge de ancla — «Más elegido»
+ * en Web Interactiva). El anclaje visual del tab de apps cae en el tier del medio.
+ */
+const ANCHOR_PLAN_IDS = new Set<string>(['web_interactive', 'app_pro'])
+
+/** De-riskers VISIBLES por plan — boceto gratis y cuotas dejan de ser letra chica. */
+const PLAN_DERISKERS: Record<string, string[]> = {
+  web_basic:       ['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'],
+  web_interactive: ['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'],
+  web_premium:     ['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'],
+  app_mvp:         ['Sin contrato de permanencia', 'Mejoras todos los meses'],
+  app_pro:         ['Sin contrato de permanencia', 'Panel admin incluido'],
+  app_platform:    ['Propuesta a medida', 'Modelo partner técnico'],
 }
 
 export function ServiciosContent() {
@@ -183,17 +198,25 @@ export function ServiciosContent() {
       <section id="pricing" className="py-16 pb-24">
         <div className="mx-auto max-w-6xl px-6">
           <SectionReveal>
-            <div className="mb-12">
-              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[var(--color-primary)] mb-3">
-                Precios transparentes
-              </p>
-              <h2 className="font-heading text-balance leading-tight mb-3">
-                <span className="block text-2xl sm:text-3xl md:text-4xl font-extralight text-[var(--color-on-surface-variant)]">Encontrá el plan</span>
-                <span className="block text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)]">que hace crecer tu negocio</span>
-              </h2>
-              <p className="text-pretty text-sm text-[var(--color-on-surface-variant)] max-w-md">
-                Precios en ARS, pactados antes de arrancar. Sin sorpresas ni letra chica. Para emprendedores y pymes de todo el país.
-              </p>
+            <div className="mb-12 flex items-end justify-between gap-6">
+              <div>
+                <p className="editorial-label editorial-label--primary mb-4">Precios transparentes</p>
+                <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl mb-3">
+                  <span className="block text-[var(--color-on-surface-variant)]">Encontrá el plan</span>
+                  <strong className="block text-[var(--color-on-surface)]">que hace crecer tu negocio.</strong>
+                </h2>
+                <p className="text-pretty text-sm text-[var(--color-on-surface-variant)] max-w-md">
+                  Precios en ARS, pactados por escrito antes de arrancar. Primero ves un boceto
+                  gratis de tu proyecto — si no te convence, no pagás nada.
+                </p>
+              </div>
+              <span
+                aria-hidden="true"
+                className="section-number hidden md:block"
+                style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}
+              >
+                02
+              </span>
             </div>
           </SectionReveal>
           <div ref={tabStickySentinelRef} aria-hidden className="h-px w-full" />
@@ -261,14 +284,14 @@ export function ServiciosContent() {
               {plans.map((plan, i) => (
                 <div
                   key={plan.id}
-                  className={plan.isFeatured ? 'md:-mt-4 md:mb-4' : ''}
+                  className={ANCHOR_PLAN_IDS.has(plan.id) ? 'md:-mt-4 md:mb-4' : ''}
                 >
                   <UnifiedPricingCard
                     plan={plan}
                     index={i}
                     onOpenDrawer={() => setOpenPlanDrawerId(plan.id)}
                     isDrawerOpen={openPlanDrawerId === plan.id}
-                    deliveryInfo={PLAN_DELIVERY[plan.id]}
+                    deriskers={PLAN_DERISKERS[plan.id]}
                   />
                 </div>
               ))}
@@ -349,12 +372,8 @@ function getServiceDrawerPlanType(plan: PricingPlan): ServiceDrawerPlanType {
 }
 
 function getServiceDrawerContentProps(plan: PricingPlan): ServiceDrawerContentProps {
-  const originalPrice = plan.originalPrice ? formatARS(plan.originalPrice) : undefined
-  const discount =
-    plan.originalPrice && plan.price !== null
-      ? `-${Math.round((1 - plan.price / plan.originalPrice) * 100)}%`
-      : undefined
-
+  // Sin precios tachados ni "-XX%" (AUDIT_ADDENDUM): el precio es el precio.
+  // El valor se ancla con entregables + boceto gratis + 3 cuotas sin interés.
   return {
     planName: plan.name,
     planType: getServiceDrawerPlanType(plan),
@@ -362,8 +381,6 @@ function getServiceDrawerContentProps(plan: PricingPlan): ServiceDrawerContentPr
       plan.price !== null
         ? `${formatARS(plan.price)}${plan.billing === 'month' ? ' /mes' : ''}`
         : 'A consultar',
-    originalPrice,
-    discount,
     idealFor: plan.idealFor.join(' · '),
     benefits: plan.gains.map((gain) => ({
       number: gain.num,
@@ -411,33 +428,31 @@ function UnifiedPricingCard({
   index,
   onOpenDrawer,
   isDrawerOpen,
-  deliveryInfo,
+  deriskers,
 }: {
   plan: PricingPlan
   index: number
   onOpenDrawer: () => void
   isDrawerOpen: boolean
-  deliveryInfo?: string
+  deriskers?: string[]
 }) {
-  const discount = plan.originalPrice
-    ? Math.round((1 - plan.price! / plan.originalPrice) * 100)
-    : 0
-  const visibleFeatures = plan.features.slice(0, 5)
+  const isAnchor = ANCHOR_PLAN_IDS.has(plan.id)
 
   return (
     <SectionReveal delay={index * 0.1} className="h-full">
       <div
         className={cn(
           'relative h-full overflow-hidden rounded-2xl transition-all duration-300',
-          plan.isFeatured
+          isAnchor
             ? 'border border-[rgba(var(--color-primary-rgb),0.6)] shadow-[0_0_60px_rgba(var(--color-primary-rgb),0.18),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]'
             : 'glass-card border border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.2)]',
         )}
-        style={plan.isFeatured ? { background: 'var(--color-surface-high, rgba(255,255,255,0.04))' } : undefined}
+        style={isAnchor ? { background: 'var(--color-surface-high, rgba(255,255,255,0.04))' } : undefined}
       >
-        {/* Featured: radial glow background */}
-        {plan.isFeatured && (
+        {/* Ancla: radial glow background */}
+        {isAnchor && (
           <div
+            aria-hidden
             className="pointer-events-none absolute inset-0"
             style={{
               background: 'radial-gradient(ellipse 100% 60% at 50% 0%, rgba(var(--color-primary-rgb), 0.1) 0%, transparent 70%)',
@@ -447,18 +462,20 @@ function UnifiedPricingCard({
 
         {/* Top accent line */}
         <div
+          aria-hidden
           className="absolute top-0 inset-x-0 h-[2px] pointer-events-none"
           style={{
-            background: plan.isFeatured
+            background: isAnchor
               ? 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 1) 50%, transparent)'
               : 'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.5) 50%, transparent)',
           }}
         />
 
         <div className="relative z-10 flex h-full flex-col p-6 md:p-7">
-          {/* Badge row */}
+          {/* Badge: UN solo badge de ancla («Más elegido» en Web Interactiva).
+              El resto lleva su categoría discreta en outline. */}
           <div className="mb-5 flex items-center gap-2">
-            {plan.isFeatured ? (
+            {plan.id === 'web_interactive' ? (
               <span
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.18em]"
                 style={{
@@ -468,7 +485,7 @@ function UnifiedPricingCard({
                 }}
               >
                 <span className="size-1.5 rounded-full inline-block animate-pulse" style={{ background: 'var(--color-primary)' }} />
-                Recomendado
+                {plan.badge}
               </span>
             ) : (
               <Badge variant="outline">{plan.badge}</Badge>
@@ -476,24 +493,19 @@ function UnifiedPricingCard({
           </div>
 
           {/* Plan name */}
-          <h3
-            className={cn(
-              'mb-4 text-xl font-bold leading-snug',
-              plan.isFeatured ? 'text-[var(--color-on-surface)]' : 'text-[var(--color-on-surface)]',
-            )}
-          >
+          <h3 className="mb-4 text-xl font-bold leading-snug text-[var(--color-on-surface)]">
             {plan.name}
           </h3>
 
-          {/* Price block */}
-          <div className="mb-5 pb-5" style={{ borderBottom: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
+          {/* Price block — sin tachados ni "-XX%": el precio es el precio */}
+          <div className="mb-4 pb-4" style={{ borderBottom: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
             {plan.price !== null ? (
               <>
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0">
                   <span
                     className={cn(
-                      'text-4xl font-extrabold tracking-tight',
-                      plan.isFeatured ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface)]',
+                      'font-extrabold tracking-tight tabular-nums',
+                      isAnchor ? 'text-[2.75rem] leading-none text-[var(--color-primary)]' : 'text-4xl text-[var(--color-on-surface)]',
                     )}
                   >
                     {formatARS(plan.price)}
@@ -502,19 +514,11 @@ function UnifiedPricingCard({
                     <span className="text-base font-semibold text-[var(--color-on-surface-variant)]">/mes</span>
                   )}
                 </div>
-                {plan.originalPrice && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm text-[var(--color-on-surface-variant)] line-through opacity-60">
-                      {formatARS(plan.originalPrice)}
-                    </span>
-                    <Badge variant="primary" className="text-[10px]">-{discount}%</Badge>
-                  </div>
-                )}
-                {plan.billing === 'month' && (
-                  <p className="mt-1.5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
-                    Retainer mensual · IVA aparte según facturación
-                  </p>
-                )}
+                <p className="mt-1.5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
+                  {plan.billing === 'month'
+                    ? 'Fee mensual: desarrollo activo, soporte y mejoras · IVA aparte'
+                    : 'Precio final en ARS, pactado por escrito'}
+                </p>
               </>
             ) : (
               <div>
@@ -526,26 +530,39 @@ function UnifiedPricingCard({
             )}
           </div>
 
-          {/* Headline + description */}
+          {/* De-riskers visibles (boceto gratis / cuotas / entrega) */}
+          {deriskers && deriskers.length > 0 && (
+            <ul className="mb-4 flex flex-wrap gap-1.5">
+              {deriskers.map((d) => (
+                <li
+                  key={d}
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-[var(--color-on-surface)]"
+                  style={{
+                    background: 'rgba(var(--color-primary-rgb), 0.08)',
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.22)',
+                  }}
+                >
+                  <CheckIcon className="size-3 shrink-0 text-[var(--color-primary)]" />
+                  {d}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Headline + description — el texto fluye completo (sin ellipsis en mobile) */}
           <p className="mb-2 text-sm font-bold leading-snug text-[var(--color-on-surface)]">
             {plan.frontHeadline}
           </p>
-          <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-[var(--color-on-surface-variant)] opacity-75">
+          <p className="mb-5 text-sm leading-relaxed text-[var(--color-on-surface-variant)] opacity-80">
             {plan.description}
           </p>
 
-          {deliveryInfo && (
-            <p
-              className="mb-4 text-xs font-semibold"
-              style={{ color: 'rgba(var(--color-primary-rgb), 0.85)' }}
-            >
-              {deliveryInfo}
-            </p>
-          )}
-
-          {/* Features list */}
+          {/* Entregables concretos */}
+          <p className="mb-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-on-surface-variant)] opacity-60">
+            Qué incluye
+          </p>
           <ul className="mb-6 flex-1 space-y-2.5">
-            {visibleFeatures.map((f) => (
+            {plan.features.map((f) => (
               <li key={f} className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface-variant)]">
                 <span
                   className="mt-0.5 size-4 flex-shrink-0 rounded-full inline-flex items-center justify-center"
@@ -558,39 +575,31 @@ function UnifiedPricingCard({
             ))}
           </ul>
 
-          {/* Actions */}
+          {/* Actions — CTA de dinero SIEMPRE sólido verde WhatsApp; detalle en ghost */}
           <div className="space-y-2.5">
+            <WhatsAppOutboundLink
+              waHref={whatsappUrl(waMsgPlan(plan.name))}
+              className={cn(
+                'btn-tech inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-semibold text-white select-none',
+                'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              )}
+              style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+            >
+              <WhatsAppIcon className="size-4" />
+              {plan.price === null ? 'Consultar por WhatsApp' : 'Empezar proyecto'}
+            </WhatsAppOutboundLink>
+
             <button
               type="button"
               onClick={onOpenDrawer}
               aria-expanded={isDrawerOpen}
               aria-controls={`service-plan-drawer-${plan.id}`}
-              className="inline-flex h-11 w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-all duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.06)] active:scale-[0.99]"
-              style={{
-                borderColor: 'rgba(var(--color-primary-rgb), 0.2)',
-                color: 'var(--color-on-surface-variant)',
-              }}
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent px-4 text-sm font-medium text-[var(--color-on-surface-variant)] transition-all duration-200 hover:border-[rgba(var(--color-primary-rgb),0.25)] hover:text-[var(--color-primary)] active:scale-[0.99]"
             >
-              <span className="text-sm font-medium">Ver detalle completo</span>
+              Ver detalle completo
               <ArrowRightIcon className="size-4 opacity-60" />
             </button>
-
-            <WhatsAppOutboundLink
-              waHref={whatsappUrl(waMsgPlan(plan.name))}
-              className={cn(
-                'inline-flex w-full items-center justify-center gap-2 font-semibold',
-                'transition-all duration-300 ease-out',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                'btn-tech',
-                plan.isFeatured
-                  ? 'btn-primary-tech active:scale-[0.97]'
-                  : 'btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
-                'h-11 px-6 text-sm rounded-xl',
-              )}
-            >
-              Empezar proyecto
-              <ArrowRightIcon className="size-4" />
-            </WhatsAppOutboundLink>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
-import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon } from '@/components/ui/icons'
+import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 import { MobileDrawer } from '@/components/layout/mobile-drawer'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
@@ -100,7 +100,9 @@ export function Navbar({
       <div
         className="w-full pt-[env(safe-area-inset-top,0px)]"
         style={{
-          backgroundColor: 'var(--color-surface-low)',
+          backgroundColor: 'var(--nav-bg)',
+          backdropFilter: 'blur(16px) saturate(140%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(140%)',
           borderBottom: '1px solid var(--glass-border)',
         }}
       >
@@ -221,11 +223,12 @@ export function Navbar({
             className={cn(
               'hidden md:inline-flex items-center justify-center gap-2 font-semibold',
               'transition-all duration-200 ease-out',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-              'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              'btn-wa active:scale-[0.97]',
               'h-9 px-4 text-sm rounded-xl'
             )}
           >
+            <WhatsAppIcon className="size-4" />
             Hablemos
           </WhatsAppOutboundLink>
 

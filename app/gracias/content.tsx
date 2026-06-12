@@ -6,7 +6,9 @@ import { motion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
 
-const FALLBACK_WA = `https://wa.me/${WHATSAPP_NUMBER}`
+const FALLBACK_WA = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  'Hola Manuel, quiero arrancar mi proyecto. ¿Lo charlamos?'
+)}`
 
 declare global {
   interface Window {
@@ -111,7 +113,9 @@ export function GraciasContent() {
           transition={{ delay: 0.3 }}
           className="mx-auto mt-3 max-w-md text-base leading-relaxed text-[var(--color-on-surface-variant)]"
         >
-          WhatsApp ya debería estar abierto. Si no, usá el botón de abajo.
+          {waParam
+            ? 'WhatsApp ya debería estar abierto. Si no, usá el botón de abajo.'
+            : 'Tocá el botón y seguimos por WhatsApp.'}
         </motion.p>
 
         {/* Separador */}

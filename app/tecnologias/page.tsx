@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { TecnologiasContent } from './content'
 
 export const metadata: Metadata = {
-  title: 'Stack tecnológico | Flutter, Next.js y Supabase | Manuel Navarro',
+  title: 'Stack tecnológico | Flutter, Next.js y Supabase',
   description:
     'Flutter, Next.js, Supabase, Riverpod y TypeScript: el stack que elijo para apps móviles y webs rápidas en Argentina. Cada tecnología tiene una razón de ser.',
   keywords: [

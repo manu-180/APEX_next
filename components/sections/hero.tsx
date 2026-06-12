@@ -4,13 +4,11 @@ import dynamic from 'next/dynamic'
 import { useRef, useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { MousePosition } from '@/components/ui/particle-field'
-import { TextReveal } from '@/components/ui/text-reveal'
 import { GridBackground } from '@/components/ui/grid-background'
-import { Badge } from '@/components/ui/badge'
-import { ArrowRightIcon } from '@/components/ui/icons'
+import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
-import { ROUTES } from '@/lib/constants'
-import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
+import { ROUTES, PROJECTS } from '@/lib/constants'
+import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { trackGoogleAdsHeroCtaClick } from '@/lib/analytics/google-ads'
 import { getAvailabilityText } from '@/lib/data/availability'
@@ -21,7 +19,32 @@ const ParticleField = dynamic(
   { ssr: false },
 )
 
+/**
+ * Mensaje de WhatsApp contextual del hero (brief §1.2 y §5):
+ * específico, voseo, 1-2 líneas, sin emojis, termina con pregunta.
+ */
+const WA_MSG_HERO =
+  'Hola Manuel, tengo un negocio y quiero una web que venda. ¿Arrancamos con el boceto gratis?'
+
+/**
+ * Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2).
+ * AUDIT_ADDENDUM: el CTA de dinero es SIEMPRE sólido verde WhatsApp, como /gracias.
+ */
+const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
+const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+
 /* ── Micro-icons for feature tags ── */
+function SketchIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="size-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="12" height="12" rx="1.5" />
+      <path d="M2 6h12" />
+      <path d="M5 9.5h4" />
+      <path d="M5 12h6" />
+    </svg>
+  )
+}
+
 function TimerIcon() {
   return (
     <svg viewBox="0 0 16 16" className="size-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -42,16 +65,13 @@ function PriceTagIcon() {
   )
 }
 
-function DiamondIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M2 6.5l6-4.5 6 4.5L8 14 2 6.5Z" />
-      <path d="M2 6.5h12" />
-    </svg>
-  )
-}
-
 const FEATURES = [
+  {
+    icon: <SketchIcon />,
+    tag: 'BOCETO',
+    value: 'Gratis en 24-48 h',
+    desc: 'Ves cómo queda tu web antes de pagar un peso. Si no te gusta, no pagás.',
+  },
   {
     icon: <TimerIcon />,
     tag: 'PLAZO',
@@ -62,14 +82,22 @@ const FEATURES = [
     icon: <PriceTagIcon />,
     tag: 'PRECIO',
     value: 'Desde ARS 300k',
-    desc: 'Precio cerrado desde el inicio. Lo que cotizamos, pagás.',
+    desc: 'Precio cerrado por escrito desde el inicio, en 3 cuotas sin interés.',
   },
-  {
-    icon: <DiamondIcon />,
-    tag: 'DISEÑO',
-    value: 'A medida, siempre',
-    desc: 'Sin templates ni atajos. Todo pensado para tu marca.',
-  },
+]
+
+/** Strip de confianza — solo datos reales y verificables (brief §5). */
+const TRUST_ITEMS = [
+  'Respuesta en menos de 1 hora',
+  'Boceto gratis en 24-48 h',
+  'Productos propios en producción',
+]
+
+/** Productos propios online — prueba verificable, no claims. */
+const LIVE_PRODUCTS = [
+  { name: 'BotLode', url: PROJECTS.botlode },
+  { name: 'Botrive', url: PROJECTS.botrive },
+  { name: 'Assistify', url: PROJECTS.assistify },
 ]
 
 function FeatureCard({ f }: { f: (typeof FEATURES)[number] }) {
@@ -166,8 +194,10 @@ export function HeroSection() {
   }, [])
 
   const handleCTAClick = useCallback(() => {
+    // Conversión propia del hero (label distinto al de WhatsApp). El tracking
+    // de WhatsApp + Meta vive centralizado en openWhatsAppWithThankYouPage.
     trackGoogleAdsHeroCtaClick()
-    openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_NAV), router)
+    openWhatsAppWithThankYouPage(whatsappUrl(WA_MSG_HERO), router)
   }, [router])
 
   useEffect(() => {
@@ -246,57 +276,58 @@ export function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-16 items-center">
           {/* ── Left column ─────────────────────────────────────────── */}
           <div className="apex-hero-col-left w-full min-w-0 max-w-none lg:max-w-xl">
-            <div className="mb-8 flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 glass-card glow-border">
-                <span
-                  className="size-2 rounded-full animate-pulse"
-                  style={{ backgroundColor: 'var(--color-online)', boxShadow: '0 0 8px var(--color-online)' }}
-                />
-                <span className="text-xs font-medium text-[var(--color-on-surface-variant)]">
-                  {/* Scarcity real: el texto sale de CURRENT_AVAILABILITY (lib/data/availability) */}
-                  {getAvailabilityText().text}
-                </span>
-              </div>
-              <Badge variant="outline" className="rounded-full px-4 py-1.5 text-xs font-semibold">
-                Diseño premium
-              </Badge>
-            </div>
+            {/* Eyebrow editorial con disponibilidad real (lib/data/availability) */}
+            <p className="editorial-label editorial-label--primary mb-8">
+              <span
+                className="size-2 rounded-full animate-pulse"
+                style={{ backgroundColor: 'var(--color-online)', boxShadow: '0 0 8px var(--color-online)' }}
+                aria-hidden="true"
+              />
+              {getAvailabilityText().text}
+            </p>
 
-            <h1 className="font-heading text-balance leading-tight mb-6">
-              <span className="block text-3xl sm:text-4xl md:text-5xl font-light text-[var(--color-on-surface-variant)]">
-                <TextReveal text="Tu negocio" delay={0.1} />
-              </span>
-              <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--color-on-surface)]">
-                <TextReveal text="online en 15 días," delay={0.18} />
-              </span>
-              <span className="block text-3xl sm:text-4xl md:text-5xl font-extrabold text-gradient-primary pb-1">
-                <TextReveal text="listo para vender." delay={0.26} />
-              </span>
+            <h1 className="heading-display text-balance mb-6 text-4xl sm:text-5xl md:text-[3.4rem]">
+              <span className="block text-[var(--color-on-surface-variant)]">Tu negocio</span>
+              <strong className="block text-[var(--color-on-surface)]">online y vendiendo</strong>
+              <strong
+                className="block bg-clip-text text-transparent pb-1"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(95deg, var(--color-on-surface) 35%, var(--color-primary) 105%)',
+                }}
+              >
+                en 15 días.
+              </strong>
             </h1>
 
             <p className="text-pretty text-base text-[var(--color-on-surface-variant)] leading-relaxed mb-10">
-              Páginas web y apps móviles para emprendedores y pymes argentinas que quieren vender más.
-              Diseño premium, entrega garantizada en 15 días y precio cerrado desde{' '}
-              <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300k</span>.
+              Webs y apps a medida para pymes y emprendedores argentinos — boceto gratis en
+              24-48 h y precio cerrado desde{' '}
+              <span className="font-semibold text-[var(--color-on-surface)] tabular-nums">ARS 300.000</span>.
             </p>
 
             <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
               <button
                 type="button"
                 onClick={handleCTAClick}
+                data-hover
+                data-inspector-title="CTA primario WhatsApp"
+                data-inspector-desc="Abre WhatsApp con mensaje contextual del hero y navega a /gracias. Riesgo invertido: pide el boceto gratis, no una compra."
+                data-inspector-cat="Conversión"
                 className={cn(
                   'inline-flex w-full shrink-0 items-center justify-center gap-2 font-semibold select-none lg:w-auto',
                   'transition-all duration-200 ease-out',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech btn-primary-tech active:scale-[0.97]',
+                  'btn-tech text-white hover:brightness-110 hover:scale-[1.01] active:scale-[0.97]',
                   'min-h-12 px-7 py-3 text-sm rounded-xl',
                 )}
+                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
               >
+                <WhatsAppIcon className="size-4 shrink-0" />
                 <span className="text-center leading-snug">
-                  Contame tu idea{' '}
-                  <span className="opacity-70 font-normal">(15 min gratis)</span>
+                  Quiero mi boceto gratis{' '}
+                  <span className="opacity-70 font-normal">(24-48 h)</span>
                 </span>
-                <ArrowRightIcon className="size-4 shrink-0" aria-hidden />
               </button>
               <Link href={ROUTES.servicios} className="w-full lg:w-auto" prefetch={false}>
                 <button
@@ -310,13 +341,30 @@ export function HeroSection() {
                   )}
                 >
                   Ver precios
+                  <ArrowRightIcon className="size-4 shrink-0" aria-hidden />
                 </button>
               </Link>
             </div>
 
-            <p className="mt-5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
-              Respuesta en menos de 2 hs · Plazo garantizado o devolvemos · NDA disponible
-            </p>
+            {/* Strip de confianza — datos reales, sin métricas infladas */}
+            <div className="mt-8">
+              <div className="divider-theme mb-4" aria-hidden="true" />
+              <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                {TRUST_ITEMS.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-2 text-xs text-[var(--color-on-surface-variant)]"
+                  >
+                    <span
+                      className="size-1 rounded-full"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                      aria-hidden="true"
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* ── Right column ─────────────────── */}
@@ -325,32 +373,36 @@ export function HeroSection() {
               <FeatureCard key={f.value} f={f} />
             ))}
 
-            <div className="mt-1 grid grid-cols-3 gap-2">
-              {[
-                { value: '+150', label: 'Proyectos' },
-                { value: '4.9', label: 'Rating' },
-                { value: '15d', label: 'Entrega' },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="group relative overflow-hidden rounded-md px-3 py-2.5 text-center stat-card-shine backdrop-blur-[20px] saturate-150"
-                  style={{
-                    backgroundColor: 'var(--glass-bg)',
-                    border: '1px solid var(--glass-border)',
-                  }}
-                >
-                  <span className="pointer-events-none absolute left-1 top-1 size-2 border-l border-t opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
-                  <span className="pointer-events-none absolute right-1 top-1 size-2 border-r border-t opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
-                  <span className="pointer-events-none absolute bottom-1 left-1 size-2 border-b border-l opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
-                  <span className="pointer-events-none absolute bottom-1 right-1 size-2 border-b border-r opacity-20 transition-opacity duration-150 group-hover:opacity-80" style={{ borderColor: 'var(--color-primary)' }} aria-hidden="true" />
-                  <div className="relative text-sm font-extrabold text-[var(--color-on-surface)] tabular-nums">
-                    {stat.value}
-                  </div>
-                  <div className="relative text-[10px] text-[var(--color-on-surface-variant)] uppercase tracking-wide">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+            {/* Productos propios online — prueba verificable, links reales */}
+            <div
+              className="mt-1 rounded-md px-4 py-3 backdrop-blur-[20px] saturate-150"
+              style={{
+                backgroundColor: 'var(--glass-bg)',
+                border: '1px solid var(--glass-border)',
+              }}
+            >
+              <p className="mb-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-60">
+                Productos propios · online ahora
+              </p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                {LIVE_PRODUCTS.map((p, i) => (
+                  <span key={p.name} className="flex items-center gap-3">
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)]"
+                    >
+                      {p.name}
+                    </a>
+                    {i < LIVE_PRODUCTS.length - 1 && (
+                      <span className="text-[var(--color-on-surface-variant)] opacity-40" aria-hidden="true">
+                        ·
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

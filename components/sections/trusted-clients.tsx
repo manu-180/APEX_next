@@ -1,100 +1,69 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Lock, LockOpen } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
-import { SectionReveal } from '@/components/ui/section-reveal'
-import { ExternalLinkIcon } from '@/components/ui/icons'
+import { ExternalLinkIcon, WhatsAppIcon } from '@/components/ui/icons'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { whatsappUrl } from '@/lib/whatsapp'
+import { PROJECTS } from '@/lib/constants'
 import { cn } from '@/lib/utils/cn'
 
-interface ClientSite {
+/**
+ * Prueba social temprana (brief §3.2) — honesta:
+ * una clienta real entregada (Mi Lugar en el Mundo) + los productos propios
+ * que Manuel construyó y opera en producción. Cero testimonios inventados,
+ * cero contadores inflados: todo lo que se muestra está online y es clickeable.
+ */
+
+const WA_MSG_PROOF =
+  'Hola Manuel, vi los proyectos en producción que mostrás en tu web. ¿Podés hacer algo así para mi negocio?'
+
+const FEATURED_CLIENT = {
+  name: 'Mi Lugar en el Mundo',
+  domain: 'moda.theapexweb.com',
+  url: 'https://moda.theapexweb.com',
+  label: 'Cliente real · Moda',
+  description:
+    'Tienda de vestidos de fiesta: diseño, desarrollo y puesta online. Entregada y en uso.',
+  screenshot: '/images/clients/mi-lugar.png',
+}
+
+interface OwnProduct {
   name: string
   domain: string
   url: string
-  category: string
-  screenshot: string
+  tagline: string
 }
 
-const CLIENTS: ClientSite[] = [
+/** Descripciones verificables, tomadas del propio sitio (theme.ts / llms.txt). */
+const OWN_PRODUCTS: OwnProduct[] = [
   {
-    name: 'MNL Tecno',
-    domain: 'mnltecno.com',
-    url: 'https://mnltecno.com',
-    category: 'E-commerce',
-    screenshot: '/images/clients/mnltecno.jpg',
+    name: 'BotLode',
+    domain: 'botlode.com',
+    url: PROJECTS.botlode,
+    tagline: 'Ecosistema de bots con IA: creá y operá bots sin código.',
   },
   {
-    name: 'Taller Cerámica',
-    domain: 'tallerceramica.com',
-    url: 'https://tallerceramica.com',
-    category: 'Educación',
-    screenshot: '/images/clients/tallerceramica.jpg',
+    name: 'Botrive',
+    domain: 'botrive.com',
+    url: PROJECTS.botrive,
+    tagline: 'Plataforma de automatización con IA.',
   },
   {
-    name: 'Taller Marcelo',
-    domain: 'tallermarcelo.com',
-    url: 'https://tallermarcelo.com',
-    category: 'Automotriz',
-    screenshot: '/images/clients/tallermarcelo.jpg',
-  },
-  {
-    name: 'Luma Invita',
-    domain: 'bylumainvita.com',
-    url: 'https://bylumainvita.com',
-    category: 'Eventos',
-    screenshot: '/images/clients/bylumainvita.png',
-  },
-  {
-    name: 'Mi Lugar en el Mundo',
-    domain: 'moda.theapexweb.com',
-    url: 'https://moda.theapexweb.com',
-    category: 'Moda',
-    screenshot: '/images/clients/mi-lugar.png',
-  },
-  {
-    name: 'Apostillas Ya',
-    domain: 'apostillasargentinasonline.com',
-    url: 'https://www.apostillasargentinasonline.com',
-    category: 'Trámites',
-    screenshot: '/images/clients/apostillas-ya.png',
-  },
-  {
-    name: 'DG Studio',
-    domain: 'dg.theapexweb.com',
-    url: 'https://dg.theapexweb.com',
-    category: 'Wellness',
-    screenshot: '/images/clients/dg-studio.png',
-  },
-  {
-    name: 'Imaginate',
-    domain: 'imaginate.theapexweb.com',
-    url: 'https://imaginate.theapexweb.com',
-    category: 'Lencería',
-    screenshot: '/images/clients/imaginate.png',
-  },
-  {
-    name: 'Handy',
-    domain: 'handy.theapexweb.com',
-    url: 'https://handy.theapexweb.com',
-    category: 'Marketplace',
-    screenshot: '/images/clients/handy.png',
+    name: 'Assistify',
+    domain: 'assistify.lat',
+    url: PROJECTS.assistify,
+    tagline: 'Gestión de clases para profesores e institutos — iOS y Android.',
   },
 ]
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: i * 0.1 },
-  }),
-}
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 /* ────────────────────────────────────────────────────────────────────────
-   Browser chrome bar — macOS-style traffic lights + URL bar with lock
+   Browser chrome bar — URL con candado (detalle premium del card real)
    ──────────────────────────────────────────────────────────────────────── */
 
 function BrowserChrome({ domain, isHovered = false }: { domain: string; isHovered?: boolean }) {
@@ -130,212 +99,168 @@ function BrowserChrome({ domain, isHovered = false }: { domain: string; isHovere
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   Frosted client card — blurred screenshot → reveal on hover
+   Featured client card — screenshot real, sin frost: la prueba se muestra
    ──────────────────────────────────────────────────────────────────────── */
 
-function ClientCard({
-  client,
-  index,
-}: {
-  client: ClientSite
-  index: number
-}) {
+function FeaturedClientCard() {
   const [isHovered, setIsHovered] = useState(false)
   const prefersReducedMotion = useReducedMotion()
 
   return (
     <motion.div
-      custom={index}
-      variants={fadeUp}
-      className="relative"
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+      whileInView={
+        prefersReducedMotion
+          ? { opacity: 1 }
+          : { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } }
+      }
+      viewport={{ once: true, amount: 0.2 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      className="h-full"
     >
       <a
-        href={client.url}
+        href={FEATURED_CLIENT.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
-        aria-label={`Visitar ${client.name} — ${client.domain}`}
+        aria-label={`Visitar ${FEATURED_CLIENT.name} — ${FEATURED_CLIENT.domain}`}
+        data-hover
+        data-inspector-title="Cliente real entregado"
+        data-inspector-desc="Screenshot del sitio real, clickeable. Prueba social verificable en vez de testimonios inventados."
+        data-inspector-cat="Conversión"
+        className="group flex h-full flex-col overflow-hidden bento-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
       >
-        <motion.div
-          className={cn(
-            'relative overflow-hidden rounded-2xl border',
-            'bg-[var(--color-surface-low)]/90 backdrop-blur-md',
-            'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]',
-            'before:pointer-events-none before:absolute before:inset-x-4 before:top-0 before:z-[2] before:h-px before:rounded-full',
-            'before:bg-gradient-to-r before:from-transparent before:via-white/12 before:to-transparent',
-            'transition-[border-color,box-shadow] duration-300 ease-out',
-            isHovered
-              ? 'border-[rgba(var(--color-primary-rgb),0.28)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_16px_48px_-20px_rgba(var(--color-primary-rgb),0.3)]'
-              : 'border-[var(--color-outline)] hover:border-[rgba(var(--color-primary-rgb),0.18)]',
-          )}
-          whileHover={
-            prefersReducedMotion ? undefined : { y: -5, transition: { duration: 0.22, ease: 'easeOut' } }
-          }
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--color-on-surface)]/[0.03] to-transparent"
+        <BrowserChrome domain={FEATURED_CLIENT.domain} isHovered={isHovered} />
+
+        <div className="relative aspect-[16/10] overflow-hidden sm:aspect-auto sm:min-h-[260px] sm:flex-1">
+          <Image
+            src={FEATURED_CLIENT.screenshot}
+            alt={`Sitio web real de ${FEATURED_CLIENT.name}`}
+            fill
+            className={cn(
+              'object-cover object-top transition-transform duration-500 ease-out',
+              isHovered && !prefersReducedMotion ? 'scale-[1.03]' : 'scale-100',
+            )}
+            sizes="(max-width: 1024px) 100vw, 55vw"
           />
 
-          <BrowserChrome domain={client.domain} isHovered={isHovered} />
-
-          {/* Screenshot area with frosted glass overlay */}
-          <div className="relative aspect-[16/10] overflow-hidden">
-            <Image
-              src={client.screenshot}
-              alt={`Sitio web de ${client.name}`}
-              fill
-              className={cn(
-                'object-cover object-top transition-all duration-500 ease-out',
-                isHovered ? 'scale-[1.02] blur-0' : 'scale-[1.06] blur-[6px]',
-              )}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
-
-            {/* Frost overlay */}
-            <div
-              className={cn(
-                'absolute inset-0 transition-opacity duration-500 ease-out',
-                isHovered ? 'opacity-0' : 'opacity-100',
-              )}
-              style={{
-                background:
-                  'linear-gradient(135deg, var(--color-surface-low) 0%, rgba(var(--color-primary-rgb), 0.06) 50%, var(--color-surface-low) 100%)',
-                backdropFilter: 'saturate(0.3)',
-              }}
-            />
-
-            {/* Center reveal hint (visible when frosted) */}
-            <div
-              className={cn(
-                'absolute inset-0 flex flex-col items-center justify-center gap-2 transition-opacity duration-300',
-                isHovered ? 'opacity-0' : 'opacity-100',
-              )}
-            >
-              <div
-                className="flex size-10 items-center justify-center rounded-full"
-                style={{
-                  background: 'rgba(var(--color-primary-rgb), 0.1)',
-                  border: '1px solid rgba(var(--color-primary-rgb), 0.2)',
-                }}
-              >
-                <svg
-                  className="size-4 text-[var(--color-primary)]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                  />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-on-surface-variant)]/50">
-                Preview
-              </span>
-            </div>
-
-            {/* Hover CTA overlay */}
-            <div
-              className={cn(
-                'absolute inset-0 flex items-center justify-center transition-opacity duration-300',
-                'bg-gradient-to-t from-black/40 via-transparent to-transparent',
-                isHovered ? 'opacity-100' : 'opacity-0',
-              )}
-            >
-              <span className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md">
-                Visitar sitio
-                <ExternalLinkIcon className="size-3.5" />
-              </span>
-            </div>
+          {/* Hover CTA overlay */}
+          <div
+            className={cn(
+              'absolute inset-0 flex items-center justify-center transition-opacity duration-300',
+              'bg-gradient-to-t from-black/45 via-transparent to-transparent',
+              isHovered ? 'opacity-100' : 'opacity-0',
+            )}
+          >
+            <span className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md">
+              Visitar sitio
+              <ExternalLinkIcon className="size-3.5" />
+            </span>
           </div>
+        </div>
 
-          {/* Footer */}
-          <div className="relative px-5 py-4">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-b-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              style={{
-                background:
-                  'radial-gradient(180px circle at 50% 0%, rgba(var(--color-primary-rgb), 0.08), transparent 70%)',
-              }}
-            />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <h3 className="font-heading text-base font-extrabold text-[var(--color-on-surface)]">
-                  {client.name}
-                </h3>
-                <p className="mt-0.5 text-xs font-medium text-[var(--color-on-surface-variant)]">
-                  {client.category}
-                </p>
-              </div>
-              <div
-                className={cn(
-                  'flex size-8 items-center justify-center rounded-lg transition-colors duration-200',
-                  isHovered
-                    ? 'bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)]',
-                )}
-              >
-                <ExternalLinkIcon className="size-4" />
-              </div>
-            </div>
+        <div className="relative px-5 py-4 sm:px-6 sm:py-5">
+          <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-primary)]">
+            {FEATURED_CLIENT.label}
+          </p>
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="font-heading text-lg font-extrabold text-[var(--color-on-surface)]">
+              {FEATURED_CLIENT.name}
+            </h3>
+            <span
+              className={cn(
+                'flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-200',
+                isHovered
+                  ? 'bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)]'
+                  : 'text-[var(--color-on-surface-variant)]',
+              )}
+              aria-hidden="true"
+            >
+              <ExternalLinkIcon className="size-4" />
+            </span>
           </div>
-        </motion.div>
+          <p className="mt-1 max-w-md text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+            {FEATURED_CLIENT.description}
+          </p>
+        </div>
       </a>
     </motion.div>
   )
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   Section — "Confían en APEX"
+   Product card — wordmark editorial, sin logos truchos
    ──────────────────────────────────────────────────────────────────────── */
 
-function CarouselDots({ total, active }: { total: number; active: number }) {
+function ProductCard({ product, order }: { product: OwnProduct; order: number }) {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
-    <div className="mt-6 flex items-center justify-center gap-2 sm:hidden" aria-hidden>
-      {Array.from({ length: total }, (_, i) => (
+    <motion.a
+      href={product.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Visitar ${product.name} — ${product.domain}`}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={
+        prefersReducedMotion
+          ? { opacity: 1 }
+          : {
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.5, ease: EASE_OUT, delay: 0.08 + order * 0.08 },
+            }
+      }
+      viewport={{ once: true, amount: 0.3 }}
+      whileHover={
+        prefersReducedMotion ? undefined : { y: -3, transition: { duration: 0.22, ease: 'easeOut' } }
+      }
+      data-hover
+      data-inspector-title={`Producto propio: ${product.name}`}
+      data-inspector-desc="Producto construido y operado por Manuel, online en producción. Link real, verificable."
+      data-inspector-cat="Conversión"
+      className="group block bento-surface p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-70">
+            Producto propio
+          </p>
+          <h3 className="font-heading text-xl font-extrabold leading-none text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)]">
+            {product.name}
+          </h3>
+          <p className="mt-2 text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+            {product.tagline}
+          </p>
+        </div>
         <span
-          key={i}
-          className={cn(
-            'rounded-full transition-all duration-300',
-            i === active
-              ? 'h-1.5 w-5 bg-[var(--color-primary)]'
-              : 'size-1.5 bg-[var(--color-on-surface-variant)]/25',
-          )}
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] transition-colors duration-200 group-hover:bg-[rgba(var(--color-primary-rgb),0.12)] group-hover:text-[var(--color-primary)]"
+          aria-hidden="true"
+        >
+          <ExternalLinkIcon className="size-4" />
+        </span>
+      </div>
+      <p className="mt-4 flex items-center gap-1.5 font-mono text-[11px] text-[var(--color-on-surface-variant)] opacity-60">
+        <span
+          className="size-1.5 rounded-full"
+          style={{ backgroundColor: 'var(--color-online)' }}
+          aria-hidden="true"
         />
-      ))}
-    </div>
+        {product.domain}
+      </p>
+    </motion.a>
   )
 }
 
+/* ────────────────────────────────────────────────────────────────────────
+   Section 01 — prueba social honesta
+   ──────────────────────────────────────────────────────────────────────── */
+
 export function TrustedClientsSection() {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current
-    if (!el) return
-    const cardWidth = el.scrollWidth / CLIENTS.length
-    const index = Math.round(el.scrollLeft / cardWidth)
-    setActiveIndex(Math.min(index, CLIENTS.length - 1))
-  }, [])
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-    el.addEventListener('scroll', handleScroll, { passive: true })
-    return () => el.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
-    <section className="relative py-24 md:py-32">
+    <section className="relative overflow-hidden py-24 md:py-32">
       <GridBackground showRadialLight />
 
       <div
@@ -344,63 +269,80 @@ export function TrustedClientsSection() {
           background:
             'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.12), transparent)',
         }}
+        aria-hidden="true"
       />
 
+      {/* Numeración editorial gigante — rompe el grid por el borde derecho */}
+      <span
+        aria-hidden="true"
+        className="section-number absolute -right-4 top-10 hidden lg:block"
+        style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
+      >
+        01
+      </span>
+
       <div className="relative z-10 mx-auto max-w-6xl px-6">
-        <SectionReveal>
-          <div className="mb-16 max-w-2xl">
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <Badge variant="primary">Clientes</Badge>
-              <Badge variant="outline">Sitios entregados</Badge>
-            </div>
-            <h2 className="font-heading text-balance text-3xl leading-tight sm:text-4xl md:text-5xl">
-              <span className="font-light text-[var(--color-on-surface-variant)]">Más de 150 sitios </span>
-              <span className="font-extrabold text-[var(--color-on-surface)]">en producción.</span>
-            </h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-4 max-w-lg text-pretty text-[var(--color-on-surface-variant)]"
-            >
-              De emprendedores y pymes argentinas que eligieron crecer con presencia online real.
-              Diseñados, desarrollados y entregados por APEX.
-            </motion.p>
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+          whileInView={
+            prefersReducedMotion
+              ? { opacity: 1 }
+              : { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } }
+          }
+          viewport={{ once: true, amount: 0.4 }}
+          className="mb-14 max-w-2xl"
+        >
+          <p className="editorial-label mb-6">En producción ahora</p>
+          <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl">
+            <span className="block text-[var(--color-on-surface-variant)]">Sin mockups ni promesas.</span>
+            <strong className="block text-[var(--color-on-surface)]">Online y funcionando.</strong>
+          </h2>
+          <p className="mt-5 max-w-xl text-pretty text-[var(--color-on-surface-variant)]">
+            Una tienda entregada a una clienta real y tres productos propios que construí y
+            opero todos los días. Entrá a cualquiera y comprobalo — están online ahora.
+          </p>
+        </motion.div>
+
+        {/* Bento asimétrico: cliente real protagonista, productos en columna */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
+          <div className="lg:col-span-7">
+            <FeaturedClientCard />
           </div>
-        </SectionReveal>
-
-        {/* Desktop: grid 4 cols | Mobile: horizontal snap-scroll carousel */}
-        <div className="relative">
-          {/* Fade edges on mobile to hint scrollability */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-4 bg-gradient-to-r from-[var(--color-surface-base)] to-transparent sm:hidden" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-4 bg-gradient-to-l from-[var(--color-surface-base)] to-transparent sm:hidden" />
-
-          <motion.div
-            ref={scrollRef}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.1 }}
-            className={cn(
-              'flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none',
-              '-mx-6 px-6',
-              'sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0',
-              'lg:grid-cols-3',
-            )}
-            data-motion
-          >
-            {CLIENTS.map((client, i) => (
-              <div
-                key={client.domain}
-                className="w-[75vw] flex-shrink-0 snap-center sm:w-auto sm:flex-shrink"
-              >
-                <ClientCard client={client} index={i} />
-              </div>
+          <div className="flex flex-col gap-4 lg:col-span-5 lg:gap-5">
+            {OWN_PRODUCTS.map((product, i) => (
+              <ProductCard key={product.domain} product={product} order={i} />
             ))}
-          </motion.div>
+          </div>
         </div>
 
-        <CarouselDots total={CLIENTS.length} active={activeIndex} />
+        {/* CTA contextual de la sección */}
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+          whileInView={
+            prefersReducedMotion
+              ? { opacity: 1 }
+              : { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT, delay: 0.15 } }
+          }
+          viewport={{ once: true, amount: 0.6 }}
+          className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4"
+        >
+          <WhatsAppOutboundLink
+            waHref={whatsappUrl(WA_MSG_PROOF)}
+            className={cn(
+              'inline-flex items-center justify-center gap-2 font-semibold select-none',
+              'transition-all duration-200 ease-out',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
+              'h-12 px-7 text-sm rounded-xl',
+            )}
+          >
+            <WhatsAppIcon className="size-4" />
+            Quiero algo así para mi negocio
+          </WhatsAppOutboundLink>
+          <p className="text-xs text-[var(--color-on-surface-variant)] opacity-70">
+            Te respondo en menos de 1 hora.
+          </p>
+        </motion.div>
       </div>
     </section>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, type CSSProperties } from 'react'
 import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { TECH_STACK, type ThemeId } from '@/lib/types/theme'
 import { useApexTheme } from '@/hooks/useTheme'
@@ -26,6 +26,27 @@ const CATEGORY_LABELS: Record<string, string> = {
   tooling: 'Herramientas',
 }
 
+/**
+ * Resumen de negocio por tecnología — paráfrasis de los beneficios que ya
+ * viven en TECH_STACK (lib/types/theme.ts). Cero claims nuevos.
+ */
+const BUSINESS_OUTCOMES: Record<string, string> = {
+  flutter: 'Pagás un desarrollo, no dos.',
+  nextjs: 'Google te encuentra. Tu web convierte.',
+  supabase: 'Cero servidores que mantener.',
+  riverpod: 'Crece sin reescribirse desde cero.',
+  typescript: 'Cambios futuros más rápidos y baratos.',
+}
+
+/** Bento: las 2 piezas que el cliente "compra" (app y web) van grandes. */
+const BENTO_SPANS = [
+  'lg:col-span-3',
+  'lg:col-span-3',
+  'lg:col-span-2',
+  'lg:col-span-2',
+  'sm:col-span-2 lg:col-span-2',
+] as const
+
 export function TechCardsSection() {
   const { activeTheme, applyTheme } = useApexTheme()
   const [pressedId, setPressedId] = React.useState<string | null>(null)
@@ -44,6 +65,31 @@ export function TechCardsSection() {
   return (
     <section className="relative pb-24 md:pb-32">
       <div className="relative z-10 mx-auto max-w-6xl px-6">
+        {/* ── Encabezado editorial ─────────────────────────────────────── */}
+        <SectionReveal>
+          <div className="relative mb-10 md:mb-12">
+            <span
+              aria-hidden="true"
+              className="section-number absolute -top-10 right-0 hidden md:block"
+              style={{ '--sn-stroke-alpha': '0.12' } as CSSProperties}
+            >
+              01
+            </span>
+            <p className="editorial-label mb-6">Qué gana tu negocio</p>
+            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl mb-4">
+              <span className="block text-[var(--color-on-surface-variant)]">Cinco piezas.</span>
+              <strong className="block text-[var(--color-on-surface)]">
+                Un solo criterio: tu negocio.
+              </strong>
+            </h2>
+            <p className="text-pretty text-base text-[var(--color-on-surface-variant)] max-w-2xl">
+              Cada card explica qué te aporta esa tecnología — en beneficios concretos,
+              no en specs técnicas.
+            </p>
+          </div>
+        </SectionReveal>
+
+        {/* ── Hint: las cards cambian el tema del sitio ─────────────────── */}
         <SectionReveal>
           <div className="mb-8 flex justify-start">
             <div
@@ -54,7 +100,7 @@ export function TechCardsSection() {
                   'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.55) 0%, rgba(var(--color-accent-rgb), 0.38) 48%, rgba(var(--color-primary-rgb), 0.28) 100%)',
               }}
             >
-              <div className="relative flex w-full items-center gap-3.5 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-surface-low)_90%,transparent)] px-4 py-2.5 backdrop-blur-xl theme-transition dark:bg-[color-mix(in_srgb,var(--color-surface-low)_82%,transparent)] sm:px-5 sm:py-3">
+              <div className="relative flex w-full items-center gap-3.5 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-surface-low)_90%,transparent)] px-5 py-3.5 backdrop-blur-xl theme-transition dark:bg-[color-mix(in_srgb,var(--color-surface-low)_82%,transparent)] sm:px-6 sm:py-4">
                 <span
                   aria-hidden
                   className="pointer-events-none absolute inset-x-8 top-0 z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-[rgba(var(--color-primary-rgb),0.35)] to-transparent"
@@ -83,21 +129,36 @@ export function TechCardsSection() {
                     }}
                   />
                 </span>
-                <p className="relative z-[2] text-pretty text-sm leading-snug text-[var(--color-on-surface-variant)] theme-transition">
-                  Hacé click en cualquier card — el sitio entero cambia de tema en tiempo real.
+                <p className="relative z-[2] text-pretty text-base sm:text-lg leading-snug theme-transition">
+                  <strong
+                    className="font-heading font-extrabold glow-text"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    Tocá una card
+                  </strong>{' '}
+                  <span className="font-medium text-[var(--color-on-surface)]">
+                    — el sitio entero cambia de tema.
+                  </span>{' '}
+                  <span className="text-sm text-[var(--color-on-surface-variant)]">
+                    En vivo, sin recargar.
+                  </span>
                 </p>
               </div>
             </div>
           </div>
         </SectionReveal>
 
-        <div ref={gridRef} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {TECH_STACK.map((tech) => {
+        {/* ── Bento de tech cards (glassmorphism + glow preservados) ────── */}
+        <div ref={gridRef} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6">
+          {TECH_STACK.map((tech, index) => {
             const Icon = ICON_MAP[tech.themeId]
             const isActive = activeTheme === tech.themeId
+            const isFeatured = index < 2
+            const features = isFeatured ? tech.features : tech.features.slice(0, 3)
+            const outcome = BUSINESS_OUTCOMES[tech.themeId]
 
             return (
-              <div key={tech.themeId} data-tech-card>
+              <div key={tech.themeId} data-tech-card className={BENTO_SPANS[index] ?? 'lg:col-span-2'}>
                 <GlowCard
                   active={isActive}
                   className={`h-full rounded-2xl ${pressedId === tech.themeId ? 'card-wave-pressed' : ''}`}
@@ -108,7 +169,7 @@ export function TechCardsSection() {
                   }}
                 >
                   <div
-                    className="w-full p-6 text-left md:p-8"
+                    className="flex h-full w-full flex-col p-6 text-left md:p-8"
                     data-hover
                     data-inspector-title="Card con Cambio de Tema Global"
                     data-inspector-desc="Al hacer clic, toda la web cambia su paleta de colores con una ola animada desde el punto del click. El tema viaja por CSS Custom Properties en cascada hacia todos los componentes, sin recargar la página."
@@ -130,7 +191,11 @@ export function TechCardsSection() {
                       </Badge>
                     </div>
 
-                    <h3 className="mb-1 text-xl font-bold text-[var(--color-on-surface)] theme-transition">
+                    <h3
+                      className={`mb-1 font-bold text-[var(--color-on-surface)] theme-transition ${
+                        isFeatured ? 'text-2xl' : 'text-xl'
+                      }`}
+                    >
                       {tech.title}
                     </h3>
                     <p className="glow-text mb-3 text-sm font-medium text-[var(--color-primary)] theme-transition">
@@ -142,7 +207,7 @@ export function TechCardsSection() {
                     </p>
 
                     <ul className="space-y-2">
-                      {tech.features.map((feature) => (
+                      {features.map((feature) => (
                         <li
                           key={feature}
                           className="flex items-start gap-2 text-sm text-[var(--color-on-surface-variant)]"
@@ -152,6 +217,26 @@ export function TechCardsSection() {
                         </li>
                       ))}
                     </ul>
+
+                    {/* Resumen de negocio — el "para qué" en una línea */}
+                    {outcome ? (
+                      <div className="mt-auto pt-5">
+                        <div
+                          aria-hidden
+                          className="mb-3 h-px"
+                          style={{
+                            background:
+                              'linear-gradient(to right, rgba(var(--color-primary-rgb), 0.3), transparent)',
+                          }}
+                        />
+                        <p
+                          className="text-sm font-semibold theme-transition"
+                          style={{ color: 'var(--color-primary)' }}
+                        >
+                          → {outcome}
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
                 </GlowCard>
               </div>

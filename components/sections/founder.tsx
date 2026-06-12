@@ -1,213 +1,314 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
-import { ArrowRightIcon } from '@/components/ui/icons'
-import { ROUTES } from '@/lib/constants'
+import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { whatsappUrl } from '@/lib/whatsapp'
+import { PROJECTS, ROUTES } from '@/lib/constants'
+import { cn } from '@/lib/utils/cn'
 
 /**
- * Sección "Manuel" — founder visible en home.
+ * Sección 04 — Founder card honesta.
  *
- * Why: founder-led brands convierten 12-18% mejor en deals high-ticket de
- * servicios profesionales. Hace falta cara, nombre y enlace a perfil/LinkedIn.
+ * Es Manuel: atiende él, construye él. Sin agencia, sin vendedores.
+ * Prueba = productos propios en producción (links reales, verificables).
+ * Solo números canónicos del AUDIT_ADDENDUM — nada de métricas infladas.
  */
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+/**
+ * Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2).
+ * AUDIT_ADDENDUM: el CTA de dinero es SIEMPRE sólido verde WhatsApp.
+ */
+const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
+const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+
+const WA_MSG_FOUNDER =
+  'Hola Manuel, leí quién está detrás de APEX y quiero contarte mi proyecto. ¿Lo charlamos?'
+
 const YEARS_EXP = new Date().getFullYear() - 2021
-const MANUEL_LINKEDIN_URL = 'https://www.linkedin.com/in/manuel-navarro-dev' // pendiente: ajustar al URL real
+
+/** Verdades canónicas (AUDIT_ADDENDUM) — nada inflado. */
+const FOUNDER_STATS = [
+  { value: `${YEARS_EXP}+`, label: 'Años construyendo' },
+  { value: '8+', label: 'En producción' },
+  { value: '<1 h', label: 'Respuesta' },
+]
+
+/** Compromisos respaldados por el FAQ de /servicios — cero promesas nuevas. */
+const COMMITMENTS = [
+  'El que te responde el WhatsApp y el que escribe el código somos la misma persona.',
+  'Plazo pactado por escrito: si no llego a la fecha, te devuelvo el depósito.',
+  'El código es tuyo desde el día uno. Sin lock-in, sin letra chica.',
+]
+
+/** Productos propios online — prueba verificable, de lib/constants. */
+const LIVE_PRODUCTS = [
+  { name: 'BotLode', url: PROJECTS.botlode },
+  { name: 'Botrive', url: PROJECTS.botrive },
+  { name: 'Assistify', url: PROJECTS.assistify },
+]
+
+/**
+ * Foto real (`/manuel.jpg` en public) con fallback elegante al avatar "MN".
+ *
+ * SSR-safe: el avatar es la capa base SIEMPRE renderizada; la foto se funde
+ * encima recién cuando cargó OK (onLoad + chequeo post-mount para imágenes
+ * cacheadas que resolvieron antes de hidratar). Si el archivo no existe,
+ * la foto queda en opacity-0 y nunca se ve el glifo de imagen rota.
+ */
+function FounderPortrait() {
+  const imgRef = useRef<HTMLImageElement | null>(null)
+  const [photoLoaded, setPhotoLoaded] = useState(false)
+
+  useEffect(() => {
+    const el = imgRef.current
+    if (el?.complete && el.naturalWidth > 0) setPhotoLoaded(true)
+  }, [])
+
+  return (
+    <div className="relative aspect-[4/5] overflow-hidden">
+      {/* Capa base: avatar MN — fallback elegante mientras no haya foto */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+        style={{
+          background:
+            'linear-gradient(160deg, rgba(var(--color-primary-rgb), 0.14), rgba(var(--color-primary-rgb), 0.04) 55%, transparent)',
+        }}
+      >
+        <span
+          className="flex size-20 select-none items-center justify-center rounded-full text-2xl font-extrabold"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.28), rgba(var(--color-primary-rgb), 0.1))',
+            border: '2px solid rgba(var(--color-primary-rgb), 0.38)',
+            color: 'var(--color-primary)',
+          }}
+          aria-hidden="true"
+        >
+          MN
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-60">
+          Manuel · APEX
+        </span>
+      </div>
+
+      <Image
+        ref={imgRef}
+        src="/manuel.jpg"
+        alt="Manuel Navarro, el desarrollador detrás de APEX"
+        fill
+        sizes="(max-width: 1024px) 300px, 360px"
+        className={cn(
+          'object-cover transition-opacity duration-500',
+          photoLoaded ? 'opacity-100' : 'opacity-0',
+        )}
+        onLoad={() => setPhotoLoaded(true)}
+      />
+    </div>
+  )
+}
 
 export function FounderSection() {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <section className="relative py-20 sm:py-24 md:py-28 overflow-hidden">
+    <section className="relative overflow-hidden py-24 md:py-32">
       <GridBackground />
 
-      {/* Glow primary lateral */}
       <div
-        aria-hidden
+        className="absolute left-0 right-0 top-0 h-px"
+        style={{
+          background:
+            'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.12), transparent)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Numeración editorial — rompe el grid por el borde izquierdo */}
+      <span
+        aria-hidden="true"
+        className="section-number absolute -left-6 top-10 hidden lg:block"
+        style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
+      >
+        04
+      </span>
+
+      {/* Glow lateral sutil del tema */}
+      <div
+        aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 55% 45% at 90% 50%, rgba(var(--color-primary-rgb), 0.08), transparent 70%)',
+            'radial-gradient(ellipse 50% 45% at 92% 50%, rgba(var(--color-primary-rgb), 0.07), transparent 70%)',
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-5xl px-6">
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="grid gap-10 md:grid-cols-[280px_1fr] md:items-center"
-        >
-          {/* ── Profile card column ───────────────────────────────── */}
-          <div
-            className="relative mx-auto md:mx-0 flex flex-col gap-4 w-full max-w-[280px] rounded-xl p-5"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              boxShadow:
-                '0 24px 60px -16px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(255,255,255,0.04) inset',
-            }}
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
+        {/* Grid asimétrico: contenido 7 cols + retrato 4 cols (gutter col 8) */}
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
+          {/* ── Contenido ─────────────────────────────────────────── */}
+          <motion.div
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+            whileInView={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } }
+            }
+            viewport={{ once: true, amount: 0.25 }}
+            className="lg:col-span-7"
           >
-            {/* Avatar + nombre */}
-            <div className="flex flex-col items-center gap-2.5">
-              <div className="relative">
-                <div
-                  className="h-14 w-14 rounded-full flex items-center justify-center text-base font-bold select-none"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.28), rgba(6, 182, 212, 0.18))',
-                    border: '2px solid rgba(var(--color-primary-rgb), 0.38)',
-                    color: 'var(--color-primary)',
-                  }}
-                >
-                  MN
-                </div>
-                <span
-                  className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 animate-pulse"
-                  style={{
-                    backgroundColor: 'var(--color-online)',
-                    borderColor: 'var(--color-surface-low)',
-                    boxShadow: '0 0 6px var(--color-online)',
-                  }}
-                />
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-semibold text-[var(--color-on-surface)]">Manuel Navarro</p>
-                <p className="text-xs text-[var(--color-on-surface-variant)]">Full-Stack · Mobile</p>
-              </div>
-            </div>
+            <p className="editorial-label mb-6">Quién está detrás</p>
 
-            {/* Divisor */}
-            <div
-              className="h-px"
-              style={{
-                background:
-                  'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.22), transparent)',
-              }}
-            />
-
-            {/* Mini stats */}
-            <div className="grid grid-cols-2 gap-2 text-center">
-              {[
-                { v: `${YEARS_EXP}+`, l: 'Años exp.' },
-                { v: '150+', l: 'Proyectos' },
-                { v: '100%', l: 'Satisfechos' },
-                { v: '<2h', l: 'Respuesta' },
-              ].map((s) => (
-                <div key={s.l}>
-                  <p
-                    className="text-base font-extrabold glow-text"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
-                    {s.v}
-                  </p>
-                  <p className="text-[9px] leading-tight text-[var(--color-on-surface-variant)]">
-                    {s.l}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Divisor */}
-            <div
-              className="h-px"
-              style={{
-                background:
-                  'linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.22), transparent)',
-              }}
-            />
-
-            {/* Tech tags */}
-            <div className="flex flex-wrap gap-1 justify-center">
-              {['Next.js', 'Flutter', 'Supabase'].map((t) => (
-                <span
-                  key={t}
-                  className="rounded px-1.5 py-0.5 text-[9px] font-mono font-semibold"
-                  style={{
-                    background: 'rgba(var(--color-primary-rgb), 0.08)',
-                    color: 'rgba(var(--color-primary-rgb), 0.8)',
-                    border: '1px solid rgba(var(--color-primary-rgb), 0.18)',
-                  }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Content column ─────────────────────────────────────── */}
-          <div>
-            <div className="mb-5 flex flex-wrap items-center gap-2">
-              <Badge variant="primary">Quién hay detrás</Badge>
-              <Badge variant="outline">Founder · Dev</Badge>
-            </div>
-
-            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl leading-tight mb-4">
-              <span className="font-extralight text-[var(--color-on-surface-variant)]">Hola, soy</span>{' '}
-              <span className="font-extrabold text-[var(--color-on-surface)]">Manuel.</span>
+            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl">
+              <span className="block text-[var(--color-on-surface-variant)]">
+                Sin agencia, sin vendedores.
+              </span>
+              <strong className="block text-[var(--color-on-surface)]">Hola, soy Manuel.</strong>
             </h2>
 
-            <p className="text-pretty text-base leading-relaxed text-[var(--color-on-surface-variant)] mb-4">
-              No soy una agencia. Soy Manuel, un ingeniero argentino que diseña, programa y
-              entrega cada proyecto de principio a fin — sin intermediarios, sin sorpresas.
-              La persona que atiende tu consulta es la misma que escribe el código.
+            <p className="mt-5 max-w-xl text-pretty leading-relaxed text-[var(--color-on-surface-variant)]">
+              Diseño, programo y entrego cada proyecto de principio a fin. Además construyo
+              productos propios que funcionan en producción y que gente real usa todos los
+              días. Si tu proyecto tiene sentido técnico y comercial, lo armamos juntos. Si
+              no, te lo digo de frente — y te ahorro tiempo y plata.
             </p>
 
-            <p className="text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)] opacity-80 mb-7">
-              Más de 8 productos propios en producción que gente real usa todos los días.
-              Si tu proyecto tiene sentido técnico y comercial, lo construimos. Si no, te lo
-              digo — y te ahorro el tiempo y la plata.
-            </p>
-
-            {/* Manifesto inline */}
-            <ul className="mb-7 space-y-2 text-sm">
-              {[
-                'Trabajo con 1-2 clientes en simultáneo. Sin overbooking.',
-                'Plazo en fecha o devolvemos. Sin asteriscos.',
-                'El código es tuyo desde el día uno. Sin lock-in.',
-              ].map((line) => (
+            <ul className="mt-7 max-w-xl space-y-2.5 text-sm">
+              {COMMITMENTS.map((line) => (
                 <li
                   key={line}
                   className="flex items-start gap-2.5 text-[var(--color-on-surface-variant)]"
                 >
                   <ArrowRightIcon
-                    className="size-3.5 mt-0.5 shrink-0"
+                    className="mt-0.5 size-3.5 shrink-0"
                     style={{ color: 'var(--color-primary)' }}
+                    aria-hidden
                   />
                   <span>{line}</span>
                 </li>
               ))}
             </ul>
 
-            {/* CTA row */}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Prueba: productos propios online ahora */}
+            <div className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-60">
+                Mis productos · online ahora
+              </span>
+              {LIVE_PRODUCTS.map((p, i) => (
+                <span key={p.name} className="flex items-center gap-3">
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
+                  >
+                    {p.name}
+                  </a>
+                  {i < LIVE_PRODUCTS.length - 1 && (
+                    <span
+                      className="text-[var(--color-on-surface-variant)] opacity-40"
+                      aria-hidden="true"
+                    >
+                      ·
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+
+            {/* CTAs: dinero = verde WhatsApp sólido · navegación = link discreto */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <WhatsAppOutboundLink
+                waHref={whatsappUrl(WA_MSG_FOUNDER)}
+                data-hover
+                data-inspector-title="CTA WhatsApp del founder"
+                data-inspector-desc="Mensaje contextual de la sección founder. Tracking centralizado en openWhatsAppWithThankYouPage."
+                data-inspector-cat="Conversión"
+                className={cn(
+                  'btn-tech inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold select-none',
+                  'h-12 px-7 text-sm text-white',
+                  'transition-all duration-200 ease-out hover:brightness-110 hover:scale-[1.02] active:scale-[0.97]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                )}
+                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+              >
+                <WhatsAppIcon className="size-4" />
+                Contame tu proyecto
+              </WhatsAppOutboundLink>
+
               <Link
                 href={ROUTES.about}
                 prefetch={false}
-                className="btn-tech btn-primary-tech inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-xl"
+                className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
               >
-                Sobre mí
-                <ArrowRightIcon className="size-3.5" />
+                Conocé mi historia
+                <ArrowRightIcon
+                  className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
               </Link>
-              <a
-                href={MANUEL_LINKEDIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
-              >
-                <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden>
-                  <path d="M20.45 20.45h-3.55v-5.56c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.44-2.13 2.94v5.66H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.27 2.38 4.27 5.47v6.27zM5.34 7.43a2.06 2.06 0 0 1-2.06-2.06 2.06 2.06 0 1 1 4.12 0c0 1.14-.92 2.06-2.06 2.06zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
-                </svg>
-                LinkedIn
-              </a>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+
+          {/* ── Retrato ───────────────────────────────────────────── */}
+          <motion.div
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+            whileInView={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT, delay: 0.1 } }
+            }
+            viewport={{ once: true, amount: 0.25 }}
+            className="mx-auto w-full max-w-[300px] lg:col-span-4 lg:col-start-9 lg:max-w-none"
+          >
+            <div className="bento-surface overflow-hidden lg:-rotate-1 lg:transition-transform lg:duration-300 lg:hover:rotate-0">
+              <FounderPortrait />
+
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-2 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: 'var(--color-online)',
+                      boxShadow: '0 0 6px var(--color-online)',
+                    }}
+                    aria-hidden="true"
+                  />
+                  <p className="text-sm font-bold text-[var(--color-on-surface)]">
+                    Manuel Navarro
+                  </p>
+                </div>
+                <p className="mt-0.5 text-xs text-[var(--color-on-surface-variant)]">
+                  Full-stack · Web y apps a medida · Buenos Aires
+                </p>
+
+                <div className="divider-theme my-4" aria-hidden="true" />
+
+                <dl className="grid grid-cols-3 gap-2 text-center">
+                  {FOUNDER_STATS.map((s) => (
+                    <div key={s.label} className="flex flex-col-reverse">
+                      <dt className="text-[9px] leading-tight text-[var(--color-on-surface-variant)]">
+                        {s.label}
+                      </dt>
+                      <dd
+                        className="text-base font-extrabold tabular-nums"
+                        style={{ color: 'var(--color-primary)' }}
+                      >
+                        {s.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   )
