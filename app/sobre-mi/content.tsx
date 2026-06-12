@@ -84,11 +84,11 @@ const NO_HAGO = [
 
 const PRODUCTOS = [
   {
-    name: 'BotLode',
+    name: 'Handy',
     tag: 'Producto propio',
-    desc: 'Ecosistema de bots con IA: creás un bot sin código y atiende consultas las 24 horas.',
-    url: PROJECTS.botlode,
-    domain: 'botlode.com',
+    desc: 'Herramientas web rápidas y prácticas para el día a día.',
+    url: PROJECTS.handy,
+    domain: 'handy.theapexweb.com',
     span: 'lg:col-span-3',
   },
   {
@@ -100,11 +100,11 @@ const PRODUCTOS = [
     span: 'lg:col-span-3',
   },
   {
-    name: 'Botrive',
+    name: 'Byluma Invita',
     tag: 'Producto propio',
-    desc: 'Plataforma de automatización con IA.',
-    url: PROJECTS.botrive,
-    domain: 'botrive.com',
+    desc: 'Invitaciones digitales personalizadas para eventos y celebraciones.',
+    url: PROJECTS.byluma,
+    domain: 'bylumainvita.com',
     span: 'lg:col-span-2',
   },
   {

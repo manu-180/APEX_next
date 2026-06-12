@@ -95,8 +95,8 @@ const TRUST_ITEMS = [
 
 /** Productos propios online — prueba verificable, no claims. */
 const LIVE_PRODUCTS = [
-  { name: 'BotLode', url: PROJECTS.botlode },
-  { name: 'Botrive', url: PROJECTS.botrive },
+  { name: 'Handy', url: PROJECTS.handy },
+  { name: 'Byluma Invita', url: PROJECTS.byluma },
   { name: 'Assistify', url: PROJECTS.assistify },
 ]
 

@@ -26,8 +26,8 @@ export const ROUTES = {
 
 // ─── Social / External ───────────────────────────────────────────────────────
 export const PROJECTS = {
-  botlode:       'https://botlode.com',
-  botrive:       'https://botrive.com',
+  handy:         'https://handy.theapexweb.com/',
+  byluma:        'https://www.bylumainvita.com/',
   assistify:     'https://assistify.lat',
 } as const
 

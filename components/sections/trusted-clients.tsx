@@ -41,16 +41,16 @@ interface OwnProduct {
 /** Descripciones verificables, tomadas del propio sitio (theme.ts / llms.txt). */
 const OWN_PRODUCTS: OwnProduct[] = [
   {
-    name: 'BotLode',
-    domain: 'botlode.com',
-    url: PROJECTS.botlode,
-    tagline: 'Ecosistema de bots con IA: creá y operá bots sin código.',
+    name: 'Handy',
+    domain: 'handy.theapexweb.com',
+    url: PROJECTS.handy,
+    tagline: 'Herramientas web rápidas y prácticas para el día a día.',
   },
   {
-    name: 'Botrive',
-    domain: 'botrive.com',
-    url: PROJECTS.botrive,
-    tagline: 'Plataforma de automatización con IA.',
+    name: 'Byluma Invita',
+    domain: 'bylumainvita.com',
+    url: PROJECTS.byluma,
+    tagline: 'Invitaciones digitales personalizadas para eventos y celebraciones.',
   },
   {
     name: 'Assistify',
