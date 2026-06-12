@@ -628,7 +628,15 @@ export function BotlodeChat() {
       + '.botlode-snackbar .snackbar-icon svg{width:100%;height:100%}'
       + '.botlode-snackbar-offline .snackbar-icon{color:#ff9d6e;filter:drop-shadow(0 0 8px rgba(255,140,80,.4))}'
       + '.botlode-snackbar-online .snackbar-icon{color:#70f0a0;filter:drop-shadow(0 0 8px rgba(100,240,160,.45))}'
-      + '.botlode-snackbar .snackbar-text{flex:1;line-height:1.5;text-shadow:0 1px 2px rgba(0,0,0,.3)}';
+      + '.botlode-snackbar .snackbar-text{flex:1;line-height:1.5;text-shadow:0 1px 2px rgba(0,0,0,.3)}'
+      /* Modo claro (Porcelain HUD): paleta clara con tinta calida/verde y sombra navy.
+         Scoped a html.light — las reglas dark de arriba quedan intactas y el cambio
+         de tema en vivo (Ctrl+T) re-estiliza el snackbar sin recrearlo. */
+      + '.light .botlode-snackbar-offline{background:linear-gradient(135deg,rgba(255,247,240,.97) 0%,rgba(255,240,230,.97) 100%);border-color:rgba(194,65,12,.45);color:#9A3412;box-shadow:0 12px 40px rgba(24,32,60,.18)}'
+      + '.light .botlode-snackbar-online{background:linear-gradient(135deg,rgba(240,253,246,.97) 0%,rgba(232,250,240,.97) 100%);border-color:rgba(22,163,74,.45);color:#15803D;box-shadow:0 12px 40px rgba(24,32,60,.18)}'
+      + '.light .botlode-snackbar-offline .snackbar-icon{color:#C2410C;filter:drop-shadow(0 1px 2px rgba(24,32,60,.10))}'
+      + '.light .botlode-snackbar-online .snackbar-icon{color:#15803D;filter:drop-shadow(0 1px 2px rgba(24,32,60,.10))}'
+      + '.light .botlode-snackbar .snackbar-text{text-shadow:none}';
     (document.head || document.documentElement).appendChild(s);
   }
 

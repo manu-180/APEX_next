@@ -59,9 +59,11 @@ const focusRing =
 const inputBase =
   'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-all duration-200'
 
-const inputIdle = 'border-[var(--color-surface-high)]'
+/* Light: campos blancos nítidos — borde tinta visible y foco con anillo del tema.
+   Dark conserva el borde surface-high y el glow original. */
+const inputIdle = 'border-[rgba(11,15,26,0.16)] dark:border-[var(--color-surface-high)]'
 const inputFocus =
-  'focus:border-[rgba(var(--color-primary-rgb),0.5)] focus:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)] focus:ring-0'
+  'focus:border-[rgba(var(--color-primary-rgb),0.5)] focus:shadow-[0_0_0_3px_rgba(var(--color-primary-rgb),0.15)] dark:focus:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)] focus:ring-0'
 
 const inputClassName = cn(inputBase, inputIdle, inputFocus)
 
@@ -197,10 +199,11 @@ function WhatsAppNowPanel() {
         data-inspector-desc="CTA primario de la página: abre WhatsApp con mensaje prellenado y deja esta pestaña en /gracias. El tracking de conversión vive centralizado en openWhatsAppWithThankYouPage."
         data-inspector-cat="UX · Conversión"
       >
+        {/* Stroke 0.14 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
         <span
           aria-hidden="true"
-          className="section-number absolute right-5 top-4"
-          style={{ '--sn-stroke-alpha': '0.14', fontSize: '3.25rem' } as CSSProperties}
+          className="section-number absolute right-5 top-4 dark:[--sn-stroke-alpha:0.14]"
+          style={{ fontSize: '3.25rem' } as CSSProperties}
         >
           01
         </span>
@@ -233,11 +236,12 @@ function WhatsAppNowPanel() {
               'group inline-flex w-full select-none items-center justify-center gap-3',
               'h-14 rounded-2xl px-6 text-base font-bold text-white sm:h-16 sm:text-lg',
               'transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
+              // Light: apoyo navy + verde profundo (patrón .btn-wa); dark conserva el glow original
+              'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_14px_30px_-12px_rgba(18,140,126,0.45)] dark:shadow-[0_14px_34px_-12px_rgba(37,211,102,0.5)]',
               focusRing,
             )}
             style={{
               background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-              boxShadow: '0 14px 34px -12px rgba(37, 211, 102, 0.5)',
             }}
             data-hover
             data-inspector-title="Escribirme por WhatsApp"
@@ -402,10 +406,11 @@ function BookingCalendar() {
         data-inspector-desc="Días y horarios sincronizados con Supabase; tiempo real y restricción única evitan la doble reserva. Domingos bloqueados por constantes."
         data-inspector-cat="UX · Motion"
       >
+        {/* Stroke 0.14 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
         <span
           aria-hidden="true"
-          className="section-number absolute right-5 top-4"
-          style={{ '--sn-stroke-alpha': '0.14', fontSize: '3.25rem' } as CSSProperties}
+          className="section-number absolute right-5 top-4 dark:[--sn-stroke-alpha:0.14]"
+          style={{ fontSize: '3.25rem' } as CSSProperties}
         >
           02
         </span>
@@ -425,8 +430,8 @@ function BookingCalendar() {
 
         {!supabaseReady && (
           <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-200">
-            Falta configurar <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_SUPABASE_URL</code> y{' '}
-            <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> para reservas en vivo.
+            Falta configurar <code className="rounded bg-[rgba(11,15,26,0.08)] px-1 dark:bg-black/20">NEXT_PUBLIC_SUPABASE_URL</code> y{' '}
+            <code className="rounded bg-[rgba(11,15,26,0.08)] px-1 dark:bg-black/20">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> para reservas en vivo.
           </div>
         )}
 
@@ -603,8 +608,8 @@ function BookingCalendar() {
                   className={cn(
                     inputBase,
                     'flex items-stretch gap-0 overflow-hidden px-0 py-0',
-                    'border-[var(--color-surface-high)]',
-                    'focus-within:border-[rgba(var(--color-primary-rgb),0.5)] focus-within:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)]'
+                    inputIdle,
+                    'focus-within:border-[rgba(var(--color-primary-rgb),0.5)] focus-within:shadow-[0_0_0_3px_rgba(var(--color-primary-rgb),0.15)] dark:focus-within:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)]'
                   )}
                 >
                   <span
@@ -742,7 +747,7 @@ function ReviewsSection() {
                     {[1, 2, 3, 4, 5].map((s) => (
                       <StarIcon
                         key={s}
-                        className="size-5 text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.45)]"
+                        className="size-5 text-amber-400 dark:drop-shadow-[0_0_5px_rgba(251,191,36,0.45)]"
                         filled={s <= filledStars}
                       />
                     ))}

@@ -50,11 +50,12 @@ const PRINCIPIOS = [
 const WA_BTN_CLASS =
   'inline-flex items-center justify-center gap-2.5 rounded-xl font-bold text-white select-none ' +
   'transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] ' +
+  // Sombra: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa)
+  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_4px_18px_rgba(18,140,126,0.30)] dark:shadow-[0_4px_20px_rgba(37,211,102,0.3)]'
 
 const WA_BTN_STYLE: CSSProperties = {
   background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-  boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)',
 }
 
 const DIRECT_BENEFITS = [
@@ -330,10 +331,11 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
 
             {/* ── Columna ficha técnica (rompe el eje con el 01 gigante) ── */}
             <Reveal delay={0.15} className="relative">
+              {/* Stroke 0.14 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
               <span
                 aria-hidden="true"
-                className="section-number absolute -top-16 -right-2 hidden lg:block"
-                style={{ '--sn-stroke-alpha': '0.14', fontSize: 'clamp(6rem, 9vw, 8.5rem)' } as CSSProperties}
+                className="section-number absolute -top-16 -right-2 hidden lg:block dark:[--sn-stroke-alpha:0.14]"
+                style={{ fontSize: 'clamp(6rem, 9vw, 8.5rem)' } as CSSProperties}
               >
                 01
               </span>
@@ -405,8 +407,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
           <Reveal className="relative mb-12 md:mb-16">
             <span
               aria-hidden="true"
-              className="section-number absolute -top-8 right-0 hidden md:block"
-              style={{ '--sn-stroke-alpha': '0.12' } as CSSProperties}
+              className="section-number absolute -top-8 right-0 hidden md:block dark:[--sn-stroke-alpha:0.12]"
             >
               02
             </span>
@@ -476,7 +477,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                 data-inspector-desc="Anti-pitch deliberado: decir que no a ciertas prácticas es parte de la propuesta. Genera más confianza que cualquier promesa."
                 data-inspector-cat="Copy · Conversion"
               >
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] mb-5 text-red-400">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] mb-5 text-red-600 dark:text-red-400">
                   Lo que NO hago
                 </p>
                 <ul className="space-y-3.5">
@@ -486,7 +487,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                       className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--color-on-surface-variant)]"
                     >
                       <span
-                        className="inline-flex size-4 shrink-0 items-center justify-center rounded-full mt-0.5 text-[10px] font-bold text-red-400"
+                        className="inline-flex size-4 shrink-0 items-center justify-center rounded-full mt-0.5 text-[10px] font-bold text-red-600 dark:text-red-400"
                         style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)' }}
                         aria-hidden
                       >
@@ -530,8 +531,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
           <Reveal className="relative mb-12 md:mb-16">
             <span
               aria-hidden="true"
-              className="section-number absolute -top-8 right-0 hidden md:block"
-              style={{ '--sn-stroke-alpha': '0.12' } as CSSProperties}
+              className="section-number absolute -top-8 right-0 hidden md:block dark:[--sn-stroke-alpha:0.12]"
             >
               03
             </span>
@@ -594,8 +594,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
           <Reveal className="relative mb-10 md:mb-14">
             <span
               aria-hidden="true"
-              className="section-number absolute -top-8 right-0 hidden md:block"
-              style={{ '--sn-stroke-alpha': '0.12' } as CSSProperties}
+              className="section-number absolute -top-8 right-0 hidden md:block dark:[--sn-stroke-alpha:0.12]"
             >
               04
             </span>

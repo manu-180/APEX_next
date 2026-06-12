@@ -109,8 +109,9 @@ function FeatureCard({ f }: { f: (typeof FEATURES)[number] }) {
         border: '1px solid var(--glass-border)',
       }}
     >
+      {/* Light: el grid de puntos necesita más alpha sobre blanco; dark conserva 0.03/0.07 originales */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 opacity-[0.05] transition-opacity duration-300 group-hover:opacity-[0.12] dark:opacity-[0.03] dark:group-hover:opacity-[0.07]"
         style={{
           backgroundImage: 'radial-gradient(circle, var(--color-primary) 1px, transparent 1px)',
           backgroundSize: '18px 18px',
@@ -261,14 +262,16 @@ export function HeroSection() {
         }}
       />
 
+      {/* Light: hairlines verticales al doble de alpha (invisibles sobre porcelana);
+          dark vuelve al valor original exacto vía opacity-50 (0.12·0.5=0.06 / 0.08·0.5=0.04) */}
       <div className="pointer-events-none absolute inset-0">
         <div
-          className="absolute left-[15%] top-0 h-full w-px"
-          style={{ background: 'linear-gradient(to bottom, transparent, rgba(var(--color-primary-rgb), 0.06), transparent)' }}
+          className="absolute left-[15%] top-0 h-full w-px dark:opacity-50"
+          style={{ background: 'linear-gradient(to bottom, transparent, rgba(var(--color-primary-rgb), 0.12), transparent)' }}
         />
         <div
-          className="absolute right-[30%] top-0 h-full w-px"
-          style={{ background: 'linear-gradient(to bottom, transparent, rgba(var(--color-accent-rgb), 0.04), transparent)' }}
+          className="absolute right-[30%] top-0 h-full w-px dark:opacity-50"
+          style={{ background: 'linear-gradient(to bottom, transparent, rgba(var(--color-accent-rgb), 0.08), transparent)' }}
         />
       </div>
 
@@ -287,7 +290,8 @@ export function HeroSection() {
             </p>
 
             <h1 className="heading-display text-balance mb-6 text-4xl sm:text-5xl md:text-[3.4rem]">
-              <span className="block text-[var(--color-on-surface-variant)]">Tu negocio</span>
+              {/* Light: la línea fina necesita más tinta (al 64% se lava a 54px); dark conserva el variant original */}
+              <span className="block text-[rgba(11,15,26,0.80)] dark:text-[var(--color-on-surface-variant)]">Tu negocio</span>
               <strong className="block text-[var(--color-on-surface)]">online y vendiendo</strong>
               <strong
                 className="block bg-clip-text text-transparent pb-1"

@@ -44,17 +44,17 @@ const PLAN_ACCENT_STYLE: Record<
   },
   popular: {
     chipClassName:
-      'text-amber-200 bg-[rgba(245,158,11,0.14)] border-[rgba(245,158,11,0.34)]',
+      'text-amber-700 dark:text-amber-200 bg-[rgba(245,158,11,0.14)] border-[rgba(245,158,11,0.34)]',
     glowClassName: 'from-[rgba(245,158,11,0.35)] via-[rgba(245,158,11,0.1)] to-transparent',
-    numberClassName: 'text-amber-300',
+    numberClassName: 'text-amber-600 dark:text-amber-300',
     ctaClassName:
       'text-[#1a1305] bg-gradient-to-r from-amber-300 via-amber-400 to-orange-300 hover:shadow-[0_0_0_1px_rgba(245,158,11,0.45),0_14px_42px_-14px_rgba(245,158,11,0.75)]',
   },
   recommended: {
     chipClassName:
-      'text-emerald-200 bg-[rgba(16,185,129,0.16)] border-[rgba(16,185,129,0.34)]',
+      'text-emerald-700 dark:text-emerald-200 bg-[rgba(16,185,129,0.16)] border-[rgba(16,185,129,0.34)]',
     glowClassName: 'from-[rgba(16,185,129,0.36)] via-[rgba(16,185,129,0.12)] to-transparent',
-    numberClassName: 'text-emerald-300',
+    numberClassName: 'text-emerald-600 dark:text-emerald-300',
     ctaClassName:
       'text-[#062118] bg-gradient-to-r from-emerald-300 via-emerald-400 to-teal-300 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.45),0_14px_42px_-14px_rgba(16,185,129,0.75)]',
   },
@@ -130,7 +130,7 @@ export function ServiceDrawerContent({
                 </span>
               ) : null}
               {discount ? (
-                <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs font-semibold text-[var(--color-on-surface)]">
+                <span className="inline-flex items-center rounded-full border border-[var(--glass-border)] bg-[rgba(11,15,26,0.04)] dark:border-white/15 dark:bg-white/5 px-2 py-0.5 text-xs font-semibold text-[var(--color-on-surface)]">
                   {discount}
                 </span>
               ) : null}
@@ -166,7 +166,7 @@ export function ServiceDrawerContent({
             initial="hidden"
             animate="visible"
             variants={shouldReduceMotion ? undefined : benefitsContainerVariants}
-            className="overflow-hidden rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.01)]"
+            className="overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[rgba(11,15,26,0.02)] dark:border-white/10 dark:bg-[rgba(255,255,255,0.01)]"
           >
             {benefits.map((benefit, index) => (
               <motion.li
@@ -186,7 +186,7 @@ export function ServiceDrawerContent({
                   </p>
                 </div>
                 {index < benefits.length - 1 && (
-                  <div className="col-span-2 mt-4 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                  <div className="col-span-2 mt-4 h-px w-full bg-gradient-to-r from-transparent via-[rgba(11,15,26,0.10)] dark:via-white/15 to-transparent" />
                 )}
               </motion.li>
             ))}
@@ -201,7 +201,7 @@ export function ServiceDrawerContent({
             {features.map((feature) => (
               <li
                 key={feature}
-                className="flex items-start gap-2.5 rounded-xl border border-white/8 bg-[rgba(255,255,255,0.02)] px-3 py-2.5"
+                className="flex items-start gap-2.5 rounded-xl border border-white/8 bg-[rgba(11,15,26,0.03)] dark:bg-[rgba(255,255,255,0.02)] px-3 py-2.5"
               >
                 <CheckIcon className="mt-0.5 size-4 flex-shrink-0 text-[var(--color-primary)]" />
                 <span className="text-sm leading-relaxed text-[var(--color-on-surface-variant)]">{feature}</span>
@@ -210,7 +210,7 @@ export function ServiceDrawerContent({
           </ul>
         </section>
 
-        <blockquote className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.02)] px-4 py-3.5">
+        <blockquote className="rounded-2xl border border-[var(--glass-border)] bg-[rgba(11,15,26,0.03)] dark:border-white/10 dark:bg-[rgba(255,255,255,0.02)] px-4 py-3.5">
           <p className="text-[13px] italic leading-relaxed text-[var(--color-on-surface-variant)] md:text-sm">
             "{closingQuote}"
           </p>
@@ -218,7 +218,7 @@ export function ServiceDrawerContent({
       </div>
 
       <div
-        className="sticky bottom-0 z-20 -mx-5 mt-6 rounded-t-2xl border-t border-white/10 px-5 pb-1 pt-3 backdrop-blur-xl md:-mx-6 md:px-6"
+        className="sticky bottom-0 z-20 -mx-5 mt-6 rounded-t-2xl border-t border-[var(--glass-border)] dark:border-white/10 px-5 pb-1 pt-3 backdrop-blur-xl md:-mx-6 md:px-6"
         style={{ backgroundColor: 'color-mix(in srgb, var(--color-surface-lowest) 88%, transparent)' }}
       >
         <WhatsAppOutboundLink

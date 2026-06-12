@@ -180,7 +180,9 @@ export function ServiceDrawer({
     () => ({
       backgroundColor: 'var(--color-surface-lowest)',
       borderColor: `color-mix(in srgb, ${primaryColor} 24%, transparent)`,
-      boxShadow: `0 22px 80px -28px rgba(0,0,0,0.75), 0 0 0 1px color-mix(in srgb, ${primaryColor} 10%, transparent), 0 0 34px -18px color-mix(in srgb, ${primaryColor} 35%, transparent)`,
+      // Light usa la sombra navy del sistema (--shadow-card-lg, definida solo en .light);
+      // en dark la variable no existe y cae al fallback original (glow + negro) intacto.
+      boxShadow: `var(--shadow-card-lg, 0 22px 80px -28px rgba(0,0,0,0.75), 0 0 0 1px color-mix(in srgb, ${primaryColor} 10%, transparent), 0 0 34px -18px color-mix(in srgb, ${primaryColor} 35%, transparent))`,
     }),
     [primaryColor],
   )
@@ -195,7 +197,7 @@ export function ServiceDrawer({
             exit={{ opacity: 0 }}
             transition={overlayTransition}
             onClick={onClose}
-            className="absolute inset-0 bg-black/65 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-[var(--scrim-bg)] backdrop-blur-[2px]"
           />
 
           <div className="pointer-events-none absolute inset-0 flex items-end justify-end md:items-stretch">
@@ -247,7 +249,7 @@ export function ServiceDrawer({
                       }}
                     />
                   </div>
-                  <div className="relative flex items-start justify-between gap-4 border-b border-white/5 px-5 pb-4 pt-4">
+                  <div className="relative flex items-start justify-between gap-4 border-b border-[var(--glass-border)] dark:border-white/5 px-5 pb-4 pt-4">
                     <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
                       {title}
                     </h2>
@@ -282,7 +284,7 @@ export function ServiceDrawer({
                     </div>
                   )}
 
-                  <div className="relative flex items-start justify-between gap-4 border-b border-white/5 px-5 pb-4 pt-4 md:px-6 md:pt-6">
+                  <div className="relative flex items-start justify-between gap-4 border-b border-[var(--glass-border)] dark:border-white/5 px-5 pb-4 pt-4 md:px-6 md:pt-6">
                     <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
                       {title}
                     </h2>

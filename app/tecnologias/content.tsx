@@ -304,7 +304,10 @@ export function TecnologiasContent() {
                       )}
                       style={{
                         background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                        boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)',
+                        // Light: apoyo navy + verde profundo (patrón .btn-wa); dark conserva el glow original
+                        boxShadow: isLight
+                          ? '0 2px 5px rgba(24, 32, 60, 0.08), 0 4px 18px rgba(18, 140, 126, 0.30)'
+                          : '0 4px 20px rgba(37, 211, 102, 0.3)',
                       }}
                     >
                       <WhatsAppIcon className="size-4" />

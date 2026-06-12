@@ -71,11 +71,10 @@ export function GraciasContent() {
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 280, damping: 18 }}
-          className="mx-auto mb-8 flex size-24 items-center justify-center rounded-full"
+          className="mx-auto mb-8 flex size-24 items-center justify-center rounded-full shadow-[0_2px_6px_rgba(24,32,60,0.06),0_8px_24px_-8px_rgba(18,140,126,0.25)] dark:shadow-[0_0_32px_rgba(37,211,102,0.18)]"
           style={{
             background: 'rgba(37, 211, 102, 0.12)',
             border: '1.5px solid rgba(37, 211, 102, 0.4)',
-            boxShadow: '0 0 32px rgba(37, 211, 102, 0.18)',
           }}
         >
           <motion.div
@@ -138,10 +137,9 @@ export function GraciasContent() {
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-3 text-sm font-bold text-white transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-3 text-sm font-bold text-white transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] shadow-[0_2px_5px_rgba(24,32,60,0.08),0_4px_18px_rgba(18,140,126,0.30)] dark:shadow-[0_4px_20px_rgba(37,211,102,0.3)]"
             style={{
               background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-              boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)',
             }}
           >
             <WhatsAppIcon className="size-5" style={{ color: 'white' }} />

@@ -274,7 +274,8 @@ function TooltipCard({ tooltip }: { tooltip: TooltipInfo }) {
             <span
               className="rounded-full px-2 py-0.5 text-[9px] font-mono tracking-[0.12em] uppercase"
               style={{
-                color,
+                // En light los acentos 300 no leen sobre blanco: se oscurecen con tinta navy (dark intacto).
+                color: isLight ? `color-mix(in srgb, ${color} 58%, #0B0F1A)` : color,
                 backgroundColor: alpha(color, 0.1),
                 border: `1px solid ${alpha(color, 0.22)}`,
               }}

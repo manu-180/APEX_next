@@ -70,27 +70,14 @@ export function WhatsAppFloatingButton() {
         onMouseLeave={() => setHovered(false)}
         aria-label="Abrir WhatsApp con Manuel"
         className={cn(
-          'pointer-events-auto group relative inline-flex items-center',
+          'wa-float-pill pointer-events-auto group relative inline-flex items-center',
           'rounded-full',
           'min-h-[3.5rem]',
           'transition-all duration-300 ease-out',
           'hover:scale-[1.02] active:scale-[0.98]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
           isExpanded ? 'pl-2 pr-4 py-2 sm:pr-5 gap-3' : 'p-2 gap-0',
         )}
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(13,13,18,0.88) 0%, rgba(26,26,36,0.88) 100%)',
-          border: '1px solid rgba(var(--color-primary-rgb), 0.32)',
-          backdropFilter: 'blur(18px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(18px) saturate(180%)',
-          boxShadow: [
-            '0 18px 48px -16px rgba(0,0,0,0.55)',
-            '0 0 0 1px rgba(255,255,255,0.04) inset',
-            '0 0 28px -10px rgba(var(--color-primary-rgb), 0.4)',
-          ].join(', '),
-          color: 'white',
-        }}
       >
         {/* Glow pulse sutil — usa color del tema, no verde clásico */}
         <span
@@ -138,7 +125,7 @@ export function WhatsAppFloatingButton() {
             style={{
               background: '#22c55e',
               boxShadow:
-                '0 0 0 2px rgba(13,13,18,0.95), 0 0 10px rgba(34,197,94,0.65)',
+                '0 0 0 2px var(--wa-pill-ring), 0 0 10px rgba(34,197,94,0.65)',
             }}
           />
         </span>
@@ -153,11 +140,11 @@ export function WhatsAppFloatingButton() {
         >
           <span
             className="font-heading text-[10px] uppercase tracking-[0.18em] leading-none mb-0.5"
-            style={{ color: 'rgba(255,255,255,0.55)' }}
+            style={{ color: 'var(--wa-pill-label)' }}
           >
             En línea
           </span>
-          <span className="font-heading text-base font-extrabold leading-tight tracking-tight whitespace-nowrap text-white">
+          <span className="font-heading text-base font-extrabold leading-tight tracking-tight whitespace-nowrap text-current">
             Hablemos
           </span>
         </span>

@@ -131,7 +131,7 @@ export function MobileDrawer({
           <motion.div
             aria-hidden="true"
             className="fixed inset-0"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', zIndex: 79 }}
+            style={{ background: 'var(--scrim-bg)', backdropFilter: 'blur(8px)', zIndex: 79 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -145,14 +145,13 @@ export function MobileDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Menú de navegación"
-            className="fixed top-0 right-0 flex flex-col"
+            className="fixed top-0 right-0 flex flex-col shadow-[-2px_0_6px_rgba(24,32,60,0.05),-16px_0_48px_-12px_rgba(24,32,60,0.20)] dark:shadow-[-8px_0_48px_rgba(0,0,0,0.4)]"
             style={{
               width: 'min(85vw, 360px)',
               height: '100dvh',
               background: 'var(--color-surface-low)',
               backdropFilter: 'blur(24px)',
               borderLeft: '1px solid var(--glass-border)',
-              boxShadow: '-8px 0 48px rgba(0,0,0,0.4)',
               zIndex: 80,
             }}
             drag="x"

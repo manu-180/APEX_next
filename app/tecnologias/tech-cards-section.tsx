@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, type CSSProperties } from 'react'
+import React, { useRef } from 'react'
 import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { TECH_STACK, type ThemeId } from '@/lib/types/theme'
 import { useApexTheme } from '@/hooks/useTheme'
@@ -68,10 +68,10 @@ export function TechCardsSection() {
         {/* ── Encabezado editorial ─────────────────────────────────────── */}
         <SectionReveal>
           <div className="relative mb-10 md:mb-12">
+            {/* Stroke 0.12 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
             <span
               aria-hidden="true"
-              className="section-number absolute -top-10 right-0 hidden md:block"
-              style={{ '--sn-stroke-alpha': '0.12' } as CSSProperties}
+              className="section-number absolute -top-10 right-0 hidden md:block dark:[--sn-stroke-alpha:0.12]"
             >
               01
             </span>
@@ -94,7 +94,7 @@ export function TechCardsSection() {
           <div className="mb-8 flex justify-start">
             <div
               ref={hintRef}
-              className="theme-transition relative inline-flex max-w-xl rounded-full p-px shadow-[0_10px_40px_-16px_rgba(var(--color-primary-rgb),0.55)] ring-1 ring-[rgba(var(--color-primary-rgb),0.12)]"
+              className="theme-transition relative inline-flex max-w-xl rounded-full p-px shadow-[0_2px_6px_rgba(24,32,60,0.06),0_10px_32px_-14px_rgba(var(--color-primary-rgb),0.38)] dark:shadow-[0_10px_40px_-16px_rgba(var(--color-primary-rgb),0.55)] ring-1 ring-[rgba(var(--color-primary-rgb),0.12)]"
               style={{
                 background:
                   'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.55) 0%, rgba(var(--color-accent-rgb), 0.38) 48%, rgba(var(--color-primary-rgb), 0.28) 100%)',
@@ -177,11 +177,14 @@ export function TechCardsSection() {
                   >
                     <div className="mb-5 flex items-start justify-between">
                       <div
-                        className="tech-icon-box flex size-12 items-center justify-center rounded-xl theme-transition"
+                        className={`tech-icon-box flex size-12 items-center justify-center rounded-xl theme-transition ${
+                          isActive
+                            ? 'shadow-[0_1px_3px_rgba(24,32,60,0.08),0_4px_14px_-4px_rgba(var(--color-primary-rgb),0.30)] dark:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.20)]'
+                            : ''
+                        }`}
                         style={{
                           backgroundColor: 'rgba(var(--color-primary-rgb), 0.12)',
                           color: 'var(--color-primary)',
-                          boxShadow: isActive ? '0 0 20px rgba(var(--color-primary-rgb), 0.20)' : 'none',
                         }}
                       >
                         {Icon ? <Icon className="size-6" /> : <span className="text-lg font-bold">?</span>}

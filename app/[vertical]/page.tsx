@@ -207,7 +207,7 @@ export default async function VerticalLandingPage({
               >
                 <span
                   aria-hidden
-                  className="mt-2.5 size-1.5 shrink-0 rounded-full bg-red-400"
+                  className="mt-2.5 size-1.5 shrink-0 rounded-full bg-red-500 dark:bg-red-400"
                 />
                 <span>{pain}</span>
               </li>

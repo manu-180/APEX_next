@@ -36,18 +36,14 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--scrim-bg)] backdrop-blur-sm"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="relative z-10 w-[92vw] max-w-2xl rounded-2xl px-7 py-6 sm:px-8 glass-card glow-border"
-            style={{
-              boxShadow:
-                '0 0 40px -10px rgba(var(--color-primary-rgb), 0.15), 0 25px 50px -12px rgba(0,0,0,0.6)',
-            }}
+            className="relative z-10 w-[92vw] max-w-2xl rounded-2xl px-7 py-6 sm:px-8 glass-card glow-border dark:shadow-[0_0_40px_-10px_rgba(var(--color-primary-rgb),0.15),0_25px_50px_-12px_rgba(0,0,0,0.6)]"
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-[var(--color-on-surface)]">
@@ -118,7 +114,7 @@ function ShortcutRow({
   requiresShift?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-1.5 px-2 rounded-lg hover:bg-[rgba(255,255,255,0.03)] transition-colors">
+    <div className="flex items-center justify-between gap-3 py-1.5 px-2 rounded-lg hover:bg-[rgba(11,15,26,0.04)] dark:hover:bg-[rgba(255,255,255,0.03)] transition-colors">
       <span className="text-sm text-[var(--color-on-surface-variant)]">{label}</span>
       <kbd className="flex flex-wrap items-center justify-end gap-1 text-xs font-mono shrink-0">
         <span className="kbd-key">Ctrl</span>

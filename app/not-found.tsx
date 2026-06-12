@@ -69,9 +69,9 @@ export default function NotFound() {
         aria-hidden="true"
       />
 
-      {/* Dot-grid backdrop — fades at edges */}
+      {/* Dot-grid backdrop — fades at edges (más presente sobre porcelana en light) */}
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[52%] opacity-[0.18]"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[52%] opacity-[0.32] dark:opacity-[0.18]"
         style={{
           width: '520px',
           height: '220px',
@@ -209,7 +209,8 @@ export default function NotFound() {
         <span style={{ color: 'var(--color-accent)' }}>apex@sys</span>
         <span style={{ opacity: 0.4 }}>:~$</span>
         <span>resolve</span>
-        <span style={{ color: 'rgb(248,113,113)' }}>NOT_FOUND</span>
+        {/* red-400 (= rgb(248,113,113)) solo en dark; en light necesita más tinta */}
+        <span className="text-red-600 dark:text-red-400">NOT_FOUND</span>
         <span
           className="nf-cur ml-0.5 inline-block h-[13px] w-[7px] align-middle"
           style={{ background: 'var(--color-accent)', opacity: 0.75 }}

@@ -64,7 +64,7 @@ export function ProjectsSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-[var(--scrim-bg)] backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -75,7 +75,7 @@ export function ProjectsSheet({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 32, stiffness: 380 }}
-              className="pointer-events-auto w-full max-w-md sm:max-w-lg max-h-[min(60vh,520px)] overflow-hidden rounded-t-2xl sm:rounded-t-3xl glass-card shadow-[0_-12px_48px_-12px_rgba(0,0,0,0.45)]"
+              className="pointer-events-auto w-full max-w-md sm:max-w-lg max-h-[min(60vh,520px)] overflow-hidden rounded-t-2xl sm:rounded-t-3xl glass-card dark:shadow-[0_-12px_48px_-12px_rgba(0,0,0,0.45)]"
               style={{
                 borderTop: '1px solid rgba(var(--color-primary-rgb), 0.3)',
               }}
@@ -134,7 +134,7 @@ export function ProjectsSheet({
                         data-inspector-cat="Motion · Spring"
                       >
                         {thumb ? (
-                          <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-white/5">
+                          <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-[rgba(11,15,26,0.08)] dark:ring-white/5">
                             <Image
                               src={thumb}
                               alt={entry.project.title}
@@ -182,7 +182,7 @@ export function ProjectsSheet({
                       data-inspector-desc="Enlace a un sitio real ya publicado: se abre en pestaña nueva con noopener para que el sitio externo no acceda a tu ventana. Ideal para ver el resultado final en vivo."
                       data-inspector-cat="Seguridad"
                     >
-                      <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-white/5">
+                      <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-[rgba(11,15,26,0.08)] dark:ring-white/5">
                         <Image
                           src={entry.imageSrc}
                           alt={entry.name}

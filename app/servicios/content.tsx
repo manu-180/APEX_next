@@ -75,7 +75,9 @@ function ServiciosTabQuerySync({ onSelectMobile }: { onSelectMobile: () => void 
  * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
  */
 const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+/** Sombra del CTA: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa). */
+const WA_SHADOW_CLASS =
+  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_10px_26px_-10px_rgba(18,140,126,0.42)] dark:shadow-[0_10px_28px_-10px_rgba(37,211,102,0.45)]'
 
 /**
  * Tier ancla por pestaña (AUDIT_ADDENDUM: UN solo badge de ancla — «Más elegido»
@@ -440,14 +442,20 @@ function UnifiedPricingCard({
 
   return (
     <SectionReveal delay={index * 0.1} className="h-full">
+      {/* Ancla en light: superficie blanca elevada con sombra navy estratificada
+          (el glow 60px es lenguaje de dark); dark conserva el render original. */}
       <div
         className={cn(
           'relative h-full overflow-hidden rounded-2xl transition-all duration-300',
           isAnchor
-            ? 'border border-[rgba(var(--color-primary-rgb),0.6)] shadow-[0_0_60px_rgba(var(--color-primary-rgb),0.18),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]'
+            ? cn(
+                'border border-[rgba(var(--color-primary-rgb),0.6)]',
+                'bg-[var(--color-surface-lowest)] dark:bg-[var(--color-surface-high)]',
+                'shadow-[0_2px_6px_rgba(24,32,60,0.05),0_24px_56px_-20px_rgba(24,32,60,0.20),0_0_28px_-10px_rgba(var(--color-primary-rgb),0.25),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]',
+                'dark:shadow-[0_0_60px_rgba(var(--color-primary-rgb),0.18),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]',
+              )
             : 'glass-card border border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.2)]',
         )}
-        style={isAnchor ? { background: 'var(--color-surface-high, rgba(255,255,255,0.04))' } : undefined}
       >
         {/* Ancla: radial glow background */}
         {isAnchor && (
@@ -583,8 +591,9 @@ function UnifiedPricingCard({
                 'btn-tech inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-semibold text-white select-none',
                 'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                WA_SHADOW_CLASS,
               )}
-              style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+              style={{ background: WA_GRADIENT }}
             >
               <WhatsAppIcon className="size-4" />
               {plan.price === null ? 'Consultar por WhatsApp' : 'Empezar proyecto'}

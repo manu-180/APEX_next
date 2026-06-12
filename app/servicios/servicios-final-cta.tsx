@@ -12,7 +12,9 @@ import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-li
  * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
  */
 const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 14px 36px -12px rgba(37, 211, 102, 0.55)'
+/** Sombra del CTA: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa). */
+const WA_SHADOW_CLASS =
+  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_14px_32px_-12px_rgba(18,140,126,0.50)] dark:shadow-[0_14px_36px_-12px_rgba(37,211,102,0.55)]'
 
 /** De-riskers canónicos (AUDIT_ADDENDUM): respuesta <1 h, boceto 24-48 h, 3 cuotas. */
 const FINAL_DERISKERS = [
@@ -33,22 +35,23 @@ export function ServiciosFinalCta() {
           data-inspector-cat="UX · Conversión"
         >
           {/* Watermark de sección */}
+          {/* Stroke 0.1 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
           <span
             aria-hidden="true"
-            className="section-number absolute -top-3 right-4"
-            style={{ fontSize: 'clamp(4.5rem, 9vw, 7rem)', '--sn-stroke-alpha': '0.1' } as CSSProperties}
+            className="section-number absolute -top-3 right-4 dark:[--sn-stroke-alpha:0.1]"
+            style={{ fontSize: 'clamp(4.5rem, 9vw, 7rem)' } as CSSProperties}
           >
             07
           </span>
 
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-16 -left-16 size-48 rounded-full blur-3xl opacity-30"
+            className="pointer-events-none absolute -top-16 -left-16 size-48 rounded-full blur-3xl opacity-40 dark:opacity-30"
             style={{ background: 'rgba(var(--color-primary-rgb), 0.4)' }}
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-16 -right-16 size-48 rounded-full blur-3xl opacity-20"
+            className="pointer-events-none absolute -bottom-16 -right-16 size-48 rounded-full blur-3xl opacity-30 dark:opacity-20"
             style={{ background: 'rgba(var(--color-primary-rgb), 0.3)' }}
           />
           <div
@@ -81,8 +84,9 @@ export function ServiciosFinalCta() {
                 'btn-tech inline-flex h-14 items-center justify-center gap-3 rounded-xl px-9 text-base font-semibold text-white select-none',
                 'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                WA_SHADOW_CLASS,
               )}
-              style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+              style={{ background: WA_GRADIENT }}
             >
               <WhatsAppIcon className="size-5" />
               Hablemos por WhatsApp

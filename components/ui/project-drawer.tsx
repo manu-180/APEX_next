@@ -557,7 +557,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
             animate="visible"
             exit="exit"
             onClick={onClose}
-            className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-[2px]"
+            className="fixed inset-0 z-[70] bg-[var(--scrim-bg)] backdrop-blur-[2px]"
           />
 
           {/* ── Panel ────────────────────────────────────────── */}
@@ -567,12 +567,10 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed top-0 right-0 z-[70] h-full w-full sm:w-[560px] overflow-y-auto overflow-x-hidden"
+            className="fixed top-0 right-0 z-[70] h-full w-full sm:w-[560px] overflow-y-auto overflow-x-hidden shadow-[-24px_0_64px_-24px_rgba(24,32,60,0.25),-1px_0_0_rgba(var(--color-primary-rgb),0.08)] dark:shadow-[-24px_0_80px_-10px_rgba(0,0,0,0.7),-1px_0_0_rgba(var(--color-primary-rgb),0.08)]"
             style={{
               backgroundColor: 'var(--color-surface-lowest)',
               borderLeft: '1px solid rgba(var(--color-primary-rgb), 0.1)',
-              boxShadow:
-                '-24px 0 80px -10px rgba(0,0,0,0.7), -1px 0 0 rgba(var(--color-primary-rgb), 0.08)',
             }}
           >
             {/* Top accent line */}

@@ -13,7 +13,7 @@ interface Particle {
   radius: number
   baseAlpha: number
   alpha: number
-  color: string
+  colorIndex: number
 }
 
 export interface MousePosition {
@@ -47,11 +47,25 @@ interface ParticleFieldProps {
   lineWidth?: number
 }
 
-const COLORS = [
+/* Fallback si las CSS vars no están — equivale al set de dark mode. */
+const DEFAULT_COLORS = [
   '6, 182, 212',   // cyan
   '59, 130, 246',  // blue
   '124, 58, 237',  // violet
 ]
+
+/**
+ * Colores reales desde globals.css (--particle-rgb-1/2/3): dark usa los tonos
+ * brillantes; light define tonos profundos legibles sobre porcelana.
+ */
+function readThemeParticleColors(): string[] {
+  if (typeof window === 'undefined') return DEFAULT_COLORS
+  const style = getComputedStyle(document.documentElement)
+  return DEFAULT_COLORS.map((fallback, i) => {
+    const value = style.getPropertyValue(`--particle-rgb-${i + 1}`).trim()
+    return value || fallback
+  })
+}
 
 const RETURN_FORCE_IDLE = 0.006
 const VELOCITY_DAMPING = 0.955
@@ -80,12 +94,13 @@ export function ParticleField({
   const internalMouseRef = useRef<MousePosition>({ x: -9999, y: -9999, active: false })
   const rafRef = useRef<number>(0)
   const dprRef = useRef(1)
+  const colorsRef = useRef<string[]>(DEFAULT_COLORS)
 
   const createParticles = useCallback(
     (w: number, h: number) => {
       const particles: Particle[] = []
       for (let i = 0; i < particleCount; i++) {
-        const colorRgb = COLORS[Math.floor(Math.random() * COLORS.length)]
+        const colorIndex = Math.floor(Math.random() * DEFAULT_COLORS.length)
         const x = Math.random() * w
         const y = Math.random() * h
         const rRange = particleRadiusMax - particleRadiusMin
@@ -100,7 +115,7 @@ export function ParticleField({
           radius: Math.random() * rRange + particleRadiusMin,
           baseAlpha: Math.random() * aRange + particleAlphaMin,
           alpha: 0,
-          color: colorRgb,
+          colorIndex,
         })
       }
       return particles
@@ -122,6 +137,16 @@ export function ParticleField({
     if (!ctx) return
 
     dprRef.current = Math.min(window.devicePixelRatio || 1, 2)
+
+    // Colores theme-aware: se releen cuando cambia la clase light/dark en <html>.
+    colorsRef.current = readThemeParticleColors()
+    const themeObserver = new MutationObserver(() => {
+      colorsRef.current = readThemeParticleColors()
+    })
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
 
     const resize = () => {
       const dpr = dprRef.current
@@ -227,7 +252,7 @@ export function ParticleField({
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(${p.color}, ${p.alpha})`
+        ctx.fillStyle = `rgba(${colorsRef.current[p.colorIndex]}, ${p.alpha})`
         ctx.fill()
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -241,7 +266,7 @@ export function ParticleField({
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `rgba(${p.color}, ${alpha})`
+            ctx.strokeStyle = `rgba(${colorsRef.current[p.colorIndex]}, ${alpha})`
             ctx.lineWidth = lineWidthPx
             ctx.stroke()
           }
@@ -255,6 +280,7 @@ export function ParticleField({
 
     return () => {
       cancelAnimationFrame(rafRef.current)
+      themeObserver.disconnect()
       window.removeEventListener('resize', resize)
       if (handleMouse) canvas.removeEventListener('mousemove', handleMouse)
       if (handleMouseLeave) canvas.removeEventListener('mouseleave', handleMouseLeave)

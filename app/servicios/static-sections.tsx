@@ -15,7 +15,9 @@ import { FaqAccordion } from './faq-accordion'
  * (solo en elementos/CTAs de WhatsApp). Todo lo demás usa vars del tema.
  */
 const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+/** Sombra del CTA: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa). */
+const WA_SHADOW_CLASS =
+  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_10px_26px_-10px_rgba(18,140,126,0.42)] dark:shadow-[0_10px_28px_-10px_rgba(37,211,102,0.45)]'
 
 /**
  * FAQ — orden de objeciones del DESIGN_BRIEF §1.6:
@@ -139,8 +141,9 @@ export function ServiciosHero() {
                   'h-12 px-6 text-sm text-white',
                   'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                  WA_SHADOW_CLASS,
                 )}
-                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+                style={{ background: WA_GRADIENT }}
               >
                 <WhatsAppIcon className="size-4" />
                 No sé qué necesito, escribime
@@ -305,14 +308,14 @@ export function ServiciosProcess() {
                         className={cn(
                           'mb-3 flex size-10 items-center justify-center rounded-full text-xs font-black',
                           highlight
-                            ? 'bg-[var(--color-primary)] text-[var(--color-surface-base)]'
+                            ? cn(
+                                'bg-[var(--color-primary)] text-[var(--color-surface-base)]',
+                                // Glow del paso destacado: en light pasa a sombra de apoyo navy + halo del tema
+                                'shadow-[0_1px_3px_rgba(24,32,60,0.10),0_6px_16px_-4px_rgba(var(--color-primary-rgb),0.35)]',
+                                'dark:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.45)]',
+                              )
                             : 'border border-[rgba(var(--color-primary-rgb),0.45)] text-[var(--color-primary)]',
                         )}
-                        style={
-                          highlight
-                            ? { boxShadow: '0 0 20px rgba(var(--color-primary-rgb), 0.45)' }
-                            : undefined
-                        }
                       >
                         {step}
                       </div>
@@ -585,10 +588,11 @@ export function ServiciosComparisonTable() {
                   APEX vs WordPress vs Wix vs Tiendanube vs Agencia
                 </h3>
               </div>
+              {/* Stroke 0.16 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
               <span
                 aria-hidden="true"
-                className="section-number hidden md:block"
-                style={{ fontSize: 'clamp(3rem, 6vw, 4.5rem)', '--sn-stroke-alpha': '0.16' } as CSSProperties}
+                className="section-number hidden md:block dark:[--sn-stroke-alpha:0.16]"
+                style={{ fontSize: 'clamp(3rem, 6vw, 4.5rem)' } as CSSProperties}
               >
                 05
               </span>
