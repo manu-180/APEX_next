@@ -141,4 +141,10 @@ tokens CSS centralizados, `prefers-reduced-motion` en 27 sitios, ISR + headers s
 - Pulir páginas menores: `/gracias`, `not-found`, `global-error` (post-conversión/error — baja prioridad).
 - Opcional premium: barra de progreso de navegación (route-change) global.
 - Opcional: `content-visibility:auto` en secciones below-the-fold (requiere globals.css).
-- **Sin commitear** (regla: commitear solo cuando Manuel lo pide). Árbol verde. Si Manuel confirma, commitear Fases 1–4.
+## 5.7 DEPLOY A PRODUCCIÓN ✅ (2026-06-13)
+- Commit `a71e0d2` (Fases 1–4) en `main`, pusheado a `origin/main`.
+- Vercel deploy `dpl_JBdyXM5y3zvSqEEQD5zbLqQBMUWw` → **READY** (production, build ~38s, zero-downtime).
+- Smoke test prod (`www.theapexweb.com`): 7 páginas 200 · `manuel.jpg` 55 KB · `mi-lugar.webp` 30 KB · `mi-lugar.png` 404 (correcto).
+- **Ramas**: solo `main` (+ `origin/main`). Sin ramas colgando.
+- **Stash colgante** `conductor-pre-run-3bc42a2e…` (2026-05-06): contiene SOLO prompts de planificación de `/proyectos` (`prompts/proyectos-redesign/*`). **OBSOLETO** — la ruta `/proyectos` se eliminó a propósito (commit `091a7199`). Pendiente: decisión de Manuel para dropearlo (`git stash drop stash@{0}`; recuperable vía reflog ~90 días).
+- Pendiente menor (no bloqueante): pulir `/gracias`/`not-found`, barra de progreso de navegación, `content-visibility:auto` below-fold.
