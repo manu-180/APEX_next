@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   motion,
   AnimatePresence,
@@ -299,7 +299,13 @@ function BookingCalendar() {
     method: 'whatsapp' | 'email'
   } | null>(null)
 
-  const dates = useMemo(() => {
+  /** Días disponibles. Se computan recién al montar porque "hoy" depende del
+   *  reloj/huso de quien renderiza: el server (UTC) puede estar en otro día que
+   *  el visitante y la grilla del SSR no coincidiría con la del cliente
+   *  (error de hidratación). Hasta montar, SSR muestra un skeleton estable. */
+  const [dates, setDates] = useState<Date[]>([])
+
+  useEffect(() => {
     const days: Date[] = []
     const today = new Date()
     for (let i = 0; i < 21 && days.length < 14; i++) {
@@ -307,8 +313,13 @@ function BookingCalendar() {
       d.setDate(today.getDate() + i)
       if (!BLOCKED_WEEKDAYS.includes(d.getDay())) days.push(d)
     }
-    return days
+    setDates(days)
   }, [])
+
+  /** false en SSR y en el primer render del cliente; true tras montar. Gatea
+   *  todo lo que depende de la hora actual o de APIs solo-cliente (Supabase),
+   *  para que el HTML del server sea determinístico. */
+  const hydrated = dates.length > 0
 
   const handleSubmit = async () => {
     if (!selectedDate || selectedHour === null) return
@@ -428,7 +439,10 @@ function BookingCalendar() {
           Lunes a sábado, de 9 a 19. Sin compromiso.
         </p>
 
-        {!supabaseReady && (
+        {/* supabaseReady es siempre false en SSR (el cliente browser lanza sin
+            window) y true al hidratar: sin el gate `hydrated`, este banner
+            aparecía en el HTML del server y no en el cliente → mismatch. */}
+        {hydrated && !supabaseReady && (
           <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-200">
             Falta configurar <code className="rounded bg-[rgba(11,15,26,0.08)] px-1 dark:bg-black/20">NEXT_PUBLIC_SUPABASE_URL</code> y{' '}
             <code className="rounded bg-[rgba(11,15,26,0.08)] px-1 dark:bg-black/20">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> para reservas en vivo.
@@ -441,6 +455,19 @@ function BookingCalendar() {
           aria-label="Elegí un día"
           className="no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-3"
         >
+          {!hydrated &&
+            /* Placeholder SSR: clona la caja del botón real (mismas clases de
+               tipografía con texto invisible) para que no haya layout shift. */
+            Array.from({ length: 14 }, (_, i) => (
+              <div
+                key={i}
+                aria-hidden="true"
+                className="flex min-w-[52px] flex-shrink-0 animate-pulse flex-col items-center rounded-xl border border-transparent bg-[var(--color-surface-high)]/40 px-3 py-2 text-center"
+              >
+                <span className="invisible text-[10px] font-medium uppercase">lun</span>
+                <span className="invisible text-lg font-bold tabular-nums">00</span>
+              </div>
+            ))}
           {dates.map((d) => {
             const isSelected = selectedDate.toDateString() === d.toDateString()
             const longLabel = d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -482,7 +509,10 @@ function BookingCalendar() {
           </div>
         )}
 
-        {isSunday ? (
+        {/* `isSunday` e `isHourSelectable` derivan del reloj (selectedDate nace
+            de new Date() y los horarios de hoy se filtran por la hora actual):
+            en SSR se muestra siempre el skeleton para no divergir del cliente. */}
+        {hydrated && isSunday ? (
           <div className="mb-5 rounded-xl border border-[var(--color-surface-high)] bg-[var(--color-surface-lowest)]/50 py-8 text-center text-sm text-[var(--color-on-surface-variant)]">
             Los domingos descanso. Elegí otro día.
           </div>
@@ -502,7 +532,7 @@ function BookingCalendar() {
                 </span>
               </div>
             </div>
-            {loadingSlots ? (
+            {!hydrated || loadingSlots ? (
               <div className="mb-5 grid grid-cols-4 gap-2">
                 {BOOKING_SLOT_HOURS.map((h) => (
                   <div key={h} className="h-10 animate-pulse rounded-lg bg-[var(--color-surface-high)]/40" />
