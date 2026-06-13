@@ -246,7 +246,14 @@ export function BudgetCalculatorSection() {
   })()
 
   return (
-    <section id="calculadora" className="relative py-20 sm:py-24">
+    <section
+      id="calculadora"
+      className="relative py-20 sm:py-24"
+      data-hover
+      data-inspector-title="Calculadora de presupuesto"
+      data-inspector-desc="Wizard de 4 pasos que califica al lead y arma el contexto antes de ir a WhatsApp. Sin email, sin fricción — reduce la barrera de entrada al máximo."
+      data-inspector-cat="UX · Formulario"
+    >
       <div className="mx-auto max-w-3xl px-6">
         <motion.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
@@ -278,7 +285,13 @@ export function BudgetCalculatorSection() {
         </motion.div>
 
         {/* ── Progress bar ──────────────────────────────────────────── */}
-        <div className="mb-8">
+        <div
+          className="mb-8"
+          data-hover
+          data-inspector-title="Barra de progreso del wizard"
+          data-inspector-desc="Muestra avance sin obligar a completar. Reduce ansiedad y abandono: el visitante sabe exactamente cuánto falta."
+          data-inspector-cat="UX · Motion"
+        >
           <div className="h-1 w-full rounded-full overflow-hidden bg-[var(--color-surface-high)]">
             <motion.div
               className="h-full rounded-full"
@@ -318,7 +331,13 @@ export function BudgetCalculatorSection() {
         </div>
 
         {/* ── Step container ───────────────────────────────────────── */}
-        <div className="bento-surface p-6 sm:p-8">
+        <div
+          className="bento-surface p-6 sm:p-8"
+          data-hover
+          data-inspector-title="Contenedor del wizard"
+          data-inspector-desc="Una pregunta por pantalla con AnimatePresence. Avance automático al elegir opción simple — sin botón Siguiente innecesario. Reduce fricción cognitiva."
+          data-inspector-cat="UX · Formulario"
+        >
           <AnimatePresence mode="wait">
             {step === 0 && (
               <motion.div
@@ -524,6 +543,10 @@ export function BudgetCalculatorSection() {
                   <button
                     type="button"
                     onClick={goToWhatsApp}
+                    data-hover
+                    data-inspector-title="CTA WhatsApp con contexto armado"
+                    data-inspector-desc="Abre WhatsApp con el resumen completo (tipo de proyecto, plazo, integraciones). Manuel recibe el contexto ya listo — la charla empieza de donde dejó el wizard."
+                    data-inspector-cat="Conversión"
                     className={cn(
                       'btn-tech inline-flex flex-1 items-center justify-center gap-2.5 min-h-12 rounded-xl px-6 text-sm font-semibold text-white select-none',
                       'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',

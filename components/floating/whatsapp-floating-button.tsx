@@ -58,9 +58,9 @@ export function WhatsAppFloatingButton() {
   return (
     <div
       className={cn(
-        'fixed z-[60] pointer-events-none',
-        'right-[max(1rem,env(safe-area-inset-right))]',
-        'bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))]',
+        'fixed z-[60] pointer-events-none overflow-visible',
+        'right-[max(1.5rem,calc(env(safe-area-inset-right)+0.5rem))]',
+        'bottom-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))]',
       )}
     >
       <button
@@ -76,7 +76,7 @@ export function WhatsAppFloatingButton() {
           'transition-all duration-300 ease-out',
           'hover:scale-[1.02] active:scale-[0.98]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-          isExpanded ? 'pl-2 pr-4 py-2 sm:pr-5 gap-3' : 'p-2 gap-0',
+          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'p-2 gap-0',
         )}
       >
         {/* Glow pulse sutil — usa color del tema, no verde clásico */}
@@ -134,7 +134,7 @@ export function WhatsAppFloatingButton() {
         <span
           className={cn(
             'relative flex flex-col items-start overflow-hidden transition-[max-width,opacity,margin] duration-300 ease-out',
-            'hidden xs:flex sm:flex',
+            'hidden sm:flex',
             isExpanded ? 'max-w-[12rem] opacity-100' : 'max-w-0 opacity-0 -ml-3',
           )}
         >
@@ -153,7 +153,7 @@ export function WhatsAppFloatingButton() {
         <span
           aria-hidden
           className={cn(
-            'relative ml-1 hidden xs:inline-flex sm:inline-flex transition-transform duration-300 ease-out group-hover:translate-x-0.5',
+            'relative ml-1 hidden sm:inline-flex transition-transform duration-300 ease-out group-hover:translate-x-0.5',
             isExpanded ? 'opacity-100' : 'max-w-0 opacity-0 ml-0',
           )}
           style={{ color: 'var(--color-primary)' }}
