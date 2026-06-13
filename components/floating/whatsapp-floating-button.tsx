@@ -76,7 +76,7 @@ export function WhatsAppFloatingButton() {
           'transition-all duration-300 ease-out',
           'hover:scale-[1.02] active:scale-[0.98]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'p-2 gap-0',
+          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'p-2 gap-0 overflow-hidden',
         )}
       >
         {/* Glow pulse sutil — usa color del tema, no verde clásico */}
@@ -133,9 +133,9 @@ export function WhatsAppFloatingButton() {
         {/* Label "Hablemos" — tipografía heading premium */}
         <span
           className={cn(
-            'relative flex flex-col items-start overflow-hidden transition-[max-width,opacity,margin] duration-300 ease-out',
+            'relative flex flex-col items-start overflow-hidden transition-[max-width,opacity] duration-300 ease-out',
             'hidden sm:flex',
-            isExpanded ? 'max-w-[12rem] opacity-100' : 'max-w-0 opacity-0 -ml-3',
+            isExpanded ? 'max-w-[12rem] opacity-100' : 'max-w-0 opacity-0',
           )}
         >
           <span
