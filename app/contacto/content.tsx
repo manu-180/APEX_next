@@ -148,7 +148,7 @@ export function ContactoContent() {
       {/* ── Decisión binaria: WhatsApp ahora · o · agendar ────────────── */}
       <section className="pb-20 md:pb-28" aria-label="Elegí cómo contactarme">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[2fr_auto_1fr] lg:gap-8">
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[2fr_auto_3fr] lg:gap-8">
             <WhatsAppNowPanel />
 
             {/* Divisor "o" — vertical en desktop */}
