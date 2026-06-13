@@ -148,7 +148,7 @@ export function ContactoContent() {
       {/* ── Decisión binaria: WhatsApp ahora · o · agendar ────────────── */}
       <section className="pb-20 md:pb-28" aria-label="Elegí cómo contactarme">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[1.4fr_auto_1fr] lg:gap-8">
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[2fr_auto_1fr] lg:gap-8">
             <WhatsAppNowPanel />
 
             {/* Divisor "o" — vertical en desktop */}
@@ -308,7 +308,7 @@ function BookingCalendar() {
   useEffect(() => {
     const days: Date[] = []
     const today = new Date()
-    for (let i = 0; i < 21 && days.length < 14; i++) {
+    for (let i = 0; i < 10 && days.length < 7; i++) {
       const d = new Date(today)
       d.setDate(today.getDate() + i)
       if (!BLOCKED_WEEKDAYS.includes(d.getDay())) days.push(d)
@@ -458,7 +458,7 @@ function BookingCalendar() {
           {!hydrated &&
             /* Placeholder SSR: clona la caja del botón real (mismas clases de
                tipografía con texto invisible) para que no haya layout shift. */
-            Array.from({ length: 14 }, (_, i) => (
+            Array.from({ length: 7 }, (_, i) => (
               <div
                 key={i}
                 aria-hidden="true"
