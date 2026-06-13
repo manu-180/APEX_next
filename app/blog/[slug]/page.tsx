@@ -147,11 +147,17 @@ export default async function BlogPostPage({
 
         <div className="relative z-10 mx-auto max-w-3xl px-6">
           <nav className="mb-8 flex items-center gap-2 text-xs text-[var(--color-on-surface-variant)]">
-            <Link href="/" className="hover:text-[var(--color-primary)] transition-colors">
+            <Link
+              href="/"
+              className="rounded transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+            >
               Inicio
             </Link>
             <span className="opacity-40">/</span>
-            <Link href="/blog" className="hover:text-[var(--color-primary)] transition-colors">
+            <Link
+              href="/blog"
+              className="rounded transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+            >
               Blog
             </Link>
             <span className="opacity-40">/</span>
@@ -224,15 +230,15 @@ export default async function BlogPostPage({
                   <details
                     key={i}
                     name="post-faq"
-                    className="group rounded-xl overflow-hidden border"
+                    className="group rounded-xl overflow-hidden border transition-colors duration-200 hover:border-[rgba(var(--color-primary-rgb),0.3)] has-[summary:focus-visible]:border-[rgba(var(--color-primary-rgb),0.45)] open:border-[rgba(var(--color-primary-rgb),0.3)]"
                     style={{
                       borderColor: 'var(--glass-border)',
                       backgroundColor: 'var(--color-surface-base)',
                     }}
                     open={i === 0}
                   >
-                    <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                      <span className="text-sm font-semibold text-[var(--color-on-surface)] pr-4">
+                    <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden transition-colors duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.05)] active:bg-[rgba(var(--color-primary-rgb),0.08)] focus-visible:outline-none focus-visible:bg-[rgba(var(--color-primary-rgb),0.06)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-primary)]">
+                      <span className="text-sm font-semibold text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)] group-open:text-[var(--color-primary)]">
                         {item.q}
                       </span>
                       <span
@@ -302,14 +308,20 @@ export default async function BlogPostPage({
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/servicios"
-                className="btn-tech btn-primary-tech inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl min-h-12"
+                className="group btn-tech btn-primary-tech inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl min-h-12
+                  active:scale-[0.97]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
               >
                 Ver servicios y precios
-                <ArrowRightIcon className="size-4" />
+                <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
               </Link>
               <Link
                 href="/contacto"
-                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl min-h-12 border transition-colors hover:bg-[var(--color-surface-low)]"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl min-h-12 border
+                  transition-[background-color,border-color,transform] duration-200
+                  hover:bg-[var(--color-surface-low)] hover:border-[rgba(var(--color-primary-rgb),0.35)]
+                  active:scale-[0.97]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                 style={{ borderColor: 'var(--glass-border)', color: 'var(--color-on-surface)' }}
               >
                 Agendá una consulta gratis
@@ -325,7 +337,11 @@ export default async function BlogPostPage({
                   <Link
                     key={v.slug}
                     href={`/${v.slug}`}
-                    className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors hover:text-[var(--color-primary)]"
+                    className="rounded-full px-3 py-1.5 text-xs font-semibold
+                      transition-[color,background-color,border-color,transform] duration-200
+                      hover:text-[var(--color-primary)] hover:border-[rgba(var(--color-primary-rgb),0.35)] hover:bg-[rgba(var(--color-primary-rgb),0.06)]
+                      active:scale-[0.97]
+                      focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                     style={{
                       backgroundColor: 'var(--color-surface-low)',
                       color: 'var(--color-on-surface)',
@@ -354,7 +370,14 @@ export default async function BlogPostPage({
                 <Link
                   key={r.slug}
                   href={`/blog/${r.slug}`}
-                  className="group block rounded-xl p-5 border transition-all"
+                  className="group block rounded-xl p-5 border
+                    transition-[transform,box-shadow,border-color] duration-300 ease-out will-change-transform
+                    hover:-translate-y-1 hover:border-[rgba(var(--color-primary-rgb),0.4)]
+                    hover:shadow-[0_12px_34px_-18px_rgba(var(--color-primary-rgb),0.4)]
+                    active:translate-y-0 active:duration-100
+                    focus-visible:outline-none focus-visible:-translate-y-1
+                    focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+                    motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                   style={{
                     backgroundColor: 'var(--color-surface-base)',
                     borderColor: 'var(--glass-border)',

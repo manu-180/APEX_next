@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   motion,
   AnimatePresence,
@@ -11,6 +11,7 @@ import {
 import type { CSSProperties } from 'react'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { GridBackground } from '@/components/ui/grid-background'
 import { SonarWavesBg } from '@/components/ui/sonar-waves-bg'
 import {
@@ -21,6 +22,7 @@ import {
   WhatsAppIcon,
 } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { useToast } from '@/components/ui/toast'
 import {
   BOOKING_SLOT_HOURS,
   BLOCKED_WEEKDAYS,
@@ -87,6 +89,25 @@ function FormField({ children, className }: { children: React.ReactNode; classNa
     >
       {children}
     </motion.div>
+  )
+}
+
+/** Flecha circular de reintento (local: no existe en el set global de íconos). */
+function RetryIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+      <path d="M3 3v5h5" />
+    </svg>
   )
 }
 
@@ -284,9 +305,11 @@ function BookingCalendar() {
     setSubmitError,
     confirmBooking,
     reset,
+    onBookedHoursChanged,
   } = useBooking()
 
   const prefersReducedMotion = useReducedMotion()
+  const { toast } = useToast()
   const [contactMethod, setContactMethod] = useState<'whatsapp' | 'email'>('whatsapp')
   const [name, setName] = useState('')
   const [contact, setContact] = useState('')
@@ -321,7 +344,71 @@ function BookingCalendar() {
    *  para que el HTML del server sea determinístico. */
   const hydrated = dates.length > 0
 
+  /* ── Feedback efímero (toasts) — se dispara en las TRANSICIONES de estado del
+        hook, no en cada render. La confirmación inline (pantalla de éxito) y el
+        error inline se conservan; el toast es feedback adicional, no roba foco. */
+  const successNotified = useRef(false)
+  useEffect(() => {
+    if (success && !successNotified.current) {
+      successNotified.current = true
+      const when = lastBooking
+        ? `${lastBooking.date.toLocaleDateString('es-AR', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+          })} · ${formatBookingHour(lastBooking.hour)} hs`
+        : undefined
+      const channel = lastBooking?.method === 'email' ? 'por email' : 'por WhatsApp'
+      toast({
+        variant: 'success',
+        title: '¡Reserva confirmada!',
+        description: when
+          ? `${when}. Te llega la confirmación ${channel}.`
+          : `Te llega la confirmación ${channel}.`,
+      })
+    }
+    if (!success) successNotified.current = false
+  }, [success, lastBooking, toast])
+
+  const prevSubmitError = useRef<string | null>(null)
+  useEffect(() => {
+    if (submitError && submitError !== prevSubmitError.current) {
+      const slotTaken = /ocupad/i.test(submitError)
+      toast({
+        variant: 'error',
+        title: slotTaken ? 'Ese horario se ocupó' : 'No pudimos confirmar',
+        description: slotTaken
+          ? 'Elegí otro horario libre y volvé a confirmar.'
+          : 'Revisá tu conexión e intentá de nuevo. Si sigue, escribime por WhatsApp.',
+      })
+    }
+    prevSubmitError.current = submitError
+  }, [submitError, toast])
+
+  /* ── Realtime: si la disponibilidad cambia mientras el usuario elige, avisamos
+        con un toast sutil en vez de mutar la grilla en silencio (el hook ya
+        debouncea las ráfagas de eventos). */
+  useEffect(() => {
+    onBookedHoursChanged((change) => {
+      if (change.selectedHourTaken) {
+        toast({
+          variant: 'info',
+          title: 'Ese horario se acaba de ocupar',
+          description: 'Elegí otro de los que quedan libres.',
+        })
+      } else {
+        toast({
+          variant: 'info',
+          title: 'Se actualizó la disponibilidad',
+          description: 'Alguien reservó un horario recién.',
+        })
+      }
+    })
+    return () => onBookedHoursChanged(null)
+  }, [onBookedHoursChanged, toast])
+
   const handleSubmit = async () => {
+    if (submitting) return // anti doble-submit (defensa extra al disabled del Button)
     if (!selectedDate || selectedHour === null) return
     if (contactMethod === 'email' && !contact.trim()) return
     if (contactMethod === 'whatsapp' && waLocalDigits.replace(/\D/g, '').length !== BOOKING_WA_LOCAL_DIGITS)
@@ -480,15 +567,17 @@ function BookingCalendar() {
                 aria-pressed={isSelected}
                 aria-label={longLabel}
                 className={cn(
-                  'flex min-w-[52px] flex-shrink-0 flex-col items-center rounded-xl border px-3 py-2 text-center transition-all',
+                  'flex min-h-[44px] min-w-[52px] flex-shrink-0 flex-col items-center justify-center rounded-xl border px-3 py-2 text-center',
+                  'transition-[transform,background-color,border-color,box-shadow,color] duration-200 ease-out',
+                  'active:scale-[0.95]',
                   focusRing,
                   isSelected
                     ? 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)] shadow-glow-sm'
-                    : 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:border-[rgba(var(--color-primary-rgb),0.3)]'
+                    : 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:-translate-y-0.5 hover:border-[rgba(var(--color-primary-rgb),0.3)] hover:text-[var(--color-on-surface)]'
                 )}
                 data-hover
                 data-inspector-title={longLabel}
-                data-inspector-desc="Día disponible; domingos excluidos por constantes."
+                data-inspector-desc="Día disponible; domingos excluidos por constantes. Hover eleva la pastilla; al elegir queda con halo del tema."
                 data-inspector-cat="UX · Motion"
               >
                 <span className="text-[10px] font-medium uppercase">
@@ -501,12 +590,34 @@ function BookingCalendar() {
         </div>
 
         {slotsError && (
-          <div className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-200">
-            <span>{slotsError}</span>
-            <button type="button" className={cn('shrink-0 underline', focusRing)} onClick={reloadSlots}>
-              Reintentar
+          <motion.div
+            role="alert"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.18 }}
+            className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-200"
+          >
+            <span className="min-w-0">{slotsError}</span>
+            <button
+              type="button"
+              onClick={reloadSlots}
+              disabled={loadingSlots}
+              aria-busy={loadingSlots || undefined}
+              className={cn(
+                'group inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/40 px-2.5 py-1 font-semibold',
+                'transition-all duration-150 hover:bg-red-500/15 active:scale-[0.96]',
+                'disabled:cursor-wait disabled:opacity-60',
+                focusRing
+              )}
+            >
+              {loadingSlots ? (
+                <Spinner className="size-3.5" />
+              ) : (
+                <RetryIcon className="size-3.5 transition-transform duration-300 group-hover:rotate-180" />
+              )}
+              {loadingSlots ? 'Cargando…' : 'Reintentar'}
             </button>
-          </div>
+          </motion.div>
         )}
 
         {/* `isSunday` e `isHourSelectable` derivan del reloj (selectedDate nace
@@ -533,9 +644,9 @@ function BookingCalendar() {
               </div>
             </div>
             {!hydrated || loadingSlots ? (
-              <div className="mb-5 grid grid-cols-4 gap-2">
+              <div className="mb-5 grid grid-cols-4 gap-2" aria-hidden="true">
                 {BOOKING_SLOT_HOURS.map((h) => (
-                  <div key={h} className="h-10 animate-pulse rounded-lg bg-[var(--color-surface-high)]/40" />
+                  <div key={h} className="h-11 animate-pulse rounded-lg bg-[var(--color-surface-high)]/40" />
                 ))}
               </div>
             ) : (
@@ -550,19 +661,23 @@ function BookingCalendar() {
                       disabled={!ok}
                       onClick={() => ok && setSelectedHour(h)}
                       whileHover={!prefersReducedMotion && ok && !sel ? { scale: 1.04 } : undefined}
-                      whileTap={!prefersReducedMotion && ok ? { scale: 0.95 } : undefined}
+                      whileTap={!prefersReducedMotion && ok ? { scale: 0.94 } : undefined}
                       transition={{ duration: 0.12 }}
                       aria-pressed={sel}
                       aria-label={`${formatBookingHour(h)}${ok ? '' : ' — no disponible'}`}
                       className={cn(
-                        'rounded-lg border px-2 py-2 text-xs font-medium transition-colors',
+                        'flex min-h-[44px] items-center justify-center rounded-lg border px-2 text-xs font-medium',
+                        'transition-[transform,background-color,border-color,box-shadow,color] duration-150 ease-out',
                         focusRing,
-                        !ok && 'cursor-not-allowed opacity-40 line-through',
-                        ok && !sel && 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:border-[rgba(var(--color-primary-rgb),0.3)]',
-                        sel && 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)] shadow-glow-sm'
+                        !ok && 'cursor-not-allowed border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] opacity-40 line-through',
+                        ok && !sel &&
+                          'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:border-[rgba(var(--color-primary-rgb),0.4)] hover:text-[var(--color-on-surface)] active:scale-[0.94]',
+                        sel &&
+                          'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] font-semibold text-[var(--color-primary)] shadow-glow-sm'
                       )}
                       data-hover
                       data-inspector-title={`${formatBookingHour(h)}${ok ? '' : ' (no disponible)'}`}
+                      data-inspector-desc={ok ? 'Horario libre. Se marca con halo del tema al elegirlo.' : 'Horario ocupado o pasado: deshabilitado y tachado.'}
                       data-inspector-cat="UX · Motion"
                     >
                       {formatBookingHour(h)}
@@ -589,11 +704,12 @@ function BookingCalendar() {
               }}
               aria-pressed={contactMethod === m}
               className={cn(
-                'flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-all',
+                'flex min-h-[44px] flex-1 items-center justify-center rounded-lg border px-3 text-xs font-semibold',
+                'transition-[transform,background-color,border-color,color] duration-150 ease-out active:scale-[0.97]',
                 focusRing,
                 contactMethod === m
                   ? 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.12)] text-[var(--color-primary)]'
-                  : 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)]'
+                  : 'border-[var(--color-surface-high)] text-[var(--color-on-surface-variant)] hover:border-[rgba(var(--color-primary-rgb),0.3)] hover:text-[var(--color-on-surface)]'
               )}
               data-hover
               data-inspector-title={m === 'whatsapp' ? 'Canal: WhatsApp' : 'Canal: Email'}
@@ -714,15 +830,19 @@ function BookingCalendar() {
         <Button
           onClick={handleSubmit}
           disabled={!canSubmit}
+          isLoading={submitting}
+          loadingText="Reservando…"
           variant="primary"
-          className="mt-auto w-full"
+          className="group mt-auto w-full"
           type="button"
+          aria-label="Confirmar turno gratis"
           data-hover
           data-inspector-title="Confirmar reunión"
+          data-inspector-desc="Mientras se guarda la reserva muestra spinner, se bloquea (aria-busy) y evita el doble envío. El resultado se confirma con un toast y la pantalla de éxito."
           data-inspector-cat="UX · Formulario"
         >
-          {submitting ? 'Reservando…' : 'Confirmar turno gratis'}
-          <ArrowRightIcon className="size-4" />
+          Confirmar turno gratis
+          <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Button>
       </article>
     </SectionReveal>
@@ -832,16 +952,16 @@ function ReviewsSection() {
               <article
                 key={r.id}
                 data-review-item
-                className="grid grid-cols-[3px_1fr] gap-5 py-8 first:pt-0 last:pb-0"
+                className="group grid grid-cols-[3px_1fr] gap-5 py-8 first:pt-0 last:pb-0"
               >
-                {/* Barra de acento del tema */}
+                {/* Barra de acento del tema — late con el hover de la reseña */}
                 <div
-                  className="self-stretch rounded-full"
+                  className="origin-center self-stretch rounded-full opacity-60 transition-[opacity,transform] duration-300 ease-out group-hover:scale-x-150 group-hover:opacity-100 motion-reduce:transition-none"
                   style={{ background: 'var(--color-primary)' }}
                   aria-hidden
                 />
 
-                <div>
+                <div className="transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none">
                   {/* Texto de la reseña */}
                   <p className="mb-4 text-pretty text-base leading-relaxed text-[var(--color-on-surface)]">
                     <span

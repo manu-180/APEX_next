@@ -1,23 +1,44 @@
 import { cn } from '@/lib/utils/cn'
 import { type ButtonHTMLAttributes, forwardRef } from 'react'
+import { Spinner } from '@/components/ui/spinner'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'outline'
   size?: 'sm' | 'md' | 'lg'
+  /** Muestra spinner, bloquea el click y marca `aria-busy` mientras dura una acción async. */
+  isLoading?: boolean
+  /** Texto opcional a mostrar mientras `isLoading` (si se omite, se mantienen los children). */
+  loadingText?: string
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', children, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      loadingText,
+      disabled,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const isTech = variant === 'primary' || variant === 'outline'
 
     return (
       <button
         ref={ref}
+        disabled={disabled || isLoading}
+        aria-busy={isLoading || undefined}
+        data-loading={isLoading ? '' : undefined}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-semibold select-none',
+          'relative inline-flex items-center justify-center gap-2 font-semibold select-none',
           'transition-all duration-300 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
           'disabled:pointer-events-none disabled:opacity-50',
+          isLoading && 'cursor-wait',
           isTech ? 'btn-tech' : 'rounded-xl',
           variant === 'primary' && [
             'btn-primary-tech',
@@ -46,7 +67,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-hover
         {...props}
       >
-        {children}
+        {isLoading && <Spinner className="size-4 shrink-0" />}
+        <span className={cn('inline-flex items-center gap-2', isLoading && 'opacity-90')}>
+          {isLoading && loadingText ? loadingText : children}
+        </span>
       </button>
     )
   }

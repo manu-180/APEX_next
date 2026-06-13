@@ -72,11 +72,13 @@ export function WhatsAppFloatingButton() {
         className={cn(
           'wa-float-pill pointer-events-auto group relative inline-flex items-center',
           'rounded-full',
+          // Cuadrado exacto al colapsar → círculo perfecto (mismo alto que ancho).
           'min-h-[3.5rem]',
           'transition-all duration-300 ease-out',
-          'hover:scale-[1.02] active:scale-[0.98]',
+          // Press/hover táctil — sólo con motion permitido.
+          'motion-safe:hover:scale-[1.03] motion-safe:active:scale-[0.94] active:opacity-95',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'p-2 gap-0 overflow-hidden',
+          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'aspect-square p-2 gap-0 overflow-hidden',
         )}
       >
         {/* Glow pulse sutil — usa color del tema, no verde clásico */}

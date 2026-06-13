@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import type { Variants } from 'framer-motion'
 import { animate, motion, useInView, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CheckIcon, WhatsAppIcon, XIcon } from '@/components/ui/icons'
@@ -9,6 +10,17 @@ import { whatsappUrl } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils/cn'
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+/* Stagger reveal para listas (contrato §2: 30–50 ms por item).
+   El item entra con transform/opacity; salida no aplica (once: true). */
+const LIST_CONTAINER: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.045, delayChildren: 0.05 } },
+}
+const LIST_ITEM: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE_OUT } },
+}
 
 /* Mensajes WA contextuales (brief §1.2/§5): 1-2 líneas, voseo, terminan con pregunta. */
 const WA_MSG_PROBLEMA =
@@ -64,7 +76,10 @@ function AnimatedMetric({
   }, [isInView, prefersReducedMotion, value])
 
   return (
-    <div ref={ref} className="flex flex-col gap-1 border-l border-[var(--color-outline)] pl-3 sm:pl-4">
+    <div
+      ref={ref}
+      className="group flex flex-col gap-1 border-l border-[var(--color-outline)] pl-3 transition-colors duration-200 hover:border-[rgba(var(--color-primary-rgb),0.55)] sm:pl-4"
+    >
       <p className="tabular-nums font-heading text-2xl font-extrabold leading-none text-[var(--color-primary)] sm:text-[26px]">
         {display}
         {suffix}
@@ -126,21 +141,31 @@ export function ClientBenefitsSection() {
             data-inspector-desc="Fórmula PAS: dolores concretos del dueño de pyme, sin estadísticas inventadas."
             data-inspector-cat="Copy · Conversión"
           >
-            <ul className="space-y-5">
+            <motion.ul
+              className="space-y-5"
+              variants={prefersReducedMotion ? undefined : LIST_CONTAINER}
+              initial={prefersReducedMotion ? false : 'hidden'}
+              whileInView={prefersReducedMotion ? undefined : 'show'}
+              viewport={{ once: true, amount: 0.3 }}
+            >
               {PAINS.map((pain) => (
-                <li key={pain} className="flex items-start gap-3.5">
+                <motion.li
+                  key={pain}
+                  variants={prefersReducedMotion ? undefined : LIST_ITEM}
+                  className="group flex items-start gap-3.5"
+                >
                   <span
-                    className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border border-[var(--color-outline)] text-[var(--color-on-surface-variant)] opacity-70"
+                    className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border border-[var(--color-outline)] text-[var(--color-on-surface-variant)] opacity-70 transition-[opacity,border-color] duration-200 group-hover:opacity-100 group-hover:border-[rgba(var(--color-primary-rgb),0.4)]"
                     aria-hidden="true"
                   >
                     <XIcon className="size-3" />
                   </span>
-                  <p className="text-pretty text-base leading-relaxed text-[var(--color-on-surface-variant)] sm:text-lg">
+                  <p className="text-pretty text-base leading-relaxed text-[var(--color-on-surface-variant)] transition-colors duration-200 group-hover:text-[var(--color-on-surface)] sm:text-lg">
                     {pain}
                   </p>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
 
             <div className="divider-theme my-7" aria-hidden="true" />
 
@@ -170,17 +195,25 @@ export function ClientBenefitsSection() {
               <strong className="text-[var(--color-on-surface)]">trabaja para vos.</strong>
             </h3>
 
-            <ul className="mt-6 space-y-3.5" aria-label="Qué incluye trabajar con APEX">
+            <motion.ul
+              className="mt-6 space-y-3.5"
+              aria-label="Qué incluye trabajar con APEX"
+              variants={prefersReducedMotion ? undefined : LIST_CONTAINER}
+              initial={prefersReducedMotion ? false : 'hidden'}
+              whileInView={prefersReducedMotion ? undefined : 'show'}
+              viewport={{ once: true, amount: 0.25 }}
+            >
               {SOLUTIONS.map((line) => (
-                <li
+                <motion.li
                   key={line}
-                  className="flex gap-2.5 text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)] sm:text-base"
+                  variants={prefersReducedMotion ? undefined : LIST_ITEM}
+                  className="group flex gap-2.5 text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:text-[var(--color-on-surface)] sm:text-base"
                 >
-                  <CheckIcon className="mt-0.5 size-4 shrink-0 text-[var(--color-primary)]" aria-hidden />
+                  <CheckIcon className="mt-0.5 size-4 shrink-0 text-[var(--color-primary)] transition-transform duration-200 group-hover:scale-110" aria-hidden />
                   <span>{line}</span>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
 
             <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
               <AnimatedMetric value={15} suffix="d" label="Entrega garantizada" />
@@ -192,14 +225,14 @@ export function ClientBenefitsSection() {
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(WA_MSG_PROBLEMA)}
                 className={cn(
-                  'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                  'transition-all duration-200 ease-out',
+                  'group inline-flex items-center justify-center gap-2 font-semibold select-none',
+                  'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech btn-primary-tech active:scale-[0.97]',
+                  'btn-tech btn-primary-tech',
                   'h-12 px-7 text-sm rounded-xl',
                 )}
               >
-                <WhatsAppIcon className="size-4" />
+                <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover:scale-110" />
                 Contame qué te está frenando
               </WhatsAppOutboundLink>
               <p className="text-xs text-[var(--color-on-surface-variant)] opacity-70">
@@ -262,7 +295,7 @@ function ProcessStepRow({ step, order }: { step: ProcessStep; order: number }) {
       whileInView={
         prefersReducedMotion
           ? { opacity: 1 }
-          : { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT, delay: order * 0.08 } }
+          : { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT, delay: order * 0.06 } }
       }
       viewport={{ once: true, amount: 0.4 }}
       className={cn(
@@ -350,14 +383,14 @@ export function HomeProcessSection() {
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(WA_MSG_PROCESO)}
                 className={cn(
-                  'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                  'transition-all duration-200 ease-out',
+                  'group inline-flex items-center justify-center gap-2 font-semibold select-none',
+                  'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech btn-primary-tech active:scale-[0.97]',
+                  'btn-tech btn-primary-tech',
                   'h-12 px-7 text-sm rounded-xl',
                 )}
               >
-                <WhatsAppIcon className="size-4" />
+                <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover:scale-110" />
                 Arrancar con el boceto gratis
               </WhatsAppOutboundLink>
               <p className="mt-3 text-xs text-[var(--color-on-surface-variant)] opacity-70">
@@ -387,14 +420,14 @@ export function HomeProcessSection() {
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(WA_MSG_PROCESO)}
                 className={cn(
-                  'inline-flex w-full items-center justify-center gap-2 font-semibold select-none sm:w-auto',
-                  'transition-all duration-200 ease-out',
+                  'group inline-flex w-full items-center justify-center gap-2 font-semibold select-none sm:w-auto',
+                  'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech btn-primary-tech active:scale-[0.97]',
+                  'btn-tech btn-primary-tech',
                   'h-12 px-7 text-sm rounded-xl',
                 )}
               >
-                <WhatsAppIcon className="size-4" />
+                <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover:scale-110" />
                 Arrancar con el boceto gratis
               </WhatsAppOutboundLink>
               <p className="mt-3 text-xs text-[var(--color-on-surface-variant)] opacity-70">

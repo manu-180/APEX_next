@@ -20,6 +20,15 @@ type NavLinkItem = {
   external?: boolean
 }
 
+// Controles-icono del drawer: 44px (touch target), press feedback y
+// focus-visible. Compartido por cerrar / tema / atajos.
+const DRAWER_ICON_BTN = cn(
+  'size-11 flex items-center justify-center rounded-lg outline-none',
+  'transition-[background-color,transform] duration-200 ease-out active:scale-[0.92]',
+  'hover:bg-[var(--color-surface-high)]',
+  'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-inset',
+)
+
 interface MobileDrawerProps {
   open: boolean
   onClose: () => void
@@ -46,6 +55,7 @@ export function MobileDrawer({
   const shouldReduceMotion = useReducedMotion()
   const prevOverflow = useRef<string>('')
   const drawerRef = useRef<HTMLDivElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
 
   // Body scroll lock
   useEffect(() => {
@@ -99,18 +109,26 @@ export function MobileDrawer({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [open, onClose])
 
-  // Focus first element on open
+  // Focus first element on open; restaurar el foco al disparador al cerrar.
   useEffect(() => {
-    if (!open || !drawerRef.current) return
-    const first = drawerRef.current.querySelector<HTMLElement>(
-      'a[href], button:not([disabled])'
-    )
+    if (!open) return
+    openerRef.current = (document.activeElement as HTMLElement) ?? null
+    const node = drawerRef.current
+    const first = node?.querySelector<HTMLElement>('a[href], button:not([disabled])')
     first?.focus()
+    return () => {
+      const opener = openerRef.current
+      if (opener && document.contains(opener)) opener.focus()
+    }
   }, [open])
 
   const handleDragEnd = useCallback(
     (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      if (info.offset.x > 100 && info.velocity.x > 300) {
+      // Descartar con un arrastre deliberado (>40% del ancho) O un flick rápido.
+      // Antes exigía ambos a la vez, así que un drag lento no cerraba.
+      const dragFarEnough = info.offset.x > 120
+      const flicked = info.offset.x > 56 && info.velocity.x > 320
+      if (dragFarEnough || flicked) {
         onClose()
       }
     },
@@ -127,15 +145,21 @@ export function MobileDrawer({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — scrim fuerte (≈55% negro) para legibilidad del contenido
+              detrás; el blur añade separación. Salida más rápida que entrada. */}
           <motion.div
             aria-hidden="true"
             className="fixed inset-0"
-            style={{ background: 'var(--scrim-bg)', backdropFilter: 'blur(8px)', zIndex: 79 }}
+            style={{
+              background: 'rgba(0, 0, 0, 0.55)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              zIndex: 79,
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: 'easeOut' }}
             onClick={onClose}
           />
 
@@ -144,7 +168,7 @@ export function MobileDrawer({
             ref={drawerRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Menú de navegación"
+            aria-labelledby="mobile-drawer-title"
             className="fixed top-0 right-0 flex flex-col shadow-[-2px_0_6px_rgba(24,32,60,0.05),-16px_0_48px_-12px_rgba(24,32,60,0.20)] dark:shadow-[-8px_0_48px_rgba(0,0,0,0.4)]"
             style={{
               width: 'min(85vw, 360px)',
@@ -168,6 +192,7 @@ export function MobileDrawer({
               <div className="flex items-center gap-2.5">
                 <ApexLogoMark />
                 <span
+                  id="mobile-drawer-title"
                   className="font-heading font-extrabold text-lg tracking-tight"
                   style={{ color: 'var(--color-on-surface)' }}
                 >
@@ -177,7 +202,7 @@ export function MobileDrawer({
               <button
                 onClick={onClose}
                 aria-label="Cerrar menú"
-                className="size-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--color-surface-high)]"
+                className={DRAWER_ICON_BTN}
                 style={{ color: 'var(--color-on-surface-variant)' }}
               >
                 <XIcon className="size-5" />
@@ -190,10 +215,12 @@ export function MobileDrawer({
                 {links.map((link, index) => {
                   const isActive = currentPath === link.href
                   const linkClass = cn(
-                    'flex items-center justify-between w-full font-heading font-semibold text-lg rounded-xl transition-colors',
+                    'flex items-center justify-between w-full min-h-[44px] font-heading font-semibold text-lg rounded-xl outline-none',
+                    'transition-[background-color,color,transform] duration-200 ease-out active:scale-[0.98]',
+                    'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-inset',
                     isActive
                       ? 'text-[var(--color-primary)] bg-primary-8'
-                      : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-high)]'
+                      : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-high)] hover:text-[var(--color-on-surface)]'
                   )
                   const linkStyle = { padding: '0.875rem 1rem' }
 
@@ -250,7 +277,7 @@ export function MobileDrawer({
               <button
                 onClick={onToggleTheme}
                 aria-label="Cambiar tema claro/oscuro"
-                className="size-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--color-surface-high)]"
+                className={DRAWER_ICON_BTN}
                 style={{ color: 'var(--color-on-surface-variant)' }}
               >
                 {isDark ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />}
@@ -259,7 +286,7 @@ export function MobileDrawer({
               <button
                 onClick={onShowShortcuts}
                 aria-label="Ver atajos de teclado"
-                className="size-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--color-surface-high)]"
+                className={DRAWER_ICON_BTN}
                 style={{ color: 'var(--color-on-surface-variant)' }}
               >
                 <KeyboardIcon className="size-5" />

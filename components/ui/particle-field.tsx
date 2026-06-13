@@ -73,6 +73,19 @@ const RESET_INTERVAL_MS = 5000
 const RESET_WINDOW_MS = 900
 const RETURN_FORCE_RESET = 0.02
 
+/**
+ * Densidad adaptada al viewport: en pantallas chicas el costo por frame
+ * (O(n²) por las conexiones) se dispara, así que recortamos fuerte la cantidad
+ * de partículas. Mantiene la identidad visual en desktop e impide quemar
+ * batería/CPU en notebooks angostas o tablets. < 768px el efecto no corre.
+ */
+function scaleParticleCount(requested: number, viewportWidth: number): number {
+  let factor = 1
+  if (viewportWidth < 1024) factor = 0.55
+  else if (viewportWidth < 1440) factor = 0.78
+  return Math.max(24, Math.round(requested * factor))
+}
+
 export function ParticleField({
   className,
   particleCount = 160,
@@ -95,11 +108,14 @@ export function ParticleField({
   const rafRef = useRef<number>(0)
   const dprRef = useRef(1)
   const colorsRef = useRef<string[]>(DEFAULT_COLORS)
+  /** Cantidad efectiva de partículas tras escalar por viewport. */
+  const effectiveCountRef = useRef(particleCount)
 
   const createParticles = useCallback(
     (w: number, h: number) => {
       const particles: Particle[] = []
-      for (let i = 0; i < particleCount; i++) {
+      const count = effectiveCountRef.current
+      for (let i = 0; i < count; i++) {
         const colorIndex = Math.floor(Math.random() * DEFAULT_COLORS.length)
         const x = Math.random() * w
         const y = Math.random() * h
@@ -120,15 +136,12 @@ export function ParticleField({
       }
       return particles
     },
-    [particleCount, particleRadiusMin, particleRadiusMax, particleAlphaMin, particleAlphaMax]
+    [particleRadiusMin, particleRadiusMax, particleAlphaMin, particleAlphaMax]
   )
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) return
 
     const isMobile = window.innerWidth < 768
     if (isMobile) return
@@ -136,7 +149,10 @@ export function ParticleField({
     const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
-    dprRef.current = Math.min(window.devicePixelRatio || 1, 2)
+    // DPR cap a 1.5 (en lugar de 2): mitad de píxeles a rasterizar en pantallas
+    // Retina sin pérdida perceptible para un campo de puntos suaves.
+    dprRef.current = Math.min(window.devicePixelRatio || 1, 1.5)
+    effectiveCountRef.current = scaleParticleCount(particleCount, window.innerWidth)
 
     // Colores theme-aware: se releen cuando cambia la clase light/dark en <html>.
     colorsRef.current = readThemeParticleColors()
@@ -147,6 +163,38 @@ export function ParticleField({
       attributes: true,
       attributeFilter: ['class'],
     })
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // ── Reduced-motion: estado estático barato (sin RAF) ──────────────────
+    // Pintamos una sola vez los puntos en su posición de origen, sin líneas
+    // de conexión (lo más caro), y nos repintamos solo si cambia el tamaño.
+    if (prefersReducedMotion) {
+      const drawStatic = () => {
+        const dpr = dprRef.current
+        const rect = canvas.parentElement?.getBoundingClientRect()
+        if (!rect) return
+        canvas.width = rect.width * dpr
+        canvas.height = rect.height * dpr
+        canvas.style.width = `${rect.width}px`
+        canvas.style.height = `${rect.height}px`
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+        const particles = createParticles(rect.width, rect.height)
+        ctx.clearRect(0, 0, rect.width, rect.height)
+        for (const p of particles) {
+          ctx.beginPath()
+          ctx.arc(p.homeX, p.homeY, p.radius, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${colorsRef.current[p.colorIndex]}, ${p.baseAlpha})`
+          ctx.fill()
+        }
+      }
+      drawStatic()
+      window.addEventListener('resize', drawStatic)
+      return () => {
+        themeObserver.disconnect()
+        window.removeEventListener('resize', drawStatic)
+      }
+    }
 
     const resize = () => {
       const dpr = dprRef.current
@@ -184,6 +232,13 @@ export function ParticleField({
 
     const mouseRef = externalMouse ?? internalMouseRef
     let lastMouseActiveAt = performance.now()
+
+    // Pausa cooperativa: la animación solo corre cuando el lienzo está visible
+    // en viewport (IntersectionObserver) y la pestaña está activa (visibility).
+    // Evita quemar CPU/batería renderizando un fondo que nadie ve.
+    let running = false
+    let isIntersecting = true
+    let isPageVisible = !document.hidden
 
     const animate = () => {
       const w = canvas.width / dprRef.current
@@ -273,13 +328,45 @@ export function ParticleField({
         }
       }
 
+      if (running) rafRef.current = requestAnimationFrame(animate)
+    }
+
+    const start = () => {
+      if (running || !isIntersecting || !isPageVisible) return
+      running = true
+      // reanudar el reloj para no aplicar un "salto" de física tras la pausa
+      lastMouseActiveAt = performance.now()
       rafRef.current = requestAnimationFrame(animate)
     }
 
-    rafRef.current = requestAnimationFrame(animate)
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(rafRef.current)
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        isIntersecting = entries[0]?.isIntersecting ?? true
+        if (isIntersecting) start()
+        else stop()
+      },
+      { rootMargin: '120px' }
+    )
+    io.observe(canvas)
+
+    const handleVisibility = () => {
+      isPageVisible = !document.hidden
+      if (isPageVisible) start()
+      else stop()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    start()
 
     return () => {
-      cancelAnimationFrame(rafRef.current)
+      stop()
+      io.disconnect()
+      document.removeEventListener('visibilitychange', handleVisibility)
       themeObserver.disconnect()
       window.removeEventListener('resize', resize)
       if (handleMouse) canvas.removeEventListener('mousemove', handleMouse)
@@ -287,6 +374,7 @@ export function ParticleField({
     }
   }, [
     createParticles,
+    particleCount,
     connectionDistance,
     mouseRadius,
     mouseForce,

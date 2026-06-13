@@ -282,7 +282,7 @@ export function HeroSection() {
             {/* Eyebrow editorial con disponibilidad real (lib/data/availability) */}
             <p className="editorial-label editorial-label--primary mb-8">
               <span
-                className="size-2 rounded-full animate-pulse"
+                className="size-2 rounded-full animate-pulse motion-reduce:animate-none"
                 style={{ backgroundColor: 'var(--color-online)', boxShadow: '0 0 8px var(--color-online)' }}
                 aria-hidden="true"
               />
@@ -319,7 +319,7 @@ export function HeroSection() {
                 data-inspector-desc="Abre WhatsApp con mensaje contextual del hero y navega a /gracias. Riesgo invertido: pide el boceto gratis, no una compra."
                 data-inspector-cat="Conversión"
                 className={cn(
-                  'inline-flex w-full shrink-0 items-center justify-center gap-2 font-semibold select-none lg:w-auto',
+                  'group inline-flex w-full shrink-0 items-center justify-center gap-2 font-semibold select-none lg:w-auto',
                   'transition-all duration-200 ease-out',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                   'btn-tech text-white hover:brightness-110 hover:scale-[1.01] active:scale-[0.97]',
@@ -327,7 +327,7 @@ export function HeroSection() {
                 )}
                 style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
               >
-                <WhatsAppIcon className="size-4 shrink-0" />
+                <WhatsAppIcon className="size-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
                 <span className="text-center leading-snug">
                   Quiero mi boceto gratis{' '}
                   <span className="opacity-70 font-normal">(24-48 h)</span>
@@ -337,15 +337,18 @@ export function HeroSection() {
                 <button
                   type="button"
                   className={cn(
-                    'inline-flex w-full items-center justify-center gap-2 font-semibold select-none',
-                    'transition-all duration-200 ease-out',
+                    'group inline-flex w-full items-center justify-center gap-2 font-semibold select-none',
+                    'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                    'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
+                    'btn-tech btn-outline-tech text-[var(--color-primary)]',
                     'min-h-12 px-7 py-3 text-sm rounded-xl',
                   )}
                 >
                   Ver precios
-                  <ArrowRightIcon className="size-4 shrink-0" aria-hidden />
+                  <ArrowRightIcon
+                    className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
                 </button>
               </Link>
             </div>

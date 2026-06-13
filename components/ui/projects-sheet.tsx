@@ -1,11 +1,33 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useId, useRef, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowRightIcon, ExternalLinkIcon } from '@/components/ui/icons'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { ProjectItem, ThemeId } from '@/lib/types/theme'
 import { useApexTheme } from '@/hooks/useTheme'
+
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+/** Miniatura con Skeleton: reserva el cuadro 36px y evita el pop-in al cargar. */
+function SheetThumb({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-[rgba(11,15,26,0.08)] dark:ring-white/5">
+      {!loaded && <Skeleton className="absolute inset-0 rounded-lg" />}
+      <Image
+        src={src}
+        alt={alt}
+        width={36}
+        height={36}
+        className={`h-9 w-9 object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
+  )
+}
 
 interface ProjectEntry {
   type: 'drawer'
@@ -38,19 +60,65 @@ export function ProjectsSheet({
   onOpenProject: (project: ProjectItem) => void
 }) {
   const { applyTheme } = useApexTheme()
+  const prefersReducedMotion = useReducedMotion()
+  const titleId = useId()
+  const panelRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
-  const handleEscape = useCallback(
+  // Escape para cerrar + focus-trap (Tab/Shift+Tab cicla dentro del panel).
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const container = panelRef.current
+      if (!container) return
+      const focusables = Array.from(
+        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((el) => el.tabIndex !== -1)
+      if (focusables.length === 0) {
+        e.preventDefault()
+        return
+      }
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      if (e.shiftKey) {
+        if (active === first || !container.contains(active)) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (active === last) {
+        e.preventDefault()
+        first.focus()
+      }
     },
     [onClose],
   )
 
   useEffect(() => {
     if (!isOpen) return
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [isOpen, handleEscape])
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, handleKeyDown])
+
+  // Bloqueo de scroll del body + foco al cerrar y restauración al salir.
+  useEffect(() => {
+    if (!isOpen) return
+    previousActiveElementRef.current = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 0)
+    return () => {
+      window.clearTimeout(focusTimer)
+      document.body.style.overflow = previousOverflow
+      previousActiveElementRef.current?.focus()
+    }
+  }, [isOpen])
 
   const hasEntries = entries.length > 0
 
@@ -60,10 +128,10 @@ export function ProjectsSheet({
         <>
           {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.2 }}
             className="fixed inset-0 z-50 bg-[var(--scrim-bg)] backdrop-blur-sm"
             onClick={onClose}
           />
@@ -71,10 +139,18 @@ export function ProjectsSheet({
           {/* Sheet — centrado, ancho máximo tipo bottom-sheet premium */}
           <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 sm:px-4 pointer-events-none">
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 32, stiffness: 380 }}
+              ref={panelRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+              initial={prefersReducedMotion ? { opacity: 0 } : { y: '100%' }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { y: '100%' }}
+              transition={
+                prefersReducedMotion
+                  ? { duration: 0.14 }
+                  : { type: 'spring', damping: 32, stiffness: 380 }
+              }
               className="pointer-events-auto w-full max-w-md sm:max-w-lg max-h-[min(60vh,520px)] overflow-hidden rounded-t-2xl sm:rounded-t-3xl glass-card dark:shadow-[0_-12px_48px_-12px_rgba(0,0,0,0.45)]"
               style={{
                 borderTop: '1px solid rgba(var(--color-primary-rgb), 0.3)',
@@ -91,13 +167,15 @@ export function ProjectsSheet({
                 <p className="text-xs font-mono tracking-wider text-[var(--color-primary)] opacity-70 uppercase">
                   Proyectos
                 </p>
-                <h3 className="text-lg font-bold text-[var(--color-on-surface)]">
+                <h3 id={titleId} className="text-lg font-bold text-[var(--color-on-surface)]">
                   {planName}
                 </h3>
               </div>
               <button
+                ref={closeButtonRef}
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors"
+                aria-label="Cerrar panel de proyectos"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                 data-hover
                 data-inspector-title="Cerrar panel de proyectos"
                 data-inspector-desc="Cierra el panel inferior y volvés a las tarjetas de planes. También podés usar la tecla Escape: el listener se engancha solo mientras el panel está abierto y se limpia al cerrar, sin fugas de memoria."
@@ -120,29 +198,22 @@ export function ProjectsSheet({
                     return (
                       <motion.button
                         key={entry.project.themeId}
-                        initial={{ opacity: 0, y: 12 }}
+                        initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.06 }}
+                        transition={{ delay: prefersReducedMotion ? 0 : i * 0.05 }}
+                        whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                         onClick={(e) => {
                           applyTheme(entry.project.themeId as ThemeId, e)
                           onOpenProject(entry.project)
                         }}
-                        className="w-full flex items-center gap-3 rounded-xl p-3 glass-card hover:glow-border transition-all text-left select-none"
+                        className="w-full flex items-center gap-3 rounded-xl p-3 glass-card hover:glow-border transition-all text-left select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                         data-hover
                         data-inspector-title={entry.project.title}
                         data-inspector-desc="Al tocar, el tema del sitio cambia al de este proyecto y se abre el cajón lateral con el detalle completo. Es la forma de ‘probar’ la identidad visual antes de contratar: el color y el acento viajan con vos."
                         data-inspector-cat="Motion · Spring"
                       >
                         {thumb ? (
-                          <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-[rgba(11,15,26,0.08)] dark:ring-white/5">
-                            <Image
-                              src={thumb}
-                              alt={entry.project.title}
-                              width={36}
-                              height={36}
-                              className="h-9 w-9 object-cover"
-                            />
-                          </div>
+                          <SheetThumb src={thumb} alt={entry.project.title} />
                         ) : Icon ? (
                           <div
                             className="flex h-9 w-9 items-center justify-center rounded-lg flex-shrink-0"
@@ -173,24 +244,17 @@ export function ProjectsSheet({
                       href={entry.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.06 }}
-                      className="w-full flex items-center gap-3 rounded-xl p-3 glass-card hover:glow-border transition-all text-left select-none"
+                      transition={{ delay: prefersReducedMotion ? 0 : i * 0.05 }}
+                      whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                      className="w-full flex items-center gap-3 rounded-xl p-3 glass-card hover:glow-border transition-all text-left select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                       data-hover
                       data-inspector-title={entry.name}
                       data-inspector-desc="Enlace a un sitio real ya publicado: se abre en pestaña nueva con noopener para que el sitio externo no acceda a tu ventana. Ideal para ver el resultado final en vivo."
                       data-inspector-cat="Seguridad"
                     >
-                      <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-high)] ring-1 ring-[rgba(11,15,26,0.08)] dark:ring-white/5">
-                        <Image
-                          src={entry.imageSrc}
-                          alt={entry.name}
-                          width={36}
-                          height={36}
-                          className="h-9 w-9 object-cover"
-                        />
-                      </div>
+                      <SheetThumb src={entry.imageSrc} alt={entry.name} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[var(--color-on-surface)] truncate">
                           {entry.name}

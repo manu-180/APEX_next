@@ -557,7 +557,14 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                   href={p.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bento-surface hover-lift group flex h-full flex-col p-6 md:p-7"
+                  className="bento-surface hover-lift group flex h-full flex-col p-6 md:p-7
+                    transition-[transform,box-shadow,border-color] duration-300 ease-out
+                    active:translate-y-0 active:duration-100
+                    focus-visible:outline-none focus-visible:-translate-y-0.5
+                    focus-visible:border-[rgba(var(--color-primary-rgb),0.45)]
+                    focus-visible:shadow-[0_0_30px_-8px_rgba(var(--color-primary-rgb),0.3)]
+                    focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+                    motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                   data-hover
                   data-inspector-title={`${p.name} — en producción`}
                   data-inspector-desc="Celda de bento con superficie tintada por el tema activo. El link abre el producto real, funcionando en producción: la prueba de capacidad más honesta que existe."
@@ -630,10 +637,10 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
             <Reveal delay={0.2}>
               <Link
                 href={ROUTES.tecnologias}
-                className="group mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)]"
+                className="group mt-4 inline-flex items-center gap-2 rounded text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
               >
                 Ver el stack completo en detalle
-                <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
               </Link>
             </Reveal>
           </div>
@@ -724,10 +731,10 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                     </WhatsAppOutboundLink>
                     <Link
                       href={ROUTES.contact}
-                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)]"
+                      className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                     >
                       ¿Preferís una llamada? Agendá 15 minutos, gratis
-                      <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                      <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
                     </Link>
                   </div>
                   <p className="mt-4 text-xs text-[var(--color-on-surface-variant)] opacity-80">

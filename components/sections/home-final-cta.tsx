@@ -103,21 +103,36 @@ export function HomeFinalCtaSection() {
             </p>
 
             {/* De-riskers */}
-            <ul className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2.5">
+            <motion.ul
+              className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2.5"
+              variants={
+                prefersReducedMotion
+                  ? undefined
+                  : { hidden: {}, show: { transition: { staggerChildren: 0.05, delayChildren: 0.15 } } }
+              }
+              initial={prefersReducedMotion ? false : 'hidden'}
+              whileInView={prefersReducedMotion ? undefined : 'show'}
+              viewport={{ once: true, amount: 0.5 }}
+            >
               {DE_RISKERS.map((item) => (
-                <li
+                <motion.li
                   key={item}
-                  className="flex items-center gap-2 text-sm text-[var(--color-on-surface-variant)]"
+                  variants={
+                    prefersReducedMotion
+                      ? undefined
+                      : { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE_OUT } } }
+                  }
+                  className="group flex items-center gap-2 text-sm text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:text-[var(--color-on-surface)]"
                 >
                   <CheckIcon
-                    className="size-3.5 shrink-0"
+                    className="size-3.5 shrink-0 transition-transform duration-200 group-hover:scale-110"
                     style={{ color: 'var(--color-primary)' }}
                     aria-hidden
                   />
                   {item}
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
 
             {/* CTA dominante — único botón de la sección */}
             <div className="mt-9">
@@ -128,14 +143,14 @@ export function HomeFinalCtaSection() {
                 data-inspector-desc="Acción dominante de cierre de la home. Abre WhatsApp con mensaje contextual y navega a /gracias; tracking centralizado."
                 data-inspector-cat="Conversión"
                 className={cn(
-                  'btn-tech inline-flex w-full items-center justify-center gap-2.5 rounded-xl font-bold select-none sm:w-auto',
+                  'group btn-tech inline-flex w-full items-center justify-center gap-2.5 rounded-xl font-bold select-none sm:w-auto',
                   'h-14 px-8 text-base text-white',
                   'transition-all duration-200 ease-out hover:brightness-110 hover:scale-[1.02] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                 )}
                 style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
               >
-                <WhatsAppIcon className="size-5" />
+                <WhatsAppIcon className="size-5 transition-transform duration-200 group-hover:scale-110" />
                 Empezar mi proyecto por WhatsApp
               </WhatsAppOutboundLink>
 

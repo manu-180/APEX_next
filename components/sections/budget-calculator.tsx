@@ -1,8 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  animate,
+  type Variants,
+} from 'framer-motion'
 import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
@@ -173,18 +179,66 @@ function formatARS(value: number): string {
   }).format(value)
 }
 
+/**
+ * Step transition variants — continuidad direccional.
+ * `custom` = +1 (avanza) o -1 (retrocede): la pregunta entrante y la saliente
+ * se deslizan en la misma dirección, dando sensación de carrusel.
+ */
+const STEP_VARIANTS: Variants = {
+  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 24 : -24 }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -24 : 24 }),
+}
+
+const STEP_TRANSITION = {
+  x: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const },
+  opacity: { duration: 0.22, ease: [0.16, 1, 0.3, 1] as const },
+}
+
+/**
+ * Reveal premium del precio: count-up con `animate()` de Framer (sin deps nuevas),
+ * respeta reduced-motion (muestra el valor final al instante).
+ */
+function CountUpPrice({ value }: { value: number }) {
+  const prefersReducedMotion = useReducedMotion()
+  const [display, setDisplay] = useState(prefersReducedMotion ? value : 0)
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setDisplay(value)
+      return
+    }
+    const controls = animate(0, value, {
+      duration: 0.9,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (latest) => setDisplay(Math.round(latest)),
+    })
+    return () => controls.stop()
+  }, [value, prefersReducedMotion])
+
+  return <span className="tabular-nums">{formatARS(display)}</span>
+}
+
 export function BudgetCalculatorSection() {
   const prefersReducedMotion = useReducedMotion()
   const router = useRouter()
   const [step, setStep] = useState(0)
+  /** Dirección de navegación para la continuidad direccional del AnimatePresence. */
+  const [direction, setDirection] = useState(1)
   const [answers, setAnswers] = useState<CalculatorAnswers>({ integrations: [] })
 
   const totalSteps = 4
   const isLastStep = step === totalSteps
   const result = useMemo(() => (isLastStep ? calculateRange(answers) : null), [isLastStep, answers])
 
+  const goToStep = (next: number) => {
+    setDirection(next >= step ? 1 : -1)
+    setStep(next)
+  }
+
   const handleSelectSingle = <T extends string>(field: keyof CalculatorAnswers, value: T) => {
     setAnswers((prev) => ({ ...prev, [field]: value }))
+    setDirection(1)
     setTimeout(() => setStep((s) => Math.min(s + 1, totalSteps)), 200)
   }
 
@@ -229,11 +283,13 @@ export function BudgetCalculatorSection() {
   }
 
   const reset = () => {
+    setDirection(-1)
     setStep(0)
     setAnswers({ integrations: [] })
   }
 
   const goBack = () => {
+    setDirection(-1)
     setStep((s) => Math.max(s - 1, 0))
   }
 
@@ -307,10 +363,10 @@ export function BudgetCalculatorSection() {
                 <button
                   type="button"
                   onClick={goBack}
-                  className="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-[var(--color-primary)] transition-all"
+                  className="group inline-flex items-center gap-1 rounded opacity-70 hover:opacity-100 hover:text-[var(--color-primary)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                   aria-label="Volver al paso anterior"
                 >
-                  <ArrowRightIcon className="size-3 rotate-180" aria-hidden />
+                  <ArrowRightIcon className="size-3 rotate-180 transition-transform duration-200 group-hover:-translate-x-0.5" aria-hidden />
                   Atrás
                 </button>
               )}
@@ -322,7 +378,7 @@ export function BudgetCalculatorSection() {
               <button
                 type="button"
                 onClick={reset}
-                className="opacity-60 hover:opacity-100 hover:text-[var(--color-primary)] transition-all"
+                className="rounded opacity-60 hover:opacity-100 hover:text-[var(--color-primary)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
               >
                 Reiniciar
               </button>
@@ -338,13 +394,16 @@ export function BudgetCalculatorSection() {
           data-inspector-desc="Una pregunta por pantalla con AnimatePresence. Avance automático al elegir opción simple — sin botón Siguiente innecesario. Reduce fricción cognitiva."
           data-inspector-cat="UX · Formulario"
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={direction} initial={false}>
             {step === 0 && (
               <motion.div
                 key="q0"
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
+                custom={direction}
+                variants={prefersReducedMotion ? undefined : STEP_VARIANTS}
+                initial={prefersReducedMotion ? false : 'enter'}
+                animate={prefersReducedMotion ? { opacity: 1 } : 'center'}
+                exit={prefersReducedMotion ? undefined : 'exit'}
+                transition={STEP_TRANSITION}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
                   {Q_PROJECT_TYPE.title}
@@ -371,9 +430,12 @@ export function BudgetCalculatorSection() {
             {step === 1 && (
               <motion.div
                 key="q1"
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
+                custom={direction}
+                variants={prefersReducedMotion ? undefined : STEP_VARIANTS}
+                initial={prefersReducedMotion ? false : 'enter'}
+                animate={prefersReducedMotion ? { opacity: 1 } : 'center'}
+                exit={prefersReducedMotion ? undefined : 'exit'}
+                transition={STEP_TRANSITION}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-5">
                   {Q_TIMELINE.title}
@@ -395,9 +457,12 @@ export function BudgetCalculatorSection() {
             {step === 2 && (
               <motion.div
                 key="q2"
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
+                custom={direction}
+                variants={prefersReducedMotion ? undefined : STEP_VARIANTS}
+                initial={prefersReducedMotion ? false : 'enter'}
+                animate={prefersReducedMotion ? { opacity: 1 } : 'center'}
+                exit={prefersReducedMotion ? undefined : 'exit'}
+                transition={STEP_TRANSITION}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
                   {Q_INTEGRATIONS.title}
@@ -421,23 +486,25 @@ export function BudgetCalculatorSection() {
                   <button
                     type="button"
                     onClick={goBack}
-                    className="inline-flex items-center gap-2 min-h-11 px-4 text-sm font-semibold rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
+                    className="group inline-flex items-center gap-2 min-h-11 px-4 text-sm font-semibold rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-low)]"
                   >
-                    <ArrowRightIcon className="size-4 rotate-180" aria-hidden />
+                    <ArrowRightIcon className="size-4 rotate-180 transition-transform duration-200 group-hover:-translate-x-0.5" aria-hidden />
                     Atrás
                   </button>
-                  <button
+                  <motion.button
                     type="button"
-                    onClick={() => setStep(3)}
+                    onClick={() => goToStep(3)}
                     disabled={!canAdvance}
+                    whileTap={canAdvance && !prefersReducedMotion ? { scale: 0.97 } : undefined}
                     className={cn(
-                      'btn-tech btn-primary-tech inline-flex items-center gap-2 min-h-11 px-6 text-sm font-semibold rounded-xl',
+                      'btn-tech btn-primary-tech inline-flex items-center gap-2 min-h-11 px-6 text-sm font-semibold rounded-xl transition-opacity',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-low)]',
                       !canAdvance && 'opacity-50 cursor-not-allowed',
                     )}
                   >
                     Siguiente
                     <ArrowRightIcon className="size-4" />
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             )}
@@ -445,9 +512,12 @@ export function BudgetCalculatorSection() {
             {step === 3 && (
               <motion.div
                 key="q3"
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
+                custom={direction}
+                variants={prefersReducedMotion ? undefined : STEP_VARIANTS}
+                initial={prefersReducedMotion ? false : 'enter'}
+                animate={prefersReducedMotion ? { opacity: 1 } : 'center'}
+                exit={prefersReducedMotion ? undefined : 'exit'}
+                transition={STEP_TRANSITION}
               >
                 <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-5">
                   {Q_CONTENT.title}
@@ -469,9 +539,12 @@ export function BudgetCalculatorSection() {
             {isLastStep && result && (
               <motion.div
                 key="result"
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -12 }}
+                custom={direction}
+                variants={prefersReducedMotion ? undefined : STEP_VARIANTS}
+                initial={prefersReducedMotion ? false : 'enter'}
+                animate={prefersReducedMotion ? { opacity: 1 } : 'center'}
+                exit={prefersReducedMotion ? undefined : 'exit'}
+                transition={STEP_TRANSITION}
               >
                 <div className="mb-1 flex items-center gap-2">
                   <span
@@ -486,13 +559,19 @@ export function BudgetCalculatorSection() {
                 </h3>
                 {result.hasFixedPrice ? (
                   <>
-                    <div
+                    <motion.div
+                      initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.94 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: prefersReducedMotion ? 0 : 0.1 }}
                       className="font-heading text-4xl sm:text-5xl font-extrabold tabular-nums mb-2"
                       style={{ color: 'var(--color-primary)' }}
                     >
-                      {formatARS(result.base)}
-                    </div>
-                    <div
+                      <CountUpPrice value={result.base} />
+                    </motion.div>
+                    <motion.div
+                      initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1], delay: prefersReducedMotion ? 0 : 0.45 }}
                       className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-6 text-xs font-semibold"
                       style={{
                         backgroundColor: 'rgba(var(--color-primary-rgb), 0.08)',
@@ -503,7 +582,7 @@ export function BudgetCalculatorSection() {
                       <CheckIcon className="size-3.5" />
                       3 cuotas sin interés de{' '}
                       <span className="tabular-nums">{formatARS(result.installment)}</span>
-                    </div>
+                    </motion.div>
                   </>
                 ) : (
                   <div
@@ -540,27 +619,28 @@ export function BudgetCalculatorSection() {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button
+                  <motion.button
                     type="button"
                     onClick={goToWhatsApp}
+                    whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
                     data-hover
                     data-inspector-title="CTA WhatsApp con contexto armado"
                     data-inspector-desc="Abre WhatsApp con el resumen completo (tipo de proyecto, plazo, integraciones). Manuel recibe el contexto ya listo — la charla empieza de donde dejó el wizard."
                     data-inspector-cat="Conversión"
                     className={cn(
                       'btn-tech inline-flex flex-1 items-center justify-center gap-2.5 min-h-12 rounded-xl px-6 text-sm font-semibold text-white select-none',
-                      'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                      'transition-transform duration-200 ease-out hover:scale-[1.02]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                     )}
                     style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
                   >
                     <WhatsAppIcon className="size-4" />
                     Validar con Manuel por WhatsApp
-                  </button>
+                  </motion.button>
                   <button
                     type="button"
                     onClick={reset}
-                    className="inline-flex items-center justify-center gap-2 min-h-12 px-6 text-sm font-semibold rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
+                    className="inline-flex items-center justify-center gap-2 min-h-12 px-6 text-sm font-semibold rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-low)]"
                   >
                     Empezar de nuevo
                   </button>
@@ -592,33 +672,45 @@ function OptionButton({
   onClick: () => void
   multiple?: boolean
 }) {
+  const prefersReducedMotion = useReducedMotion()
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
+      whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        'group relative flex items-start gap-3 rounded-xl border p-4 text-left transition-all',
+        'group relative flex items-start gap-3 rounded-xl border p-4 text-left transition-[border-color,background-color,box-shadow] duration-200',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-low)]',
         selected
-          ? 'border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.06)]'
-          : 'border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.3)]',
+          ? 'border-[rgba(var(--color-primary-rgb),0.55)] bg-[rgba(var(--color-primary-rgb),0.07)] shadow-[0_4px_18px_-10px_rgba(var(--color-primary-rgb),0.4)]'
+          : 'border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.3)] hover:bg-[rgba(var(--color-primary-rgb),0.025)]',
       )}
     >
       <span
         className={cn(
-          'flex shrink-0 size-5 items-center justify-center rounded-full border mt-0.5 transition-colors',
+          'flex shrink-0 size-5 items-center justify-center rounded-full border mt-0.5 transition-colors duration-200',
           multiple ? 'rounded-md' : '',
           selected
             ? 'bg-[var(--color-primary)] border-[var(--color-primary)]'
-            : 'border-[var(--color-surface-high)]',
+            : 'border-[var(--color-surface-high)] group-hover:border-[rgba(var(--color-primary-rgb),0.45)]',
         )}
       >
-        {selected && (
-          <CheckIcon
-            className="size-3"
-            style={{ color: 'var(--color-surface-base)' }}
-          />
-        )}
+        <AnimatePresence initial={false}>
+          {selected && (
+            <motion.span
+              key="check"
+              initial={prefersReducedMotion ? false : { scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={prefersReducedMotion ? undefined : { scale: 0, opacity: 0 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex"
+            >
+              <CheckIcon className="size-3" style={{ color: 'var(--color-surface-base)' }} />
+            </motion.span>
+          )}
+        </AnimatePresence>
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-[var(--color-on-surface)]">{label}</span>
@@ -628,6 +720,6 @@ function OptionButton({
           </span>
         )}
       </span>
-    </button>
+    </motion.button>
   )
 }

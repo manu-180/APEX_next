@@ -137,28 +137,30 @@ export function ServiciosHero() {
                   'Hola, estoy viendo los planes en tu web pero no sé cuál me conviene. ¿Me orientás?',
                 )}
                 className={cn(
-                  'btn-tech inline-flex items-center justify-center gap-2.5 font-semibold select-none',
+                  'group btn-tech inline-flex items-center justify-center gap-2.5 font-semibold select-none',
                   'h-12 px-6 text-sm text-white',
-                  'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                  'transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.97]',
+                  'motion-reduce:transform-none motion-reduce:transition-none',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                   WA_SHADOW_CLASS,
                 )}
                 style={{ background: WA_GRADIENT }}
               >
-                <WhatsAppIcon className="size-4" />
+                <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover:scale-110 motion-reduce:transform-none" />
                 No sé qué necesito, escribime
               </WhatsAppOutboundLink>
 
               <a
                 href="#pricing"
                 className={cn(
-                  'btn-tech btn-outline-tech inline-flex items-center justify-center gap-2 font-semibold select-none',
+                  'group btn-tech btn-outline-tech inline-flex items-center justify-center gap-2 font-semibold select-none',
                   'h-12 px-6 text-sm text-[var(--color-primary)]',
-                  'transition-transform duration-200 ease-out active:scale-[0.97]',
+                  'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                 )}
               >
                 Ver planes
-                <span aria-hidden className="rotate-90 inline-block leading-none">→</span>
+                <span aria-hidden className="rotate-90 inline-block leading-none transition-transform duration-200 group-hover:translate-y-0.5">→</span>
               </a>
             </div>
 
@@ -194,7 +196,7 @@ export function ServiciosHero() {
                   {i > 0 && <div aria-hidden className="divider-theme opacity-60" />}
                   <Link
                     href={row.href}
-                    className="group flex items-center justify-between gap-4 rounded-lg px-4 py-3.5 transition-colors hover:bg-[rgba(var(--color-primary-rgb),0.06)]"
+                    className="group flex items-center justify-between gap-4 rounded-lg px-4 py-3.5 transition-colors hover:bg-[rgba(var(--color-primary-rgb),0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                   >
                     <span className="min-w-0">
                       <span className="block text-sm font-bold text-[var(--color-on-surface)]">
@@ -630,12 +632,13 @@ export function ServiciosComparisonTable() {
                   {COMPARISON_ROWS.map((row, idx) => (
                     <tr
                       key={row.feature}
+                      className="group/row transition-colors duration-150 hover:bg-[rgba(var(--color-primary-rgb),0.035)]"
                       style={{
                         borderTop: idx === 0 ? 'none' : '1px solid rgba(var(--color-primary-rgb), 0.08)',
                       }}
                     >
                       <td
-                        className="sticky left-0 z-10 px-3 py-3 text-xs font-semibold text-[var(--color-on-surface)]"
+                        className="sticky left-0 z-10 px-3 py-3 text-xs font-semibold text-[var(--color-on-surface)] transition-colors duration-150 group-hover/row:bg-[rgba(var(--color-primary-rgb),0.05)]"
                         style={{ backgroundColor: 'var(--color-surface-low, #0d0d0d)' }}
                       >
                         {row.feature}
@@ -713,7 +716,7 @@ export function VerticalsBridge() {
               <li key={v.slug}>
                 <a
                   href={`/${v.slug}`}
-                  className="group flex items-center justify-between rounded-xl border px-4 py-3 transition-colors hover:border-[rgba(var(--color-primary-rgb),0.35)]"
+                  className="group flex items-center justify-between rounded-xl border px-4 py-3 transition-colors hover:border-[rgba(var(--color-primary-rgb),0.35)] hover:bg-[rgba(var(--color-primary-rgb),0.03)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                   style={{
                     backgroundColor: 'var(--color-surface-base)',
                     borderColor: 'var(--glass-border)',
@@ -774,10 +777,10 @@ export function ServiciosStaticFaq() {
               waHref={whatsappUrl(
                 'Hola, tengo una duda que no encontré en el FAQ de tu web. ¿Me la respondés?',
               )}
-              className="group inline-flex items-center gap-2.5 text-sm font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)]"
+              className="group inline-flex items-center gap-2.5 rounded-xl text-sm font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
             >
               <span
-                className="inline-flex size-8 items-center justify-center rounded-full text-white"
+                className="inline-flex size-8 items-center justify-center rounded-full text-white transition-transform duration-200 group-hover:scale-105"
                 style={{ background: WA_GRADIENT }}
               >
                 <WhatsAppIcon className="size-4" />

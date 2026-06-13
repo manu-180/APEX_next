@@ -157,16 +157,34 @@ export function TechCardsSection() {
             const features = isFeatured ? tech.features : tech.features.slice(0, 3)
             const outcome = BUSINESS_OUTCOMES[tech.themeId]
 
+            const activate = (e?: React.MouseEvent | null) => {
+              setPressedId(tech.themeId)
+              window.setTimeout(() => setPressedId(null), 400)
+              applyTheme(tech.themeId as ThemeId, e)
+            }
+
             return (
-              <div key={tech.themeId} data-tech-card className={BENTO_SPANS[index] ?? 'lg:col-span-2'}>
+              <div
+                key={tech.themeId}
+                data-tech-card
+                role="button"
+                tabIndex={0}
+                aria-pressed={isActive}
+                aria-label={`Aplicar el tema ${tech.title} a todo el sitio`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    activate(null)
+                  }
+                }}
+                className={`rounded-2xl outline-none
+                  focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+                  ${BENTO_SPANS[index] ?? 'lg:col-span-2'}`}
+              >
                 <GlowCard
                   active={isActive}
                   className={`h-full rounded-2xl ${pressedId === tech.themeId ? 'card-wave-pressed' : ''}`}
-                  onClick={(e) => {
-                    setPressedId(tech.themeId)
-                    setTimeout(() => setPressedId(null), 400)
-                    applyTheme(tech.themeId as ThemeId, e)
-                  }}
+                  onClick={(e) => activate(e)}
                 >
                   <div
                     className="flex h-full w-full flex-col p-6 text-left md:p-8"

@@ -1,8 +1,9 @@
 'use client'
 
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useState } from 'react'
 import Image from 'next/image'
 import { motion, useMotionValue, useSpring, animate } from 'framer-motion'
+import { Skeleton } from '@/components/ui/skeleton'
 import { type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
 import { cn } from '@/lib/utils/cn'
@@ -43,6 +44,11 @@ export function ProjectCardPremium({
   const shimmerRef = useRef<HTMLDivElement>(null)
   const spotlightRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useRef(false)
+  // Espejo reactivo del ref para condicionar props de JSX (whileTap, shimmer).
+  const [reducedMotion, setReducedMotion] = useState(false)
+  // La miniatura del hero arranca con Skeleton hasta que `next/image` resuelve,
+  // evitando el "pop-in" y el salto de layout.
+  const [thumbLoaded, setThumbLoaded] = useState(false)
 
   const rotateX = useMotionValue(0)
   const rotateY = useMotionValue(0)
@@ -52,14 +58,18 @@ export function ProjectCardPremium({
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
     prefersReducedMotion.current = mq.matches
+    setReducedMotion(mq.matches)
     const handler = (e: MediaQueryListEvent) => {
       prefersReducedMotion.current = e.matches
+      setReducedMotion(e.matches)
     }
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
   }, [])
 
   useEffect(() => {
+    // El shimmer del borde es decorativo y continuo: lo apagamos en reduced-motion.
+    if (reducedMotion) return
     const shimmerEl = shimmerRef.current
     if (!shimmerEl) return
     const controls = animate(0, 360, {
@@ -69,7 +79,7 @@ export function ProjectCardPremium({
       onUpdate: (v) => shimmerEl.style.setProperty('--shimmer-angle', `${v}deg`),
     })
     return () => controls.stop()
-  }, [])
+  }, [reducedMotion])
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -143,6 +153,7 @@ export function ProjectCardPremium({
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        whileTap={reducedMotion ? undefined : { scale: 0.985 }}
         style={{ rotateX: springX, rotateY: springY }}
         className={cn(
           'group relative flex flex-col overflow-hidden rounded-2xl cursor-pointer',
@@ -185,13 +196,21 @@ export function ProjectCardPremium({
         {/* ── Visual hero ──────────────────────────────────────────────── */}
         <div className="relative h-44 flex-shrink-0 overflow-hidden md:h-48">
           {thumbSrc ? (
-            <Image
-              src={thumbSrc}
-              alt={project.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
+            <>
+              {/* Placeholder que reserva el alto del hero (anti-CLS) hasta cargar */}
+              {!thumbLoaded && <Skeleton className="absolute inset-0 rounded-none" />}
+              <Image
+                src={thumbSrc}
+                alt={project.title}
+                fill
+                className={cn(
+                  'object-cover transition-opacity duration-500',
+                  thumbLoaded ? 'opacity-100' : 'opacity-0',
+                )}
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                onLoad={() => setThumbLoaded(true)}
+              />
+            </>
           ) : Icon ? (
             <div
               className="absolute inset-0 flex items-center justify-center"

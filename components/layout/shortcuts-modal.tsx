@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { SHORTCUTS } from '@/lib/constants'
 import { XIcon } from '@/components/ui/icons'
 
@@ -11,18 +11,55 @@ interface ShortcutsModalProps {
 }
 
 export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
-  const handleEscape = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    },
-    [onClose],
-  )
+  const prefersReducedMotion = useReducedMotion()
+  const panelRef = useRef<HTMLDivElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
 
+  // Escape para cerrar + focus trap dentro del modal.
   useEffect(() => {
     if (!open) return
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [open, handleEscape])
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab' || !panelRef.current) return
+
+      const focusable = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [open, onClose])
+
+  // Mover foco al panel al abrir; devolverlo al disparador al cerrar.
+  useEffect(() => {
+    if (!open) return
+    openerRef.current = (document.activeElement as HTMLElement) ?? null
+    panelRef.current?.focus()
+    return () => {
+      const opener = openerRef.current
+      if (opener && document.contains(opener)) opener.focus()
+    }
+  }, [open])
 
   const navShortcuts = SHORTCUTS.filter((s) => s.group === 'nav')
   const actionShortcuts = SHORTCUTS.filter((s) => s.group === 'action')
@@ -30,28 +67,44 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center" role="dialog" aria-modal="true">
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="shortcuts-modal-title"
+        >
           <motion.div
+            aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: 'easeOut' }}
             onClick={onClose}
-            className="absolute inset-0 bg-[var(--scrim-bg)] backdrop-blur-sm"
+            className="absolute inset-0 bg-[rgba(0,0,0,0.55)] backdrop-blur-sm"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            ref={panelRef}
+            tabIndex={-1}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.2 }}
-            className="relative z-10 w-[92vw] max-w-2xl rounded-2xl px-7 py-6 sm:px-8 glass-card glow-border dark:shadow-[0_0_40px_-10px_rgba(var(--color-primary-rgb),0.15),0_25px_50px_-12px_rgba(0,0,0,0.6)]"
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 10 }}
+            transition={{
+              duration: prefersReducedMotion ? 0.12 : 0.22,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="relative z-10 w-full max-w-2xl rounded-2xl px-7 py-6 sm:px-8 outline-none glass-card glow-border dark:shadow-[0_0_40px_-10px_rgba(var(--color-primary-rgb),0.15),0_25px_50px_-12px_rgba(0,0,0,0.6)]"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-[var(--color-on-surface)]">
+              <h2
+                id="shortcuts-modal-title"
+                className="text-lg font-bold text-[var(--color-on-surface)]"
+              >
                 Atajos de Teclado
               </h2>
               <button
                 onClick={onClose}
-                className="text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors"
+                aria-label="Cerrar atajos de teclado"
+                className="flex size-9 items-center justify-center rounded-lg outline-none text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.92] focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)]"
                 data-hover
               >
                 <XIcon className="h-5 w-5" />

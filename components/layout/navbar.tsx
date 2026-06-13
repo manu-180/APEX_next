@@ -13,6 +13,16 @@ import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 import { MobileDrawer } from '@/components/layout/mobile-drawer'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
 
+// Estilo base compartido de los controles-icono del navbar: superficie táctil,
+// press feedback (active:scale) y focus-visible siempre visible. El tamaño
+// (size-9 / size-11) lo decide cada botón según dónde se muestra (≥44px en mobile).
+const ICON_BTN = cn(
+  'flex items-center justify-center rounded-lg outline-none',
+  'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]',
+  'transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.92]',
+  'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+)
+
 const NAV_LINKS = [
   { href: ROUTES.home, label: 'Inicio', external: false },
   { href: ROUTES.servicios, label: 'Servicios', external: false },
@@ -42,21 +52,30 @@ export function Navbar({
   const { resolvedTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   const navLinksRef = useRef<HTMLDivElement>(null)
   const linkRefs = useRef<Partial<Record<string, HTMLElement>>>({})
   const [underline, setUnderline] = useState<UnderlineMetrics | null>(null)
+  // Link bajo el cursor: la barra se desliza hacia él (hover) y vuelve al
+  // activo al salir. Microinteracción causa→efecto, animada vía CSS
+  // (.apex-nav-underline) — respeta reduced-motion sin lógica extra.
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null)
 
   const updateUnderline = useCallback(() => {
     const container = navLinksRef.current
     if (!container) return
-    const active = NAV_LINKS.find((l) => !l.external && l.href === pathname)
-    if (!active) {
+    const targetHref =
+      hoveredHref ?? NAV_LINKS.find((l) => !l.external && l.href === pathname)?.href
+    if (!targetHref) {
       setUnderline(null)
       return
     }
-    const link = linkRefs.current[active.href]
-    if (!link) return
+    const link = linkRefs.current[targetHref]
+    if (!link) {
+      setUnderline(null)
+      return
+    }
     const cr = container.getBoundingClientRect()
     const lr = link.getBoundingClientRect()
     const insetX = 8
@@ -65,7 +84,7 @@ export function Navbar({
       width: Math.max(0, lr.width - insetX * 2),
       top: lr.bottom - cr.top + 2,
     })
-  }, [pathname])
+  }, [pathname, hoveredHref])
 
   useLayoutEffect(() => {
     updateUnderline()
@@ -73,6 +92,23 @@ export function Navbar({
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Glass reactivo al scroll: una vez desplazado, el nav gana sombra/elevación.
+  // rAF-throttled + passive para no bloquear el hilo de scroll.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    let raf = 0
+    const onScroll = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => setScrolled(window.scrollY > 8))
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      cancelAnimationFrame(raf)
+    }
   }, [])
 
   useEffect(() => {
@@ -98,12 +134,17 @@ export function Navbar({
       style={{ zIndex: 'var(--z-sticky)' } as React.CSSProperties}
     >
       <div
-        className="w-full pt-[env(safe-area-inset-top,0px)]"
+        className="w-full pt-[env(safe-area-inset-top,0px)] transition-[box-shadow,border-color,background-color] duration-300 ease-out"
         style={{
           backgroundColor: 'var(--nav-bg)',
           backdropFilter: 'blur(16px) saturate(140%)',
           WebkitBackdropFilter: 'blur(16px) saturate(140%)',
-          borderBottom: '1px solid var(--glass-border)',
+          borderBottom: scrolled
+            ? '1px solid rgba(var(--color-primary-rgb), 0.18)'
+            : '1px solid var(--glass-border)',
+          boxShadow: scrolled
+            ? '0 8px 28px -16px rgba(0,0,0,0.45), 0 1px 0 0 rgba(var(--color-primary-rgb), 0.06)'
+            : '0 0 0 0 rgba(0,0,0,0)',
         }}
       >
         <div className="mx-auto flex h-14 w-full min-w-0 max-w-6xl flex-row items-center justify-between gap-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] md:h-16">
@@ -118,14 +159,20 @@ export function Navbar({
           </span>
         </Link>
 
-        <div ref={navLinksRef} className="relative hidden md:flex items-center gap-1">
+        <div
+          ref={navLinksRef}
+          className="relative hidden md:flex items-center gap-1"
+          onMouseLeave={() => setHoveredHref(null)}
+        >
           {NAV_LINKS.map((link) => {
             const active = !link.external && pathname === link.href
             const navClass = cn(
-              'relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg',
+              'relative px-4 py-2 text-sm font-medium rounded-lg outline-none',
+              'transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.97]',
+              'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
               active
                 ? 'text-[var(--color-primary)]'
-                : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]',
+                : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[rgba(var(--color-primary-rgb),0.06)]',
             )
             if (link.external) {
               return (
@@ -135,6 +182,9 @@ export function Navbar({
                   target="_blank"
                   rel="noopener noreferrer"
                   className={navClass}
+                  onMouseEnter={() => setHoveredHref(link.href)}
+                  onFocus={() => setHoveredHref(link.href)}
+                  onBlur={() => setHoveredHref(null)}
                 >
                   {link.label}
                 </a>
@@ -150,6 +200,10 @@ export function Navbar({
                 href={link.href}
                 prefetch={false}
                 className={navClass}
+                aria-current={active ? 'page' : undefined}
+                onMouseEnter={() => setHoveredHref(link.href)}
+                onFocus={() => setHoveredHref(link.href)}
+                onBlur={() => setHoveredHref(null)}
               >
                 {link.label}
               </Link>
@@ -164,7 +218,12 @@ export function Navbar({
                 left: underline.left,
                 width: underline.width,
                 backgroundColor: 'var(--color-primary)',
+                // Activo: barra plena. Preview por hover de un link no activo:
+                // levemente atenuada para señalar "destino" sin confundir con el estado.
+                opacity: hoveredHref && hoveredHref !== pathname ? 0.6 : 1,
                 boxShadow: '0 0 12px rgba(var(--color-primary-rgb), 0.6)',
+                transition:
+                  'left 0.32s cubic-bezier(0.22,1,0.36,1), width 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease-out',
               }}
             />
           )}
@@ -180,7 +239,7 @@ export function Navbar({
 
           <button
             onClick={(e) => onToggleDarkMode(e)}
-            className="flex size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
+            className={cn(ICON_BTN, 'size-11 md:size-9')}
             aria-label="Toggle tema claro/oscuro"
           >
             {!mounted ? (
@@ -197,10 +256,10 @@ export function Navbar({
               type="button"
               onClick={onToggleInspector}
               className={cn(
-                'flex size-9 items-center justify-center rounded-lg transition-colors duration-200',
-                inspectorActive
-                  ? 'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.12)] ring-1 ring-[rgba(var(--color-primary-rgb),0.35)]'
-                  : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]'
+                ICON_BTN,
+                'size-11 md:size-9',
+                inspectorActive &&
+                  'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.12)] ring-1 ring-[rgba(var(--color-primary-rgb),0.35)] hover:text-[var(--color-primary)] hover:bg-[rgba(var(--color-primary-rgb),0.12)]'
               )}
               aria-label={inspectorActive ? 'Desactivar modo inspector' : 'Activar modo inspector'}
               aria-pressed={inspectorActive}
@@ -212,7 +271,7 @@ export function Navbar({
 
           <button
             onClick={onShowShortcuts}
-            className="hidden md:flex size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
+            className={cn(ICON_BTN, 'hidden md:flex size-9')}
             aria-label="Atajos de teclado"
           >
             <KeyboardIcon className="size-4" />
@@ -234,8 +293,10 @@ export function Navbar({
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex md:hidden size-9 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)] transition-colors duration-200"
+            className={cn(ICON_BTN, 'flex md:hidden size-11')}
             aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={mobileOpen}
+            aria-haspopup="dialog"
           >
             {mobileOpen ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
           </button>

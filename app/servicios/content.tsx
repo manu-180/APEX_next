@@ -241,7 +241,8 @@ export function ServiciosContent() {
                     <button
                       key={t}
                       onClick={() => handleTabChange(t)}
-                      className="relative px-6 py-2.5 rounded-lg text-sm font-semibold"
+                      aria-pressed={tab === t}
+                      className="relative px-6 py-2.5 rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                       data-hover
                       data-inspector-title={t === 'web' ? 'Pestaña Sitio Web' : 'Pestaña App móvil'}
                       data-inspector-desc="El botón activo no se redibuja a mano: hay una sola 'pastilla' que viaja de un lado al otro con física de resorte (layoutId en Framer Motion). Es la misma sensación que un interruptor premium de un salpicadero, pero en tu navegador."
@@ -446,15 +447,21 @@ function UnifiedPricingCard({
           (el glow 60px es lenguaje de dark); dark conserva el render original. */}
       <div
         className={cn(
-          'relative h-full overflow-hidden rounded-2xl transition-all duration-300',
+          'group/card relative h-full overflow-hidden rounded-2xl transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none',
           isAnchor
             ? cn(
                 'border border-[rgba(var(--color-primary-rgb),0.6)]',
                 'bg-[var(--color-surface-lowest)] dark:bg-[var(--color-surface-high)]',
                 'shadow-[0_2px_6px_rgba(24,32,60,0.05),0_24px_56px_-20px_rgba(24,32,60,0.20),0_0_28px_-10px_rgba(var(--color-primary-rgb),0.25),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]',
+                'hover:shadow-[0_4px_10px_rgba(24,32,60,0.07),0_32px_64px_-20px_rgba(24,32,60,0.26),0_0_36px_-10px_rgba(var(--color-primary-rgb),0.35),0_0_0_1px_rgba(var(--color-primary-rgb),0.12)]',
                 'dark:shadow-[0_0_60px_rgba(var(--color-primary-rgb),0.18),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]',
+                'dark:hover:shadow-[0_0_72px_rgba(var(--color-primary-rgb),0.26),0_0_0_1px_rgba(var(--color-primary-rgb),0.14)]',
               )
-            : 'glass-card border border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.2)]',
+            : cn(
+                'glass-card border border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.3)]',
+                'hover:shadow-[0_2px_6px_rgba(24,32,60,0.05),0_18px_40px_-22px_rgba(24,32,60,0.22),0_0_24px_-12px_rgba(var(--color-primary-rgb),0.2)]',
+                'dark:hover:shadow-[0_0_40px_-8px_rgba(var(--color-primary-rgb),0.22)]',
+              ),
         )}
       >
         {/* Ancla: radial glow background */}
@@ -588,14 +595,15 @@ function UnifiedPricingCard({
             <WhatsAppOutboundLink
               waHref={whatsappUrl(waMsgPlan(plan.name))}
               className={cn(
-                'btn-tech inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-semibold text-white select-none',
-                'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                'group/wa btn-tech inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-semibold text-white select-none',
+                'transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.97]',
+                'motion-reduce:transform-none motion-reduce:transition-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                 WA_SHADOW_CLASS,
               )}
               style={{ background: WA_GRADIENT }}
             >
-              <WhatsAppIcon className="size-4" />
+              <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover/wa:scale-110 motion-reduce:transform-none" />
               {plan.price === null ? 'Consultar por WhatsApp' : 'Empezar proyecto'}
             </WhatsAppOutboundLink>
 
@@ -604,10 +612,10 @@ function UnifiedPricingCard({
               onClick={onOpenDrawer}
               aria-expanded={isDrawerOpen}
               aria-controls={`service-plan-drawer-${plan.id}`}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent px-4 text-sm font-medium text-[var(--color-on-surface-variant)] transition-all duration-200 hover:border-[rgba(var(--color-primary-rgb),0.25)] hover:text-[var(--color-primary)] active:scale-[0.99]"
+              className="group/detail inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent px-4 text-sm font-medium text-[var(--color-on-surface-variant)] transition-all duration-200 hover:border-[rgba(var(--color-primary-rgb),0.25)] hover:text-[var(--color-primary)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
             >
               Ver detalle completo
-              <ArrowRightIcon className="size-4 opacity-60" />
+              <ArrowRightIcon className="size-4 opacity-60 transition-transform duration-200 group-hover/detail:translate-x-0.5 group-hover/detail:opacity-100" />
             </button>
           </div>
         </div>

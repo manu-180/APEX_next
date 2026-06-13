@@ -9,6 +9,7 @@ import { ExternalLinkIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { PROJECTS } from '@/lib/constants'
+import { MI_LUGAR_BLUR } from '@/lib/data/image-blur'
 import { cn } from '@/lib/utils/cn'
 
 /**
@@ -28,7 +29,7 @@ const FEATURED_CLIENT = {
   label: 'Cliente real · Moda',
   description:
     'Tienda de vestidos de fiesta: diseño, desarrollo y puesta online. Entregada y en uso.',
-  screenshot: '/images/clients/mi-lugar.png',
+  screenshot: '/images/clients/mi-lugar.webp',
 }
 
 interface OwnProduct {
@@ -137,6 +138,8 @@ function FeaturedClientCard() {
             src={FEATURED_CLIENT.screenshot}
             alt={`Sitio web real de ${FEATURED_CLIENT.name}`}
             fill
+            placeholder="blur"
+            blurDataURL={MI_LUGAR_BLUR}
             className={cn(
               'object-cover object-top transition-transform duration-500 ease-out',
               isHovered && !prefersReducedMotion ? 'scale-[1.03]' : 'scale-100',

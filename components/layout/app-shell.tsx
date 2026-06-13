@@ -8,6 +8,7 @@ import { useInspector } from '@/hooks/useInspector'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { Navbar } from './navbar'
 import { Footer } from './footer'
+import { ToastProvider } from '@/components/ui/toast'
 
 const ShortcutsModal = dynamic(
   () => import('./shortcuts-modal').then((m) => m.ShortcutsModal),
@@ -104,6 +105,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [])
 
   return (
+    <ToastProvider>
     <div className={inspector.isActive ? 'inspector-mode' : ''}>
       <Navbar
         onToggleDarkMode={toggleDarkMode}
@@ -131,5 +133,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </>
       )}
     </div>
+    </ToastProvider>
   )
 }

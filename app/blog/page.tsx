@@ -105,7 +105,14 @@ export default function BlogPage() {
           <div className="mx-auto max-w-6xl px-6">
             <Link
               href={`/blog/${featured.slug}`}
-              className="group block rounded-2xl overflow-hidden border p-8 sm:p-10 transition-all"
+              className="group block rounded-2xl overflow-hidden border p-8 sm:p-10
+                transition-[transform,box-shadow,border-color] duration-300 ease-out will-change-transform
+                hover:-translate-y-1 hover:border-[rgba(var(--color-primary-rgb),0.4)]
+                hover:shadow-[0_18px_50px_-22px_rgba(var(--color-primary-rgb),0.45)]
+                active:translate-y-0 active:duration-100
+                focus-visible:outline-none focus-visible:-translate-y-1
+                focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+                motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               style={{
                 background:
                   'linear-gradient(155deg, color-mix(in srgb, var(--color-surface-high) 88%, var(--color-primary) 12%) 0%, var(--color-surface-base) 100%)',
@@ -145,7 +152,14 @@ export default function BlogPage() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group flex flex-col rounded-2xl border p-6 transition-all"
+                className="group flex flex-col rounded-2xl border p-6
+                  transition-[transform,box-shadow,border-color] duration-300 ease-out will-change-transform
+                  hover:-translate-y-1 hover:border-[rgba(var(--color-primary-rgb),0.4)]
+                  hover:shadow-[0_14px_40px_-20px_rgba(var(--color-primary-rgb),0.4)]
+                  active:translate-y-0 active:duration-100
+                  focus-visible:outline-none focus-visible:-translate-y-1
+                  focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+                  motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                 style={{
                   backgroundColor: 'var(--color-surface-low)',
                   borderColor: 'var(--glass-border)',

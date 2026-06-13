@@ -217,11 +217,18 @@ export function CircuitBoardBg({
 
     const nodeRadii: number[] = Array.from({ length: NODE_COUNT }, () => 2 + Math.floor(Math.random() * 2))
 
+    // Pausa cooperativa: el lazo (600 nodos + aristas + pulsos) solo dibuja
+    // cuando el lienzo está en viewport y la pestaña activa. Fuera de vista no
+    // tiene sentido gastar GPU/CPU recalculando proximidad al cursor.
+    let running = false
+    let isIntersecting = true
+    let isPageVisible = !document.hidden
+
     const drawFrame = (now: number) => {
       const ctx = canvas.getContext('2d')
       const graph = graphRef.current
       if (!ctx || !graph) {
-        rafRef.current = requestAnimationFrame(drawFrame)
+        if (running) rafRef.current = requestAnimationFrame(drawFrame)
         return
       }
 
@@ -449,17 +456,47 @@ export function CircuitBoardBg({
         }
       }
 
+      if (running) rafRef.current = requestAnimationFrame(drawFrame)
+    }
+
+    const start = () => {
+      if (running || !isIntersecting || !isPageVisible) return
+      running = true
       rafRef.current = requestAnimationFrame(drawFrame)
     }
 
-    rafRef.current = requestAnimationFrame(drawFrame)
-
-    return () => {
-      window.removeEventListener('resize', onResize)
+    const stop = () => {
+      running = false
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current)
         rafRef.current = null
       }
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        isIntersecting = entries[0]?.isIntersecting ?? true
+        if (isIntersecting) start()
+        else stop()
+      },
+      { rootMargin: '120px' }
+    )
+    io.observe(canvas)
+
+    const handleVisibility = () => {
+      isPageVisible = !document.hidden
+      if (isPageVisible) start()
+      else stop()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    start()
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+      io.disconnect()
+      document.removeEventListener('visibilitychange', handleVisibility)
+      stop()
     }
   }, [enabled, resizeAndRebuild])
 

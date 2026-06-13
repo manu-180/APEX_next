@@ -66,3 +66,79 @@ Ejecutado con 1 agente de fundación + 4 agentes de páginas (+3 finalizadores t
 - No migrar Next 14→15/16 en este refactor (riesgo innecesario pre-campaña).
 - UX de booking sigue mostrando éxito si el WhatsApp falla (la reserva SÍ se guardó); ahora el lead queda registrado en el inbox igual, así no se pierde nada.
 - Trabajo directo en main (APEX_next) / master (apex_hunter) — regla de Manuel.
+
+---
+
+# 5. UX & PERFORMANCE OVERHAUL — EN CURSO (iniciado 2026-06-13)
+
+> Pedido de Manuel: mejorar **completamente** la experiencia de usuario en toda la web
+> — cargar más rápido/óptimo, visualmente mejor, **feedback visual premium**, al detalle
+> en **cada componente** de **todas** las páginas.
+
+## 5.1 Diagnóstico base (auditoría 2026-06-13)
+Arquitectura ya sólida (SSR + `next/dynamic` below-fold, `next/font` `display:optional`,
+tokens CSS centralizados, `prefers-reduced-motion` en 27 sitios, ISR + headers seguridad).
+**Focos reales:**
+1. **Imágenes pesadas sin optimizar** — `manuel.jpg` 2.2 MB, `mi-lugar.png` 1.4 MB,
+   `imaginate.png` 1 MB, `handy.png` 1 MB. Sin `priority` ni `placeholder="blur"`.
+   (El resto ya tiene `.webp/.avif`; estos 4 quedaron afuera del pipeline.)
+2. **Feedback de interacción** — `WhatsAppOutboundLink` (todos los CTA) y `Button` no
+   acusaban el click; formularios sin estado de envío; `project-drawer`/`botlode-chat` sin skeleton.
+3. **Performance mobile** — `particle-field` (160 partículas) y `circuit-board-bg`
+   (600 nodos SVG) sin guardas de viewport.
+4. **Microinteracciones** — estados hover/focus/active/press inconsistentes entre CTAs.
+
+## 5.2 Plan por fases
+- **FASE 1 — Fundaciones premium** ⏳: `spinner.tsx`, `skeleton.tsx`, `button.tsx`
+  (`isLoading`/`loadingText`), `whatsapp-outbound-link.tsx` (pulso `.cta-opening`),
+  CSS `.skeleton`/`.cta-opening`. Pendiente: toasts (fase contacto), nav-progress (fase nav).
+- **FASE 2 — Imágenes/LCP**: `scripts/optimize-images.mjs` (sharp) para los 4 pesados;
+  `placeholder="blur"`+`blurDataURL`; `priority` en LCP; revisar `sizes`.
+- **FASE 3 — Pulido por página** (agentes en paralelo con file-ownership): home, servicios,
+  contacto (+toasts), sobre-mí, tecnologías, blog, floating, layout, ui drawers/cards.
+- **FASE 4 — Perf hardening**: guardas mobile particle/circuit, `content-visibility:auto`
+  below-fold, auditar reduced-motion restante.
+- **FASE 5 — Verificación**: `tsc --noEmit`, `build`, Lighthouse prod, QA preview mobile/desktop+light/dark.
+
+## 5.3 Decisiones / gotchas de esta fase
+- **NO migrar Next** (confirmado en §4). **NO tematizar el verde WhatsApp** (`#25D366`→`#128C7E`).
+- Skills auto-sugeridas por hooks (`bootstrap`, `next-upgrade`, `shadcn`, `nextjs`,
+  `investigation-mode`, `observability`) se **ignoran**: el proyecto manda usar solo las de
+  diseño/perf; no usamos shadcn ni migramos Next.
+- `manuel.jpg` ya es la foto real (el pendiente "subir foto" de §4 está resuelto); ahora toca optimizarla.
+- `WhatsAppOutboundLink` navega la pestaña actual a `/gracias`; el pulso `.cta-opening` es ack inmediato.
+
+## 5.4 Estado — FASES 1–4 COMPLETADAS ✅ (2026-06-13), verificado
+
+**FASE 1 — Fundaciones premium ✅**
+- `components/ui/spinner.tsx`, `skeleton.tsx`, `toast.tsx` (ToastProvider montado en `app-shell`, `aria-live=polite`).
+- `button.tsx` con `isLoading`/`loadingText` (spinner + `aria-busy` + disable + cursor).
+- `whatsapp-outbound-link.tsx` con pulso `.cta-opening` al click (toda la web).
+- `globals.css`: `.skeleton` (barrido) + `.cta-opening` (pulso) con guardas reduced-motion.
+
+**FASE 2 — Imágenes/LCP ✅** (`scripts/shrink-heavy-sources.mjs`, idempotente)
+- `manuel.jpg` 2.2 MB → **54 KB** (900px JPEG q82). `mi-lugar.png` 1.4 MB → **30 KB** (`mi-lugar.webp`, ref actualizada en `trusted-clients.tsx` + `placeholder="blur"`).
+- `lib/data/image-blur.ts` autogenerado (MANUEL_BLUR, MI_LUGAR_BLUR). Orphans `imaginate/handy.png` restaurados (re-encode los agrandaba).
+
+**FASE 3 — Pulido por página ✅** (6 agentes en paralelo, file-ownership disjunto, todos tsc-verdes):
+- **Home** (hero/below-fold/client-benefits/home-final-cta/afip): stagger 45ms, hover táctil de íconos/flechas, skeletons en lazy sections, reduced-motion parity (fix afip).
+- **Servicios** (content/faq-accordion/static-sections/final-cta/budget-calculator): FAQ height-auto con bypass reduced-motion + a11y disclosure; calculator con continuidad direccional entre pasos + count-up del precio (`animate()` de Framer, 0 deps) + `whileTap`; hover/focus-visible en tabla y cards.
+- **Contacto** (content + useBooking): **submit pending** (Button `isLoading`), **toasts** éxito/error/realtime (4 sitios, `useToast`), retry de slots, press en calendario, reviews hover. Lógica de booking/bridge intacta (verificado por git diff).
+- **Content** (sobre-mi/tecnologias/tech-cards/blog): a11y por teclado en las 7 tech-cards (`role=button`+Enter/Space), focus-visible en productos/links/breadcrumbs/FAQ, hover-lift en cards de blog.
+- **Layout+Floating** (navbar/footer/mobile-drawer/shortcuts-modal/botlode-chat/whatsapp-float): underline deslizante + glass al scroll + 44px targets; scrim 55% + focus-restore en drawer; focus-trap en modal; **skeleton de carga del iframe botlode**; círculo perfecto garantizado en WA flotante (`aspect-square`).
+- **UI/bg** (project-drawer/projects-sheet/cards + particle/circuit/sonar/code-rain): focus-trap+scroll-lock+scrim en drawers, **Skeleton en imágenes** (anti-CLS), tilt respeta reduced-motion.
+
+**FASE 4 — Perf hardening ✅** (dentro del Agente UI/bg):
+- Fondos animados: **IntersectionObserver (pausa offscreen) + visibilitychange (pausa tab oculta)** en los 4 efectos; particle-field con conteo escalado por viewport + DPR cap 2→1.5 + estado estático sin rAF en reduced-motion; circuit-board simplificado <768px.
+
+**FASE 5 — Verificación ✅**
+- `npx tsc --noEmit` → **EXIT 0** (integrado, tras los 6 agentes).
+- `npm run build` → **EXIT 0**, 26 páginas. Bundles: home 120 kB · servicios 201 kB · contacto 220 kB · sobre-mi 172 kB.
+- Dev server + preview: home y contacto renderizan, **0 errores/warnings de consola**, sin errores de hidratación, ToastProvider montado (`aria-live=polite`), `mi-lugar.webp` carga OK.
+- Nota tooling: `preview_screenshot` hace timeout 30s en este entorno (captura CDP); verificación por accessibility snapshot + consola + DOM eval + build.
+
+## 5.6 Pendiente / próximos (no bloqueante)
+- Pulir páginas menores: `/gracias`, `not-found`, `global-error` (post-conversión/error — baja prioridad).
+- Opcional premium: barra de progreso de navegación (route-change) global.
+- Opcional: `content-visibility:auto` en secciones below-the-fold (requiere globals.css).
+- **Sin commitear** (regla: commitear solo cuando Manuel lo pide). Árbol verde. Si Manuel confirma, commitear Fases 1–4.

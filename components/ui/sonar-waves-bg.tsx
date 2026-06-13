@@ -197,8 +197,13 @@ export function SonarWavesBg({
       rafIdRef.current = requestAnimationFrame(tick)
     }
 
+    // Pausa cooperativa por viewport (IntersectionObserver) + pestaña activa
+    // (visibilitychange): no propagamos ondas mientras nadie las mira.
+    let isIntersecting = true
+    let isPageVisible = !document.hidden
+
     const start = () => {
-      if (!isEnabled() || runningRef.current) return
+      if (!isEnabled() || runningRef.current || !isIntersecting || !isPageVisible) return
       runningRef.current = true
       syncSize()
       emittersRef.current = makeEmitters()
@@ -220,12 +225,31 @@ export function SonarWavesBg({
       else start()
     }
 
+    const io = new IntersectionObserver(
+      (entries) => {
+        isIntersecting = entries[0]?.isIntersecting ?? true
+        if (isIntersecting) start()
+        else stop()
+      },
+      { rootMargin: '120px' }
+    )
+    io.observe(canvas)
+
+    const handleVisibility = () => {
+      isPageVisible = !document.hidden
+      if (isPageVisible) start()
+      else stop()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
     mqReduce.addEventListener('change', onReduceChange)
     window.addEventListener('resize', onResize)
 
     start()
 
     return () => {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', handleVisibility)
       mqReduce.removeEventListener('change', onReduceChange)
       window.removeEventListener('resize', onResize)
       stop()

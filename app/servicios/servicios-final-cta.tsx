@@ -81,14 +81,15 @@ export function ServiciosFinalCta() {
             <WhatsAppOutboundLink
               waHref={whatsappUrl('Hola Manuel, quiero arrancar mi proyecto. ¿Coordinamos 15 min?')}
               className={cn(
-                'btn-tech inline-flex h-14 items-center justify-center gap-3 rounded-xl px-9 text-base font-semibold text-white select-none',
-                'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                'group btn-tech inline-flex h-14 items-center justify-center gap-3 rounded-xl px-9 text-base font-semibold text-white select-none',
+                'transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.97]',
+                'motion-reduce:transform-none motion-reduce:transition-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                 WA_SHADOW_CLASS,
               )}
               style={{ background: WA_GRADIENT }}
             >
-              <WhatsAppIcon className="size-5" />
+              <WhatsAppIcon className="size-5 transition-transform duration-200 group-hover:scale-110 motion-reduce:transform-none" />
               Hablemos por WhatsApp
             </WhatsAppOutboundLink>
 

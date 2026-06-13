@@ -11,21 +11,82 @@
  *   resuelva el DNS/TLS lo antes posible.
  */
 
+import { useEffect, useState } from 'react'
 import Script from 'next/script'
 
 /** false = no se monta el iframe ni el bot flotante del player Flutter (botlode-player). */
 const ENABLE_BOTLODE_PLAYER = false
 
 export function BotlodeChat() {
+  // El player Flutter arranca con opacity:0 y se revela vía postMessage
+  // (CMD_READY) / fallback de 8s. Mientras tanto el rincón queda vacío, así que
+  // mostramos un skeleton con barrido anclado donde aparece la burbuja del bot.
+  // Se oculta en cuanto el iframe dispara onLoad o llega CMD_READY (lo que pase
+  // primero). No tocamos el contrato de estilos de #botlode-player.
+  const [iframeReady, setIframeReady] = useState(false)
+  // Mantiene el skeleton en el árbol durante el fade-out (evita un corte seco).
+  const [skeletonMounted, setSkeletonMounted] = useState(true)
+
+  useEffect(() => {
+    if (!ENABLE_BOTLODE_PLAYER || iframeReady) return
+    const onMessage = (event: MessageEvent) => {
+      if (event.data === 'CMD_READY') setIframeReady(true)
+    }
+    window.addEventListener('message', onMessage)
+    // Salvaguarda: ocultar el skeleton aunque nunca llegue señal de readiness.
+    const fallback = window.setTimeout(() => setIframeReady(true), 8000)
+    return () => {
+      window.removeEventListener('message', onMessage)
+      window.clearTimeout(fallback)
+    }
+  }, [iframeReady])
+
+  // Al quedar listo: desmonta el skeleton recién terminado el fade.
+  useEffect(() => {
+    if (!iframeReady) return
+    const t = window.setTimeout(() => setSkeletonMounted(false), 320)
+    return () => window.clearTimeout(t)
+  }, [iframeReady])
+
   if (!ENABLE_BOTLODE_PLAYER) return null
 
   return (
     <>
+      {/* ── Skeleton de carga ──────────────────────────────────
+          Sibling independiente del iframe (NO toca #botlode-player). Disco con
+          barrido `.skeleton` (reduced-motion-safe, aria-hidden) donde se materializa
+          la burbuja del bot. Reserva el espacio → sin CLS. Fade-out al estar listo. */}
+      {skeletonMounted && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 100001,
+            pointerEvents: 'none',
+            opacity: iframeReady ? 0 : 1,
+            transition: 'opacity 0.3s ease-out',
+          }}
+        >
+          <div
+            className="skeleton"
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '9999px',
+              boxShadow: '0 8px 24px -8px rgba(0,0,0,0.35)',
+            }}
+          />
+        </div>
+      )}
+
       {/* ── Iframe principal ───────────────────────────────── */}
       <iframe
         id="botlode-player"
         tabIndex={0}
         src="https://botlode-player.vercel.app?botId=0b99e786-fa91-42ba-9578-5784f5049140&v=2.5"
+        onLoad={() => setIframeReady(true)}
         style={{
           position: 'fixed',
           bottom: '16px',

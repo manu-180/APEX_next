@@ -11,7 +11,7 @@ import type { BlogBlock } from '@/lib/data/blog-posts'
  *  - [texto](https://…) → <a target="_blank" rel="noopener noreferrer">
  */
 const INLINE_LINK_CLASS =
-  'font-medium text-[var(--color-primary)] underline decoration-[var(--color-primary)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-primary)]'
+  'rounded-sm font-medium text-[var(--color-primary)] underline decoration-[var(--color-primary)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] focus-visible:decoration-[var(--color-primary)]'
 
 function renderInline(text: string): React.ReactNode {
   const parts: React.ReactNode[] = []
@@ -196,6 +196,7 @@ export function BlogBlockRenderer({ block }: { block: BlogBlock }) {
               {block.rows.map((row, idx) => (
                 <tr
                   key={idx}
+                  className="transition-colors duration-150 hover:bg-[rgba(var(--color-primary-rgb),0.04)]"
                   style={{
                     borderTop: idx === 0 ? 'none' : '1px solid var(--glass-border)',
                   }}

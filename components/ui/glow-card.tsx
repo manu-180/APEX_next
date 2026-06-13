@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react'
+import { useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 
 interface GlowCardProps {
@@ -24,6 +25,7 @@ export function GlowCard({
   onClick,
 }: GlowCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
   const [isHovered, setIsHovered] = useState(false)
   const baseX = restTilt?.x ?? 0
@@ -41,6 +43,9 @@ export function GlowCard({
     const y = ((e.clientY - rect.top) / rect.height) * 100
     setMousePos({ x, y })
 
+    // Sin inclinación 3D bajo prefers-reduced-motion; el resplandor que sigue
+    // al cursor (opacidad/posición, sin rotar) permanece como feedback de hover.
+    if (prefersReducedMotion) return
     const tiltX = ((y - 50) / 50) * -tiltIntensity
     const tiltY = ((x - 50) / 50) * tiltIntensity
     setTilt({ x: tiltX, y: tiltY })

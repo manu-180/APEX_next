@@ -12,6 +12,15 @@ const WHATSAPP_FOOTER_HREF = whatsappUrl(WA_MSG_FOOTER_LINK)
 /** Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2). */
 const WHATSAPP_GREEN = '#25D366'
 
+/** `.footer-link` (globals.css) ya da hover + underline-reveal, pero no tiene
+ *  estado de teclado. Componemos focus-visible + press feedback con Tailwind
+ *  sin tocar el CSS global. */
+const FOOTER_LINK = cn(
+  'footer-link text-sm rounded outline-none',
+  'transition-transform duration-150 ease-out active:scale-[0.97]',
+  'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] focus-visible:text-[var(--color-primary)]',
+)
+
 const SERVICIOS_LINKS = [
   { label: 'Landing Page',     href: `${ROUTES.servicios}?tab=web` },
   { label: 'Web Interactiva',  href: `${ROUTES.servicios}?tab=web` },
@@ -122,7 +131,7 @@ export function Footer() {
                   <li key={l.label}>
                     <Link
                       href={l.href}
-                      className="footer-link text-sm"
+                      className={FOOTER_LINK}
                       data-hover
                       data-inspector-title="Navegación a Servicios"
                       data-inspector-desc="Client-side navigation con Next.js — activa el tab correcto vía query param ?tab=web o ?tab=mobile."
@@ -146,7 +155,7 @@ export function Footer() {
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="footer-link text-sm"
+                        className={FOOTER_LINK}
                         data-hover
                         data-inspector-title="Link Externo — Anti-Tabnabbing"
                         data-inspector-desc="rel=noopener noreferrer evita que la pestaña externa redirija la actual — protección estándar contra tabnabbing."
@@ -159,7 +168,7 @@ export function Footer() {
                     <li key={l.label}>
                       <Link
                         href={l.href}
-                        className="footer-link text-sm"
+                        className={FOOTER_LINK}
                         data-hover
                         data-inspector-title="Navegación Interna"
                         data-inspector-desc="Client-side navigation — sin recarga, estado del tema preservado."

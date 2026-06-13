@@ -67,6 +67,8 @@ export function CodeRainBg({
   const lastTimeRef = useRef<number>(0)
   const internalCursorRef = useRef<CursorState>({ x: -1, y: -1, active: false })
   const cursorRef = externalCursorRef ?? internalCursorRef
+  /** El lazo solo corre si el lienzo está en viewport y la pestaña activa. */
+  const runningRef = useRef(false)
 
   const [graphicsOn, setGraphicsOn] = useState(false)
 
@@ -95,7 +97,7 @@ export function CodeRainBg({
     const w = container.clientWidth
     const h = container.clientHeight
     if (w <= 0 || h <= 0) {
-      rafRef.current = requestAnimationFrame(drawFrame)
+      if (runningRef.current) rafRef.current = requestAnimationFrame(drawFrame)
       return
     }
 
@@ -158,11 +160,12 @@ export function CodeRainBg({
       }
     }
 
-    rafRef.current = requestAnimationFrame(drawFrame)
+    if (runningRef.current) rafRef.current = requestAnimationFrame(drawFrame)
   }, [])
 
   useEffect(() => {
     if (!graphicsOn) {
+      runningRef.current = false
       cancelAnimationFrame(rafRef.current)
       rafRef.current = 0
       lastTimeRef.current = 0
@@ -170,12 +173,49 @@ export function CodeRainBg({
       return
     }
 
-    lastTimeRef.current = 0
-    rafRef.current = requestAnimationFrame(drawFrame)
+    const canvas = canvasRef.current
+    let isIntersecting = true
+    let isPageVisible = !document.hidden
 
-    return () => {
+    const start = () => {
+      if (runningRef.current || !isIntersecting || !isPageVisible) return
+      runningRef.current = true
+      lastTimeRef.current = 0 // descartar el delta acumulado durante la pausa
+      rafRef.current = requestAnimationFrame(drawFrame)
+    }
+
+    const stop = () => {
+      runningRef.current = false
       cancelAnimationFrame(rafRef.current)
       rafRef.current = 0
+    }
+
+    let io: IntersectionObserver | null = null
+    if (canvas) {
+      io = new IntersectionObserver(
+        (entries) => {
+          isIntersecting = entries[0]?.isIntersecting ?? true
+          if (isIntersecting) start()
+          else stop()
+        },
+        { rootMargin: '120px' }
+      )
+      io.observe(canvas)
+    }
+
+    const handleVisibility = () => {
+      isPageVisible = !document.hidden
+      if (isPageVisible) start()
+      else stop()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    start()
+
+    return () => {
+      io?.disconnect()
+      document.removeEventListener('visibilitychange', handleVisibility)
+      stop()
       lastTimeRef.current = 0
     }
   }, [graphicsOn, drawFrame])

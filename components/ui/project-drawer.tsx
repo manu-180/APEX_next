@@ -1,11 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils/cn'
+
+const DRAWER_FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 import {
   XIcon,
   ExternalLinkIcon,
@@ -518,6 +522,34 @@ function StoreButton({
   )
 }
 
+// ─── Header thumbnail (Skeleton hasta cargar → sin pop-in) ────────────────────
+function HeaderThumb({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <div
+      className="relative h-[56px] w-[56px] flex-shrink-0 overflow-hidden rounded-2xl"
+      style={{
+        boxShadow:
+          '0 0 0 1px rgba(var(--color-primary-rgb), 0.18), 0 0 28px -4px rgba(var(--color-primary-rgb), 0.35)',
+      }}
+    >
+      {!loaded && <Skeleton className="absolute inset-0 rounded-2xl" />}
+      <Image
+        src={src}
+        alt={alt}
+        width={56}
+        height={56}
+        sizes="56px"
+        className={cn(
+          'h-[56px] w-[56px] object-cover transition-opacity duration-300',
+          loaded ? 'opacity-100' : 'opacity-0',
+        )}
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
+  )
+}
+
 // ─── Main drawer ──────────────────────────────────────────────────────────────
 interface ProjectDrawerProps {
   project: ProjectItem | null
@@ -526,19 +558,60 @@ interface ProjectDrawerProps {
 }
 
 export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
+  const prefersReducedMotion = useReducedMotion()
+  const titleId = useId()
+  const panelRef = useRef<HTMLElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const previousActiveElementRef = useRef<HTMLElement | null>(null)
+
+  // Bloqueo de scroll del body + foco al botón cerrar y restauración al salir.
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
+    if (!open) return
+    previousActiveElementRef.current = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 0)
     return () => {
-      document.body.style.overflow = ''
+      window.clearTimeout(focusTimer)
+      document.body.style.overflow = previousOverflow
+      previousActiveElementRef.current?.focus()
     }
   }, [open])
 
+  // Escape para cerrar + focus-trap dentro del panel (accesibilidad de modal).
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+    if (!open) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const container = panelRef.current
+      if (!container) return
+      const focusables = Array.from(
+        container.querySelectorAll<HTMLElement>(DRAWER_FOCUSABLE_SELECTOR),
+      ).filter((el) => el.tabIndex !== -1)
+      if (focusables.length === 0) {
+        e.preventDefault()
+        return
+      }
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      if (e.shiftKey) {
+        if (active === first || !container.contains(active)) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (active === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
-    if (open) window.addEventListener('keydown', handleEsc)
-    return () => window.removeEventListener('keydown', handleEsc)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [open, onClose])
 
   const Icon = project ? PROJECT_ICONS[project.themeId] : null
@@ -553,7 +626,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
           {/* ── Overlay ──────────────────────────────────────── */}
           <motion.div
             variants={overlayVariants}
-            initial="hidden"
+            initial={prefersReducedMotion ? false : 'hidden'}
             animate="visible"
             exit="exit"
             onClick={onClose}
@@ -563,10 +636,15 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
           {/* ── Panel ────────────────────────────────────────── */}
           <motion.aside
             key={project.themeId}
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             variants={panelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
+            initial={prefersReducedMotion ? { opacity: 0 } : 'hidden'}
+            animate={prefersReducedMotion ? { opacity: 1, x: 0 } : 'visible'}
+            exit={prefersReducedMotion ? { opacity: 0 } : 'exit'}
+            transition={prefersReducedMotion ? { duration: 0.15 } : undefined}
             className="fixed top-0 right-0 z-[70] h-full w-full sm:w-[560px] overflow-y-auto overflow-x-hidden shadow-[-24px_0_64px_-24px_rgba(24,32,60,0.25),-1px_0_0_rgba(var(--color-primary-rgb),0.08)] dark:shadow-[-24px_0_80px_-10px_rgba(0,0,0,0.7),-1px_0_0_rgba(var(--color-primary-rgb),0.08)]"
             style={{
               backgroundColor: 'var(--color-surface-lowest)',
@@ -603,20 +681,27 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
 
             {/* Close button */}
             <motion.button
+              ref={closeButtonRef}
+              type="button"
               onClick={onClose}
-              className="absolute top-4 right-4 z-20 flex h-8 w-8 items-center justify-center rounded-lg"
+              aria-label="Cerrar panel del proyecto"
+              className="absolute top-4 right-4 z-20 flex h-8 w-8 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-lowest)]"
               style={{
                 color: 'var(--color-on-surface-variant)',
                 backgroundColor: 'rgba(var(--color-primary-rgb), 0.06)',
                 border: '1px solid rgba(var(--color-primary-rgb), 0.1)',
               }}
-              whileHover={{
-                rotate: 90,
-                scale: 1.12,
-                backgroundColor: 'rgba(var(--color-primary-rgb), 0.12)',
-                transition: { duration: 0.18 },
-              }}
-              whileTap={{ scale: 0.88 }}
+              whileHover={
+                prefersReducedMotion
+                  ? undefined
+                  : {
+                      rotate: 90,
+                      scale: 1.12,
+                      backgroundColor: 'rgba(var(--color-primary-rgb), 0.12)',
+                      transition: { duration: 0.18 },
+                    }
+              }
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.88 }}
             >
               <XIcon className="h-4 w-4" />
             </motion.button>
@@ -625,7 +710,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
             <motion.div
               key={project.themeId}
               variants={containerVariants}
-              initial="hidden"
+              initial={prefersReducedMotion ? 'visible' : 'hidden'}
               animate="visible"
               className="relative p-6 md:p-8"
             >
@@ -636,21 +721,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
               >
                 {/* Logo / icon */}
                 {thumbSrc ? (
-                  <div
-                    className="relative h-[56px] w-[56px] flex-shrink-0 overflow-hidden rounded-2xl"
-                    style={{
-                      boxShadow:
-                        '0 0 0 1px rgba(var(--color-primary-rgb), 0.18), 0 0 28px -4px rgba(var(--color-primary-rgb), 0.35)',
-                    }}
-                  >
-                    <Image
-                      src={thumbSrc}
-                      alt={project.title}
-                      width={56}
-                      height={56}
-                      className="h-[56px] w-[56px] object-cover"
-                    />
-                  </div>
+                  <HeaderThumb src={thumbSrc} alt={project.title} />
                 ) : Icon ? (
                   <div
                     className="flex h-[56px] w-[56px] flex-shrink-0 items-center justify-center rounded-2xl"
@@ -666,7 +737,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                 ) : null}
 
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-xl font-extrabold tracking-tight text-[var(--color-on-surface)] leading-tight">
+                  <h2 id={titleId} className="text-xl font-extrabold tracking-tight text-[var(--color-on-surface)] leading-tight">
                     {project.title}
                   </h2>
                   <p

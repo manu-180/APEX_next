@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 
 interface TiltCardProps {
@@ -13,6 +13,7 @@ interface TiltCardProps {
 
 export function TiltCard({ children, className, glowColor, tiltMax = 10 }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
   const [transform, setTransform] = useState({ rotateX: 0, rotateY: 0 })
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 })
   const [isHovered, setIsHovered] = useState(false)
@@ -25,23 +26,27 @@ export function TiltCard({ children, className, glowColor, tiltMax = 10 }: TiltC
     const x = (e.clientX - rect.left) / rect.width
     const y = (e.clientY - rect.top) / rect.height
 
-    const now = Date.now()
-    const dt = now - lastTime.current
-    if (dt > 0) {
-      const speed = Math.sqrt(
-        (x - lastPos.current.x) ** 2 + (y - lastPos.current.y) ** 2
-      ) / (dt / 1000)
-      const destabilize = Math.min(speed * 2, 1.5)
-      const dynamicTilt = tiltMax * (1 + destabilize * 0.6)
+    // Sin tilt 3D cuando el usuario pidió menos movimiento; el glow que sigue al
+    // cursor (cambio de opacidad/posición, sin rotar la tarjeta) sí se mantiene.
+    if (!prefersReducedMotion) {
+      const now = Date.now()
+      const dt = now - lastTime.current
+      if (dt > 0) {
+        const speed = Math.sqrt(
+          (x - lastPos.current.x) ** 2 + (y - lastPos.current.y) ** 2
+        ) / (dt / 1000)
+        const destabilize = Math.min(speed * 2, 1.5)
+        const dynamicTilt = tiltMax * (1 + destabilize * 0.6)
 
-      setTransform({
-        rotateX: (0.5 - y) * dynamicTilt,
-        rotateY: (x - 0.5) * dynamicTilt,
-      })
+        setTransform({
+          rotateX: (0.5 - y) * dynamicTilt,
+          rotateY: (x - 0.5) * dynamicTilt,
+        })
+      }
+      lastTime.current = now
+      lastPos.current = { x, y }
     }
 
-    lastTime.current = now
-    lastPos.current = { x, y }
     setGlowPos({ x: x * 100, y: y * 100 })
   }
 
@@ -56,9 +61,13 @@ export function TiltCard({ children, className, glowColor, tiltMax = 10 }: TiltC
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      animate={transform}
+      animate={prefersReducedMotion ? { rotateX: 0, rotateY: 0 } : transform}
       transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-      style={{ perspective: 900, transformStyle: 'preserve-3d' }}
+      style={
+        prefersReducedMotion
+          ? undefined
+          : { perspective: 900, transformStyle: 'preserve-3d' }
+      }
       className={cn('group relative', className)}
       data-hover
     >

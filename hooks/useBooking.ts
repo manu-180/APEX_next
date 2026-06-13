@@ -1,12 +1,23 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client'
 import { BOOKING_SLOT_HOURS } from '@/lib/constants'
 import { formatLocalDateYMD, localDayToMiddayIso } from '@/lib/date-local'
 
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+}
+
+/**
+ * Señal que el hook emite cuando la disponibilidad cambia en vivo (Realtime),
+ * para que la UI pueda avisar con un toast en vez de mutar en silencio.
+ * - `addedBooked`: horas que pasaron a estar ocupadas desde la última carga.
+ * - `selectedHourTaken`: la hora que el usuario tenía elegida quedó ocupada.
+ */
+export interface BookedHoursChange {
+  addedBooked: number[]
+  selectedHourTaken: boolean
 }
 
 export function useBooking() {
@@ -28,25 +39,63 @@ export function useBooking() {
   const [success, setSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
+  /** Callback opt-in que la UI registra para enterarse de cambios en vivo. */
+  const onBookedHoursChangedRef = useRef<((change: BookedHoursChange) => void) | null>(null)
+  /** Set vigente, en ref, para diffear sin re-suscribir el canal Realtime. */
+  const bookedHoursRef = useRef<Set<number>>(new Set())
+  /** Hora elegida, en ref, para saber si una actualización en vivo la "robó". */
+  const selectedHourRef = useRef<number | null>(null)
+  /** Colapsa ráfagas de eventos Realtime en una sola notificación. */
+  const liveNotifyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const onBookedHoursChanged = useCallback(
+    (cb: ((change: BookedHoursChange) => void) | null) => {
+      onBookedHoursChangedRef.current = cb
+    },
+    []
+  )
+
   const loadBookedHours = useCallback(
-    async (date: Date) => {
+    async (date: Date, opts?: { live?: boolean }) => {
       if (!supabase) return
       if (date.getDay() === 0) {
         setBookedHours(new Set())
+        bookedHoursRef.current = new Set()
         return
       }
       const dateString = formatLocalDateYMD(date)
-      setLoadingSlots(true)
+      // En refrescos en vivo no mostramos el skeleton: la grilla ya está poblada
+      // y un parpadeo de carga sería peor que actualizar en sitio.
+      if (!opts?.live) setLoadingSlots(true)
       setSlotsError(null)
       try {
         const { data, error } = await supabase.from('appointments').select('hour_slot').eq('date_slot', dateString)
         if (error) throw error
-        setBookedHours(new Set((data ?? []).map((r: { hour_slot: number }) => r.hour_slot)))
+        const next = new Set((data ?? []).map((r: { hour_slot: number }) => r.hour_slot))
+
+        if (opts?.live && onBookedHoursChangedRef.current) {
+          const prev = bookedHoursRef.current
+          const addedBooked = [...next].filter((h) => !prev.has(h))
+          const sel = selectedHourRef.current
+          const selectedHourTaken = sel !== null && !prev.has(sel) && next.has(sel)
+          if (addedBooked.length > 0 || selectedHourTaken) {
+            // Debounce: ante varias filas en milisegundos, un solo aviso.
+            if (liveNotifyTimer.current) clearTimeout(liveNotifyTimer.current)
+            const cb = onBookedHoursChangedRef.current
+            liveNotifyTimer.current = setTimeout(() => {
+              cb({ addedBooked, selectedHourTaken })
+            }, 250)
+          }
+        }
+
+        setBookedHours(next)
+        bookedHoursRef.current = next
       } catch {
         setSlotsError('No se pudieron cargar los horarios. Probá de nuevo.')
         setBookedHours(new Set())
+        bookedHoursRef.current = new Set()
       } finally {
-        setLoadingSlots(false)
+        if (!opts?.live) setLoadingSlots(false)
       }
     },
     [supabase]
@@ -72,13 +121,25 @@ export function useBooking() {
     const ch = supabase
       .channel('appointments-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
-        loadBookedHours(selectedDate)
+        loadBookedHours(selectedDate, { live: true })
       })
       .subscribe()
     return () => {
       supabase.removeChannel(ch)
     }
   }, [supabase, selectedDate, loadBookedHours])
+
+  // Espejo de la hora elegida para el diff de Realtime (sin re-suscribir canal).
+  useEffect(() => {
+    selectedHourRef.current = selectedHour
+  }, [selectedHour])
+
+  // Limpia el timer de notificación en vivo al desmontar.
+  useEffect(() => {
+    return () => {
+      if (liveNotifyTimer.current) clearTimeout(liveNotifyTimer.current)
+    }
+  }, [])
 
   const isHourSelectable = useCallback(
     (h: number) => {
@@ -194,5 +255,7 @@ export function useBooking() {
     setSubmitError,
     confirmBooking,
     reset,
+    /** Registra (o limpia con `null`) un callback para cambios de disponibilidad en vivo. */
+    onBookedHoursChanged,
   }
 }
