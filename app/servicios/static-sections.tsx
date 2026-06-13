@@ -51,15 +51,15 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Cuáles son las formas de pago?',
-    a: '3 cuotas sin interés, cada una un tercio del total: la primera al aprobar el boceto (activa el calendario de entrega), la segunda durante el desarrollo y la última contra entrega. Acepto transferencia bancaria, MercadoPago, dólar MEP/CCL y cripto (USDT) para clientes del exterior.',
+    a: '3 cuotas sin interés, cada una un tercio del total: la primera al aprobar el boceto (activa el calendario de entrega), la segunda durante el desarrollo y la última contra entrega. Acepto transferencia bancaria y MercadoPago.',
   },
   {
     q: '¿La página se va a ver bien en el celular?',
-    a: 'Sí — se diseña primero para el celular y después para la compu (mobile-first), porque la mayoría de tus clientes te va a encontrar desde el teléfono. La pruebo en distintos tamaños de pantalla antes de entregar, y el boceto que recibís ya muestra la versión móvil.',
+    a: 'Sí. Cada página se desarrolla con diseño responsivo a medida: se adapta automáticamente a cualquier tamaño de pantalla, desde el celular hasta la computadora, sin perder proporciones ni legibilidad. Antes de entregar, la reviso en distintos dispositivos para asegurarnos de que se vea impecable en todos.',
   },
   {
     q: '¿El hosting y el dominio están incluidos?',
-    a: 'El primer año de hosting profesional (Vercel) está incluido. Después suele costar USD 0-20 por mes según tráfico — te lo dejo configurado y sabés exactamente qué esperar. El dominio lo registrás a tu nombre (te guío paso a paso o lo hacemos juntos en 10 minutos): es importante que sea tuyo, no mío.',
+    a: 'El hosting está incluido desde el día uno. El dominio va por tu cuenta — se registra a tu nombre y suele costar alrededor de USD 10 por año. Si nunca lo hiciste, no te preocupés: te guío en el proceso o lo resolvemos juntos en menos de 10 minutos.',
   },
   {
     q: '¿De quién es el código cuando terminamos?',
