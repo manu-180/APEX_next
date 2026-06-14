@@ -11,6 +11,7 @@ import {
 } from './static-sections'
 import { ServiciosFinalCta } from './servicios-final-cta'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
+import { ServiciosShowcase } from '@/components/sections/servicios-showcase'
 import { BudgetCalculatorSection } from '@/components/sections/budget-calculator'
 import { AfipAddonSection } from '@/components/sections/afip-addon'
 
@@ -49,10 +50,12 @@ export default function ServiciosPage() {
   return (
     <>
       <SafeJsonLd data={faqSchema} />
-      {/* Orden DESIGN_BRIEF §3: hero corto → pricing → calculadora → proceso →
-          diferenciador → AFIP → comparativa única → verticales → FAQ → CTA final */}
+      {/* Orden DESIGN_BRIEF §3: hero corto → pricing → casos reales (prueba) →
+          calculadora → proceso → diferenciador → AFIP → comparativa única →
+          verticales → FAQ → CTA final */}
       <ServiciosHero />
       <ServiciosContent />
+      <ServiciosShowcase />
       <BudgetCalculatorSection />
       <ServiciosProcess />
       <ServiciosWhyApex />

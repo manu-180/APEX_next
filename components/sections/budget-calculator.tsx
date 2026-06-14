@@ -336,7 +336,7 @@ export function BudgetCalculatorSection() {
             className="section-number hidden sm:block"
             style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}
           >
-            03
+            04
           </span>
         </motion.div>
 

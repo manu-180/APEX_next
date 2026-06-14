@@ -272,7 +272,7 @@ export function ServiciosProcess() {
               className="section-number hidden sm:block"
               style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' } as CSSProperties}
             >
-              04
+              05
             </span>
           </div>
         </SectionReveal>
@@ -596,7 +596,7 @@ export function ServiciosComparisonTable() {
                 className="section-number hidden md:block dark:[--sn-stroke-alpha:0.16]"
                 style={{ fontSize: 'clamp(3rem, 6vw, 4.5rem)' } as CSSProperties}
               >
-                05
+                06
               </span>
             </div>
             <p className="mb-6 max-w-2xl text-sm text-[var(--color-on-surface-variant)]">
@@ -762,7 +762,7 @@ export function ServiciosStaticFaq() {
               className="section-number block"
               style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' } as CSSProperties}
             >
-              06
+              07
             </span>
             <p className="editorial-label editorial-label--primary mt-2 mb-4">FAQ</p>
             <h2 className="heading-display text-3xl sm:text-4xl mb-4">
