@@ -58,38 +58,7 @@ export function LabGallery({ demos }: { demos: LabDemo[] }) {
 
   return (
     <section id="laboratorio" className="px-6 py-16 sm:py-20">
-      {/* separador sutil arriba */}
-      <div aria-hidden className="mx-auto mb-16 h-px max-w-6xl" style={{ background: 'linear-gradient(90deg, transparent, var(--glass-border) 50%, transparent)' }} />
-
       <div className="mx-auto max-w-6xl">
-        <SectionReveal>
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="mb-4 flex items-center gap-2.5">
-                <p className="editorial-label editorial-label--primary !mb-0">02 · El laboratorio</p>
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-primary)]"
-                  style={{ background: 'rgba(var(--color-primary-rgb),0.08)', border: '1px solid rgba(var(--color-primary-rgb),0.2)' }}
-                >
-                  <span className="relative flex size-2">
-                    <span className="absolute inline-flex size-full animate-ping rounded-full opacity-60" style={{ background: 'var(--color-primary)' }} />
-                    <span className="relative inline-flex size-2 rounded-full" style={{ background: 'var(--color-primary)' }} />
-                  </span>
-                  Se actualiza solo
-                </span>
-              </div>
-              <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl">
-                <strong className="text-[var(--color-on-surface)]">Diseño sin cliente.</strong>
-                <span className="text-[var(--color-on-surface-variant)]"> Solo para romper el molde.</span>
-              </h2>
-              <p className="text-pretty mt-3 max-w-2xl text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
-                Un sistema autónomo diseña, construye y publica un sitio premium cada semana. Sin
-                brief de cliente: pura exploración de estética y motion. Todo lo que ves acá llegó
-                solo — y va a seguir creciendo.
-              </p>
-            </div>
-          </div>
-        </SectionReveal>
 
         {/* Filtro */}
         {categories.length > 2 && (

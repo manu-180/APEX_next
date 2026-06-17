@@ -41,14 +41,13 @@ export function EnProduccion() {
         <SectionReveal>
           <div className="mb-10 flex items-end justify-between gap-6">
             <div>
-              <p className="editorial-label editorial-label--primary mb-4">01 · En producción</p>
+              <p className="editorial-label editorial-label--primary mb-4">Muestrario · Diseño en vivo</p>
               <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl">
-                <strong className="text-[var(--color-on-surface)]">Sitios reales</strong>
-                <span className="text-[var(--color-on-surface-variant)]"> que ya están vendiendo.</span>
+                <strong className="text-[var(--color-on-surface)]">Páginas que hicimos.</strong>
+                <span className="text-[var(--color-on-surface-variant)]"> Abiertas, tocables, en producción.</span>
               </h2>
               <p className="text-pretty mt-3 max-w-xl text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
-                Productos propios y clientes reales, en línea hoy. Cada card abre el sitio en una
-                pestaña nueva.
+                Cada card abre el sitio real en una pestaña nueva. Código en producción, no maquetas.
               </p>
             </div>
           </div>
@@ -65,10 +64,9 @@ export function EnProduccion() {
                 tags={site.highlights}
                 previewSrc={site.image ?? `/projects/showcase/${site.slug}.webp`}
                 previewMode="image"
-                badge={site.kind === 'product' ? 'Producto propio' : 'Cliente'}
                 BrandIcon={site.themeId ? BRAND_ICON[site.themeId] : undefined}
-                inspectorTitle={`En producción · ${site.name}`}
-                inspectorDesc="Código real en producción que podés abrir y tocar ahora mismo. La prueba más honesta de lo que entregamos."
+                inspectorTitle={`Muestrario · ${site.name}`}
+                inspectorDesc="Sitio real en producción que podés abrir y tocar ahora mismo."
                 className="h-full"
               />
             </SectionReveal>

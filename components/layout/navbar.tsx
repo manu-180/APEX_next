@@ -7,8 +7,7 @@ import { useTheme } from '@/components/providers/theme-mode-provider'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
-import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
-import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon, WhatsAppIcon } from '@/components/ui/icons'
+import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon } from '@/components/ui/icons'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 import { MobileDrawer } from '@/components/layout/mobile-drawer'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
@@ -26,7 +25,6 @@ const ICON_BTN = cn(
 const NAV_LINKS = [
   { href: ROUTES.home, label: 'Inicio', external: false },
   { href: ROUTES.servicios, label: 'Servicios', external: false },
-  { href: ROUTES.muestrario, label: 'Muestrario', external: false },
   { href: ROUTES.tecnologias, label: 'Tecnologías', external: false },
   { href: ROUTES.about, label: 'Sobre Mí', external: false },
   { href: ROUTES.contact, label: 'Contacto', external: false },
@@ -278,19 +276,19 @@ export function Navbar({
             <KeyboardIcon className="size-4" />
           </button>
 
-          <WhatsAppOutboundLink
-            waHref={WHATSAPP_NAV_HREF}
+          <Link
+            href={ROUTES.muestrario}
+            prefetch={false}
             className={cn(
               'hidden md:inline-flex items-center justify-center gap-2 font-semibold',
               'transition-all duration-200 ease-out',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-              'btn-wa active:scale-[0.97]',
-              'h-9 px-4 text-sm rounded-xl'
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              'active:scale-[0.97] h-9 px-4 text-sm rounded-xl',
+              'bg-[var(--color-primary)] text-[var(--color-on-primary)] hover:opacity-90',
             )}
           >
-            <WhatsAppIcon className="size-4" />
-            Hablemos
-          </WhatsAppOutboundLink>
+            Muestrario
+          </Link>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
