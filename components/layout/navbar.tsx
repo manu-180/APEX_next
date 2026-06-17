@@ -7,7 +7,7 @@ import { useTheme } from '@/components/providers/theme-mode-provider'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
-import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon } from '@/components/ui/icons'
+import { MenuIcon, XIcon, SunIcon, MoonIcon, KeyboardIcon, InspectorIcon, GalleryIcon, ArrowRightIcon } from '@/components/ui/icons'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 import { MobileDrawer } from '@/components/layout/mobile-drawer'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
@@ -279,15 +279,33 @@ export function Navbar({
           <Link
             href={ROUTES.muestrario}
             prefetch={false}
+            aria-label="Ver muestrario de proyectos"
             className={cn(
-              'hidden md:inline-flex items-center justify-center gap-2 font-semibold',
-              'transition-all duration-200 ease-out',
+              'group/cta relative hidden md:inline-flex items-center justify-center gap-2 overflow-hidden',
+              'h-9 pl-3.5 pr-3 rounded-xl font-heading text-sm font-semibold tracking-tight',
+              'text-[var(--color-on-primary)]',
+              'transition-[transform,box-shadow,filter] duration-300 ease-out active:scale-[0.97]',
+              'shadow-[0_2px_10px_-2px_rgba(var(--color-primary-rgb),0.5),inset_0_1px_0_rgba(255,255,255,0.22)]',
+              'hover:shadow-[0_8px_24px_-6px_rgba(var(--color-primary-rgb),0.7),inset_0_1px_0_rgba(255,255,255,0.28)]',
+              'hover:brightness-[1.04]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-              'active:scale-[0.97] h-9 px-4 text-sm rounded-xl',
-              'bg-[var(--color-primary)] text-[var(--color-on-primary)] hover:opacity-90',
             )}
+            style={{
+              backgroundImage:
+                'linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb),0.84) 55%, rgba(var(--color-primary-rgb),0.92) 100%)',
+            }}
           >
-            Muestrario
+            {/* Sheen: barrido de luz que cruza al hover — señal premium, oculto en reduced-motion */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 -left-3/4 w-2/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-700 ease-out group-hover/cta:translate-x-[280%] motion-reduce:hidden"
+            />
+            <GalleryIcon className="relative size-4 transition-transform duration-300 ease-out group-hover/cta:-rotate-6 group-hover/cta:scale-110" />
+            <span className="relative">Muestrario</span>
+            <ArrowRightIcon
+              aria-hidden
+              className="relative size-3.5 opacity-70 transition-all duration-300 ease-out group-hover/cta:translate-x-0.5 group-hover/cta:opacity-100"
+            />
           </Link>
 
           <button
