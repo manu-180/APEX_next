@@ -17,7 +17,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(servicios|proyectos|tecnologias|sobre-mi|contacto|gracias)',
+        source: '/(servicios|muestrario|proyectos|tecnologias|sobre-mi|contacto|gracias)',
         headers: [
           {
             key: 'Cache-Control',

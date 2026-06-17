@@ -1,7 +1,28 @@
 # PROGRESS — Refactor pre-campaña + fix funnel WhatsApp
 
-> Última actualización: 2026-06-10 (sesión Claude)
+> Última actualización: 2026-06-17 (sesión Claude)
 > Objetivo: dejar theapexweb.com listo para campaña — funnel WhatsApp funcionando end-to-end + rediseño premium orientado a conversión.
+
+---
+
+## 0. MUESTRARIO — galería premium auto-actualizada (✅ 2026-06-17, build verde)
+
+**Qué:** nueva ruta `/muestrario` (link en navbar desktop + drawer mobile, entre Servicios y Tecnologías). Galería premium en dos bloques:
+- **01 · En producción** — sitios reales (productos propios + clientes) aplanados desde `lib/data/showcase.ts` (`SHOWCASE_TIERS`). Sin precio (eso es de /servicios): acá se muestra el trabajo. Screenshots locales `/public/projects/showcase/<slug>.webp`.
+- **02 · El laboratorio** — los demos que genera **Libre Albedrío** (la Vidriera). **Se recargan solos**: lee en vivo la tabla `demos` del Supabase de libre-albedrio (`wsmsspeeeujynqornyrj`) vía REST anónimo, con ISR (`revalidate=1800`). Cada demo nuevo con `status='deployado'` + `url_deploy` aparece solo. Filtro por tipo de producto + flag "Nuevo" en el más reciente.
+
+**Archivos nuevos:** `app/muestrario/{page,muestrario-hero,en-produccion,lab-gallery,muestrario-cta,preview-card}.tsx`, `lib/data/lab-demos.ts`, `public/projects/muestrario/*.jpg` (5 screenshots curados).
+**Editados:** `lib/constants/index.ts` (ROUTES.muestrario), `components/layout/navbar.tsx` (NAV_LINK), `components/sections/servicios-showcase.tsx` (link "Ver el muestrario completo"), `app/sitemap.ts`, `next.config.mjs` (cache header).
+
+**Decisiones clave (gotchas):**
+- **Iframes en vivo DESCARTADOS**: los demos mandan `X-Frame-Options: SAMEORIGIN`/`DENY` (e-commerce hasta `frame-ancestors 'none'`) → no se pueden embeber. Verificado con curl.
+- **Thumbnails del laboratorio**: prioridad `screenshot_url` hosteada (http) → override local (`LOCAL_SHOT` en lab-demos.ts) → captura en vivo vía **microlink** (`api.microlink.io/...&screenshot=true&embed=screenshot.url`) → fallback a póster de marca generado desde la `paleta` real. (mShots de WordPress da 403; microlink da 200 image/png.)
+- Los 5 demos actuales tienen screenshot curado local (capturado con Playwright, hero ya animado) porque microlink deja oscuros/vacíos los heroes dark (nebula, brasa). Los demos FUTUROS usan microlink automático.
+- Anon key de libre-albedrio hardcodeada como fallback en `lib/data/lab-demos.ts` (es pública, protegida por RLS) → funciona sin configurar envs. Overridable con `LIBRE_ALBEDRIO_SUPABASE_URL` / `LIBRE_ALBEDRIO_SUPABASE_ANON_KEY`.
+
+**Verificado:** `tsc --noEmit` ✓ · `npm run build` ✓ (`/muestrario` prerender estático 7.99kB/158kB) · navegador (dark+light+mobile, filtro, capturas live + curadas, 0 errores de consola).
+
+**Pendiente / follow-up (repo libre_albedrio):** para que los demos FUTUROS tengan thumbnail crisp (no microlink oscuro), el pipeline de la Vidriera debería subir el screenshot del hero a Supabase Storage y guardar la URL pública en `demos.screenshot_url`. El muestrario ya le da prioridad automática.
 
 ---
 
@@ -17,7 +38,7 @@
 4. **Click-path wa.me frágil** — `lib/whatsapp-navigate.ts` hacía `window.open(waHref,'_blank','noopener')`: con `noopener` el spec devuelve `null` siempre (imposible detectar bloqueo), y en in-app browsers (Instagram/FB/Google app) el popup se bloquea → usuario aterriza en `/gracias` sin que WhatsApp se abra. **Conversión perdida silenciosamente.**
 5. **Tracking duplicado/triplicado** — `trackGoogleAdsWhatsAppClick`/`trackMetaLead` se disparaban en el caller Y dentro del helper (hero, floating button, afip-addon, budget-calculator, botlode-bridge). Conversiones infladas el día que haya campaña.
 6. **Tráfico ≈ 0** — sin ads: 0 filas en `appointments` (Supabase APEX `osoijzjxzxdkwmobctyb`), 0 logs runtime en Vercel en 7 días. "No llegan mensajes" es, en parte, "no hay visitas".
-7. Descartado: número OK en todo el código (`5491168049457`), Evolution API Railway viva (v2.3.7), `/gracias` no duplica conversión.
+7. Descartado: número OK en todo el código (`5491134272488`), Evolution API Railway viva (v2.3.7), `/gracias` no duplica conversión.
 
 **Arquitectura confirmada de apex_hunter (apex-leads):**
 - Repo: `C:\MisProyectos\Armagedon\apex_hunter` (rama **master**, remote `manu-180/agente-busca-clientes`), app en subcarpeta `apex-leads/`, deploy Vercel en `https://leads.theapexweb.com`.

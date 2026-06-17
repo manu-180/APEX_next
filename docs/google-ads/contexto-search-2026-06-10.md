@@ -88,7 +88,7 @@ empleos php · frontend remote · trabajar de desarrollador web · wireframe · 
 - / (home) · /servicios · /contacto · /sobre-mi · /tecnologias · /blog · /gracias (thank-you)
 - Verticals con landing dedicada: /web-para-medicos (desde $600k, 15-25 días) · /web-para-abogados (desde $600k, 15-30 días) · /web-para-contadores (desde $900k, 20-35 días)
 - Precios oficiales: Web Landing $300K · Web Interactiva $600K · E-commerce $900K · App Profesional $1.2M · App Empresarial $2.7M · Plataforma: consultar
-- WhatsApp oficial: 5491168049457
+- WhatsApp oficial: 5491134272488
 
 ## Capacidades del MCP (lo que se puede hacer por API)
 ✅ add_keywords (EXACT/PHRASE/BROAD) · add_negative_keywords (campaña, BROAD) · set_campaign_status · set_ad_group_status · update_campaign_budget · create_conversion_action · search (GAQL)
