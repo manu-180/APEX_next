@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { MuestrarioHero } from './muestrario-hero'
-import { EnProduccion } from './en-produccion'
-import { LabGallery } from './lab-gallery'
+import { MuestrarioGallery } from './muestrario-gallery'
 import { MuestrarioCta } from './muestrario-cta'
 import { getLabDemos, LAB_REVALIDATE_SECONDS } from '@/lib/data/lab-demos'
 import { SHOWCASE_TIERS } from '@/lib/data/showcase'
@@ -42,8 +41,7 @@ export default async function MuestrarioPage() {
   return (
     <>
       <MuestrarioHero totalCount={produccionCount + demos.length} labCount={demos.length} />
-      <EnProduccion />
-      <LabGallery demos={demos} />
+      <MuestrarioGallery demos={demos} />
       <MuestrarioCta />
     </>
   )
