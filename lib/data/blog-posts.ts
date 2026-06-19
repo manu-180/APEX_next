@@ -864,7 +864,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Checklist verificable de 12 puntos para evaluar a un freelance o agencia antes de firmar. Si cumple 9+, vas bien.',
     publishedAt: '2026-05-02',
-    readingMinutes: 5,
+    updatedAt: '2026-06-19',
+    readingMinutes: 8,
     category: 'estrategia',
     tags: ['contratación', 'freelance', 'checklist', 'argentina'],
     tldr: 'Para evitar perder plata contratando dev en Argentina, evaluá al candidato con 12 criterios: trabajos en producción, casos con métricas, plazo escrito, propiedad del código, precio fijo, factura A/B, canal directo, qué NO hace, stack en castellano, referencias, NDA opcional, garantía explícita. Si cumple 9+, vas bien.',
@@ -933,6 +934,39 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'paragraph',
         text: 'Si el candidato cumple 12/12 del checklist, tiene casos verificables impresionantes, y te puede dar referencias de clientes con tu volumen exacto — puede pedir 20-40% más que el promedio del mercado. Vale la pena porque el riesgo bajó al mínimo.',
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Dónde busco un buen freelance o estudio web?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Los mejores casi nunca aparecen en plataformas de "trabajitos baratos". Buscá por: referidos de otros dueños de PyME (el canal número uno), LinkedIn filtrando por proyectos reales, y Google ("desarrollador web [tu rubro] Argentina"). Antes de escribir, mirá su portfolio en vivo: si te muestra sitios funcionando y no solo capturas, ya pasó el primer filtro.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Qué preguntar en la primera llamada?',
+      },
+      {
+        type: 'list',
+        items: [
+          '¿Me podés mostrar 3 proyectos tuyos en producción, en vivo?',
+          '¿En qué cuenta queda el código y el dominio?',
+          '¿El precio es fijo? ¿Qué pasa si me paso del scope?',
+          '¿En cuánto tiempo lo entregás y cómo me lo confirmás por escrito?',
+          '¿Qué NO incluye el proyecto?',
+        ],
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cómo conviene estructurar el pago?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Nunca 100% por adelantado, y nunca 100% contra entrega tampoco. Lo sano: un anticipo razonable para arrancar y el resto en cuotas atadas a hitos. Mejor todavía si, antes de poner un peso, ves un boceto del proyecto — así pagás sobre algo concreto, no sobre una promesa. Es como trabajo en [APEX](/servicios): boceto gratis en 24-48 h y 3 cuotas sin interés.',
+      },
     ],
     faq: [
       {
@@ -951,6 +985,14 @@ export const BLOG_POSTS: BlogPost[] = [
         q: '¿Qué hago si el dev desaparece a la mitad del proyecto?',
         a: 'Primero, intentá contacto por todos los canales durante 7 días. Si no responde, contratá otro dev para auditar lo que hay y completar. Conservá toda la comunicación previa — si pagaste y no hay entrega, podés reclamar legalmente o por medios de pago (chargeback en MercadoPago si fue por ahí).',
       },
+      {
+        q: '¿Cuánto anticipo es razonable pagar?',
+        a: 'Un anticipo del 30-50% para arrancar es lo habitual, con el resto atado a hitos o en cuotas. Desconfiá de quien pide el 100% por adelantado. Lo ideal es ver un boceto antes de pagar el primer peso.',
+      },
+      {
+        q: '¿Conviene pedir un boceto antes de contratar?',
+        a: 'Sí, es la mejor forma de bajar el riesgo. Un boceto te muestra cómo va a quedar el proyecto antes de comprometer plata. Si un proveedor se niega a mostrarte algo concreto antes de cobrar todo, es una señal de alerta.',
+      },
     ],
   },
 
@@ -960,7 +1002,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Cómo integrar pasarela de pagos MercadoPago + facturación electrónica AFIP en un sitio web argentino. Costos reales, plazos y aspectos técnicos para 2026.',
     publishedAt: '2026-04-28',
-    readingMinutes: 7,
+    updatedAt: '2026-06-19',
+    readingMinutes: 10,
     category: 'tecnologia',
     tags: ['mercadopago', 'afip', 'pagos', 'integración', 'argentina'],
     tldr: 'Integrar MercadoPago en una web custom cuesta ARS 80k-200k y lleva 3-5 días. Agregar facturación electrónica AFIP automática suma ARS 200k-400k y otros 5-10 días. El stack más simple en 2026: MercadoPago Checkout Pro + AFIP SDK + webhook handlers.',
@@ -1065,6 +1108,38 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'paragraph',
         text: 'Sólo si usás una plataforma que ya lo trae integrado (Tiendanube tiene parcial, Tienda Online de MP integrada). Para sitios custom o e-commerce hechos a medida, necesitás un dev — la integración AFIP requiere SOAP, certificados X.509 y manejo de errores específicos.',
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cuánto tarda toda la integración (MercadoPago + AFIP)?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Sumando las dos partes, una integración completa de cobro + facturación electrónica automática suele llevar entre 8 y 18 días hábiles según la complejidad. El cobro (MercadoPago) se resuelve primero en 3-5 días; la facturación AFIP se monta sobre eso y suma otros 5-12 días, más el testing en sandbox antes de pasar a producción.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Es seguro? ¿Dónde quedan los datos de la tarjeta?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Sí, y este es un punto clave: con Checkout Pro los datos de la tarjeta los procesa y guarda MercadoPago, no tu sitio. Vos nunca tocás ni almacenás el número de tarjeta, así que no cargás con el peso de la certificación PCI. Tu base de datos solo guarda el estado del pago y el ID de la transacción.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cuáles son los errores más comunes al integrar?',
+      },
+      {
+        type: 'list',
+        items: [
+          'No manejar webhooks idempotentes: MercadoPago puede avisar el mismo pago dos veces y terminás facturando doble.',
+          'Olvidar la renovación anual del certificado AFIP: un día deja de facturar sin aviso.',
+          'Probar solo en sandbox y no validar el primer pago real en producción.',
+          'No contemplar pagos rechazados o en disputa: el flujo tiene que manejar esos estados, no solo el "aprobado".',
+        ],
+      },
     ],
     faq: [
       {
@@ -1083,6 +1158,14 @@ export const BLOG_POSTS: BlogPost[] = [
         q: '¿Puedo integrar MercadoPago en Wix o Shopify?',
         a: 'En Wix sí, vía app de MercadoPago para Wix. En Shopify no es tan simple porque Shopify Payments no opera en Argentina — tenés que usar gateway de terceros con comisión adicional.',
       },
+      {
+        q: '¿Quién paga la comisión de las cuotas sin interés?',
+        a: 'Las "cuotas sin interés" son sin interés para el comprador, pero la comisión (que sube con la cantidad de cuotas) la absorbe el vendedor. Por eso conviene definir bien qué planes de cuotas ofrecés según tu margen.',
+      },
+      {
+        q: '¿Necesito un certificado de AFIP para facturar? ¿Cómo lo saco?',
+        a: 'Sí, necesitás un certificado digital y dar de alta el punto de venta web en AFIP/ARCA. Se tramita desde tu Clave Fiscal y se renueva una vez al año. La integración usa ese certificado para firmar cada factura; conviene que el dev automatice o documente la renovación.',
+      },
     ],
   },
 
@@ -1092,7 +1175,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'PWA vs app nativa para PyMEs argentinas en 2026. Cuándo conviene cada una, costos comparados, y los 3 escenarios donde la PWA gana 9 de 10 veces.',
     publishedAt: '2026-04-25',
-    readingMinutes: 5,
+    updatedAt: '2026-06-19',
+    readingMinutes: 8,
     category: 'tecnologia',
     tags: ['pwa', 'app móvil', 'pyme', 'argentina'],
     tldr: 'Una Progressive Web App (PWA) cuesta 40-60% menos que una app nativa, no requiere descarga de stores, y cubre el 80% de las necesidades para la mayoría de PyMEs argentinas. Conviene PWA en lugar de app nativa cuando el uso es ocasional, el discovery viene por web, o no necesitás hardware nativo profundo.',
@@ -1184,6 +1268,38 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'paragraph',
         text: 'Next.js 15 + Tailwind CSS + Supabase es el stack más eficiente para PWAs en 2026. Permite render server-side (bueno para SEO), Service Workers para offline, Web Push API nativa, y deploy en Vercel sin configuración adicional.',
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cuánto cuesta una PWA en Argentina?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Una PWA bien hecha cuesta entre ARS 600.000 y 1.500.000, con entrega en 15-25 días — un 40-60% menos que una app nativa equivalente, porque es un solo proyecto en lugar de tres (web + iOS + Android). Y como es web, no pagás la cuota anual de Apple Developer ni esperás la review de las tiendas para publicar cambios. Tenés los planes en [servicios](/servicios).',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Una PWA ayuda con el SEO?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Esta es la gran ventaja sobre la app nativa: una PWA es indexable por Google. Una app nativa es invisible para los buscadores —solo se descubre dentro de las tiendas—, mientras que tu PWA puede rankear y traerte clientes nuevos desde una búsqueda. Combinás adquisición (SEO) y retención (instalación + notificaciones) en un solo producto.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿En qué PyMEs encaja mejor una PWA?',
+      },
+      {
+        type: 'list',
+        items: [
+          'Consultorios y profesionales de la salud: turnos online y recordatorios sin obligar al paciente a bajar una app (ver [web para médicos](/web-para-medicos)).',
+          'Comercios con catálogo: catálogo instalable, rápido y actualizable al instante.',
+          'Restaurantes y servicios con reservas: agenda online que se abre como app.',
+          'Estudios contables: portal del cliente con vencimientos y comprobantes (ver [web para contadores](/web-para-contadores)).',
+        ],
+      },
     ],
     faq: [
       {
@@ -1201,6 +1317,14 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         q: '¿Cuánto cuesta convertir mi web actual en PWA?',
         a: 'Si tu sitio está bien construido (Next.js, React), agregar capacidades PWA cuesta entre ARS 80k y 250k (2-5 días). Si tu sitio está en Wix o WordPress, suele requerir reconstruirlo de cero.',
+      },
+      {
+        q: '¿Una PWA me sirve si quiero que me encuentren en Google?',
+        a: 'Sí, y es una de sus mayores ventajas: a diferencia de una app nativa, una PWA es un sitio web indexable, así que puede rankear en Google y traerte clientes nuevos desde una búsqueda. La app nativa solo se descubre dentro de las tiendas.',
+      },
+      {
+        q: '¿Puedo empezar con una PWA y pasar a app nativa después?',
+        a: 'Sí. Es un camino habitual y de bajo riesgo: arrancás con una PWA, validás que la gente la usa, y si más adelante necesitás hardware avanzado o estar en las tiendas, invertís en la app nativa con datos en la mano en vez de adivinando.',
       },
     ],
   },
