@@ -12,6 +12,10 @@ import { normalizeBookingPhoneToE164 } from '@/lib/booking-phone'
 const DEFAULT_LEADS_URL = 'https://leads.theapexweb.com'
 const BRIDGE_TIMEOUT_MS = 25_000
 
+// El bridge puede tardar hasta 25s; sin esto Vercel cortaría la función antes
+// (default 15s en Pro) y la confirmación de WhatsApp fallaría silenciosamente.
+export const maxDuration = 30
+
 export async function POST(req: Request) {
   let body: { phone?: string; dateIso?: string; hour?: number; clientName?: string }
   try {
