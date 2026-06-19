@@ -32,6 +32,9 @@ export const PROJECTS = {
   assistify:     'https://assistify.lat',
 } as const
 
+/** Link directo al diálogo de reseña del Perfil de Negocio (Google). Compartible. */
+export const GOOGLE_REVIEW_URL = 'https://g.page/r/Cf6x-buXP4ugEBM/review' as const
+
 // ─── Keyboard Shortcuts ───────────────────────────────────────────────────────
 export const SHORTCUTS = [
   { key: 'H', label: 'Ir a Home',                         route: ROUTES.home,                       group: 'nav' as const },

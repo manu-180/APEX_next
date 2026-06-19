@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${APP_URL}/tecnologias`,      lastModified: new Date('2026-05-15'), changeFrequency: 'monthly', priority: 0.7  },
     { url: `${APP_URL}/sobre-mi`,         lastModified: new Date('2026-05-15'), changeFrequency: 'monthly', priority: 0.7  },
     { url: `${APP_URL}/contacto`,         lastModified: new Date('2026-05-15'), changeFrequency: 'monthly', priority: 0.8  },
+    { url: `${APP_URL}/opiniones`,        lastModified: new Date('2026-06-19'), changeFrequency: 'monthly', priority: 0.6  },
   ]
 
   const blogUrls: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
