@@ -43,7 +43,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Tabla actualizada con los precios reales del mercado argentino 2026 para landing, sitio corporativo, e-commerce y apps móviles. Sin "depende".',
     publishedAt: '2026-05-15',
-    readingMinutes: 7,
+    updatedAt: '2026-06-19',
+    readingMinutes: 11,
     category: 'pricing',
     tags: ['precios', 'argentina', 'desarrollo web', 'presupuesto'],
     tldr: 'En Argentina mayo 2026, una landing cuesta entre ARS 180k-500k, un sitio interactivo entre 500k-1.2M, e-commerce custom entre 900k-3M, y una app móvil entre 580k-6M. El rango depende de complejidad, plazo, contenido propio e integraciones.',
@@ -119,6 +120,71 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'heading',
         level: 2,
+        text: '¿Cuánto cuesta el mantenimiento mensual de una página web?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Acá hay mucha confusión —a veces a propósito—. Una landing o un sitio que no cambia casi no tiene costo mensual: pagás el dominio (USD 10-15 al año) y el hosting, que en infraestructura moderna (Vercel, Netlify) puede ser USD 0 para el tráfico normal de una PyME. El "mantenimiento" caro que venden muchas agencias, muchas veces, es una cuota por nada.',
+      },
+      {
+        type: 'table',
+        headers: ['Concepto', 'Costo real', '¿Lo necesitás?'],
+        rows: [
+          ['Dominio .com / .com.ar', 'USD 10-15 / año', 'Sí, siempre'],
+          ['Hosting landing / sitio estático', 'USD 0-20 / mes', 'Sí (suele ir gratis el 1er año)'],
+          ['Hosting con base de datos / panel', 'USD 0-30 / mes', 'Solo si tenés admin o login'],
+          ['Mantenimiento "por las dudas"', 'ARS 45k-80k / mes', 'Casi nunca — pagá por cambio'],
+          ['Cambio puntual (texto, sección)', 'ARS 50k-80k por vez', 'Solo cuando lo pedís'],
+        ],
+      },
+      {
+        type: 'callout',
+        variant: 'warning',
+        text: 'Si tu sitio no cambia mes a mes, un mantenimiento mensual fijo es plata tirada. Un fijo de ARS 60k/mes son 720k al año por, muchas veces, no hacer nada. Pagá por bloque cuando realmente necesitás un cambio.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Por qué unos cobran en dólares y otros en pesos?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Cobrar en USD protege al desarrollador de la inflación, pero te traslada a vos el riesgo cambiario: un proyecto de 3 meses puede terminar costándote 20-30% más en pesos del que arrancó. Cobrar en pesos con precio fijo pactado por escrito te da certeza: sabés exactamente cuánto vas a pagar de principio a fin. Por eso publico los precios en ARS y los fijo antes de empezar, sin "ajuste por inflación" sorpresa a mitad de camino.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Conviene un freelance, una agencia o una plataforma como Wix?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Para la mayoría de las PyMEs argentinas, un freelance full-stack es el punto óptimo: pagás por el trabajo, no por la estructura de una agencia (oficinas, vendedores, project managers que encarecen 2-3x lo mismo). Una plataforma tipo Wix o Tiendanube es barata de entrada, pero alquilás para siempre y el código nunca es tuyo. El resumen:',
+      },
+      {
+        type: 'table',
+        headers: ['Opción', 'Costo típico', 'Dueño del código', 'Ideal para'],
+        rows: [
+          ['Plataforma (Wix/Tiendanube)', '$35-65 USD/mes para siempre', 'No (alquilás)', 'Arrancar rápido y validar'],
+          ['Freelance full-stack', 'ARS 300k-1.2M una sola vez', 'Sí, tuyo', 'PyME que quiere un activo propio'],
+          ['Agencia', 'ARS 1.5M-5M+ una sola vez', 'Depende del contrato', 'Empresa con equipo y presupuesto'],
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: 'Tenés la comparación completa, fila por fila —APEX vs WordPress vs Wix vs Tiendanube vs agencia—, en la página de [servicios y precios](/servicios), con qué recibís exactamente a cada precio.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Se puede pagar una página web en cuotas?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Sí, y debería ser lo normal. Trabajo con 3 cuotas sin interés y, antes de que pagues nada, te hago un boceto gratis en 24-48 h: ves cómo va a quedar tu proyecto y recién ahí decidís. Si no te convence, no pagás. Eso te saca el riesgo de encima — no estás pagando una promesa, estás pagando algo que ya viste.',
+      },
+      {
+        type: 'heading',
+        level: 2,
         text: '¿Cómo evitar pagar de más?',
       },
       {
@@ -153,6 +219,18 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         q: '¿Vale la pena pagar mantenimiento mensual?',
         a: 'Sólo si el sitio o app es crítico para tu negocio y se actualiza con frecuencia. Para landings estáticas, conviene pagar por bloques cuando hay cambios ($50-80k cada vez) en vez de un fijo mensual.',
+      },
+      {
+        q: '¿Cuánto tarda en estar lista una página web?',
+        a: 'Una landing está lista en 7-15 días y un sitio interactivo en 15-25 días. En APEX el plazo se pacta por escrito antes de empezar, con un boceto gratis en 24-48 h para que veas el diseño antes de pagar.',
+      },
+      {
+        q: '¿Qué pasa si no me gusta el diseño?',
+        a: 'Por eso primero ves un boceto gratis en 24-48 h, sin pagar nada. Si no te convence, no avanzás y no pagás. Recién cuando aprobás el diseño se arranca el desarrollo: no comprás una promesa, comprás algo que ya viste.',
+      },
+      {
+        q: '¿Puedo pagar mi página web en cuotas?',
+        a: 'Sí. Trabajo con 3 cuotas sin interés, y el primer boceto es gratis: recién pagás cuando aprobás cómo va a quedar tu proyecto.',
       },
     ],
   },
