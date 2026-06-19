@@ -397,7 +397,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Precios reales y comparativa técnica para apps iOS + Android en Argentina 2026. Cuándo conviene Flutter, React Native o nativo según tu caso.',
     publishedAt: '2026-05-10',
-    readingMinutes: 6,
+    updatedAt: '2026-06-19',
+    readingMinutes: 9,
     category: 'pricing',
     tags: ['apps', 'flutter', 'react native', 'ios', 'android', 'precios'],
     tldr: 'Una app móvil simple en Argentina cuesta entre ARS 580k-1.15M (Flutter o React Native), una profesional con backend 1.15M-2.7M, y enterprise 2.7M+. Flutter conviene para diseño consistente cross-platform, React Native si ya tenés team React, nativo sólo para apps con hardware crítico.',
@@ -481,6 +482,33 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'paragraph',
         text: 'Desde "arrancamos" hasta "instalable en stores": 4-6 semanas para un MVP, 8-12 semanas para una app profesional. El bottleneck no suele ser el desarrollo sino la review de Apple (3-7 días) y el setup inicial de cuentas (otra semana).',
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Conviene una app o te alcanza con una PWA?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Antes de gastar en una app nativa, preguntate si no te alcanza una PWA: una web que se instala como app y manda notificaciones. Si no necesitás cámara avanzada, NFC, Bluetooth ni pagos in-app de la store, una PWA te da el 80% de la experiencia por una fracción del costo y sin la comisión del 15-30% de las tiendas. Lo desarrollo en [por qué tu PyME necesita una PWA y no una app nativa](/blog/por-que-pyme-pwa-2026).',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Necesito un backend para mi app?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Casi siempre sí: si tu app guarda usuarios, datos o pagos, necesita un backend. La buena noticia es que hoy no se construye de cero. Con Supabase o Firebase tenés base de datos, autenticación y storage listos, con plan gratis para arrancar y costos que recién suben cuando la app crece. Eso baja el precio inicial y el riesgo: no pagás infraestructura pesada hasta que la app la justifique.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cómo se paga el desarrollo de una app?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Igual que una web: precio fijo pactado por escrito en pesos, en 3 cuotas sin interés, y con un prototipo antes de desarrollar para que veas el flujo de la app antes de poner plata. Lo más sano es arrancar por un MVP acotado, validarlo con usuarios reales y recién después invertir en las features grandes. Te paso un presupuesto por [WhatsApp](/contacto) en menos de un día.',
+      },
     ],
     faq: [
       {
@@ -498,6 +526,14 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         q: '¿Cuánto sale mantener una app después de lanzarla?',
         a: 'Los costos fijos de plataforma rondan USD 130-250/mes (Apple Developer, Google Play, backend, monitoring). Aparte, mantenimiento técnico con el dev cuesta entre ARS 50.000 y 250.000/mes según frecuencia de updates.',
+      },
+      {
+        q: '¿Puedo empezar con una versión más chica y crecer después?',
+        a: 'Sí, y es lo más recomendable. Se arranca con un MVP de 3-5 pantallas (ARS 580k-1.15M), se valida con usuarios reales y se suman features en etapas. Así no invertís de entrada en algo que todavía no sabés si el mercado va a usar.',
+      },
+      {
+        q: '¿Una PWA me sirve en lugar de una app nativa?',
+        a: 'En muchos casos sí. Si no necesitás hardware avanzado ni estar en las tiendas, una PWA (web instalable con notificaciones) te da gran parte de la experiencia de una app por mucho menos plata y sin comisiones de App Store o Play Store. Si necesitás cámara avanzada, NFC o pagos in-app, ahí conviene nativo con Flutter.',
       },
     ],
   },
