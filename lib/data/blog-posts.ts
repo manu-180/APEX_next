@@ -241,7 +241,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Comparativa honesta entre Next.js, WordPress y Wix para sitios de PyMEs en Argentina. Velocidad real, costos, lock-in, SEO y cuándo conviene cada uno.',
     publishedAt: '2026-05-12',
-    readingMinutes: 6,
+    updatedAt: '2026-06-19',
+    readingMinutes: 9,
     category: 'tecnologia',
     tags: ['nextjs', 'wordpress', 'wix', 'comparativa', 'pymes'],
     tldr: 'Para PyMEs argentinas en 2026: Next.js es la opción premium para sitios que necesitan velocidad, SEO y propiedad del código (rango $300k-$1.2M ARS). WordPress conviene para blogs largos con muchos plugins. Wix sólo para casos muy chicos (<$300k facturación/mes).',
@@ -321,6 +322,46 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'paragraph',
         text: 'Tres pasos esenciales: 1) Hacer auditoría de URLs y keywords activas en Search Console antes de migrar. 2) Diseñar el sitio nuevo con la misma estructura de URLs (mismas slugs). 3) Configurar redirects 301 para cualquier URL que cambie. Esto preserva el ranking acumulado y no perdés tráfico orgánico.',
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cuál rankea mejor en Google?',
+      },
+      {
+        type: 'paragraph',
+        text: 'A igualdad de contenido, gana el más rápido y el más limpio técnicamente — y ahí Next.js corre con ventaja. Renderiza el HTML en el servidor (SSR/SSG), llega a Lighthouse 90+ en mobile sin esfuerzo y maneja metadata, sitemap y datos estructurados (schema) de forma nativa. WordPress llega a un buen SEO, pero a fuerza de plugins, y cada plugin suma peso y mantenimiento. Wix arrastra el render de su editor visual, que lo deja siempre por detrás en velocidad.',
+      },
+      {
+        type: 'callout',
+        variant: 'tip',
+        text: 'Los Core Web Vitals son factor de ranking desde hace años. Un sitio Next.js bien hecho arranca esa pelea casi ganada; uno en Wix parte en desventaja y no hay plugin que lo arregle.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Qué pasa con la seguridad y el mantenimiento?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Es la diferencia más subestimada. Un WordPress vive de plugins, y cada plugin desactualizado es una puerta abierta: la mayoría de los sitios de PyMEs hackeados son WordPress con plugins viejos. Te obliga a actualizar —o pagarle a alguien que lo haga— todos los meses. Un sitio Next.js estático casi no tiene superficie de ataque: no hay base de datos expuesta ni panel de login público que romper.',
+      },
+      {
+        type: 'list',
+        items: [
+          'Next.js estático: superficie de ataque mínima, sin updates obligatorios mensuales.',
+          'WordPress: requiere updates de core + plugins + temas, idealmente automáticos y monitoreados.',
+          'Wix: la seguridad la maneja la plataforma, a cambio de control y portabilidad cero.',
+        ],
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Y si más adelante quiero una app móvil?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Acá Next.js juega en otra liga. Al ser React, comparte lógica y mentalidad con React Native, así que el salto a una app móvil reutiliza parte del trabajo. Desde WordPress o Wix, una app es empezar de cero con otro equipo y otro presupuesto. Si tu plan a 2 años incluye app, arrancar en el stack correcto te ahorra rehacer todo. Lo vemos en [servicios](/servicios): hago web y apps con el mismo stack (Next.js + Flutter).',
+      },
     ],
     faq: [
       {
@@ -338,6 +379,14 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         q: '¿Conviene Next.js para un blog?',
         a: 'Sólo si el blog es parte de un sitio más grande (marketing, portfolio, e-commerce). Para un blog puro, WordPress sigue siendo más rápido de operar — el admin nativo y los plugins de blogging son insuperables.',
+      },
+      {
+        q: '¿WordPress es inseguro?',
+        a: 'WordPress en sí no, pero su ecosistema de plugins es la causa número uno de sitios de PyMEs hackeados. Requiere actualizaciones constantes de core, plugins y temas. Un sitio Next.js estático tiene mucha menos superficie de ataque porque no expone base de datos ni panel de login público.',
+      },
+      {
+        q: '¿Cuánto tarda en estar listo un sitio en Next.js?',
+        a: 'Una landing en Next.js está lista en unos 15 días y un sitio interactivo en 15-25 días, con el plazo pactado por escrito y un boceto gratis en 24-48 h antes de pagar.',
       },
     ],
   },
