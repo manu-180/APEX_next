@@ -6,7 +6,8 @@ import { getLabDemos, LAB_REVALIDATE_SECONDS } from '@/lib/data/lab-demos'
 import { SHOWCASE_TIERS } from '@/lib/data/showcase'
 
 export const metadata: Metadata = {
-  title: 'Muestrario — sitios reales en vivo',
+  // El template global ya agrega "| Manuel Navarro" — no repetir marca acá.
+  title: 'Portfolio de páginas web — ejemplos reales en vivo',
   description:
     'Galería de sitios web hechos por APEX: productos propios y clientes reales en producción, más un laboratorio de diseño que suma un sitio premium nuevo cada semana. Abrí cualquiera en vivo.',
   keywords: [

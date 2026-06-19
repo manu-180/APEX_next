@@ -68,6 +68,14 @@ const nextConfig = {
     ];
   },
 
+  async redirects() {
+    return [
+      // /proyectos fue renombrada a /muestrario — 301 preserva el equity de la
+      // URL vieja que Google todavía tiene indexada (aparece en GSC con impresiones).
+      { source: '/proyectos', destination: '/muestrario', permanent: true },
+    ];
+  },
+
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [360, 640, 750, 828, 1080, 1200, 1920],

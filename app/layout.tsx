@@ -45,12 +45,15 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
+    // Home = página de mayor autoridad: el título lidera con la keyword comercial
+    // (no con el nombre propio, que nadie busca). Marca "APEX" al final = el término
+    // branded que sí es ownable ("apex web"); "Manuel Navarro" queda para el resto vía template.
+    default: 'Desarrollo web y apps para PyMEs en Argentina | APEX',
     template: '%s | Manuel Navarro',
   },
   description:
-    'Especializado en crear experiencias fluidas, eficientes y con diseño premium. Apps móviles con Flutter y webs de alto rendimiento con Next.js.',
-  keywords: ['Flutter', 'Next.js', 'Supabase', 'Riverpod', 'TypeScript', 'Full-Stack', 'Mobile', 'Argentina', 'Desarrollo web', 'Apps móviles', 'Diseño premium', 'UX'],
+    'Diseño y desarrollo de páginas web y apps a medida para PyMEs y emprendedores en Argentina. Precio fijo, boceto gratis en 48 h y entrega en 15 días.',
+  keywords: ['páginas web Argentina', 'desarrollo web Argentina', 'diseño de páginas web', 'desarrollo de apps Argentina', 'web para PyMEs', 'tienda online Argentina', 'Flutter', 'Next.js', 'Supabase', 'desarrollador full-stack Argentina'],
   authors: [{ name: 'Manuel Navarro' }],
   creator: 'Manuel Navarro',
   openGraph: {
@@ -58,15 +61,15 @@ export const metadata: Metadata = {
     locale: 'es_AR',
     url: APP_URL,
     siteName: 'APEX Portfolio',
-    title: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
+    title: 'Páginas web y apps a medida para PyMEs argentinas | APEX',
     description:
-      'Experiencias con diseño premium: apps con Flutter y webs de alto rendimiento con Next.js. Consultá precios y agendá tu reunión gratis.',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Manuel Navarro — Desarrollo Web & Mobile | APEX' }],
+      'Diseño premium, precio fijo y entrega en 15 días. Boceto gratis en 48 h antes de pagar nada. Web, e-commerce y apps móviles a medida.',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'APEX — Desarrollo de páginas web y apps en Argentina' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Manuel Navarro — Desarrollador Full-Stack & Mobile',
-    description: 'Experiencias fluidas con diseño premium: Flutter, Next.js y más.',
+    title: 'Páginas web y apps a medida para PyMEs argentinas | APEX',
+    description: 'Diseño premium, precio fijo y entrega en 15 días. Boceto gratis en 48 h antes de pagar.',
     images: ['/opengraph-image'],
   },
   robots: { index: true, follow: true },
