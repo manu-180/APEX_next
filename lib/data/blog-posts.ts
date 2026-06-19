@@ -544,7 +544,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Las 3 preguntas que tu dev tiene que poder responder antes de firmar. Casos reales de PyMEs que perdieron $1M+ por no preguntar esto.',
     publishedAt: '2026-05-08',
-    readingMinutes: 5,
+    updatedAt: '2026-06-19',
+    readingMinutes: 8,
     category: 'estrategia',
     tags: ['contratación', 'propiedad código', 'lock-in', 'riesgos'],
     tldr: 'El código de tu sitio o app debe quedar 100% a tu nombre desde el día 1 (repositorio en tu cuenta, dominio a tu nombre, datos exportables). Si tu dev no te puede confirmar esto por escrito, no firmes.',
@@ -637,6 +638,44 @@ export const BLOG_POSTS: BlogPost[] = [
           'Considerá contratar a otro dev para una "auditoría de propiedad" — chequea qué tan portable es tu setup actual.',
         ],
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Por qué un dev serio quiere que el código sea tuyo?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Porque no necesita atarte para que te quedes. El que te retiene escondiendo el código o el acceso es porque su trabajo no se sostiene solo. Un dev confiado te entrega todo —repo, dominio, datos— y volvés igual, porque trabajás bien con él. El lock-in es una muleta de retención, no una práctica profesional. Si te lo proponen "para simplificar", desconfiá.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Qué tiene que decir el acuerdo, aunque sea un email?',
+      },
+      {
+        type: 'list',
+        items: [
+          'Que el código es tuyo y el repo se crea en TU cuenta de GitHub desde el día 1.',
+          'Que el dominio y el hosting quedan a tu nombre, no del dev.',
+          'Que podés exportar toda la base de datos cuando quieras.',
+          'Qué incluye el proyecto y qué no (scope claro, para evitar el "eso es aparte").',
+          'Precio fijo y plazo por escrito, no "por hora sin tope".',
+        ],
+      },
+      {
+        type: 'callout',
+        variant: 'tip',
+        text: 'No hace falta un contrato de abogado. Un email donde el dev confirma estos puntos ya tiene validez. Si se niega a ponerlo por escrito, ahí tenés tu respuesta.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cambia algo si es una app en vez de una web?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Aplica lo mismo, más un detalle clave: las cuentas de Apple Developer y Google Play tienen que estar a TU nombre (o de tu empresa), no del dev. Si la app se publica bajo la cuenta del desarrollador, en las tiendas la app es de él. Pedí siempre publicar bajo tu propia cuenta de developer.',
+      },
     ],
     faq: [
       {
@@ -655,6 +694,14 @@ export const BLOG_POSTS: BlogPost[] = [
         q: '¿Cómo me aseguro que el código quede a mi nombre?',
         a: 'Pedí que el repositorio se cree directamente en tu cuenta de GitHub (no transferido después). Pedí ser el "owner" desde el día 1. Si te dicen que "es más fácil" empezar en la cuenta del dev y "después transferir", desconfiá.',
       },
+      {
+        q: '¿Me sirve tener el código si no sé programar?',
+        a: 'Sí, muchísimo. Aunque no lo toques, el código es el activo: podés contratar a cualquier otro dev para que lo continúe, moverlo de servidor, o venderlo junto con tu negocio. Sin el código, dependés para siempre de una sola persona o plataforma.',
+      },
+      {
+        q: '¿Cómo maneja APEX la propiedad del código?',
+        a: 'El repositorio se crea en tu cuenta de GitHub desde el día 1, el dominio y el hosting quedan a tu nombre, y todo queda pactado por escrito antes de empezar. Si algún día querés seguir con otro dev, te llevás todo sin pedir permiso.',
+      },
     ],
   },
 
@@ -664,7 +711,8 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Comparativa honesta de e-commerce en Argentina 2026. Desde Tiendanube básico hasta custom con Next.js. Tabla con cuándo conviene cada uno según tu volumen mensual.',
     publishedAt: '2026-05-05',
-    readingMinutes: 6,
+    updatedAt: '2026-06-19',
+    readingMinutes: 9,
     category: 'tecnologia',
     tags: ['ecommerce', 'tiendanube', 'shopify', 'argentina'],
     tldr: 'Hasta $500k facturación/mes: Tiendanube ($35-65 USD/mes). Entre $500k-$3M/mes: Tiendanube + custom skin. Arriba de $3M/mes: e-commerce custom con Next.js + Supabase paga su diferencia en 6-12 meses por velocidad real, propiedad del código y sin comisión por venta.',
@@ -745,6 +793,42 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'paragraph',
         text: 'Sí. La migración bien hecha incluye: exportar el catálogo completo, mapear las URLs antiguas a las nuevas, configurar redirects 301 para cualquier cambio, y mantener la estructura de categorías. Hecho así, no perdés tráfico orgánico ni ranking acumulado.',
       },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Cuánto cuesta cada opción a 3 años?',
+      },
+      {
+        type: 'paragraph',
+        text: 'El precio de entrada engaña. Lo que importa es el costo total acumulado, porque la plataforma se paga todos los meses para siempre y el custom se paga una vez. A volumen medio:',
+      },
+      {
+        type: 'table',
+        headers: ['Opción', 'Año 1', 'Acumulado a 3 años', '¿Activo propio?'],
+        rows: [
+          ['Tiendanube + apps', 'ARS ~780k', 'ARS ~2.3M', 'No'],
+          ['Shopify (con comisión)', 'ARS ~1.2M', 'ARS ~3.6M+', 'No'],
+          ['E-commerce custom', 'ARS 900k-2M (una vez)', 'ARS 900k-2M + hosting', 'Sí, tuyo'],
+        ],
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Qué necesito para cobrar online legal en Argentina?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Dos piezas: una pasarela de pago (MercadoPago es la estándar) y la facturación electrónica de AFIP/ARCA. Las plataformas integran MercadoPago de fábrica, pero la facturación automática muchas veces queda por tu cuenta. En un e-commerce custom se puede integrar todo —cobro + factura electrónica automática— en un solo flujo. Lo explico paso a paso en [integrar MercadoPago + AFIP en tu web](/blog/integrar-mercadopago-afip-web-argentina).',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿El SEO de una tienda custom es mejor?',
+      },
+      {
+        type: 'paragraph',
+        text: 'Sí, y bastante. En custom controlás la velocidad (Core Web Vitals), las URLs, el schema de producto (precio, stock y reseñas en los resultados de Google) y el contenido de cada categoría. En las plataformas estás limitado a lo que te dejan tocar. Si una parte importante de tus ventas viene (o podría venir) de búsquedas en Google, el custom te da techo más alto.',
+      },
     ],
     faq: [
       {
@@ -762,6 +846,14 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         q: '¿Conviene Shopify en Argentina?',
         a: 'Sólo si vendés mayormente al exterior en USD, o si necesitás features específicas del ecosistema Shopify (apps de dropshipping internacionales, integraciones con TikTok Shop). Para mercado argentino puro, Tiendanube suele ser más práctico.',
+      },
+      {
+        q: '¿Necesito factura electrónica para vender online?',
+        a: 'Sí. Si vendés de forma habitual en Argentina necesitás emitir factura electrónica vía AFIP/ARCA. Las plataformas integran el cobro pero no siempre la facturación automática; en un e-commerce custom se puede integrar todo el flujo (cobro + factura) en un solo paso.',
+      },
+      {
+        q: '¿Qué es más rápido, Tiendanube o una tienda custom?',
+        a: 'Una tienda custom bien hecha (Next.js) llega a Lighthouse 90+ en mobile, mientras que Tiendanube y Shopify suelen quedar en 50-70 por el peso de sus plantillas. En e-commerce, cada segundo de carga impacta directo en la conversión.',
       },
     ],
   },
