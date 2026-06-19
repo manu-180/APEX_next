@@ -158,12 +158,14 @@ export function LocalBusinessJsonLd() {
           addressRegion: 'CABA',
           addressLocality: 'Buenos Aires',
         },
+        // Agente de WhatsApp responde 24/7 → el negocio esta "abierto" siempre.
+        // Consistente con el horario "Abierto las 24 horas" del Perfil de Negocio (Google).
         openingHoursSpecification: [
           {
             '@type': 'OpeningHoursSpecification',
-            dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            opens: '09:00',
-            closes: '19:00',
+            dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            opens: '00:00',
+            closes: '23:59',
           },
         ],
         founder: { '@id': PERSON_ID },
