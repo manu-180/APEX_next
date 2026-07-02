@@ -23,16 +23,16 @@ a {
 /* ═══════════════════════════════════════════════════════════════════════════
    DESIGN TOKENS — Single source of truth. No arbitrary values in components.
    ─────────────────────────────────────────────────────────────────────────
-   TYPOGRAPHY NOTE: layout.tsx carga Syne 700/800 (display) vía next/font y la
-   expone como `--font-syne`; Oxanium 200–800 es el cuerpo técnico. La firma
-   tipográfica del sitio es el contraste Oxanium 200 + Syne 800 en el mismo
-   heading (ver .heading-display).
+   TYPOGRAPHY NOTE: layout.tsx carga Oxanium 200–800 vía next/font. Un solo
+   typeface para display y body — la firma tipográfica del sitio es el
+   contraste de peso 200 + 800 dentro del mismo heading (ver .heading-display),
+   no un pairing de dos fuentes (Syne se probó y se revirtió, ver DESIGN_LANGUAGE_V2 §10).
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
   /* ── Fonts ───────────────────────────────────────────────────────────── */
-  /* Syne: SOLO display (headings via --font-heading). Oxanium: body/técnico. */
-  --font-heading: var(--font-syne), var(--font-oxanium), 'Oxanium', ui-sans-serif, system-ui, sans-serif;
+  /* Un solo typeface (Oxanium) para heading y body — ver nota arriba. */
+  --font-heading: var(--font-oxanium), ui-sans-serif, system-ui, sans-serif;
   --font-body:    var(--font-oxanium), ui-sans-serif, system-ui, sans-serif;
   --font-mono:    var(--font-oxanium), ui-monospace, monospace;
 
@@ -890,10 +890,10 @@ body::after {
   );
 }
 
-/* ── Display heading: contraste extremo — Oxanium 200 + Syne 800 ──────────
+/* ── Display heading: contraste extremo — Oxanium 200 + Oxanium 800 ───────
    Firma tipográfica del sitio (spec §10): la base fina usa el cuerpo técnico
-   (Oxanium 200 REAL, no sintetizado) y el énfasis usa el display (--font-heading
-   → Syne 800). Solo tipografía — el color se compone con Tailwind. */
+   (Oxanium 200 REAL, no sintetizado) y el énfasis sube a Oxanium 800 vía
+   --font-heading. Solo tipografía — el color se compone con Tailwind. */
 .heading-display {
   font-family: var(--font-body);
   font-weight: var(--weight-thin);

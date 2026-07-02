@@ -127,8 +127,8 @@ Escala fija (ver tokens §1): 30ms filas densas · 60ms grillas de cards (rango 
 
 ## 10. Tipografía
 
-- **Display:** Syne 700/800 vía `--font-heading` (ver font_decision). Solo en `.heading-display`/`.font-heading` — nunca body.
-- **Body/técnico:** Oxanium 200–800. El peso 200 SE CARGA (hoy falta): el contraste **200 vs 800 en el mismo heading** es la firma tipográfica del sitio y debe ser real, no sintetizado.
+- **Display:** Oxanium 800 vía `--font-heading` (ver font_decision — Syne se probó como display font en pairing y se revirtió a pedido de Manuel el 2026-07-02: un solo typeface para todo el sitio). Se usa en `.heading-display`/`.font-heading` — nunca body en peso liviano.
+- **Body/técnico:** Oxanium 200–800. El peso 200 SE CARGA: el contraste **200 vs 800 en el mismo heading, mismo typeface** es la firma tipográfica del sitio y debe ser real, no sintetizado.
 - **Tracking display:** `.heading-display` pasa a `letter-spacing: clamp(-0.035em, -0.5vw, -0.015em)` + `text-wrap: balance`. Variante `.heading-display--tight` (−0.025em) para h1/h2 ≥5xl.
 - **Labels técnicos:** `editorial-label`/font-mono con tracking amplio (0.25em) para readouts, numeración editorial, telemetría.
 - **Lectura larga (blog):** measure 68ch (`max-w-[42rem]`), body a `on-surface/85` (token `--color-on-surface-reading`), variant SOLO para metadatos.
@@ -148,6 +148,8 @@ Verde WhatsApp #25D366/#128C7E solo en CTAs de WhatsApp (fuente única: `lib/con
 ---
 
 ## Decision tipografica
+
+> **REVERTIDO (2026-07-02):** Manuel pidió sacar Syne — no le gustaba cómo quedaba. `--font-heading` vuelve a resolver a Oxanium (ver §10). La sección de abajo queda como registro histórico de por qué se había agregado; ya no aplica.
 
 **SÍ — se agrega Syne como display font en pairing con Oxanium.** Es la tarea pendiente anotada en globals.css (líneas 26-35) y cierra el gap más barato del sitio: hoy `--font-heading` es un no-op (resuelve a Oxanium), así que headings y body son la misma fuente y toda la infraestructura display existente no hace nada.
 

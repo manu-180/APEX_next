@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Oxanium, Syne } from 'next/font/google'
+import { Oxanium } from 'next/font/google'
 import { ThemeModeProvider } from '@/components/providers/theme-mode-provider'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
@@ -32,22 +32,6 @@ const oxanium = Oxanium({
   adjustFontFallback: true,
   fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
-
-/**
- * Syne 700/800 — display font (headings vía --font-heading en globals.css).
- * `display: 'optional'` igual que Oxanium: el h1 del hero (LCP) usa
- * .heading-display, así que cero FOUT y cero layout shift; en first-visit con
- * red lenta renderiza la fallback y Syne aparece desde la segunda vista.
- */
-const syne = Syne({
-  subsets: ['latin'],
-  variable: '--font-syne',
-  weight: ['700', '800'],
-  preload: true,
-  display: 'optional',
-  adjustFontFallback: true,
-})
-
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -101,7 +85,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" suppressHydrationWarning className={`dark ${oxanium.variable} ${syne.variable}`}>
+    <html lang="es-AR" suppressHydrationWarning className={`dark ${oxanium.variable}`}>
       <head>
         {/* Preconnect a dominios críticos de third-party — TLS handshake en paralelo */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
