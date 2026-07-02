@@ -1,9 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { PreviewCard } from './preview-card'
 import { cn } from '@/lib/utils/cn'
+import { DUR_BASE, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
 import { SHOWCASE_TIERS } from '@/lib/data/showcase'
 import type { LabDemo } from '@/lib/data/lab-demos'
 import type { ThemeId } from '@/lib/types/theme'
@@ -99,17 +101,55 @@ function buildItems(demos: LabDemo[]): UnifiedItem[] {
   return items
 }
 
+/**
+ * Ritmo bento sobre lg:grid-cols-6: featured a 4 columnas + acompañante de 2,
+ * luego filas alternadas 3/3 · 2/2/2 (rompe la repetición del grid uniforme).
+ */
+function bentoSpan(i: number): string {
+  if (i === 0) return 'sm:col-span-2 lg:col-span-4'
+  if (i === 1) return 'lg:col-span-2'
+  const pos = (i - 2) % 5
+  return pos < 2 ? 'lg:col-span-3' : 'lg:col-span-2'
+}
+
 export function MuestrarioGallery({ demos }: { demos: LabDemo[] }) {
   const [active, setActive] = useState<PriceFilter>('Todos')
   const allItems = useMemo(() => buildItems(demos), [demos])
+  const prefersReducedMotion = useReducedMotion()
+
+  // Fallback SSR (pre-mount) y rama reduced-motion propia (spec §11): grid
+  // estático, cambios de filtro instantáneos (duration 0 efectivo).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const animated = mounted && !prefersReducedMotion
 
   const filtered = useMemo(() => {
     if (active === 'Todos') return allItems
     return allItems.filter((item) => item.price === active)
   }, [allItems, active])
 
+  const renderCard = (item: UnifiedItem, i: number) => (
+    <PreviewCard
+      href={item.href}
+      domain={item.domain}
+      name={item.name}
+      blurb={item.blurb}
+      tags={item.tags}
+      previewSrc={item.previewSrc}
+      previewMode={item.previewMode}
+      BrandIcon={item.BrandIcon}
+      paletteHexes={item.paletteHexes}
+      badge={item.badge}
+      flag={item.flag}
+      featured={i === 0}
+      inspectorTitle={item.inspectorTitle}
+      inspectorDesc={item.inspectorDesc}
+      className="h-full"
+    />
+  )
+
   return (
-    <section id="galeria" className="px-6 py-16 sm:py-20">
+    <section id="galeria" className="px-6 py-24 sm:py-28">
       <div className="mx-auto max-w-6xl">
 
         <SectionReveal>
@@ -161,33 +201,67 @@ export function MuestrarioGallery({ demos }: { demos: LabDemo[] }) {
           </div>
         </SectionReveal>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((item, i) => (
-            <SectionReveal key={item.id} delay={0.04 * (i % 3)}>
-              <PreviewCard
-                href={item.href}
-                domain={item.domain}
-                name={item.name}
-                blurb={item.blurb}
-                tags={item.tags}
-                previewSrc={item.previewSrc}
-                previewMode={item.previewMode}
-                BrandIcon={item.BrandIcon}
-                paletteHexes={item.paletteHexes}
-                badge={item.badge}
-                flag={item.flag}
-                inspectorTitle={item.inspectorTitle}
-                inspectorDesc={item.inspectorDesc}
-                className="h-full"
-              />
-            </SectionReveal>
-          ))}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6">
+          {animated ? (
+            <AnimatePresence mode="popLayout">
+              {filtered.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 12, filter: 'blur(6px)' }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                    filter: 'blur(0px)',
+                    // Limpia el backdrop-root residual (el pill "Ver en vivo"
+                    // interno usa backdrop-blur) — mismo patrón que SectionReveal.
+                    transitionEnd: { filter: 'none' },
+                  }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.96,
+                    filter: 'blur(6px)',
+                    transition: { duration: DUR_BASE, ease: EASE_OUT },
+                  }}
+                  transition={{
+                    duration: DUR_SLOW,
+                    ease: EASE_OUT,
+                    delay: STAGGER_BASE * (i % 3),
+                    layout: { duration: DUR_BASE, ease: EASE_OUT },
+                  }}
+                  className={cn('h-full', bentoSpan(i))}
+                >
+                  {renderCard(item, i)}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          ) : (
+            filtered.map((item, i) => (
+              <div key={item.id} className={cn('h-full', bentoSpan(i))}>
+                {renderCard(item, i)}
+              </div>
+            ))
+          )}
         </div>
 
         {filtered.length === 0 && (
-          <p className="py-12 text-center text-sm text-[var(--color-on-surface-variant)]">
-            No hay sitios en este rango todavía.
-          </p>
+          <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-6 py-14 text-center">
+            <p className="text-sm text-[var(--color-on-surface-variant)]">
+              No hay sitios en este rango todavía.
+            </p>
+            <button
+              type="button"
+              onClick={() => setActive('Todos')}
+              className={cn(
+                'mt-4 inline-flex items-center rounded-full border border-[rgba(var(--color-primary-rgb),0.3)] px-4 py-2 text-xs font-bold text-[var(--color-primary)]',
+                'outline-none transition-[background-color,border-color] duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.08)]',
+                'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              )}
+            >
+              Ver todos los sitios
+            </button>
+          </div>
         )}
       </div>
     </section>

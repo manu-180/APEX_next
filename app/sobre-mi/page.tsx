@@ -24,6 +24,13 @@ export const metadata: Metadata = {
  */
 const HAS_FOUNDER_PHOTO = existsSync(join(process.cwd(), 'public', 'manuel.jpg'))
 
+/**
+ * Años de experiencia calculados en el SERVER y pasados como prop: el cliente
+ * ya no llama a `new Date()` en scope de módulo, así el HTML del server y la
+ * hidratación siempre coinciden (fix del mismatch en el cambio de año).
+ */
+const YEARS_EXP = new Date().getFullYear() - 2021
+
 export default function SobreMiPage() {
-  return <SobreMiContent hasFounderPhoto={HAS_FOUNDER_PHOTO} />
+  return <SobreMiContent hasFounderPhoto={HAS_FOUNDER_PHOTO} yearsExp={YEARS_EXP} />
 }

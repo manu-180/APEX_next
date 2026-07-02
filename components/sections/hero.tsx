@@ -8,6 +8,7 @@ import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES, PROJECTS } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { trackGoogleAdsHeroCtaClick } from '@/lib/analytics/google-ads'
@@ -25,13 +26,6 @@ const ParticleField = dynamic(
  */
 const WA_MSG_HERO =
   'Hola Manuel, tengo un negocio y quiero una web que venda. ¿Arrancamos con el boceto gratis?'
-
-/**
- * Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2).
- * AUDIT_ADDENDUM: el CTA de dinero es SIEMPRE sólido verde WhatsApp, como /gracias.
- */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
 
 /* ── Micro-icons for feature tags ── */
 function SketchIcon() {
@@ -290,8 +284,9 @@ export function HeroSection() {
             </p>
 
             <h1 className="heading-display text-balance mb-6 text-4xl sm:text-5xl md:text-[3.4rem]">
-              {/* Light: la línea fina necesita más tinta (al 64% se lava a 54px); dark conserva el variant original */}
-              <span className="block text-[rgba(11,15,26,0.80)] dark:text-[var(--color-on-surface-variant)]">Tu negocio</span>
+              {/* --color-ink-strong: tinta reforzada en light (la línea fina se lava a 54px),
+                  variant original en dark — token de foundation, sin hex locales */}
+              <span className="block text-[var(--color-ink-strong)]">Tu negocio</span>
               <strong className="block text-[var(--color-on-surface)]">online y vendiendo</strong>
               <strong
                 className="block bg-clip-text text-transparent pb-1"
@@ -319,16 +314,23 @@ export function HeroSection() {
                 data-inspector-desc="Abre WhatsApp con mensaje contextual del hero y navega a /gracias. Riesgo invertido: pide el boceto gratis, no una compra."
                 data-inspector-cat="Conversión"
                 className={cn(
-                  'group inline-flex w-full shrink-0 items-center justify-center gap-2 font-semibold select-none lg:w-auto',
-                  'transition-all duration-200 ease-out',
+                  'group inline-flex w-full shrink-0 items-center justify-center gap-2.5 font-semibold select-none lg:w-auto',
+                  'transition-[transform,box-shadow] duration-300 ease-out',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech text-white hover:brightness-110 hover:scale-[1.01] active:scale-[0.97]',
-                  'min-h-12 px-7 py-3 text-sm rounded-xl',
+                  'btn-tech text-white hover:scale-[1.01] active:scale-[0.97]',
+                  'min-h-12 pl-5 pr-7 py-2.5 text-sm rounded-xl',
+                  WA_SHADOW_CLASS,
                 )}
-                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+                style={{ background: WA_GRADIENT }}
               >
-                <WhatsAppIcon className="size-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
-                <span className="text-center leading-snug">
+                {/* Button-in-button (spec §8.5): chip interior con el ícono */}
+                <span
+                  aria-hidden="true"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/15 transition-[background-color,transform] duration-300 ease-out group-hover:translate-x-0.5 group-hover:bg-white/25 motion-reduce:transform-none"
+                >
+                  <WhatsAppIcon className="size-4 shrink-0" />
+                </span>
+                <span className="text-center leading-snug transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transform-none">
                   Quiero mi boceto gratis{' '}
                   <span className="opacity-70 font-normal">(24-48 h)</span>
                 </span>
@@ -338,7 +340,7 @@ export function HeroSection() {
                   type="button"
                   className={cn(
                     'group inline-flex w-full items-center justify-center gap-2 font-semibold select-none',
-                    'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                    'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                     'btn-tech btn-outline-tech text-[var(--color-primary)]',
                     'min-h-12 px-7 py-3 text-sm rounded-xl',
@@ -346,7 +348,7 @@ export function HeroSection() {
                 >
                   Ver precios
                   <ArrowRightIcon
-                    className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                    className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
                     aria-hidden
                   />
                 </button>

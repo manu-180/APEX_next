@@ -19,7 +19,9 @@ import { useState, type CSSProperties } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ROUTES } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { SectionReveal } from '@/components/ui/section-reveal'
+import { BrowserChrome } from '@/components/ui/browser-chrome'
 import {
   ArrowRightIcon,
   ExternalLinkIcon,
@@ -38,8 +40,6 @@ import {
   type ShowcaseTier,
 } from '@/lib/data/showcase'
 import type { ThemeId } from '@/lib/types/theme'
-
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
 
 const BRAND_ICON: Partial<Record<ThemeId, React.FC<{ className?: string }>>> = {
   botlode: BotLodeIcon,
@@ -102,51 +102,11 @@ function ShowcaseShot({ site }: { site: ShowcaseSite }) {
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-3 left-3 inline-flex translate-y-2 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover/card:translate-y-0 group-hover/card:opacity-100 motion-reduce:translate-y-0 motion-reduce:transition-none"
+        className="pointer-events-none absolute bottom-3 left-3 inline-flex translate-y-2 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold text-white opacity-0 backdrop-blur-md transition-[transform,opacity] duration-300 ease-out group-hover/card:translate-y-0 group-hover/card:opacity-100 motion-reduce:translate-y-0 motion-reduce:transition-none"
         style={{ background: 'rgba(var(--color-primary-rgb),0.92)' }}
       >
         Ver en vivo
         <ExternalLinkIcon className="size-3" />
-      </span>
-    </div>
-  )
-}
-
-/* ───────────────────────────────────────────────────────────────────────────
-   Browser frame (chrome con 3 puntos + pill de URL).
-   ─────────────────────────────────────────────────────────────────────────── */
-function BrowserChrome({ domain }: { domain: string }) {
-  return (
-    <div
-      className="flex items-center gap-2 border-b px-3 py-2"
-      style={{
-        borderColor: 'rgba(var(--color-primary-rgb),0.12)',
-        background: 'rgba(var(--color-primary-rgb),0.04)',
-      }}
-    >
-      <span aria-hidden className="flex items-center gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="size-2.5 rounded-full"
-            style={{ background: 'rgba(var(--color-on-surface-variant-rgb,140,140,140),0.35)' }}
-          />
-        ))}
-      </span>
-      <span
-        className="ml-1 flex min-w-0 flex-1 items-center gap-1.5 truncate rounded-md px-2.5 py-1 text-[11px] font-medium text-[var(--color-on-surface-variant)]"
-        style={{ background: 'rgba(var(--color-primary-rgb),0.07)' }}
-      >
-        <svg viewBox="0 0 24 24" fill="none" className="size-3 shrink-0 opacity-70" aria-hidden>
-          <path
-            d="M7 11V8a5 5 0 0 1 10 0v3"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
-        </svg>
-        <span className="truncate">{domain}</span>
       </span>
     </div>
   )
@@ -175,12 +135,12 @@ function ShowcaseCard({
         rel="noopener noreferrer"
         className={cn(
           'group/card relative flex h-full overflow-hidden rounded-2xl border transition-[transform,box-shadow,border-color] duration-300 ease-out',
-          'hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none',
+          'hover:-translate-y-1 active:translate-y-0 active:scale-[0.985] motion-reduce:transform-none motion-reduce:transition-none',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
           'border-[var(--glass-border)] bg-[var(--color-surface-low)]',
           'hover:border-[rgba(var(--color-primary-rgb),0.4)]',
-          'hover:shadow-[0_2px_6px_rgba(24,32,60,0.05),0_22px_48px_-24px_rgba(24,32,60,0.28),0_0_30px_-10px_rgba(var(--color-primary-rgb),0.28)]',
-          'dark:hover:shadow-[0_0_46px_-10px_rgba(var(--color-primary-rgb),0.3)]',
+          // Sombra hover estándar de card (spec §5/§8.2) — token de foundation
+          'hover:shadow-[var(--shadow-card-hover)]',
           variant === 'wide' ? 'flex-col sm:flex-row' : 'flex-col',
         )}
         data-hover
@@ -428,7 +388,9 @@ export function ServiciosShowcase() {
                   'group btn-tech inline-flex h-12 shrink-0 select-none items-center justify-center gap-2.5 px-6 text-sm font-semibold text-white',
                   'transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.97]',
                   'motion-reduce:transform-none motion-reduce:transition-none',
-                  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_10px_26px_-10px_rgba(18,140,126,0.42)] dark:shadow-[0_10px_28px_-10px_rgba(37,211,102,0.45)]',
+                  // Sombra WA canónica (rgba 18,140,126 = teal #128C7E, parte de
+                  // la excepción WhatsApp documentada en lib/constants/whatsapp-ui)
+                  WA_SHADOW_CLASS,
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                 )}
                 style={{ background: WA_GRADIENT }}

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { SHORTCUTS } from '@/lib/constants'
+import { EASE_OUT, STAGGER_TIGHT, DELAY_AFTER_PANEL } from '@/lib/motion'
 import { XIcon } from '@/components/ui/icons'
 
 interface ShortcutsModalProps {
@@ -78,9 +79,9 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: 'easeOut' }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: EASE_OUT }}
             onClick={onClose}
-            className="absolute inset-0 bg-[rgba(0,0,0,0.55)] backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--scrim-bg)] backdrop-blur-sm"
           />
           <motion.div
             ref={panelRef}
@@ -90,16 +91,18 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 10 }}
             transition={{
               duration: prefersReducedMotion ? 0.12 : 0.22,
-              ease: [0.22, 1, 0.36, 1],
+              ease: EASE_OUT,
             }}
-            className="relative z-10 w-full max-w-2xl rounded-2xl px-7 py-6 sm:px-8 outline-none glass-card glow-border dark:shadow-[0_0_40px_-10px_rgba(var(--color-primary-rgb),0.15),0_25px_50px_-12px_rgba(0,0,0,0.6)]"
+            className="relative z-10 w-full max-w-2xl rounded-2xl px-7 py-6 sm:px-8 outline-none glass-card glow-border dark:shadow-[0_0_40px_-10px_rgba(var(--color-primary-rgb),0.15),0_25px_50px_-12px_rgba(var(--shadow-tint-rgb),0.6)]"
           >
             <div className="flex items-center justify-between mb-6">
+              {/* Contraste display (spec §10): thin Oxanium 200 + display extrabold */}
               <h2
                 id="shortcuts-modal-title"
-                className="text-lg font-bold text-[var(--color-on-surface)]"
+                className="text-lg text-[var(--color-on-surface)]"
               >
-                Atajos de Teclado
+                <span className="font-extralight">Atajos de</span>{' '}
+                <span className="font-heading font-extrabold">Teclado</span>
               </h2>
               <button
                 onClick={onClose}
@@ -118,9 +121,10 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
                   Navegación
                 </p>
                 <div className="space-y-1">
-                  {navShortcuts.map((s) => (
+                  {navShortcuts.map((s, i) => (
                     <ShortcutRow
                       key={s.label}
+                      index={i}
                       shortcutKey={s.key}
                       label={s.label}
                       requiresAlt={'requiresAlt' in s && s.requiresAlt === true}
@@ -136,9 +140,10 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
                   Acciones
                 </p>
                 <div className="space-y-1">
-                  {actionShortcuts.map((s) => (
+                  {actionShortcuts.map((s, i) => (
                     <ShortcutRow
                       key={s.label}
+                      index={i}
                       shortcutKey={s.key}
                       label={s.label}
                       requiresAlt={'requiresAlt' in s && s.requiresAlt === true}
@@ -160,14 +165,27 @@ function ShortcutRow({
   label,
   requiresAlt,
   requiresShift,
+  index,
 }: {
   shortcutKey: string
   label: string
   requiresAlt?: boolean
   requiresShift?: boolean
+  index: number
 }) {
+  const prefersReducedMotion = useReducedMotion()
   return (
-    <div className="flex items-center justify-between gap-3 py-1.5 px-2 rounded-lg hover:bg-[rgba(11,15,26,0.04)] dark:hover:bg-[rgba(255,255,255,0.03)] transition-colors">
+    // Cascada de filas densas (spec §9): STAGGER_TIGHT tras el settle del panel.
+    <motion.div
+      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0.12 }
+          : { delay: DELAY_AFTER_PANEL + index * STAGGER_TIGHT, duration: 0.3, ease: EASE_OUT }
+      }
+      className="flex items-center justify-between gap-3 py-1.5 px-2 rounded-lg hover:bg-[rgba(11,15,26,0.04)] dark:hover:bg-[rgba(255,255,255,0.03)] transition-colors"
+    >
       <span className="text-sm text-[var(--color-on-surface-variant)]">{label}</span>
       <kbd className="flex flex-wrap items-center justify-end gap-1 text-xs font-mono shrink-0">
         <span className="kbd-key">Ctrl</span>
@@ -186,6 +204,6 @@ function ShortcutRow({
         )}
         <span className="kbd-key">{shortcutKey}</span>
       </kbd>
-    </div>
+    </motion.div>
   )
 }

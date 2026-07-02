@@ -3,6 +3,8 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRightIcon, CheckIcon, StarIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { EASE_OUT } from '@/lib/motion'
 
 type PlanType = 'essential' | 'popular' | 'recommended'
 
@@ -25,38 +27,35 @@ const PLAN_TYPE_LABEL: Record<PlanType, string> = {
   recommended: 'Recomendado',
 }
 
+/**
+ * Acentos por tier — SOLO alphas del primary (0.12 / 0.2 / 0.28), spec v2 §12:
+ * una sola voz de color por tema, sin paletas paralelas (amber/emerald prohibidos).
+ */
 const PLAN_ACCENT_STYLE: Record<
   PlanType,
   {
     chipClassName: string
     glowClassName: string
     numberClassName: string
-    ctaClassName: string
   }
 > = {
   essential: {
     chipClassName:
       'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.12)] border-[rgba(var(--color-primary-rgb),0.28)]',
-    glowClassName: 'from-[rgba(var(--color-primary-rgb),0.24)] via-[rgba(var(--color-primary-rgb),0.08)] to-transparent',
+    glowClassName: 'from-[rgba(var(--color-primary-rgb),0.12)] via-[rgba(var(--color-primary-rgb),0.04)] to-transparent',
     numberClassName: 'text-[var(--color-primary)]',
-    ctaClassName:
-      'text-[var(--color-surface-base)] bg-[var(--color-primary)] hover:shadow-[0_0_0_1px_rgba(var(--color-primary-rgb),0.45),0_14px_40px_-14px_rgba(var(--color-primary-rgb),0.78)]',
   },
   popular: {
     chipClassName:
-      'text-amber-700 dark:text-amber-200 bg-[rgba(245,158,11,0.14)] border-[rgba(245,158,11,0.34)]',
-    glowClassName: 'from-[rgba(245,158,11,0.35)] via-[rgba(245,158,11,0.1)] to-transparent',
-    numberClassName: 'text-amber-600 dark:text-amber-300',
-    ctaClassName:
-      'text-[#1a1305] bg-gradient-to-r from-amber-300 via-amber-400 to-orange-300 hover:shadow-[0_0_0_1px_rgba(245,158,11,0.45),0_14px_42px_-14px_rgba(245,158,11,0.75)]',
+      'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.2)] border-[rgba(var(--color-primary-rgb),0.4)]',
+    glowClassName: 'from-[rgba(var(--color-primary-rgb),0.2)] via-[rgba(var(--color-primary-rgb),0.07)] to-transparent',
+    numberClassName: 'text-[var(--color-primary)]',
   },
   recommended: {
     chipClassName:
-      'text-emerald-700 dark:text-emerald-200 bg-[rgba(16,185,129,0.16)] border-[rgba(16,185,129,0.34)]',
-    glowClassName: 'from-[rgba(16,185,129,0.36)] via-[rgba(16,185,129,0.12)] to-transparent',
-    numberClassName: 'text-emerald-600 dark:text-emerald-300',
-    ctaClassName:
-      'text-[#062118] bg-gradient-to-r from-emerald-300 via-emerald-400 to-teal-300 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.45),0_14px_42px_-14px_rgba(16,185,129,0.75)]',
+      'text-[var(--color-primary)] bg-[rgba(var(--color-primary-rgb),0.28)] border-[rgba(var(--color-primary-rgb),0.5)]',
+    glowClassName: 'from-[rgba(var(--color-primary-rgb),0.28)] via-[rgba(var(--color-primary-rgb),0.1)] to-transparent',
+    numberClassName: 'text-[var(--color-primary)]',
   },
 }
 
@@ -82,7 +81,7 @@ const benefitItemVariants = {
     filter: 'blur(0px)',
     transition: {
       duration: 0.34,
-      ease: [0.22, 1, 0.36, 1] as const,
+      ease: EASE_OUT,
     },
   },
 }
@@ -201,7 +200,7 @@ export function ServiceDrawerContent({
             {features.map((feature) => (
               <li
                 key={feature}
-                className="flex items-start gap-2.5 rounded-xl border border-white/8 bg-[rgba(11,15,26,0.03)] dark:bg-[rgba(255,255,255,0.02)] px-3 py-2.5"
+                className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-[rgba(11,15,26,0.03)] dark:bg-[rgba(255,255,255,0.02)] px-3 py-2.5"
               >
                 <CheckIcon className="mt-0.5 size-4 flex-shrink-0 text-[var(--color-primary)]" />
                 <span className="text-sm leading-relaxed text-[var(--color-on-surface-variant)]">{feature}</span>
@@ -221,9 +220,11 @@ export function ServiceDrawerContent({
         className="sticky bottom-0 z-20 -mx-5 mt-6 rounded-t-2xl border-t border-[var(--glass-border)] dark:border-white/10 px-5 pb-1 pt-3 backdrop-blur-xl md:-mx-6 md:px-6"
         style={{ backgroundColor: 'color-mix(in srgb, var(--color-surface-lowest) 88%, transparent)' }}
       >
+        {/* CTA de dinero: SIEMPRE verde WhatsApp sólido (fuente única: whatsapp-ui). */}
         <WhatsAppOutboundLink
           waHref={whatsappLink}
-          className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-base font-extrabold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] ${accentStyle.ctaClassName} ${shouldReduceMotion ? '' : 'hover:scale-[1.015] active:scale-[0.985]'}`}
+          className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-base font-extrabold text-white transition-[transform,box-shadow] duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] ${WA_SHADOW_CLASS} ${shouldReduceMotion ? '' : 'hover:scale-[1.015] active:scale-[0.985]'}`}
+          style={{ background: WA_GRADIENT }}
         >
           <WhatsAppIcon className="size-[18px]" />
           Empezar proyecto

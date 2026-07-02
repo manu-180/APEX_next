@@ -177,14 +177,18 @@ export function TechCardsSection() {
                     activate(null)
                   }
                 }}
-                className={`rounded-2xl outline-none
+                // A11y: click y teclado viven en el MISMO nodo que role=button/
+                // aria-pressed (antes el onClick estaba en la GlowCard interna).
+                // El MouseEvent llega igual a applyTheme(themeId, e): la ola
+                // sale del punto exacto del click.
+                onClick={(e) => activate(e)}
+                className={`cursor-pointer select-none rounded-2xl outline-none
                   focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
                   ${BENTO_SPANS[index] ?? 'lg:col-span-2'}`}
               >
                 <GlowCard
                   active={isActive}
                   className={`h-full rounded-2xl ${pressedId === tech.themeId ? 'card-wave-pressed' : ''}`}
-                  onClick={(e) => activate(e)}
                 >
                   <div
                     className="flex h-full w-full flex-col p-6 text-left md:p-8"

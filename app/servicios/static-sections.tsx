@@ -1,86 +1,30 @@
+'use client'
+
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
+import { motion, type Variants } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
-import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
+import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { WEB_PLANS, APP_PLANS, formatARS } from '@/lib/types/services'
 import { ROUTES } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { DELAY_AFTER_PANEL, DUR_BASE, DUR_REVEAL, DUR_SLOW, EASE_OUT, STAGGER_LOOSE } from '@/lib/motion'
 import { ServiciosHeroShell } from './servicios-hero-shell'
 import { FaqAccordion } from './faq-accordion'
+import { SERVICIOS_FAQ_ITEMS } from './faq-data'
 
 /**
- * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
- * (solo en elementos/CTAs de WhatsApp). Todo lo demás usa vars del tema.
+ * Sub-headers editoriales del FAQ. Bloques CONTIGUOS sobre el orden canónico
+ * de SERVICIOS_FAQ_ITEMS (alimenta el JSON-LD FAQPage en page.tsx y NO se
+ * reordena): la agrupación se resuelve por rangos, nunca moviendo preguntas.
  */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-/** Sombra del CTA: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa). */
-const WA_SHADOW_CLASS =
-  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_10px_26px_-10px_rgba(18,140,126,0.42)] dark:shadow-[0_10px_28px_-10px_rgba(37,211,102,0.45)]'
-
-/**
- * FAQ — orden de objeciones del DESIGN_BRIEF §1.6:
- * precio → tiempo → confianza → proceso → ROI → garantía → resto (logística).
- * Alimenta el accordion y el JSON-LD FAQPage en page.tsx.
- */
-export const SERVICIOS_FAQ_ITEMS = [
-  {
-    q: '¿Cuánto cuesta una página web en Argentina?',
-    a: 'Acá no hay "a cotizar": los precios están publicados. Landing $300.000, Web Interactiva $600.000 y Tienda Online $900.000 (ARS, precio fijo pactado por escrito antes de arrancar). Todos se pagan en 3 cuotas sin interés, y antes de la primera cuota ya viste un boceto gratis de tu proyecto. Las apps móviles funcionan distinto: con un fee mensual que incluye desarrollo activo, soporte y publicación en las tiendas — los valores están en la pestaña «Aplicación Móvil» de esta misma página.',
-  },
-  {
-    q: '¿Cuánto tarda en estar lista mi página?',
-    a: '15 días desde que aprobás el boceto, para cualquier plan web. La fecha queda pactada por escrito antes de empezar, y el boceto te lo entrego gratis en 24-48 h. Si no cumplo la fecha acordada, te devuelvo el depósito.',
-  },
-  {
-    q: '¿Cómo sé que no me vas a dejar a mitad del proyecto?',
-    a: 'Tres cosas concretas: ves un boceto gratis antes de pagar un peso, pagás en 3 cuotas atadas al avance (nunca todo por adelantado) y el código vive en un repositorio a tu nombre desde el primer día — pase lo que pase, lo hecho es tuyo. Además podés ver mis productos funcionando en producción (BotLode, Botrive, Assistify) y sitios de clientes reales antes de decidir. Hablás conmigo, no con un vendedor.',
-  },
-  {
-    q: '¿Cómo es el proceso de trabajo?',
-    a: 'Cuatro pasos: (1) me escribís por WhatsApp y charlamos 15 minutos sobre tu negocio; (2) en 24-48 h te mando un boceto gratis de tu página; (3) si te gusta, pagás la primera de 3 cuotas y en 15 días tenés tu web online, viendo avances en el camino; (4) lanzamos y tenés 3 meses de soporte incluido. Todo por WhatsApp o Zoom, desde cualquier punto del país.',
-  },
-  {
-    q: '¿Qué gano con una web a medida en vez de Wix o una plantilla?',
-    a: 'Números concretos: una web a medida carga en menos de 2 segundos (Google posiciona mejor los sitios rápidos), no pagás mensualidades obligatorias (Wix y Tiendanube cobran entre USD 16 y 250 por mes, para siempre), no pagás comisiones por venta y el código es tuyo — sin lock-in. Y está diseñada para convertir: botón de WhatsApp, SEO y velocidad al servicio de generar consultas. Si tu caso es muy simple, te lo digo honestamente: a veces Wix alcanza (mirá la tabla comparativa de esta página).',
-  },
-  {
-    q: '¿Qué pasa si no me gusta el resultado?',
-    a: 'El boceto es gratis y sin compromiso: si no te convence, no pagás nada y quedamos como amigos. Una vez en desarrollo, ves avances y los aprobás antes de cada cuota. Y si no llego a la fecha de entrega pactada por escrito, te devuelvo el depósito completo. El riesgo lo tomo yo, no vos.',
-  },
-  {
-    q: '¿Cuáles son las formas de pago?',
-    a: '3 cuotas sin interés, cada una un tercio del total: la primera al aprobar el boceto (activa el calendario de entrega), la segunda durante el desarrollo y la última contra entrega. Acepto transferencia bancaria y MercadoPago.',
-  },
-  {
-    q: '¿La página se va a ver bien en el celular?',
-    a: 'Sí. Cada página se desarrolla con diseño responsivo a medida: se adapta automáticamente a cualquier tamaño de pantalla, desde el celular hasta la computadora, sin perder proporciones ni legibilidad. Antes de entregar, la reviso en distintos dispositivos para asegurarnos de que se vea impecable en todos.',
-  },
-  {
-    q: '¿El hosting y el dominio están incluidos?',
-    a: 'El hosting está incluido desde el día uno. El dominio va por tu cuenta — se registra a tu nombre y suele costar alrededor de USD 10 por año. Si nunca lo hiciste, no te preocupés: te guío en el proceso o lo resolvemos juntos en menos de 10 minutos.',
-  },
-  {
-    q: '¿De quién es el código cuando terminamos?',
-    a: '100% tuyo desde el día uno. Vive en un repositorio (GitHub) con tu cuenta como propietaria. Si mañana querés seguir con otro desarrollador, te llevás todo sin pedir permiso ni perder un archivo. Cero lock-in.',
-  },
-  {
-    q: '¿Pueden integrar MercadoPago, AFIP o WhatsApp Business?',
-    a: 'Sí, los tres. MercadoPago para cobrar online (incluido en los planes que lo necesitan), WhatsApp para que cada consulta te llegue directo al teléfono, y facturación electrónica AFIP/ARCA automática como addon: suma entre $200.000 y $400.000 según complejidad, y emite factura A o B con CAE sin que cargues nada a mano.',
-  },
-  {
-    q: '¿Qué pasa después de la entrega?',
-    a: 'Tenés 3 meses de soporte incluido: bugs, ajustes menores y dudas de uso, sin costo. Después podés seguir por tu cuenta (la web queda andando sola) o contratar mantenimiento mensual desde $50.000, que cubre actualizaciones de seguridad, monitoreo de errores y cambios menores.',
-  },
-  {
-    q: '¿Trabajás solo en Buenos Aires?',
-    a: 'No — trabajo con clientes de toda Argentina y del exterior, 100% remoto. Reuniones por Zoom o directamente por WhatsApp. La distancia no cambia ni el precio ni el plazo.',
-  },
-  {
-    q: '¿Hacés apps móviles o solo webs?',
-    a: 'Las dos cosas: webs con Next.js y apps iOS + Android con Flutter (una sola base de código para las dos tiendas). Las apps funcionan con fee mensual porque son un producto vivo: incluye mejoras continuas, soporte y publicación en App Store y Google Play.',
-  },
+const SERVICIOS_FAQ_GROUPS = [
+  { label: 'Precio y pago', startIndex: 0 },
+  { label: 'Proceso y garantía', startIndex: 1 },
+  { label: 'Logística', startIndex: 7 },
 ] as const
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -106,7 +50,7 @@ export function ServiciosHero() {
     },
     {
       name: 'Todavía no sé',
-      meta: 'Calculadora · 90 seg',
+      meta: 'Calculadora · 60 seg',
       price: 'Gratis',
       href: '#calculadora',
     },
@@ -254,9 +198,53 @@ const PROCESS_STEPS = [
   },
 ] as const
 
+/* Proceso narrado (spec §2/§9): el panel entra con el reveal firma y luego
+   los pasos caen en cascada LOOSE (120 ms) con las líneas conectoras
+   dibujándose entre medio (scaleX/scaleY, transform-only).
+   Reduced-motion: SectionReveal degrada a estado final (los hijos con
+   variants nunca reciben "hidden" sin propagación del contenedor). */
+const PROCESS_PANEL_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 24, filter: 'blur(6px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transitionEnd: { filter: 'none' },
+    transition: {
+      duration: DUR_REVEAL,
+      ease: EASE_OUT,
+      staggerChildren: STAGGER_LOOSE,
+      delayChildren: DELAY_AFTER_PANEL,
+    },
+  },
+}
+
+const PROCESS_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 16, filter: 'blur(6px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transitionEnd: { filter: 'none' },
+    transition: { duration: DUR_SLOW, ease: EASE_OUT },
+  },
+}
+
+/** Línea conectora horizontal (desktop) — se dibuja de izquierda a derecha. */
+const PROCESS_CONNECTOR_X_VARIANTS: Variants = {
+  hidden: { scaleX: 0 },
+  visible: { scaleX: 1, transition: { duration: DUR_BASE, ease: EASE_OUT } },
+}
+
+/** Línea conectora vertical (mobile) — se dibuja de arriba hacia abajo. */
+const PROCESS_CONNECTOR_Y_VARIANTS: Variants = {
+  hidden: { scaleY: 0 },
+  visible: { scaleY: 1, transition: { duration: DUR_BASE, ease: EASE_OUT } },
+}
+
 export function ServiciosProcess() {
   return (
-    <section id="proceso" className="py-16">
+    <section id="proceso" className="scroll-mt-24 py-16">
       <div className="mx-auto max-w-5xl px-6">
         <SectionReveal>
           <div className="mb-10 flex items-end justify-between gap-6">
@@ -277,8 +265,9 @@ export function ServiciosProcess() {
           </div>
         </SectionReveal>
 
-        <SectionReveal delay={0.1}>
-          <div
+        <SectionReveal delay={0.1} stagger={STAGGER_LOOSE}>
+          <motion.div
+            variants={PROCESS_PANEL_VARIANTS}
             className="bento-surface overflow-hidden"
             data-hover
             data-inspector-title="Proceso en 4 pasos"
@@ -298,11 +287,13 @@ export function ServiciosProcess() {
               <div className="mb-6 flex flex-col items-stretch justify-center sm:flex-row sm:items-center">
                 {PROCESS_STEPS.map(({ step, title, sub, highlight }, i, arr) => (
                   <div key={step} className="flex flex-col items-center sm:flex-row sm:flex-1">
-                    <div
+                    <motion.div
+                      variants={PROCESS_ITEM_VARIANTS}
                       className={cn(
-                        'flex w-full flex-col items-center rounded-xl px-4 py-5 text-center transition-all duration-300 sm:flex-1',
+                        'flex w-full flex-col items-center rounded-xl px-4 py-5 text-center sm:flex-1',
                         highlight
-                          ? 'bg-[rgba(var(--color-primary-rgb),0.07)] border border-[rgba(var(--color-primary-rgb),0.25)]'
+                          ? // Paso de riesgo invertido: apenas más grande que el resto (spec: md:scale-[1.04])
+                            'bg-[rgba(var(--color-primary-rgb),0.07)] border border-[rgba(var(--color-primary-rgb),0.25)] md:scale-[1.04]'
                           : '',
                       )}
                     >
@@ -334,18 +325,22 @@ export function ServiciosProcess() {
                       >
                         {sub}
                       </span>
-                    </div>
+                    </motion.div>
 
                     {i < arr.length - 1 && (
-                      <div aria-hidden className="my-2 flex items-center justify-center sm:my-0">
-                        <span
-                          className="hidden select-none text-base leading-none sm:block"
-                          style={{ color: 'rgba(var(--color-primary-rgb), 0.55)' }}
-                        >
-                          ›
-                        </span>
-                        <div
-                          className="h-5 w-px sm:hidden"
+                      <div aria-hidden className="my-2 flex items-center justify-center sm:my-0 sm:px-1">
+                        {/* Conectores que se dibujan (transform-only) entre paso y paso */}
+                        <motion.span
+                          variants={PROCESS_CONNECTOR_X_VARIANTS}
+                          className="hidden h-px w-6 origin-left sm:block"
+                          style={{
+                            background:
+                              'linear-gradient(90deg, rgba(var(--color-primary-rgb), 0.2), rgba(var(--color-primary-rgb), 0.55))',
+                          }}
+                        />
+                        <motion.span
+                          variants={PROCESS_CONNECTOR_Y_VARIANTS}
+                          className="block h-5 w-px origin-top sm:hidden"
                           style={{
                             background:
                               'linear-gradient(180deg, rgba(var(--color-primary-rgb), 0.25), rgba(var(--color-primary-rgb), 0.55))',
@@ -357,11 +352,14 @@ export function ServiciosProcess() {
                 ))}
               </div>
 
-              <p className="text-center text-[11px] uppercase tracking-[0.2em] text-[var(--color-on-surface-variant)] opacity-50">
+              <motion.p
+                variants={PROCESS_ITEM_VARIANTS}
+                className="text-center text-[11px] uppercase tracking-[0.2em] text-[var(--color-on-surface-variant)] opacity-50"
+              >
                 Sin vueltas · Sin sorpresas · Sin letra chica
-              </p>
+              </motion.p>
             </div>
-          </div>
+          </motion.div>
         </SectionReveal>
       </div>
     </section>
@@ -621,7 +619,17 @@ export function ServiciosComparisonTable() {
                     <th className="sticky left-0 z-10 px-3 py-3" style={{ backgroundColor: 'rgba(var(--color-primary-rgb), 0.05)' }}>
                       Característica
                     </th>
-                    <th className="px-3 py-3 text-[var(--color-primary)]">APEX</th>
+                    {/* Columna APEX enmarcada: inset borders primary 0.3 + fondo 0.06 */}
+                    <th
+                      className="px-3 py-3 text-[var(--color-primary)]"
+                      style={{
+                        backgroundColor: 'rgba(var(--color-primary-rgb), 0.06)',
+                        boxShadow:
+                          'inset 1px 0 0 rgba(var(--color-primary-rgb), 0.3), inset -1px 0 0 rgba(var(--color-primary-rgb), 0.3), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.3)',
+                      }}
+                    >
+                      APEX
+                    </th>
                     <th className="px-3 py-3">WordPress</th>
                     <th className="px-3 py-3">Wix</th>
                     <th className="px-3 py-3">Tiendanube</th>
@@ -639,20 +647,28 @@ export function ServiciosComparisonTable() {
                     >
                       <td
                         className="sticky left-0 z-10 px-3 py-3 text-xs font-semibold text-[var(--color-on-surface)] transition-colors duration-150 group-hover/row:bg-[rgba(var(--color-primary-rgb),0.05)]"
-                        style={{ backgroundColor: 'var(--color-surface-low, #0d0d0d)' }}
+                        style={{ backgroundColor: 'var(--color-surface-low)' }}
                       >
                         {row.feature}
                       </td>
+                      {/* Celda APEX: marco inset continuo + check en las celdas ganadoras */}
                       <td
                         className="px-3 py-3 text-xs font-medium"
                         style={{
                           color: row.apexWins ? 'var(--color-primary)' : 'var(--color-on-surface)',
-                          backgroundColor: row.apexWins
-                            ? 'rgba(var(--color-primary-rgb), 0.04)'
-                            : 'transparent',
+                          backgroundColor: 'rgba(var(--color-primary-rgb), 0.06)',
+                          boxShadow:
+                            idx === COMPARISON_ROWS.length - 1
+                              ? 'inset 1px 0 0 rgba(var(--color-primary-rgb), 0.3), inset -1px 0 0 rgba(var(--color-primary-rgb), 0.3), inset 0 -1px 0 rgba(var(--color-primary-rgb), 0.3)'
+                              : 'inset 1px 0 0 rgba(var(--color-primary-rgb), 0.3), inset -1px 0 0 rgba(var(--color-primary-rgb), 0.3)',
                         }}
                       >
-                        {row.apex}
+                        <span className="inline-flex items-center gap-1.5">
+                          {row.apexWins && (
+                            <CheckIcon aria-hidden className="size-3 shrink-0 text-[var(--color-primary)]" />
+                          )}
+                          {row.apex}
+                        </span>
                       </td>
                       <td className="px-3 py-3 text-xs text-[var(--color-on-surface-variant)]">
                         {row.wordpress}
@@ -711,7 +727,8 @@ export function VerticalsBridge() {
             Tenemos soluciones específicas para tu profesión: con los módulos que realmente usás
             (turnos, agenda, AFIP, portal de clientes) y precios definidos desde el arranque.
           </p>
-          <ul className="grid gap-3 sm:grid-cols-3">
+          {/* Primera card destacada: columna más ancha rompe la simetría */}
+          <ul className="grid gap-3 sm:grid-cols-[1.3fr_1fr_1fr]">
             {VERTICALS_LIST.map((v) => (
               <li key={v.slug}>
                 <a
@@ -753,7 +770,7 @@ export function VerticalsBridge() {
    ──────────────────────────────────────────────────────────────────────────── */
 export function ServiciosStaticFaq() {
   return (
-    <section id="faq" className="py-16 mx-auto max-w-6xl px-6">
+    <section id="faq" className="scroll-mt-24 py-16 mx-auto max-w-6xl px-6">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
         <SectionReveal>
           <div className="lg:sticky lg:top-24">
@@ -792,7 +809,7 @@ export function ServiciosStaticFaq() {
         </SectionReveal>
 
         <SectionReveal delay={0.1}>
-          <FaqAccordion items={SERVICIOS_FAQ_ITEMS} />
+          <FaqAccordion items={SERVICIOS_FAQ_ITEMS} groups={SERVICIOS_FAQ_GROUPS} />
         </SectionReveal>
       </div>
     </section>

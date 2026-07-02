@@ -1,11 +1,15 @@
 'use client'
 
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { ArrowRightIcon, CheckIcon, StarIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { ROUTES } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
+import { EASE_OUT, SPRING_SNAP } from '@/lib/motion'
+import { useParallaxNumber } from '@/hooks/use-parallax-number'
 import { REVIEWS } from '@/lib/data/reviews'
 import { cn } from '@/lib/utils/cn'
 
@@ -17,15 +21,6 @@ import { cn } from '@/lib/utils/cn'
  * Tracking: WhatsAppOutboundLink ya navega vía openWhatsAppWithThankYouPage
  * (Google Ads + Meta centralizados) — acá NO se agrega tracking manual.
  */
-
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
-
-/**
- * Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2).
- * AUDIT_ADDENDUM: el CTA de dinero es SIEMPRE sólido verde WhatsApp.
- */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
 
 const WA_MSG_FINAL =
   'Hola Manuel, recorrí tu web y quiero arrancar mi proyecto. ¿Coordinamos 15 minutos?'
@@ -40,8 +35,56 @@ const DE_RISKERS = [
 /** Review real de lib/data/reviews (la misma fuente que /contacto). */
 const FEATURED_REVIEW = REVIEWS.find((r) => r.id === 2) ?? REVIEWS[0]
 
+/**
+ * Magnetic hover (spec §8.6) — ÚNICO magnetic de la home, reservado al CTA
+ * de cierre: pull de ±4px con useMotionValue + useSpring (cero re-renders),
+ * solo desktop (hover+pointer fine) y gated por useReducedMotion.
+ */
+function MagneticCta({ children, className }: { children: ReactNode; className?: string }) {
+  const prefersReducedMotion = useReducedMotion()
+  const [isDesktop, setIsDesktop] = useState(false)
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const x = useSpring(mx, SPRING_SNAP)
+  const y = useSpring(my, SPRING_SNAP)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const update = () => setIsDesktop(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  const active = isDesktop && !prefersReducedMotion
+
+  const handleMove = (e: MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    mx.set(((e.clientX - rect.left) / rect.width - 0.5) * 8)
+    my.set(((e.clientY - rect.top) / rect.height - 0.5) * 8)
+  }
+
+  const handleLeave = () => {
+    mx.set(0)
+    my.set(0)
+  }
+
+  return (
+    <motion.div
+      className={className}
+      style={active ? { x, y } : undefined}
+      onMouseMove={active ? handleMove : undefined}
+      onMouseLeave={active ? handleLeave : undefined}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 export function HomeFinalCtaSection() {
   const prefersReducedMotion = useReducedMotion()
+  const numberRef = useRef<HTMLSpanElement>(null)
+  useParallaxNumber(numberRef)
 
   return (
     <section className="relative overflow-hidden pb-28 pt-24 md:pb-36 md:pt-32">
@@ -54,8 +97,10 @@ export function HomeFinalCtaSection() {
         aria-hidden="true"
       />
 
-      {/* Numeración editorial — cierra la serie 01-05 por el borde derecho */}
+      {/* Numeración editorial — cierra la serie 01-05 por el borde derecho.
+          Parallax GSAP scrub (transform-only, solo lg+, reduced-motion safe). */}
       <span
+        ref={numberRef}
         aria-hidden="true"
         className="section-number absolute -right-4 top-10 hidden lg:block"
         style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
@@ -134,25 +179,36 @@ export function HomeFinalCtaSection() {
               ))}
             </motion.ul>
 
-            {/* CTA dominante — único botón de la sección */}
+            {/* CTA dominante — único botón de la sección (magnetic, spec §8.6) */}
             <div className="mt-9">
-              <WhatsAppOutboundLink
-                waHref={whatsappUrl(WA_MSG_FINAL)}
-                data-hover
-                data-inspector-title="CTA final WhatsApp"
-                data-inspector-desc="Acción dominante de cierre de la home. Abre WhatsApp con mensaje contextual y navega a /gracias; tracking centralizado."
-                data-inspector-cat="Conversión"
-                className={cn(
-                  'group btn-tech inline-flex w-full items-center justify-center gap-2.5 rounded-xl font-bold select-none sm:w-auto',
-                  'h-14 px-8 text-base text-white',
-                  'transition-all duration-200 ease-out hover:brightness-110 hover:scale-[1.02] active:scale-[0.97]',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                )}
-                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
-              >
-                <WhatsAppIcon className="size-5 transition-transform duration-200 group-hover:scale-110" />
-                Empezar mi proyecto por WhatsApp
-              </WhatsAppOutboundLink>
+              <MagneticCta className="inline-block w-full sm:w-auto">
+                <WhatsAppOutboundLink
+                  waHref={whatsappUrl(WA_MSG_FINAL)}
+                  data-hover
+                  data-inspector-title="CTA final WhatsApp"
+                  data-inspector-desc="Acción dominante de cierre de la home. Abre WhatsApp con mensaje contextual y navega a /gracias; tracking centralizado."
+                  data-inspector-cat="Conversión"
+                  className={cn(
+                    'group btn-tech inline-flex w-full items-center justify-center gap-3 rounded-xl font-bold select-none sm:w-auto',
+                    'h-14 pl-6 pr-8 text-base text-white',
+                    'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.02] active:scale-[0.97]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                    WA_SHADOW_CLASS_LG,
+                  )}
+                  style={{ background: WA_GRADIENT }}
+                >
+                  {/* Button-in-button (spec §8.5): chip interior con el ícono */}
+                  <span
+                    aria-hidden="true"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/15 transition-[background-color,transform] duration-300 ease-out group-hover:translate-x-0.5 group-hover:bg-white/25 motion-reduce:transform-none"
+                  >
+                    <WhatsAppIcon className="size-5" />
+                  </span>
+                  <span className="transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transform-none">
+                    Empezar mi proyecto por WhatsApp
+                  </span>
+                </WhatsAppOutboundLink>
+              </MagneticCta>
 
               <p className="mt-4 text-xs text-[var(--color-on-surface-variant)] opacity-80">
                 Te respondo yo, en menos de 1 hora. ¿Preferís agendar?{' '}

@@ -10,6 +10,26 @@ import { BreadcrumbJsonLd } from '@/components/seo/json-ld'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
 import { APP_URL, WHATSAPP_NUMBER } from '@/lib/constants'
 import { formatARS } from '@/lib/types/services'
+import { SectionReveal } from '@/components/ui/section-reveal'
+import { STAGGER_BASE } from '@/lib/motion'
+import { cn } from '@/lib/utils/cn'
+
+/**
+ * Hover estándar de card (spec §8.2): lift + borde primary + sombra token,
+ * con active y rama motion-reduce. Reemplaza los `transition-all` previos.
+ */
+const CARD_HOVER_CLASS = `group border
+  transition-[transform,box-shadow,border-color] duration-300 ease-out will-change-transform
+  hover:-translate-y-1 hover:border-[rgba(var(--color-primary-rgb),0.4)]
+  hover:shadow-[var(--shadow-card-hover)]
+  active:translate-y-0 active:scale-[0.985] active:duration-100
+  focus-visible:outline-none focus-visible:-translate-y-1
+  focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+  motion-reduce:transition-none motion-reduce:hover:translate-y-0`
+
+/** Focus visible para links de texto (breadcrumbs). */
+const CRUMB_LINK_CLASS =
+  'rounded transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]'
 
 export const dynamic = 'force-static'
 export const dynamicParams = false
@@ -138,16 +158,13 @@ export default async function VerticalLandingPage({
           }}
         />
 
-        <div className="relative z-10 mx-auto max-w-5xl px-6">
+        <SectionReveal className="relative z-10 mx-auto max-w-5xl px-6">
           <nav className="mb-6 flex items-center gap-2 text-xs text-[var(--color-on-surface-variant)]">
-            <Link href="/" className="hover:text-[var(--color-primary)] transition-colors">
+            <Link href="/" className={CRUMB_LINK_CLASS}>
               Inicio
             </Link>
             <span className="opacity-40">/</span>
-            <Link
-              href="/servicios"
-              className="hover:text-[var(--color-primary)] transition-colors"
-            >
+            <Link href="/servicios" className={CRUMB_LINK_CLASS}>
               Servicios
             </Link>
             <span className="opacity-40">/</span>
@@ -178,87 +195,127 @@ export default async function VerticalLandingPage({
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-tech btn-primary-tech inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl min-h-12"
+              className="group btn-tech btn-primary-tech inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl min-h-12 active:scale-[0.97]"
             >
               Hablemos de tu caso
-              <ArrowRightIcon className="size-4" />
+              <ArrowRightIcon className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
             </a>
           </div>
-        </div>
+        </SectionReveal>
       </section>
 
-      {/* ── Pains ──────────────────────────────────────────────────── */}
+      {/* ── Pains — 2 columnas asimétricas, h2 sticky ─────────────────── */}
       <section className="relative py-16 sm:py-20" style={{ backgroundColor: 'var(--color-surface-low)' }}>
-        <div className="mx-auto max-w-4xl px-6">
-          <span
-            className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
-            style={{ color: 'var(--color-primary)' }}
-          >
-            01 · El problema
-          </span>
-          <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)] mb-8">
-            Lo que vivís hoy
-          </h2>
-          <ul className="space-y-3">
-            {v.pains.map((pain) => (
-              <li
-                key={pain}
-                className="flex items-start gap-3 text-base sm:text-lg leading-relaxed text-[var(--color-on-surface-variant)]"
+        <div className="mx-auto grid max-w-5xl gap-8 px-6 md:grid-cols-[1fr_1.6fr] md:gap-14">
+          <SectionReveal>
+            <div className="md:sticky md:top-28">
+              <span
+                className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
+                style={{ color: 'var(--color-primary)' }}
               >
-                <span
-                  aria-hidden
-                  className="mt-2.5 size-1.5 shrink-0 rounded-full bg-red-500 dark:bg-red-400"
-                />
-                <span>{pain}</span>
+                01 · El problema
+              </span>
+              <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)]">
+                Lo que vivís hoy
+              </h2>
+            </div>
+          </SectionReveal>
+          <ul className="space-y-3">
+            {v.pains.map((pain, i) => (
+              <li key={pain}>
+                <SectionReveal delay={i * STAGGER_BASE}>
+                  <div className="flex items-start gap-3 text-base sm:text-lg leading-relaxed text-[var(--color-on-surface-variant)]">
+                    <span
+                      aria-hidden
+                      className="mt-2.5 size-1.5 shrink-0 rounded-full bg-red-500 dark:bg-red-400"
+                    />
+                    <span>{pain}</span>
+                  </div>
+                </SectionReveal>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* ── Features ───────────────────────────────────────────────── */}
+      {/* ── Features — bento asimétrico, primera card destacada ──────── */}
       <section className="relative py-16 sm:py-20" style={{ backgroundColor: 'var(--color-surface-base)' }}>
         <div className="mx-auto max-w-5xl px-6">
-          <span
-            className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
-            style={{ color: 'var(--color-primary)' }}
-          >
-            02 · La solución
-          </span>
-          <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)] mb-10">
-            Lo que armamos juntos
-          </h2>
+          <SectionReveal>
+            <span
+              className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              02 · La solución
+            </span>
+            <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--color-on-surface)] mb-10">
+              Lo que armamos juntos
+            </h2>
+          </SectionReveal>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {v.features.map((f) => (
-              <article
-                key={f.title}
-                className="rounded-xl p-6 border flex gap-4 items-start"
-                style={{
-                  backgroundColor: 'var(--color-surface-low)',
-                  borderColor: 'var(--glass-border)',
-                }}
-              >
-                <div
-                  className="flex size-9 shrink-0 items-center justify-center rounded-lg"
-                  style={{
-                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.14)',
-                    color: 'var(--color-primary)',
-                  }}
-                  aria-hidden
+          <div className="grid gap-4 md:grid-cols-6">
+            {v.features.map((f, i) => {
+              const isFeatured = i === 0
+              return (
+                <SectionReveal
+                  key={f.title}
+                  delay={i * STAGGER_BASE}
+                  className={cn(
+                    'h-full [&>div]:h-full',
+                    isFeatured ? 'md:col-span-4' : 'md:col-span-2',
+                  )}
                 >
-                  <CheckIcon className="size-4" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-base text-[var(--color-on-surface)] mb-2">
-                    {f.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
-                    {f.body}
-                  </p>
-                </div>
-              </article>
-            ))}
+                  <article
+                    className={cn(
+                      'flex h-full items-start gap-4',
+                      isFeatured
+                        ? 'bento-surface p-7'
+                        : 'rounded-xl border p-6',
+                    )}
+                    style={
+                      isFeatured
+                        ? undefined
+                        : {
+                            backgroundColor: 'var(--color-surface-low)',
+                            borderColor: 'var(--glass-border)',
+                          }
+                    }
+                  >
+                    <div
+                      className={cn(
+                        'flex shrink-0 items-center justify-center rounded-lg',
+                        isFeatured ? 'size-11' : 'size-9',
+                      )}
+                      style={{
+                        backgroundColor: 'rgba(var(--color-primary-rgb), 0.14)',
+                        color: 'var(--color-primary)',
+                      }}
+                      aria-hidden
+                    >
+                      <CheckIcon className={isFeatured ? 'size-5' : 'size-4'} />
+                    </div>
+                    <div>
+                      <h3
+                        className={cn(
+                          'font-bold text-[var(--color-on-surface)] mb-2',
+                          isFeatured ? 'text-lg' : 'text-base',
+                        )}
+                      >
+                        {f.title}
+                      </h3>
+                      <p
+                        className={cn(
+                          'leading-relaxed text-[var(--color-on-surface-variant)]',
+                          isFeatured ? 'text-base' : 'text-sm',
+                        )}
+                      >
+                        {f.body}
+                      </p>
+                    </div>
+                  </article>
+                </SectionReveal>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -268,7 +325,7 @@ export default async function VerticalLandingPage({
         className="relative py-12 sm:py-16"
         style={{ backgroundColor: 'var(--color-surface-low)' }}
       >
-        <div className="mx-auto max-w-5xl px-6">
+        <SectionReveal className="mx-auto max-w-5xl px-6">
           <span
             className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-3"
             style={{ color: 'var(--color-primary)' }}
@@ -293,12 +350,12 @@ export default async function VerticalLandingPage({
               </span>
             ))}
           </div>
-        </div>
+        </SectionReveal>
       </section>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section className="relative py-16 sm:py-20" style={{ backgroundColor: 'var(--color-surface-base)' }}>
-        <div className="mx-auto max-w-3xl px-6 text-center">
+        <SectionReveal className="mx-auto max-w-3xl px-6 text-center">
           <span
             className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
             style={{ color: 'var(--color-primary)' }}
@@ -325,17 +382,17 @@ export default async function VerticalLandingPage({
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-tech btn-primary-tech inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl min-h-12"
+            className="group btn-tech btn-primary-tech inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl min-h-12 active:scale-[0.97]"
           >
             Validar mi caso por WhatsApp
-            <ArrowRightIcon className="size-4" />
+            <ArrowRightIcon className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
           </a>
-        </div>
+        </SectionReveal>
       </section>
 
-      {/* ── FAQ ─────────────────────────────────────────────────────── */}
+      {/* ── FAQ — estados de focus/hover/open (paridad con blog) ─────── */}
       <section className="relative py-16 sm:py-20" style={{ backgroundColor: 'var(--color-surface-low)' }}>
-        <div className="mx-auto max-w-3xl px-6">
+        <SectionReveal className="mx-auto max-w-3xl px-6">
           <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[var(--color-on-surface)] mb-8">
             Preguntas frecuentes
           </h2>
@@ -344,15 +401,15 @@ export default async function VerticalLandingPage({
               <details
                 key={i}
                 name="vertical-faq"
-                className="group rounded-xl overflow-hidden border"
+                className="group rounded-xl overflow-hidden border transition-colors duration-200 hover:border-[rgba(var(--color-primary-rgb),0.3)] has-[summary:focus-visible]:border-[rgba(var(--color-primary-rgb),0.45)] open:border-[rgba(var(--color-primary-rgb),0.3)]"
                 style={{
                   borderColor: 'var(--glass-border)',
                   backgroundColor: 'var(--color-surface-base)',
                 }}
                 open={i === 0}
               >
-                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                  <span className="text-sm font-semibold text-[var(--color-on-surface)] pr-4">
+                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden transition-colors duration-200 hover:bg-[rgba(var(--color-primary-rgb),0.05)] active:bg-[rgba(var(--color-primary-rgb),0.08)] focus-visible:outline-none focus-visible:bg-[rgba(var(--color-primary-rgb),0.06)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-primary)]">
+                  <span className="text-sm font-semibold text-[var(--color-on-surface)] pr-4 transition-colors duration-200 group-hover:text-[var(--color-primary)] group-open:text-[var(--color-primary)]">
                     {item.q}
                   </span>
                   <span
@@ -380,12 +437,12 @@ export default async function VerticalLandingPage({
               </details>
             ))}
           </div>
-        </div>
+        </SectionReveal>
       </section>
 
       {/* ── Seguí explorando · internal linking ─────────────────────── */}
       <section className="relative py-16 sm:py-20" style={{ backgroundColor: 'var(--color-surface-base)' }}>
-        <div className="mx-auto max-w-5xl px-6">
+        <SectionReveal className="mx-auto max-w-5xl px-6">
           <span
             className="inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4"
             style={{ color: 'var(--color-primary)' }}
@@ -399,7 +456,7 @@ export default async function VerticalLandingPage({
           <div className="grid gap-4 md:grid-cols-2">
             <Link
               href="/servicios"
-              className="group rounded-xl p-6 border transition-all md:col-span-2"
+              className={cn('rounded-xl p-6 md:col-span-2', CARD_HOVER_CLASS)}
               style={{ backgroundColor: 'var(--color-surface-low)', borderColor: 'var(--glass-border)' }}
             >
               <span
@@ -420,7 +477,7 @@ export default async function VerticalLandingPage({
               <Link
                 key={o.slug}
                 href={`/${o.slug}`}
-                className="group rounded-xl p-5 border transition-all"
+                className={cn('rounded-xl p-5', CARD_HOVER_CLASS)}
                 style={{ backgroundColor: 'var(--color-surface-low)', borderColor: 'var(--glass-border)' }}
               >
                 <Badge variant="outline" className="mb-3 text-[10px]">
@@ -431,7 +488,7 @@ export default async function VerticalLandingPage({
                 </h3>
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)]">
                   Ver landing
-                  <ArrowRightIcon className="size-3 transition-transform duration-200 group-hover:translate-x-1" />
+                  <ArrowRightIcon className="size-3 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
                 </span>
               </Link>
             ))}
@@ -447,7 +504,7 @@ export default async function VerticalLandingPage({
                   <Link
                     key={p.slug}
                     href={`/blog/${p.slug}`}
-                    className="group block rounded-xl p-5 border transition-all"
+                    className={cn('block rounded-xl p-5', CARD_HOVER_CLASS)}
                     style={{ backgroundColor: 'var(--color-surface-low)', borderColor: 'var(--glass-border)' }}
                   >
                     <h4 className="font-heading text-sm font-extrabold text-[var(--color-on-surface)] leading-tight mb-2 group-hover:text-[var(--color-primary)] transition-colors">
@@ -455,14 +512,14 @@ export default async function VerticalLandingPage({
                     </h4>
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)]">
                       Leer
-                      <ArrowRightIcon className="size-3 transition-transform duration-200 group-hover:translate-x-1" />
+                      <ArrowRightIcon className="size-3 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
                     </span>
                   </Link>
                 ))}
               </div>
             </>
           )}
-        </div>
+        </SectionReveal>
       </section>
     </>
   )

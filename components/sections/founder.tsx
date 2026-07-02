@@ -9,6 +9,9 @@ import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { PROJECTS, ROUTES } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { EASE_OUT } from '@/lib/motion'
+import { useParallaxNumber } from '@/hooks/use-parallax-number'
 import { cn } from '@/lib/utils/cn'
 
 /**
@@ -18,15 +21,6 @@ import { cn } from '@/lib/utils/cn'
  * Prueba = productos propios en producción (links reales, verificables).
  * Solo números canónicos del AUDIT_ADDENDUM — nada de métricas infladas.
  */
-
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
-
-/**
- * Verde oficial WhatsApp — única excepción de hex permitida (DESIGN_BRIEF §2).
- * AUDIT_ADDENDUM: el CTA de dinero es SIEMPRE sólido verde WhatsApp.
- */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
 
 const WA_MSG_FOUNDER =
   'Hola Manuel, leí quién está detrás de APEX y quiero contarte mi proyecto. ¿Lo charlamos?'
@@ -72,7 +66,7 @@ function FounderPortrait() {
   }, [])
 
   return (
-    <div className="relative aspect-[4/5] overflow-hidden">
+    <div className="relative z-[1] aspect-[4/5] overflow-hidden rounded-t-[var(--radius-core)]">
       {/* Capa base: avatar MN — fallback elegante mientras no haya foto */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center gap-3"
@@ -116,6 +110,8 @@ function FounderPortrait() {
 
 export function FounderSection() {
   const prefersReducedMotion = useReducedMotion()
+  const numberRef = useRef<HTMLSpanElement>(null)
+  useParallaxNumber(numberRef)
 
   return (
     <section className="relative overflow-hidden py-24 md:py-32">
@@ -130,8 +126,10 @@ export function FounderSection() {
         aria-hidden="true"
       />
 
-      {/* Numeración editorial — rompe el grid por el borde izquierdo */}
+      {/* Numeración editorial — rompe el grid por el borde izquierdo.
+          Parallax GSAP scrub (transform-only, solo lg+, reduced-motion safe). */}
       <span
+        ref={numberRef}
         aria-hidden="true"
         className="section-number absolute -left-6 top-10 hidden lg:block"
         style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
@@ -231,15 +229,24 @@ export function FounderSection() {
                 data-inspector-desc="Mensaje contextual de la sección founder. Tracking centralizado en openWhatsAppWithThankYouPage."
                 data-inspector-cat="Conversión"
                 className={cn(
-                  'btn-tech inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold select-none',
-                  'h-12 px-7 text-sm text-white',
-                  'transition-all duration-200 ease-out hover:brightness-110 hover:scale-[1.02] active:scale-[0.97]',
+                  'group btn-tech inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold select-none',
+                  'h-12 pl-5 pr-7 text-sm text-white',
+                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.02] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                  WA_SHADOW_CLASS,
                 )}
-                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+                style={{ background: WA_GRADIENT }}
               >
-                <WhatsAppIcon className="size-4" />
-                Contame tu proyecto
+                {/* Button-in-button (spec §8.5): chip interior con el ícono */}
+                <span
+                  aria-hidden="true"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/15 transition-[background-color,transform] duration-300 ease-out group-hover:translate-x-0.5 group-hover:bg-white/25 motion-reduce:transform-none"
+                >
+                  <WhatsAppIcon className="size-4" />
+                </span>
+                <span className="transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transform-none">
+                  Contame tu proyecto
+                </span>
               </WhatsAppOutboundLink>
 
               <Link
@@ -267,7 +274,9 @@ export function FounderSection() {
             viewport={{ once: true, amount: 0.25 }}
             className="mx-auto w-full max-w-[300px] lg:col-span-4 lg:col-start-9 lg:max-w-none"
           >
-            <div className="bento-surface overflow-hidden lg:-rotate-1 lg:transition-transform lg:duration-300 lg:hover:rotate-0">
+            {/* Superficie héroe E3 (spec §3/§6): double-bezel enmarcado + grain.
+                El retrato queda en z-[1] para que el noise no ensucie la foto. */}
+            <div className="bento-surface bento-surface--framed noise-overlay overflow-hidden lg:-rotate-1 lg:transition-transform lg:duration-300 lg:hover:rotate-0">
               <FounderPortrait />
 
               <div className="px-5 py-4">

@@ -7,9 +7,9 @@ import { GridBackground } from '@/components/ui/grid-background'
 import { CheckIcon, WhatsAppIcon, XIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
+import { EASE_OUT } from '@/lib/motion'
+import { useParallaxNumber } from '@/hooks/use-parallax-number'
 import { cn } from '@/lib/utils/cn'
-
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 /* Stagger reveal para listas (contrato §2: 30–50 ms por item).
    El item entra con transform/opacity; salida no aplica (once: true). */
@@ -69,7 +69,7 @@ function AnimatedMetric({
     }
     const controls = animate(0, value, {
       duration: 0.9,
-      ease: 'easeOut',
+      ease: EASE_OUT,
       onUpdate: (latest) => setDisplay(Math.round(latest)),
     })
     return () => controls.stop()
@@ -93,13 +93,17 @@ function AnimatedMetric({
 
 export function ClientBenefitsSection() {
   const prefersReducedMotion = useReducedMotion()
+  const numberRef = useRef<HTMLSpanElement>(null)
+  useParallaxNumber(numberRef)
 
   return (
     <section id="beneficios" className="relative overflow-hidden py-24 md:py-32">
       <GridBackground showRadialLight />
 
-      {/* Numeración editorial — lado izquierdo (alterna con la 01 de la sección anterior) */}
+      {/* Numeración editorial — lado izquierdo (alterna con la 01 de la sección anterior).
+          Parallax GSAP scrub (transform-only, solo lg+, reduced-motion safe). */}
       <span
+        ref={numberRef}
         aria-hidden="true"
         className="section-number absolute -left-6 top-10 hidden lg:block"
         style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
@@ -226,7 +230,7 @@ export function ClientBenefitsSection() {
                 waHref={whatsappUrl(WA_MSG_PROBLEMA)}
                 className={cn(
                   'group inline-flex items-center justify-center gap-2 font-semibold select-none',
-                  'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                   'btn-tech btn-primary-tech',
                   'h-12 px-7 text-sm rounded-xl',
@@ -343,12 +347,15 @@ function ProcessStepRow({ step, order }: { step: ProcessStep; order: number }) {
 
 export function HomeProcessSection() {
   const prefersReducedMotion = useReducedMotion()
+  const numberRef = useRef<HTMLSpanElement>(null)
+  useParallaxNumber(numberRef)
 
   return (
     <section className="relative overflow-hidden py-24 md:py-32">
       <GridBackground />
 
       <span
+        ref={numberRef}
         aria-hidden="true"
         className="section-number absolute -right-4 top-10 hidden lg:block"
         style={{ fontSize: 'clamp(7rem, 13vw, 11rem)' }}
@@ -384,7 +391,7 @@ export function HomeProcessSection() {
                 waHref={whatsappUrl(WA_MSG_PROCESO)}
                 className={cn(
                   'group inline-flex items-center justify-center gap-2 font-semibold select-none',
-                  'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                   'btn-tech btn-primary-tech',
                   'h-12 px-7 text-sm rounded-xl',
@@ -421,7 +428,7 @@ export function HomeProcessSection() {
                 waHref={whatsappUrl(WA_MSG_PROCESO)}
                 className={cn(
                   'group inline-flex w-full items-center justify-center gap-2 font-semibold select-none sm:w-auto',
-                  'transition-all duration-200 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                   'btn-tech btn-primary-tech',
                   'h-12 px-7 text-sm rounded-xl',

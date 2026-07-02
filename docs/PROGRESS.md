@@ -1,7 +1,31 @@
 # PROGRESS — Refactor pre-campaña + fix funnel WhatsApp
 
-> Última actualización: 2026-06-17 (sesión Claude)
+> Última actualización: 2026-07-02 (sesión Claude)
 > Objetivo: dejar theapexweb.com listo para campaña — funnel WhatsApp funcionando end-to-end + rediseño premium orientado a conversión.
+
+---
+
+## -1. APEX DESIGN LANGUAGE V2 — transformación premium de todo el sitio (✅ 2026-07-02, build verde)
+
+**Qué:** rediseño integral a nivel "agencia $150k" manteniendo la estética aerospace/cyberpunk. Spec completo en `docs/design/DESIGN_LANGUAGE_V2.md` (LEY para todo cambio visual futuro). Implementado en 7 paquetes con ownership disjunto (foundation + home + chrome + servicios + contacto/sobre-mí + muestrario/tecnologías + secundarias).
+
+**Lo estructural (foundation, commit `0c9c5da`):**
+- **Syne 700/800** como display font (`--font-heading`) en pairing con Oxanium; Oxanium gana peso **200 real** → el contraste 200/800 de `.heading-display` ya no es sintetizado.
+- Motion tokens: `--ease-out: cubic-bezier(0.22,1,0.36,1)` (curva firma única), `--dur-*`; `lib/motion.ts` (EASE_OUT, SPRING_TILT/SNAP/FOCUS, STAGGER_*) como fuente única para Framer/GSAP.
+- Sombras SIEMPRE tintadas (`--shadow-tint-rgb`), glass v2 con filo de luz, noise/grain global (`--noise-url` + `body::after`) y utility `.noise-overlay`, double-bezel (`.bezel-shell`/`.bezel-core`, radios concéntricos calculados), `.bento-surface--framed`.
+- Primitivas v2: SectionReveal (blur reveal + stagger + useReducedMotion propio), GlowCard (spotlight vía motion values, cero re-renders), Button (group + active states), BrowserChrome y TiltCtaCard compartidos, `lib/constants/whatsapp-ui.ts` (verde sagrado centralizado).
+
+**Lo visible:** navbar hace morph a cápsula glass flotante al scrollear (+ hamburger morph a X, drawer con blur-stagger) · sección 03 del proceso restaurada en la home (estaba construida y nunca renderizada) · pricing con card ancla enmarcada + prefijo ARS thin/cifra extrabold · calculadora tipo instrumento (4 rieles, readout, precios desde `APP_PLANS` — **el estimado de app pasó de $1.2M hardcodeado a $580k/mes real**) · FAQ editorial (lista con índices y 3 grupos, ya no 13 cards) · PreviewCards del muestrario nivel museo (tilt 3D + spotlight + double-bezel) + galería bento con featured · booking con contador vivo 0/8, validación inline y sonar de éxito · sobre-mí con screenshots reales en "Prueba de capacidad" · blog editorial (measure 68ch, drop cap, reading progress, TOC) · /gracias con burst one-shot y reduced-motion arreglado · verticales con reveals (siguen server-rendered).
+
+**Borrado:** `app/muestrario/en-produccion.tsx` y `lab-gallery.tsx` (dead code sin referencias — la galería actual es `muestrario-gallery.tsx`).
+
+**Verificado:** `tsc --noEmit` ✓ · `npm run build` ✓ (28/28 estáticas) · Playwright: 10 páginas × dark/light + mobile, 0 errores de consola · flujo WhatsApp end-to-end (popup wa.me + /gracias?wa=) ✓ · anchors `#pricing/#calculadora/#proceso/#faq` con `scroll-mt-24` despejan el navbar pill ✓.
+
+**Gotchas de esta sesión:**
+- El browser de Playwright cachea chunks del dev server entre sesiones → hydration mismatch FANTASMA tras editar componentes. Fix: CDP `Network.clearBrowserCache` (o cerrar el browser). No es un bug del código.
+- `npm run build` deja artefactos en `.next` que se mezclan con `next dev` → borrar `.next` al pasar de build a dev.
+- El FAQ agrupa 01/02-07/08+ en 3 sub-headers pero "formas de pago" (07) quedó bajo "Proceso y garantía" para no reordenar `SERVICIOS_FAQ_ITEMS` (orden = must-not-break por JSON-LD). Reordenar = decisión de Manuel.
+- En light, el hover del card ancla de pricing puede mantener la sombra E3 estática (especificidad de `.light .bento-surface--framed` vs utility) — cosmético, anotado para un pase futuro.
 
 ---
 

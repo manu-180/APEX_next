@@ -7,8 +7,8 @@ import {
   ServiciosStaticFaq,
   ServiciosComparisonTable,
   VerticalsBridge,
-  SERVICIOS_FAQ_ITEMS,
 } from './static-sections'
+import { SERVICIOS_FAQ_ITEMS } from './faq-data'
 import { ServiciosFinalCta } from './servicios-final-cta'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
 import { ServiciosShowcase } from '@/components/sections/servicios-showcase'

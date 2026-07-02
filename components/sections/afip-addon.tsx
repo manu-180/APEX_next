@@ -6,15 +6,8 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
-
-/**
- * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
- * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
- */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
-
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { EASE_OUT } from '@/lib/motion'
 
 /* Stagger reveal del listado de features fiscales (contrato §2). */
 const BENEFITS_CONTAINER: Variants = {
@@ -136,8 +129,8 @@ export function AfipAddonSection() {
               <button
                 type="button"
                 onClick={handleCtaClick}
-                className="group/cta btn-tech inline-flex items-center gap-2.5 rounded-xl px-6 py-3 text-sm font-semibold text-white select-none transition-[transform,filter] duration-200 ease-out hover:scale-[1.02] hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
-                style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+                className={`group/cta btn-tech inline-flex items-center gap-2.5 rounded-xl px-6 py-3 text-sm font-semibold text-white select-none transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] ${WA_SHADOW_CLASS}`}
+                style={{ background: WA_GRADIENT }}
               >
                 <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover/cta:scale-110" />
                 Ver si aplica a mi caso

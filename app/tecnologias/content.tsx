@@ -1,22 +1,17 @@
 'use client'
 
 import { useRef } from 'react'
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
-import { useTheme } from '@/components/providers/theme-mode-provider'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CircuitBoardBg } from '@/components/ui/circuit-board-bg'
+import { TiltCtaCard } from '@/components/ui/tilt-cta-card'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { ROUTES } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { EASE_OUT } from '@/lib/motion'
 import { TECH_STACK } from '@/lib/types/theme'
 import { cn } from '@/lib/utils/cn'
 import { whatsappUrl } from '@/lib/whatsapp'
@@ -36,33 +31,6 @@ export function TecnologiasContent() {
   const headerRef = useRef<HTMLElement>(null)
   const bgCursorRef = useRef({ x: -1, y: -1, active: false })
   const prefersReducedMotion = useReducedMotion()
-  const { resolvedTheme } = useTheme()
-  const isLight = resolvedTheme === 'light'
-  const ctaTiltSpring = { stiffness: 88, damping: 19, mass: 0.82 }
-  const tiltXTarget = useMotionValue(0)
-  const tiltYTarget = useMotionValue(0)
-  const glareXTarget = useMotionValue(50)
-  const tiltX = useSpring(tiltXTarget, ctaTiltSpring)
-  const tiltY = useSpring(tiltYTarget, ctaTiltSpring)
-  const glareX = useSpring(glareXTarget, ctaTiltSpring)
-
-  const ctaCardShadow = useTransform([tiltX, tiltY], ([rx, ry]) => {
-    const x = rx as number
-    const y = ry as number
-    return isLight
-      ? `0 ${12 + Math.abs(x) * 2}px ${36 + Math.abs(y) * 4}px rgba(15, 23, 42, 0.08), ${y * 1.5}px ${-x * 1.5}px 28px rgba(var(--color-primary-rgb), 0.12)`
-      : `0 ${14 + Math.abs(x) * 3}px ${42 + Math.abs(y) * 5}px rgba(0, 0, 0, 0.55), ${y * 2}px ${-x * 2}px 38px rgba(var(--color-primary-rgb), 0.16)`
-  })
-
-  const ctaGlareGradient = useTransform(glareX, (gx) =>
-    isLight
-      ? `linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) ${gx}%, rgba(0,0,0,0.025) ${Math.min(gx + 11, 100)}%, rgba(0,0,0,0) ${Math.min(gx + 24, 100)}%)`
-      : `linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) ${gx}%, rgba(255,255,255,0.06) ${Math.min(gx + 11, 100)}%, rgba(255,255,255,0) ${Math.min(gx + 24, 100)}%)`,
-  )
-
-  const ctaCardShadowStatic = isLight
-    ? '0 12px 36px rgba(15, 23, 42, 0.08), 0 0 28px rgba(var(--color-primary-rgb), 0.12)'
-    : '0 14px 42px rgba(0, 0, 0, 0.55), 0 0 38px rgba(var(--color-primary-rgb), 0.16)'
   const { scrollYProgress } = useScroll({ target: headerRef, offset: ['start start', 'end start'] })
   const headerOpacity = useTransform(scrollYProgress, [0.4, 1], [1, 0])
   const headerMask = useTransform(
@@ -159,7 +127,7 @@ export function TecnologiasContent() {
                       initial={prefersReducedMotion ? false : { opacity: 0, x: 16 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, amount: 0.5 }}
-                      transition={{ duration: 0.5, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.5, delay: 0.3 + i * 0.08, ease: EASE_OUT }}
                       className="lg:border-l-2 lg:pl-4 lg:py-1"
                       style={{ borderColor: 'rgba(var(--color-primary-rgb), 0.3)' }}
                     >
@@ -179,35 +147,46 @@ export function TecnologiasContent() {
             </div>
           </SectionReveal>
 
-          {/* ── Marquee con nombres del stack ──────────────────────── */}
+          {/* ── Marquee con nombres del stack — loop seamless ─────────────
+              Exactamente 2 copias y x a -50%: el desplazamiento equivale al
+              ancho de UNA copia (pr-12 interno en vez de gap del padre), así
+              el loop no salta. `linear` es correcto acá (marquee continuo). */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.5 }}
             className="mt-12 sm:mt-16 overflow-hidden border-y py-4"
-            style={{ borderColor: 'rgba(var(--color-primary-rgb), 0.12)' }}
+            style={{
+              borderColor: 'rgba(var(--color-primary-rgb), 0.12)',
+              maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+            }}
             aria-hidden
           >
             <motion.div
-              className="flex gap-12 whitespace-nowrap"
+              className="flex whitespace-nowrap"
               animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
               transition={
                 prefersReducedMotion ? undefined : { duration: 28, repeat: Infinity, ease: 'linear' }
               }
             >
-              {[...TECH_STACK, ...TECH_STACK, ...TECH_STACK].map((t, i) => (
-                <div key={`${t.title}-${i}`} className="flex items-center gap-12 shrink-0">
-                  <span
-                    className="font-heading text-2xl sm:text-3xl font-extrabold opacity-60"
-                    style={{ color: 'var(--color-on-surface-variant)' }}
-                  >
-                    {t.title}
-                  </span>
-                  <span
-                    className="size-1.5 rounded-full shrink-0"
-                    style={{ backgroundColor: 'var(--color-primary)' }}
-                  />
+              {[0, 1].map((copy) => (
+                <div key={copy} className="flex shrink-0 items-center gap-12 pr-12">
+                  {TECH_STACK.map((t) => (
+                    <div key={`${copy}-${t.title}`} className="flex items-center gap-12 shrink-0">
+                      <span
+                        className="font-heading text-2xl sm:text-3xl font-extrabold opacity-60"
+                        style={{ color: 'var(--color-on-surface-variant)' }}
+                      >
+                        {t.title}
+                      </span>
+                      <span
+                        className="size-1.5 rounded-full shrink-0"
+                        style={{ backgroundColor: 'var(--color-primary)' }}
+                      />
+                    </div>
+                  ))}
                 </div>
               ))}
             </motion.div>
@@ -220,119 +199,64 @@ export function TecnologiasContent() {
       <section className="relative pb-24 md:pb-32">
         <div className="mx-auto max-w-6xl px-6">
           <SectionReveal>
-            <div style={{ perspective: 1000 }}>
-              <motion.div
-                data-hover
-                data-inspector-title="CTA final — tarjeta con inclinación 3D"
-                data-inspector-desc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y con resortes de Framer Motion (vuelta al neutro fluida); la sombra y el glare siguen esos valores. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; el botón de WhatsApp es el sólido verde oficial (el CTA de dinero de todo el sitio) y el secundario es contorno con el primario del tema."
-                data-inspector-cat="Física · 3D"
-                className="relative overflow-hidden rounded-3xl border p-7 sm:p-10"
-                style={{
-                  borderColor: 'var(--glass-border)',
-                  background:
-                    'linear-gradient(155deg, color-mix(in srgb, var(--color-surface-high) 92%, var(--color-primary) 8%) 0%, var(--color-surface-base) 100%)',
-                  ...(prefersReducedMotion
-                    ? {
-                        transform: 'none',
-                        boxShadow: ctaCardShadowStatic,
-                      }
-                    : {
-                        rotateX: tiltX,
-                        rotateY: tiltY,
-                        translateZ: 0,
-                        boxShadow: ctaCardShadow,
-                        transformStyle: 'preserve-3d',
-                      }),
-                }}
-                onMouseMove={(e) => {
-                  if (prefersReducedMotion) return
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  const relX = ((e.clientX - rect.left) / rect.width) * 2 - 1
-                  const relY = ((e.clientY - rect.top) / rect.height) * 2 - 1
-                  const maxTilt = 6
-                  tiltXTarget.set(relY * -maxTilt)
-                  tiltYTarget.set(relX * maxTilt)
-                  glareXTarget.set(((e.clientX - rect.left) / rect.width) * 100)
-                }}
-                onMouseLeave={() => {
-                  tiltXTarget.set(0)
-                  tiltYTarget.set(0)
-                  glareXTarget.set(50)
-                }}
-              >
-                <motion.div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-[inherit]"
-                  style={{
-                    background: prefersReducedMotion
-                      ? isLight
-                        ? 'linear-gradient(118deg, rgba(0,0,0,0) 34%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.025) 61%, rgba(0,0,0,0) 74%)'
-                        : 'linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.06) 61%, rgba(255,255,255,0) 74%)'
-                      : ctaGlareGradient,
-                    opacity: prefersReducedMotion ? (isLight ? 0.45 : 0.35) : isLight ? 0.55 : 0.7,
-                    transition: 'opacity 260ms ease',
-                  }}
-                />
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full opacity-60 blur-3xl"
-                  style={{ background: 'rgba(var(--color-primary-rgb), 0.26)' }}
-                />
-                <div className="relative grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-                  <div>
-                    <p className="editorial-label editorial-label--primary mb-5">Siguiente paso</p>
-                    <h2 className="heading-display text-balance text-2xl sm:text-3xl md:text-4xl">
-                      <span className="block text-[var(--color-on-surface-variant)]">Este stack,</span>
-                      <strong className="block text-[var(--color-on-surface)]">aplicado a tu negocio.</strong>
-                    </h2>
-                    <p className="mt-3 max-w-2xl text-pretty text-[var(--color-on-surface-variant)]">
-                      Contame qué necesitás — web, app o los dos — y te digo qué piezas lleva,
-                      en cuánto tiempo y a qué precio. Sin vueltas.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-stretch">
-                    {/* CTA de dinero: sólido verde WhatsApp (jerarquía del addendum).
-                        #25D366/#128C7E = única excepción de hex (elemento WhatsApp). */}
-                    <WhatsAppOutboundLink
-                      waHref={whatsappUrl(WA_MSG_TECNOLOGIAS)}
-                      className={cn(
-                        'inline-flex items-center justify-center gap-2.5 rounded-xl font-bold text-white select-none',
-                        'transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                        'h-12 px-7 text-sm',
-                      )}
-                      style={{
-                        background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                        // Light: apoyo navy + verde profundo (patrón .btn-wa); dark conserva el glow original
-                        boxShadow: isLight
-                          ? '0 2px 5px rgba(24, 32, 60, 0.08), 0 4px 18px rgba(18, 140, 126, 0.30)'
-                          : '0 4px 20px rgba(37, 211, 102, 0.3)',
-                      }}
-                    >
-                      <WhatsAppIcon className="size-4" />
-                      Escribime por WhatsApp
-                    </WhatsAppOutboundLink>
-                    <Link
-                      href={ROUTES.servicios}
-                      className={cn(
-                        'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                        'transition-all duration-200 ease-out',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                        'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
-                        'h-12 px-7 text-sm rounded-xl',
-                      )}
-                    >
-                      Ver planes y precios
-                      <ArrowRightIcon className="size-4" />
-                    </Link>
-                    <p className="text-xs text-[var(--color-on-surface-variant)] opacity-80 sm:ml-1 lg:ml-0 lg:text-center">
-                      Te respondo en menos de 1 hora.
-                    </p>
-                  </div>
+            {/* Tarjeta 3D compartida (components/ui/tilt-cta-card): misma física
+                que el cierre de /muestrario — perspective 1000 + SPRING_TILT +
+                glare + blob con profundidad real de preserve-3d. */}
+            <TiltCtaCard
+              inspectorTitle="CTA final — tarjeta con inclinación 3D"
+              inspectorDesc="Pensala en tres capas: (1) Estructura: en pantallas grandes es una grilla de dos columnas — texto y badge a la izquierda, botones a la derecha; en móvil se apilan. (2) Estilo: borde tipo vidrio (`glass-border`) y fondo en degradado que mezcla el color de superficie del tema con un poco del primario, más un halo difuminado atrás. (3) Movimiento: al mover el mouse, medimos dónde está el puntero dentro de la tarjeta y aplicamos una rotación 3D suave en X e Y con resortes de Framer Motion (vuelta al neutro fluida); la sombra y el glare siguen esos valores, y el contenido flota a +28px reales de profundidad. Si el sistema tiene “reducir movimiento”, no hay rotación, solo sombra tranquila. La aparición al hacer scroll la hace SectionReveal; el botón de WhatsApp es el sólido verde oficial (el CTA de dinero de todo el sitio) y el secundario es contorno con el primario del tema."
+              inspectorCat="Física · 3D"
+            >
+              <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+                <div>
+                  <p className="editorial-label editorial-label--primary mb-5">Siguiente paso</p>
+                  <h2 className="heading-display text-balance text-2xl sm:text-3xl md:text-4xl">
+                    <span className="block text-[var(--color-on-surface-variant)]">Este stack,</span>
+                    <strong className="block text-[var(--color-on-surface)]">aplicado a tu negocio.</strong>
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-pretty text-[var(--color-on-surface-variant)]">
+                    Contame qué necesitás — web, app o los dos — y te digo qué piezas lleva,
+                    en cuánto tiempo y a qué precio. Sin vueltas.
+                  </p>
                 </div>
-              </motion.div>
-            </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-stretch">
+                  {/* CTA de dinero: sólido verde WhatsApp desde lib/constants/whatsapp-ui
+                      (única excepción de hex del sitio, spec §12). */}
+                  <WhatsAppOutboundLink
+                    waHref={whatsappUrl(WA_MSG_TECNOLOGIAS)}
+                    className={cn(
+                      'inline-flex items-center justify-center gap-2.5 rounded-xl font-bold text-white select-none',
+                      'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
+                      'motion-reduce:transform-none motion-reduce:transition-none',
+                      WA_SHADOW_CLASS,
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                      'h-12 px-7 text-sm',
+                    )}
+                    style={{ background: WA_GRADIENT }}
+                  >
+                    <WhatsAppIcon className="size-4" />
+                    Escribime por WhatsApp
+                  </WhatsAppOutboundLink>
+                  <Link
+                    href={ROUTES.servicios}
+                    className={cn(
+                      'inline-flex items-center justify-center gap-2 font-semibold select-none',
+                      'transition-transform duration-200 ease-out',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                      'btn-tech btn-outline-tech text-[var(--color-primary)] active:scale-[0.97]',
+                      'h-12 px-7 text-sm rounded-xl',
+                    )}
+                  >
+                    Ver planes y precios
+                    <ArrowRightIcon className="size-4" />
+                  </Link>
+                  <p className="text-xs text-[var(--color-on-surface-variant)] opacity-80 sm:ml-1 lg:ml-0 lg:text-center">
+                    Te respondo en menos de 1 hora.
+                  </p>
+                </div>
+              </div>
+            </TiltCtaCard>
           </SectionReveal>
         </div>
       </section>

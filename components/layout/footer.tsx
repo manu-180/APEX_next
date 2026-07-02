@@ -1,4 +1,6 @@
-import type { CSSProperties } from 'react'
+'use client'
+
+import { useEffect, useRef, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
@@ -37,6 +39,47 @@ const EXPLORAR_LINKS = [
 ]
 
 export function Footer() {
+  const watermarkRef = useRef<HTMLDivElement>(null)
+
+  // Parallax de marca (spec §1/§11): el watermark APEX se desplaza -30→30px
+  // y su stroke se intensifica 0.05→0.10 scrubbed al scroll. GSAP se importa
+  // dinámicamente (client-only) y gsap.matchMedia gatea desktop + reduced-motion.
+  useEffect(() => {
+    const el = watermarkRef.current
+    if (!el) return
+    let cleanup: (() => void) | undefined
+
+    void (async () => {
+      const gsap = (await import('gsap')).default
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const mm = gsap.matchMedia()
+      // Solo lg+ (el watermark es hidden lg:block) y sin reduced-motion.
+      mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+        gsap.fromTo(
+          el,
+          { y: -30, '--sn-stroke-alpha': 0.05 },
+          {
+            y: 30,
+            '--sn-stroke-alpha': 0.1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: el.closest('footer') ?? el,
+              start: 'top bottom',
+              end: 'bottom bottom',
+              scrub: 0.6,
+            },
+          },
+        )
+      })
+
+      cleanup = () => mm.revert()
+    })()
+
+    return () => cleanup?.()
+  }, [])
+
   return (
     <footer
       id="site-footer"
@@ -46,8 +89,12 @@ export function Footer() {
       {/* Separador superior con gradiente del tema */}
       <div className="divider-theme" aria-hidden="true" />
 
+      {/* Grain de superficie (spec §6) — bajo el contenido z-10 */}
+      <span aria-hidden className="noise-overlay pointer-events-none absolute inset-0 z-0" />
+
       {/* Watermark de marca: outline gigante del tema, puramente decorativo */}
       <div
+        ref={watermarkRef}
         aria-hidden="true"
         className="section-number absolute -bottom-8 right-0 z-0 hidden select-none lg:block"
         style={
@@ -88,7 +135,7 @@ export function Footer() {
               waHref={WHATSAPP_FOOTER_HREF}
               className={cn(
                 'inline-flex items-center justify-center gap-2 font-semibold select-none',
-                'transition-all duration-200 ease-out',
+                'transition-[transform,box-shadow,background-color] duration-200 ease-out',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                 'btn-wa active:scale-[0.97]',
                 'h-12 px-7 text-sm rounded-xl',
@@ -125,7 +172,7 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-x-8 gap-y-0 lg:contents">
             {/* ── Servicios ─────────────────────────────────────────── */}
             <nav aria-label="Servicios" className="min-w-0">
-              <h4 className="footer-heading mb-5">Servicios</h4>
+              <h3 className="footer-heading mb-5">Servicios</h3>
               <ul className="space-y-1.5">
                 {SERVICIOS_LINKS.map((l) => (
                   <li key={l.label}>
@@ -146,7 +193,7 @@ export function Footer() {
 
             {/* ── Explorar ──────────────────────────────────────────── */}
             <nav aria-label="Explorar" className="min-w-0">
-              <h4 className="footer-heading mb-5">Explorar</h4>
+              <h3 className="footer-heading mb-5">Explorar</h3>
               <ul className="space-y-1.5">
                 {EXPLORAR_LINKS.map((l) =>
                   l.external ? (
@@ -201,13 +248,16 @@ export function Footer() {
           <p className="text-xs text-[var(--color-on-surface-variant)] opacity-60">
             &copy; {new Date().getFullYear()} Manuel Navarro. Todos los derechos reservados.
           </p>
-          <div className="flex items-center gap-1.5 text-xs text-[var(--color-on-surface-variant)] opacity-60">
-            Hecho con{' '}
-            <span className="font-semibold" style={{ color: 'var(--color-primary)', opacity: 1 }}>
+          {/* Sin opacity en el contenedor: la opacidad compuesta apagaba también
+              los nombres del stack (el opacity:1 inline no la revertía). Se
+              atenúa solo el texto plano; Next.js/Tailwind quedan a pleno color. */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-[var(--color-on-surface-variant)] opacity-60">Hecho con</span>
+            <span className="font-semibold" style={{ color: 'var(--color-primary)' }}>
               Next.js
-            </span>{' '}
-            +{' '}
-            <span className="font-semibold" style={{ color: 'var(--color-primary)', opacity: 1 }}>
+            </span>
+            <span className="text-[var(--color-on-surface-variant)] opacity-60">+</span>
+            <span className="font-semibold" style={{ color: 'var(--color-primary)' }}>
               Tailwind
             </span>
           </div>

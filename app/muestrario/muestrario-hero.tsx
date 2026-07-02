@@ -6,12 +6,39 @@
  * (gracias a "Libre Albedrío"). Layout asimétrico, padding generoso, un acento.
  */
 
-import { type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { animate, useInView, useReducedMotion } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
+import { BoltIcon } from '@/components/ui/icons'
+import { DUR_REVEAL, EASE_OUT } from '@/lib/motion'
+
+/**
+ * Count-up del número (momento de dopamina): SSR muestra el valor final
+ * (correcto sin JS); al entrar en viewport cuenta 0 → valor con la curva
+ * firma. Estático bajo prefers-reduced-motion (spec §11).
+ */
+function CountUpNumber({ value }: { value: number }) {
+  const prefersReducedMotion = useReducedMotion()
+  const ref = useRef<HTMLSpanElement>(null)
+  const isInView = useInView(ref, { once: true, margin: '-40px' })
+  const [display, setDisplay] = useState(value)
+
+  useEffect(() => {
+    if (!isInView || prefersReducedMotion) return
+    const controls = animate(0, value, {
+      duration: DUR_REVEAL,
+      ease: EASE_OUT,
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return () => controls.stop()
+  }, [isInView, prefersReducedMotion, value])
+
+  return <span ref={ref}>{display}</span>
+}
 
 export function MuestrarioHero({ totalCount, labCount }: { totalCount: number; labCount: number }) {
   return (
-    <section className="relative overflow-hidden px-6 pb-12 pt-32 sm:pb-16 sm:pt-40">
+    <section className="noise-overlay relative overflow-hidden px-6 pb-16 pt-32 sm:pb-24 sm:pt-40">
       {/* glow de fondo, un solo acento del tema */}
       <div
         aria-hidden
@@ -53,7 +80,7 @@ export function MuestrarioHero({ totalCount, labCount }: { totalCount: number; l
 
         {/* Tarjeta de stats — "se actualiza solo" */}
         <SectionReveal delay={0.18} direction="left">
-          <div className="bento-surface rounded-2xl p-5 sm:p-6">
+          <div className="bento-surface noise-overlay rounded-2xl p-5 sm:p-6">
             <div className="flex items-center gap-2">
               <span className="relative flex size-2.5">
                 <span className="absolute inline-flex size-full animate-ping rounded-full opacity-60" style={{ background: 'var(--color-primary)' }} />
@@ -65,7 +92,7 @@ export function MuestrarioHero({ totalCount, labCount }: { totalCount: number; l
             <div className="mt-5 grid grid-cols-2 gap-4">
               <div>
                 <div className="text-4xl font-extrabold tabular-nums text-[var(--color-on-surface)]" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {totalCount}
+                  <CountUpNumber value={totalCount} />
                 </div>
                 <div className="mt-1 text-xs text-[var(--color-on-surface-variant)]">sitios para abrir</div>
               </div>
@@ -81,7 +108,9 @@ export function MuestrarioHero({ totalCount, labCount }: { totalCount: number; l
               className="mt-5 flex items-start gap-2.5 rounded-xl p-3"
               style={{ background: 'rgba(var(--color-primary-rgb),0.05)', border: '1px solid rgba(var(--color-primary-rgb),0.14)' }}
             >
-              <span aria-hidden className="mt-px text-sm">⚡</span>
+              <span aria-hidden className="mt-px shrink-0">
+                <BoltIcon className="size-4 text-[var(--color-primary)]" />
+              </span>
               <p className="text-[11px] leading-relaxed text-[var(--color-on-surface-variant)]">
                 El laboratorio lo alimenta un sistema autónomo: diseña, construye y publica un demo
                 premium por semana. Lo que ves abajo se recarga solo.

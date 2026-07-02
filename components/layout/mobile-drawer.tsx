@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence, useReducedMotion, type PanInfo } from 'framer-motion'
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
+import { EASE_OUT, DELAY_AFTER_PANEL } from '@/lib/motion'
 import {
   XIcon,
   SunIcon,
@@ -145,13 +146,13 @@ export function MobileDrawer({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop — scrim fuerte (≈55% negro) para legibilidad del contenido
-              detrás; el blur añade separación. Salida más rápida que entrada. */}
+          {/* Backdrop — scrim tintado (--scrim-bg, spec §5) para legibilidad del
+              contenido detrás; el blur añade separación. */}
           <motion.div
             aria-hidden="true"
             className="fixed inset-0"
             style={{
-              background: 'rgba(0, 0, 0, 0.55)',
+              background: 'var(--scrim-bg)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               zIndex: 79,
@@ -159,7 +160,7 @@ export function MobileDrawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: 'easeOut' }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: EASE_OUT }}
             onClick={onClose}
           />
 
@@ -169,7 +170,7 @@ export function MobileDrawer({
             role="dialog"
             aria-modal="true"
             aria-labelledby="mobile-drawer-title"
-            className="fixed top-0 right-0 flex flex-col shadow-[-2px_0_6px_rgba(24,32,60,0.05),-16px_0_48px_-12px_rgba(24,32,60,0.20)] dark:shadow-[-8px_0_48px_rgba(0,0,0,0.4)]"
+            className="fixed top-0 right-0 flex flex-col shadow-[-2px_0_6px_rgba(var(--shadow-tint-rgb),0.05),-16px_0_48px_-12px_rgba(var(--shadow-tint-rgb),0.20)] dark:shadow-[-8px_0_48px_rgba(var(--shadow-tint-rgb),0.5),-12px_0_40px_-16px_rgba(var(--color-primary-rgb),0.15)]"
             style={{
               width: 'min(85vw, 360px)',
               height: '100dvh',
@@ -184,6 +185,15 @@ export function MobileDrawer({
             onDragEnd={handleDragEnd}
             {...drawerMotion}
           >
+            {/* Decorativos (spec §4/§6): hairline gradient superior interior +
+                grain bajo el contenido. El panel es stacking context (transform),
+                así que -z-10 queda sobre el fondo y bajo los hijos estáticos. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(var(--color-primary-rgb),0.4)] to-transparent"
+            />
+            <span aria-hidden className="noise-overlay pointer-events-none absolute inset-0 -z-10" />
+
             {/* Header */}
             <div
               className="flex items-center justify-between flex-shrink-0"
@@ -227,12 +237,26 @@ export function MobileDrawer({
                   return (
                     <motion.li
                       key={link.href}
-                      initial={{ opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      // Reveal firma (spec §2): blur one-shot en cascada tras el
+                      // spring del panel. Reduced → fade simple sin blur ni y.
+                      initial={
+                        shouldReduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                      }
+                      animate={
+                        shouldReduceMotion
+                          ? { opacity: 1 }
+                          : { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      }
                       transition={
                         shouldReduceMotion
                           ? { duration: 0.15 }
-                          : { delay: 0.25 + 0.05 * index, duration: 0.25 }
+                          : {
+                              delay: DELAY_AFTER_PANEL + 0.045 * index,
+                              duration: 0.35,
+                              ease: EASE_OUT,
+                            }
                       }
                     >
                       {link.external ? (

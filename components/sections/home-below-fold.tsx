@@ -31,6 +31,11 @@ const ClientBenefitsSection = dynamic(
   { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
 )
 
+const HomeProcessSection = dynamic(
+  () => import('./client-benefits').then((m) => m.HomeProcessSection),
+  { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
+)
+
 const TrustedClientsSection = dynamic(
   () => import('./trusted-clients').then((m) => m.TrustedClientsSection),
   { loading: () => <SectionSkeleton className="py-16 md:py-20" /> },
@@ -48,11 +53,13 @@ const HomeFinalCtaSection = dynamic(
 
 export function HomeBelowFold() {
   // Orden objetivo (DESIGN_BRIEF §3): prueba social inmediata (01) →
-  // problema/solución/proceso (02-03) → founder (04) → CTA final (05).
+  // problema/solución (02) → proceso con boceto gratis (03) → founder (04) →
+  // CTA final (05). La serie de numeración editorial queda sin agujeros.
   return (
     <>
       <TrustedClientsSection />
       <ClientBenefitsSection />
+      <HomeProcessSection />
       <FounderSection />
       <HomeFinalCtaSection />
     </>

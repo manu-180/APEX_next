@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   motion,
@@ -13,22 +13,20 @@ import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
 import { cn } from '@/lib/utils/cn'
-
-/**
- * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
- * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
- */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-const WA_SHADOW = '0 10px 28px -10px rgba(37, 211, 102, 0.45)'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { EASE_OUT, DUR_BASE, DUR_SLOW } from '@/lib/motion'
+import { WEB_PLANS, APP_PLANS, formatARS, type PricingPlan } from '@/lib/types/services'
 
 /**
  * Calculadora de presupuesto interactiva.
  *
  * Why: mecanismo de calificación + lead capture activo. El visitante responde
- * 5 preguntas, ve un rango realista, y va a WhatsApp con el contexto ya armado
+ * 4 preguntas, ve un rango realista, y va a WhatsApp con el contexto ya armado
  * (Manuel responde más rápido, deal cierra más fácil).
  *
  * No reemplaza el presupuesto real. Es un anchor + lead qualification.
+ * Precios SIEMPRE desde WEB_PLANS/APP_PLANS (lib/types/services) — nunca
+ * hardcodeados acá.
  */
 
 type ProjectType = 'web-simple' | 'web-interactiva' | 'ecommerce' | 'app' | 'unsure'
@@ -89,6 +87,9 @@ const Q_CONTENT: Question<ContentState> = {
   ],
 }
 
+/** Labels font-mono de la barra de progreso segmentada (uno por pregunta). */
+const STEP_RAIL_LABELS = ['Tipo', 'Plazo', 'Extras', 'Contenido'] as const
+
 interface CalculatorAnswers {
   project?: ProjectType
   timeline?: Timeline
@@ -96,39 +97,49 @@ interface CalculatorAnswers {
   content?: ContentState
 }
 
-/** Heurística de pricing — precios fijos accesibles, extras se charlan en la consulta. */
+/** Precio publicado de un plan (fuente única: lib/types/services). */
+function planPrice(plans: PricingPlan[], id: string): number {
+  return plans.find((p) => p.id === id)?.price ?? 0
+}
+
+/** Heurística de pricing — precios fijos publicados, extras se charlan en la consulta. */
 function calculateRange(answers: CalculatorAnswers): {
   base: number
   baseLabel: string
   installment: number
   hasFixedPrice: boolean
+  /** true = fee mensual (apps): sin cuotas, se aclara "por mes". */
+  isMonthly: boolean
   notes: string[]
 } {
   const notes: string[] = []
   let base = 0
   let baseLabel = ''
   let hasFixedPrice = true
+  let isMonthly = false
 
   switch (answers.project) {
     case 'web-simple':
       baseLabel = 'Landing / Web simple'
-      base = 300_000
+      base = planPrice(WEB_PLANS, 'web_basic')
       notes.push('Sitio profesional con 3-5 secciones, diseño a medida y optimización mobile.')
       break
     case 'web-interactiva':
       baseLabel = 'Web interactiva'
-      base = 600_000
+      base = planPrice(WEB_PLANS, 'web_interactive')
       notes.push('Algo más útil que una landing: booking, formularios inteligentes, calculadoras o paneles dinámicos.')
       break
     case 'ecommerce':
       baseLabel = 'Tienda online'
-      base = 900_000
+      base = planPrice(WEB_PLANS, 'web_premium')
       notes.push('Catálogo, carrito y pagos integrados, listo para vender.')
       break
     case 'app':
       baseLabel = 'App móvil'
-      base = 1_200_000
+      base = planPrice(APP_PLANS, 'app_mvp')
+      isMonthly = true
       notes.push('App nativa iOS + Android con backend incluido.')
+      notes.push('Fee mensual: incluye desarrollo activo, mejoras y soporte — no es un pago único.')
       break
     case 'unsure':
       baseLabel = 'Proyecto a definir'
@@ -166,17 +177,14 @@ function calculateRange(answers: CalculatorAnswers): {
     notes.push('Te ayudo con contenido y branding básico sin costo extra significativo.')
   }
 
-  const installment = hasFixedPrice ? Math.round(base / 3) : 0
+  const installment = hasFixedPrice && !isMonthly ? Math.round(base / 3) : 0
 
-  return { base, baseLabel, installment, hasFixedPrice, notes }
+  return { base, baseLabel, installment, hasFixedPrice, isMonthly, notes }
 }
 
-function formatARS(value: number): string {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(value)
+/** Cifra sin el símbolo "$" (el readout antepone "ARS" extralight). */
+function formatFigure(value: number): string {
+  return formatARS(value).replace(/^\$\s?/, '')
 }
 
 /**
@@ -191,8 +199,8 @@ const STEP_VARIANTS: Variants = {
 }
 
 const STEP_TRANSITION = {
-  x: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const },
-  opacity: { duration: 0.22, ease: [0.16, 1, 0.3, 1] as const },
+  x: { duration: 0.32, ease: EASE_OUT },
+  opacity: { duration: 0.22, ease: EASE_OUT },
 }
 
 /**
@@ -210,13 +218,13 @@ function CountUpPrice({ value }: { value: number }) {
     }
     const controls = animate(0, value, {
       duration: 0.9,
-      ease: [0.16, 1, 0.3, 1],
+      ease: EASE_OUT,
       onUpdate: (latest) => setDisplay(Math.round(latest)),
     })
     return () => controls.stop()
   }, [value, prefersReducedMotion])
 
-  return <span className="tabular-nums">{formatARS(display)}</span>
+  return <span className="tabular-nums">{formatFigure(display)}</span>
 }
 
 export function BudgetCalculatorSection() {
@@ -265,7 +273,9 @@ export function BudgetCalculatorSection() {
       `Hola Manuel, hice la calculadora y me dio:`,
       `Tipo: ${result.baseLabel}`,
       result.hasFixedPrice
-        ? `Estimado: ${formatARS(result.base)} (3 cuotas sin interés de ${formatARS(result.installment)})`
+        ? result.isMonthly
+          ? `Estimado: ${formatARS(result.base)} por mes (fee mensual)`
+          : `Estimado: ${formatARS(result.base)} (3 cuotas sin interés de ${formatARS(result.installment)})`
         : `Estimado: a definir en la consulta`,
       answers.timeline ? `Plazo: ${Q_TIMELINE.options.find((o) => o.value === answers.timeline)?.label}` : '',
       answers.integrations.length > 0
@@ -304,7 +314,7 @@ export function BudgetCalculatorSection() {
   return (
     <section
       id="calculadora"
-      className="relative py-20 sm:py-24"
+      className="relative scroll-mt-24 py-20 sm:py-24"
       data-hover
       data-inspector-title="Calculadora de presupuesto"
       data-inspector-desc="Wizard de 4 pasos que califica al lead y arma el contexto antes de ir a WhatsApp. Sin email, sin fricción — reduce la barrera de entrada al máximo."
@@ -315,19 +325,19 @@ export function BudgetCalculatorSection() {
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.55 }}
+          transition={{ duration: 0.55, ease: EASE_OUT }}
           className="mb-10 flex items-end justify-between gap-6"
         >
           <div>
             <p className="editorial-label editorial-label--primary mb-4">
-              Calculadora · 5 preguntas · 90 segundos
+              Calculadora · 4 preguntas · 60 segundos
             </p>
             <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl mb-3">
               <span className="block text-[var(--color-on-surface-variant)]">¿Cuánto te sale</span>
               <strong className="block text-[var(--color-on-surface)]">tu proyecto?</strong>
             </h2>
             <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-xl">
-              Respondé 5 preguntas y te muestro un rango realista en pesos.
+              Respondé 4 preguntas y te muestro un rango realista en pesos.
               Sin email, sin compromiso. Si querés, después seguimos en WhatsApp.
             </p>
           </div>
@@ -340,22 +350,48 @@ export function BudgetCalculatorSection() {
           </span>
         </motion.div>
 
-        {/* ── Progress bar ──────────────────────────────────────────── */}
+        {/* ── Progress: 4 rieles segmentados con readout font-mono ──────
+            El riel activo arranca con carga parcial: el avance nunca se ve
+            en 0% (lenguaje instrumento, no formulario vacío). */}
         <div
           className="mb-8"
           data-hover
           data-inspector-title="Barra de progreso del wizard"
-          data-inspector-desc="Muestra avance sin obligar a completar. Reduce ansiedad y abandono: el visitante sabe exactamente cuánto falta."
+          data-inspector-desc="Cuatro rieles segmentados, uno por pregunta, con su label técnico. El riel activo ya muestra carga parcial: el avance nunca arranca en cero. Reduce ansiedad y abandono."
           data-inspector-cat="UX · Motion"
         >
-          <div className="h-1 w-full rounded-full overflow-hidden bg-[var(--color-surface-high)]">
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: 'var(--color-primary)' }}
-              initial={{ width: '0%' }}
-              animate={{ width: `${(step / totalSteps) * 100}%` }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            />
+          <div aria-hidden className="grid grid-cols-4 gap-2">
+            {STEP_RAIL_LABELS.map((label, i) => {
+              const filled = step > i
+              const active = step === i
+              return (
+                <div key={label}>
+                  <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--color-surface-high)]">
+                    <motion.div
+                      className="h-full w-full origin-left rounded-full"
+                      style={{ background: 'var(--color-primary)' }}
+                      initial={false}
+                      animate={{ scaleX: filled ? 1 : active ? 0.3 : 0 }}
+                      transition={
+                        prefersReducedMotion
+                          ? { duration: 0 }
+                          : { duration: DUR_BASE, ease: EASE_OUT }
+                      }
+                    />
+                  </div>
+                  <span
+                    className={cn(
+                      'mt-1.5 block font-mono text-[9px] font-bold uppercase tracking-[0.18em] transition-colors duration-200',
+                      filled || active
+                        ? 'text-[var(--color-primary)]'
+                        : 'text-[var(--color-on-surface-variant)] opacity-60',
+                    )}
+                  >
+                    {label}
+                  </span>
+                </div>
+              )
+            })}
           </div>
           <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-wider text-[var(--color-on-surface-variant)]">
             <div className="flex items-center gap-3">
@@ -363,7 +399,7 @@ export function BudgetCalculatorSection() {
                 <button
                   type="button"
                   onClick={goBack}
-                  className="group inline-flex items-center gap-1 rounded opacity-70 hover:opacity-100 hover:text-[var(--color-primary)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                  className="group inline-flex items-center gap-1 rounded opacity-70 transition-[color,opacity] duration-200 hover:opacity-100 hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                   aria-label="Volver al paso anterior"
                 >
                   <ArrowRightIcon className="size-3 rotate-180 transition-transform duration-200 group-hover:-translate-x-0.5" aria-hidden />
@@ -378,7 +414,7 @@ export function BudgetCalculatorSection() {
               <button
                 type="button"
                 onClick={reset}
-                className="rounded opacity-60 hover:opacity-100 hover:text-[var(--color-primary)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                className="rounded opacity-60 transition-[color,opacity] duration-200 hover:opacity-100 hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
               >
                 Reiniciar
               </button>
@@ -546,52 +582,95 @@ export function BudgetCalculatorSection() {
                 exit={prefersReducedMotion ? undefined : 'exit'}
                 transition={STEP_TRANSITION}
               >
-                <div className="mb-1 flex items-center gap-2">
-                  <span
-                    className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
+                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-4">
+                  {result.baseLabel}
+                </h3>
+
+                {/* ── Readout instrumento: superficie propia + hairline + ticket ── */}
+                <motion.div
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 10, filter: 'blur(6px)' }}
+                  animate={
+                    prefersReducedMotion
+                      ? { opacity: 1 }
+                      : { opacity: 1, y: 0, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }
+                  }
+                  transition={{
+                    duration: DUR_SLOW,
+                    ease: EASE_OUT,
+                    delay: prefersReducedMotion ? 0 : 0.1,
+                  }}
+                  className="relative mb-6 overflow-hidden rounded-xl p-5"
+                  style={{
+                    border: '1px solid rgba(var(--color-primary-rgb), 0.35)',
+                    background: 'rgba(var(--color-primary-rgb), 0.04)',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-px"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.4) 50%, transparent)',
+                    }}
+                  />
+                  <p
+                    className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.3em]"
                     style={{ color: 'var(--color-primary)' }}
                   >
                     Estimado
-                  </span>
-                </div>
-                <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[var(--color-on-surface)] mb-1">
-                  {result.baseLabel}
-                </h3>
-                {result.hasFixedPrice ? (
-                  <>
-                    <motion.div
-                      initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.94 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: prefersReducedMotion ? 0 : 0.1 }}
-                      className="font-heading text-4xl sm:text-5xl font-extrabold tabular-nums mb-2"
+                  </p>
+
+                  {result.hasFixedPrice ? (
+                    <>
+                      {/* Ticket: prefijo ARS extralight (200 real) + cifra extrabold font-mono */}
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
+                        <span className="text-lg font-extralight uppercase tracking-wide text-[var(--color-on-surface-variant)]">
+                          ARS
+                        </span>
+                        <span
+                          className="font-mono text-4xl font-extrabold tabular-nums sm:text-5xl"
+                          style={{ color: 'var(--color-primary)' }}
+                        >
+                          <CountUpPrice value={result.base} />
+                        </span>
+                        {result.isMonthly && (
+                          <span className="text-base font-semibold text-[var(--color-on-surface-variant)]">
+                            /mes
+                          </span>
+                        )}
+                      </div>
+                      <motion.div
+                        initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, ease: EASE_OUT, delay: prefersReducedMotion ? 0 : 0.45 }}
+                        className="mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+                        style={{
+                          backgroundColor: 'rgba(var(--color-primary-rgb), 0.08)',
+                          color: 'var(--color-primary)',
+                          border: '1px solid rgba(var(--color-primary-rgb), 0.2)',
+                        }}
+                      >
+                        <CheckIcon className="size-3.5" />
+                        {result.isMonthly ? (
+                          <>Fee mensual: desarrollo activo, soporte y mejoras</>
+                        ) : (
+                          <>
+                            3 cuotas sin interés de{' '}
+                            <span className="tabular-nums">{formatARS(result.installment)}</span>
+                          </>
+                        )}
+                      </motion.div>
+                    </>
+                  ) : (
+                    <div
+                      className="font-heading text-2xl font-extrabold sm:text-3xl"
                       style={{ color: 'var(--color-primary)' }}
                     >
-                      <CountUpPrice value={result.base} />
-                    </motion.div>
-                    <motion.div
-                      initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1], delay: prefersReducedMotion ? 0 : 0.45 }}
-                      className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-6 text-xs font-semibold"
-                      style={{
-                        backgroundColor: 'rgba(var(--color-primary-rgb), 0.08)',
-                        color: 'var(--color-primary)',
-                        border: '1px solid rgba(var(--color-primary-rgb), 0.2)',
-                      }}
-                    >
-                      <CheckIcon className="size-3.5" />
-                      3 cuotas sin interés de{' '}
-                      <span className="tabular-nums">{formatARS(result.installment)}</span>
-                    </motion.div>
-                  </>
-                ) : (
-                  <div
-                    className="font-heading text-2xl sm:text-3xl font-extrabold mb-6"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
-                    Lo definimos juntos
-                  </div>
-                )}
+                      Lo definimos juntos
+                    </div>
+                  )}
+                </motion.div>
 
                 {result.notes.length > 0 && (
                   <div
@@ -631,8 +710,9 @@ export function BudgetCalculatorSection() {
                       'btn-tech inline-flex flex-1 items-center justify-center gap-2.5 min-h-12 rounded-xl px-6 text-sm font-semibold text-white select-none',
                       'transition-transform duration-200 ease-out hover:scale-[1.02]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                      WA_SHADOW_CLASS,
                     )}
-                    style={{ background: WA_GRADIENT, boxShadow: WA_SHADOW }}
+                    style={{ background: WA_GRADIENT }}
                   >
                     <WhatsAppIcon className="size-4" />
                     Validar con Manuel por WhatsApp
@@ -679,7 +759,7 @@ function OptionButton({
       onClick={onClick}
       aria-pressed={selected}
       whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-      transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.12, ease: EASE_OUT }}
       className={cn(
         'group relative flex items-start gap-3 rounded-xl border p-4 text-left transition-[border-color,background-color,box-shadow] duration-200',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-low)]',
@@ -688,6 +768,31 @@ function OptionButton({
           : 'border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.3)] hover:bg-[rgba(var(--color-primary-rgb),0.025)]',
       )}
     >
+      {/* Esquina HUD — se enciende con la selección (lenguaje instrumento) */}
+      <span
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute right-0 top-0 size-3 rounded-tr-xl border-r-2 border-t-2 transition-colors duration-300',
+          selected
+            ? 'border-[rgba(var(--color-primary-rgb),0.7)]'
+            : 'border-transparent group-hover:border-[rgba(var(--color-primary-rgb),0.25)]',
+        )}
+      />
+      <AnimatePresence initial={false}>
+        {selected && (
+          <motion.span
+            key="sel-tick"
+            aria-hidden
+            initial={prefersReducedMotion ? false : { opacity: 0, x: 4 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, x: 4 }}
+            transition={{ duration: 0.15, ease: EASE_OUT }}
+            className="pointer-events-none absolute right-2.5 top-2 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-primary)]"
+          >
+            ▸ SEL
+          </motion.span>
+        )}
+      </AnimatePresence>
       <span
         className={cn(
           'flex shrink-0 size-5 items-center justify-center rounded-full border mt-0.5 transition-colors duration-200',
@@ -704,7 +809,7 @@ function OptionButton({
               initial={prefersReducedMotion ? false : { scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={prefersReducedMotion ? undefined : { scale: 0, opacity: 0 }}
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.18, ease: EASE_OUT }}
               className="inline-flex"
             >
               <CheckIcon className="size-3" style={{ color: 'var(--color-surface-base)' }} />

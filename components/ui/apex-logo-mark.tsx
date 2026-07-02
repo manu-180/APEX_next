@@ -11,6 +11,9 @@ export function ApexLogoMark({ className, priority = false }: ApexLogoMarkProps)
     <span
       className={cn(
         'relative flex h-8 w-8 shrink-0 overflow-hidden rounded-full shadow-glow-sm ring-1 ring-[rgba(var(--color-primary-rgb),0.15)]',
+        // Hover vía `group` del contenedor (spec §8): solo ring/box-shadow.
+        // Donde el padre no tiene `group` (drawer, footer) queda estático.
+        'transition-shadow duration-300 ease-out group-hover:ring-[rgba(var(--color-primary-rgb),0.45)]',
         className
       )}
     >

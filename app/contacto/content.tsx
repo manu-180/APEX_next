@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   motion,
   AnimatePresence,
+  useAnimationControls,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -31,6 +32,8 @@ import {
 } from '@/lib/constants'
 import { useBooking } from '@/hooks/useBooking'
 import { useGsapReveal } from '@/hooks/useGsapReveal'
+import { DELAY_AFTER_PANEL, DUR_REVEAL, EASE_OUT, SPRING_FOCUS } from '@/lib/motion'
+import { WA_GRADIENT, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
 import { bookingWhatsappLocalToE164, BOOKING_WA_LOCAL_DIGITS } from '@/lib/booking-phone'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils/cn'
@@ -59,7 +62,7 @@ const focusRing =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]'
 
 const inputBase =
-  'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-all duration-200'
+  'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-[border-color,box-shadow,transform,background-color] duration-200'
 
 /* Light: campos blancos nítidos — borde tinta visible y foco con anillo del tema.
    Dark conserva el borde surface-high y el glow original. */
@@ -70,10 +73,12 @@ const inputFocus =
 const inputClassName = cn(inputBase, inputIdle, inputFocus)
 
 const microLabel =
-  'mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-on-surface-variant)]'
+  'mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-on-surface-variant)] transition-colors duration-150'
 
 /* ────────────────────────────────────────────────────────────────────────
    FormField — micro-interacción de foco (respeta reduced motion)
+   Foco: micro-lift con SPRING_FOCUS + el label se enciende en primary
+   (vía focus-within, el microLabel ya trae transition-colors).
    ──────────────────────────────────────────────────────────────────────── */
 function FormField({ children, className }: { children: React.ReactNode; className?: string }) {
   const [focused, setFocused] = useState(false)
@@ -81,9 +86,9 @@ function FormField({ children, className }: { children: React.ReactNode; classNa
 
   return (
     <motion.div
-      className={cn('relative', className)}
-      animate={!prefersReducedMotion && focused ? { y: -1 } : { y: 0 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
+      className={cn('relative [&:focus-within_label]:text-[var(--color-primary)]', className)}
+      animate={!prefersReducedMotion && focused ? { y: -2, scale: 1.005 } : { y: 0, scale: 1 }}
+      transition={{ type: 'spring', ...SPRING_FOCUS }}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={() => setFocused(false)}
     >
@@ -153,7 +158,7 @@ export function ContactoContent() {
           <SectionReveal>
             <div className="max-w-2xl">
               <p className="editorial-label editorial-label--primary mb-6">Contacto directo</p>
-              <h1 className="heading-display text-balance text-4xl sm:text-5xl md:text-6xl mb-5">
+              <h1 className="heading-display heading-display--tight text-balance text-4xl sm:text-5xl md:text-6xl mb-5">
                 <span className="block text-[var(--color-on-surface-variant)]">Tenés el proyecto.</span>
                 <strong className="block text-[var(--color-on-surface)]">Elegí cómo arrancamos.</strong>
               </h1>
@@ -213,13 +218,17 @@ const WA_PANEL_CLAIMS = [
 function WhatsAppNowPanel() {
   return (
     <SectionReveal className="h-full">
+      {/* Panel de decisión E3: double-bezel (--framed) + grain (.noise-overlay).
+          El padding vive en el wrapper interior porque el shell reserva el
+          bezel-pad; el z-10 deja el contenido sobre el grain. */}
       <article
-        className="bento-surface relative flex h-full flex-col p-7 sm:p-9"
+        className="bento-surface bento-surface--framed noise-overlay relative flex h-full flex-col"
         data-hover
         data-inspector-title="La vía rápida"
         data-inspector-desc="CTA primario de la página: abre WhatsApp con mensaje prellenado y deja esta pestaña en /gracias. El tracking de conversión vive centralizado en openWhatsAppWithThankYouPage."
         data-inspector-cat="UX · Conversión"
       >
+      <div className="relative z-10 flex h-full flex-1 flex-col p-7 sm:p-9">
         {/* Stroke 0.14 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
         <span
           aria-hidden="true"
@@ -256,14 +265,12 @@ function WhatsAppNowPanel() {
             className={cn(
               'group inline-flex w-full select-none items-center justify-center gap-3',
               'h-14 rounded-2xl px-6 text-base font-bold text-white sm:h-16 sm:text-lg',
-              'transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
-              // Light: apoyo navy + verde profundo (patrón .btn-wa); dark conserva el glow original
-              'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_14px_30px_-12px_rgba(18,140,126,0.45)] dark:shadow-[0_14px_34px_-12px_rgba(37,211,102,0.5)]',
+              'transition-[transform,box-shadow] duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] motion-reduce:hover:scale-100',
+              // Verde sagrado + sombra estándar desde la fuente única (lib/constants/whatsapp-ui)
+              WA_SHADOW_CLASS_LG,
               focusRing,
             )}
-            style={{
-              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-            }}
+            style={{ background: WA_GRADIENT }}
             data-hover
             data-inspector-title="Escribirme por WhatsApp"
             data-inspector-desc="Mensaje prellenado contextual de /contacto. Abre wa.me en pestaña nueva y esta queda en /gracias."
@@ -280,6 +287,7 @@ function WhatsAppNowPanel() {
             Atiendo yo, no un call center.
           </p>
         </div>
+      </div>
       </article>
     </SectionReveal>
   )
@@ -288,6 +296,17 @@ function WhatsAppNowPanel() {
 /* ────────────────────────────────────────────────────────────────────────
    Opción B — Agendar reunión (booking existente, lógica intacta)
    ──────────────────────────────────────────────────────────────────────── */
+
+/** Validación de formato para feedback visual del email — NO gatea el envío
+ *  (las guardas de handleSubmit quedan intactas). */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** Micro-shake del campo incompleto (transform-only, one-shot). */
+const SHAKE_KEYFRAMES = {
+  x: [0, -6, 6, -4, 4, 0],
+  transition: { duration: 0.4 },
+}
+
 function BookingCalendar() {
   const {
     supabaseReady,
@@ -321,6 +340,12 @@ function BookingCalendar() {
     hour: number
     method: 'whatsapp' | 'email'
   } | null>(null)
+
+  /* ── Feedback inline de validación — SOLO feedback encima del flujo:
+        handleSubmit, confirmBooking y sus guardas quedan intactos. ── */
+  const [emailTouched, setEmailTouched] = useState(false)
+  const contactShake = useAnimationControls()
+  const hoursShake = useAnimationControls()
 
   /** Días disponibles. Se computan recién al montar porque "hoy" depende del
    *  reloj/huso de quien renderiza: el server (UTC) puede estar en otro día que
@@ -435,24 +460,80 @@ function BookingCalendar() {
     !submitting &&
     (contactMethod === 'email' ? contact.trim().length > 0 : waDigitsOk)
 
+  /** Solo feedback visual: no bloquea el envío (guardas intactas). */
+  const emailInvalid =
+    contactMethod === 'email' &&
+    emailTouched &&
+    contact.trim().length > 0 &&
+    !EMAIL_RE.test(contact.trim())
+
+  /** Micro-shake one-shot del elemento incompleto (gated reduced-motion). */
+  const startShake = (controls: ReturnType<typeof useAnimationControls>) => {
+    if (prefersReducedMotion) return
+    void controls.start(SHAKE_KEYFRAMES)
+  }
+
+  /** El Button deshabilitado lleva `disabled:pointer-events-none`: el click cae
+   *  en el wrapper y disparamos acá el feedback del faltante, sin tocar guardas. */
+  const onBlockedSubmitAttempt = () => {
+    if (canSubmit || submitting) return
+    if (hydrated && !isSunday && selectedHour === null) {
+      startShake(hoursShake)
+      return
+    }
+    if (contactMethod === 'whatsapp' && !waDigitsOk) {
+      startShake(contactShake)
+      document.getElementById('booking-wa')?.focus()
+      return
+    }
+    if (contactMethod === 'email' && contact.trim().length === 0) {
+      setEmailTouched(true)
+      startShake(contactShake)
+      document.getElementById('booking-email')?.focus()
+    }
+  }
+
   if (success) {
     return (
       <SectionReveal className="h-full">
         <div
-          className="bento-surface flex h-full flex-col items-center justify-center p-8 text-center sm:p-10"
+          className="bento-surface bento-surface--framed noise-overlay relative flex h-full flex-col"
           data-hover
           data-inspector-title="Confirmación de agenda"
           data-inspector-desc="Reserva guardada en Supabase; la notificación sale por email (Resend) o WhatsApp (Evolution API) según el canal elegido."
           data-inspector-cat="UX · Motion"
         >
-          <motion.div
-            initial={prefersReducedMotion ? false : { scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="mb-5 flex size-16 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-glow-sm"
-          >
-            <CheckIcon className="size-8" />
-          </motion.div>
+        <div className="relative z-10 flex h-full flex-1 flex-col items-center justify-center p-8 text-center sm:p-10">
+          {/* Check + anillos sonar one-shot (retoman el motivo del header).
+              Transform/opacity only, sin loops, gated reduced-motion. */}
+          <div className="relative mb-5">
+            {!prefersReducedMotion && (
+              <>
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full border-2 border-[var(--color-primary)]"
+                  initial={{ scale: 1, opacity: 0.55 }}
+                  animate={{ scale: 2.1, opacity: 0 }}
+                  transition={{ duration: DUR_REVEAL, delay: DELAY_AFTER_PANEL + 0.12, ease: EASE_OUT }}
+                />
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full border border-[var(--color-primary)]"
+                  initial={{ scale: 1, opacity: 0.4 }}
+                  animate={{ scale: 2.9, opacity: 0 }}
+                  transition={{ duration: DUR_REVEAL, delay: DELAY_AFTER_PANEL + 0.28, ease: EASE_OUT }}
+                />
+              </>
+            )}
+            <motion.div
+              initial={prefersReducedMotion ? false : { scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              className="relative flex size-16 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-glow-sm"
+            >
+              <CheckIcon className="size-8" />
+            </motion.div>
+          </div>
 
           <h3 className="heading-display text-2xl mb-2">
             <strong className="text-[var(--color-on-surface)]">¡Listo, quedó agendado!</strong>
@@ -485,11 +566,13 @@ function BookingCalendar() {
               setContact('')
               setWaLocalDigits('')
               setLastBooking(null)
+              setEmailTouched(false)
             }}
             type="button"
           >
             Reservar otro turno
           </Button>
+        </div>
         </div>
       </SectionReveal>
     )
@@ -497,13 +580,16 @@ function BookingCalendar() {
 
   return (
     <SectionReveal className="h-full" delay={0.08}>
+      {/* Panel de decisión E3: double-bezel (--framed) + grain (.noise-overlay).
+          Padding en el wrapper interior (el shell reserva el bezel-pad). */}
       <article
-        className="bento-surface relative flex h-full flex-col p-6 sm:p-7"
+        className="bento-surface bento-surface--framed noise-overlay relative flex h-full flex-col"
         data-hover
         data-inspector-title="Panel de agenda"
         data-inspector-desc="Días y horarios sincronizados con Supabase; tiempo real y restricción única evitan la doble reserva. Domingos bloqueados por constantes."
         data-inspector-cat="UX · Motion"
       >
+      <div className="relative z-10 flex h-full flex-1 flex-col p-6 sm:p-7">
         {/* Stroke 0.14 solo en dark; en light hereda el 0.34 global (visible sobre porcelana) */}
         <span
           aria-hidden="true"
@@ -605,7 +691,7 @@ function BookingCalendar() {
               aria-busy={loadingSlots || undefined}
               className={cn(
                 'group inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/40 px-2.5 py-1 font-semibold',
-                'transition-all duration-150 hover:bg-red-500/15 active:scale-[0.96]',
+                'transition-[background-color,border-color,transform,opacity] duration-150 hover:bg-red-500/15 active:scale-[0.96]',
                 'disabled:cursor-wait disabled:opacity-60',
                 focusRing
               )}
@@ -628,9 +714,11 @@ function BookingCalendar() {
             Los domingos descanso. Elegí otro día.
           </div>
         ) : (
+          // Solo opacity: animar height fuerza layout en cada frame (spec §1)
           <motion.div
-            initial={prefersReducedMotion ? false : { opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
           >
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <p className={cn(microLabel, 'mb-0')}>Horario</p>
@@ -650,7 +738,12 @@ function BookingCalendar() {
                 ))}
               </div>
             ) : (
-              <div role="group" aria-label="Horarios disponibles" className="mb-5 grid grid-cols-4 gap-2">
+              <motion.div
+                role="group"
+                aria-label="Horarios disponibles"
+                animate={hoursShake}
+                className="mb-5 grid grid-cols-4 gap-2"
+              >
                 {BOOKING_SLOT_HOURS.map((h) => {
                   const ok = isHourSelectable(h)
                   const sel = selectedHour === h
@@ -684,7 +777,7 @@ function BookingCalendar() {
                     </motion.button>
                   )
                 })}
-              </div>
+              </motion.div>
             )}
           </motion.div>
         )}
@@ -746,9 +839,24 @@ function BookingCalendar() {
               transition={{ duration: 0.18 }}
               className="mb-3"
             >
+              {/* Wrapper del micro-shake (feedback al intentar confirmar incompleto) */}
+              <motion.div animate={contactShake}>
               <FormField>
-                <label htmlFor="booking-wa" className={microLabel}>
+                <label
+                  htmlFor="booking-wa"
+                  className={cn(microLabel, 'flex items-baseline justify-between gap-3')}
+                >
                   Tu WhatsApp
+                  {/* Contador vivo de dígitos: se enciende en primary al completar */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'font-mono text-[10px] tabular-nums transition-colors duration-150',
+                      waDigitsOk ? 'text-[var(--color-primary)]' : 'opacity-60'
+                    )}
+                  >
+                    {waLocalDigits.length}/{BOOKING_WA_LOCAL_DIGITS}
+                  </span>
                 </label>
                 <div
                   className={cn(
@@ -783,6 +891,7 @@ function BookingCalendar() {
               <p id="booking-wa-help" className="mt-1.5 text-[11px] text-[var(--color-on-surface-variant)]">
                 Solo los {BOOKING_WA_LOCAL_DIGITS} dígitos después del 11. Te confirmo al toque.
               </p>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
@@ -793,6 +902,8 @@ function BookingCalendar() {
               transition={{ duration: 0.18 }}
               className="mb-3"
             >
+              {/* Wrapper del micro-shake (feedback al intentar confirmar incompleto) */}
+              <motion.div animate={contactShake}>
               <FormField>
                 <label htmlFor="booking-email" className={microLabel}>
                   Tu email
@@ -801,12 +912,29 @@ function BookingCalendar() {
                   id="booking-email"
                   value={contact}
                   onChange={(e) => setContact(e.target.value)}
+                  onBlur={() => setEmailTouched(true)}
                   placeholder="nombre@correo.com"
                   type="email"
-                  className={inputClassName}
+                  aria-invalid={emailInvalid || undefined}
+                  aria-describedby={emailInvalid ? 'booking-email-error' : undefined}
+                  className={cn(
+                    inputClassName,
+                    emailInvalid &&
+                      'border-red-500/60 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:border-red-500/60 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.15)]'
+                  )}
                   autoComplete="email"
                 />
               </FormField>
+              {emailInvalid && (
+                <p
+                  id="booking-email-error"
+                  role="alert"
+                  className="mt-1.5 text-[11px] font-medium text-red-500 dark:text-red-400"
+                >
+                  Ese email no parece válido. Revisalo antes de confirmar.
+                </p>
+              )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -827,23 +955,29 @@ function BookingCalendar() {
           )}
         </AnimatePresence>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          isLoading={submitting}
-          loadingText="Reservando…"
-          variant="primary"
-          className="group mt-auto w-full"
-          type="button"
-          aria-label="Confirmar turno gratis"
-          data-hover
-          data-inspector-title="Confirmar reunión"
-          data-inspector-desc="Mientras se guarda la reserva muestra spinner, se bloquea (aria-busy) y evita el doble envío. El resultado se confirma con un toast y la pantalla de éxito."
-          data-inspector-cat="UX · Formulario"
-        >
-          Confirmar turno gratis
-          <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-        </Button>
+        {/* El Button deshabilitado tiene disabled:pointer-events-none: el click
+            cae en este wrapper y dispara el shake del campo incompleto.
+            Feedback puro — no altera handleSubmit ni sus guardas. */}
+        <div className="mt-auto" onClick={onBlockedSubmitAttempt}>
+          <Button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            isLoading={submitting}
+            loadingText="Reservando…"
+            variant="primary"
+            className="group w-full"
+            type="button"
+            aria-label="Confirmar turno gratis"
+            data-hover
+            data-inspector-title="Confirmar reunión"
+            data-inspector-desc="Mientras se guarda la reserva muestra spinner, se bloquea (aria-busy) y evita el doble envío. El resultado se confirma con un toast y la pantalla de éxito."
+            data-inspector-cat="UX · Formulario"
+          >
+            Confirmar turno gratis
+            <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Button>
+        </div>
+      </div>
       </article>
     </SectionReveal>
   )
@@ -939,10 +1073,11 @@ function ReviewsSection() {
           </SectionReveal>
         ) : (
           /* Lista editorial con stagger GSAP */
+          // divide-[color:…] tiñe los bordes de los HIJOS; el borderColor inline
+          // en el contenedor no llegaba a las hairlines (gris default de preflight)
           <div
             ref={listRef}
-            className="space-y-0 divide-y"
-            style={{ borderColor: 'var(--glass-border)' }}
+            className="space-y-0 divide-y divide-[color:var(--glass-border)]"
             data-hover
             data-inspector-title="Reviews editoriales con GSAP"
             data-inspector-desc="Cada reseña entra escalonada (stagger 120ms) con ScrollTrigger de GSAP. La animación respeta prefers-reduced-motion."

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useLayoutEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -25,6 +25,8 @@ import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-li
 import { WEB_PLANS, APP_PLANS, formatARS, type PricingPlan } from '@/lib/types/services'
 import { PROJECTS, type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { DUR_FAST, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
 
 // Projects that open the full drawer — kept for future use
 const PLAN_RELATED_PROJECTS: Record<string, ThemeId[]> = {
@@ -71,13 +73,27 @@ function ServiciosTabQuerySync({ onSelectMobile }: { onSelectMobile: () => void 
 }
 
 /**
- * Verde oficial WhatsApp — única excepción de hex permitida por DESIGN_BRIEF §2
- * (solo en CTAs de WhatsApp). Todo lo demás usa vars del tema.
+ * Cambio de tab Web/App (spec §9): la grilla entrante cae en cascada — cada
+ * card con y+blur y la curva firma. `mode="wait"` y el useLayoutEffect de
+ * scroll quedan intactos.
  */
-const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
-/** Sombra del CTA: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa). */
-const WA_SHADOW_CLASS =
-  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_10px_26px_-10px_rgba(18,140,126,0.42)] dark:shadow-[0_10px_28px_-10px_rgba(37,211,102,0.45)]'
+const TAB_GRID_VARIANTS: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: STAGGER_BASE } },
+  exit: { opacity: 0, transition: { duration: DUR_FAST, ease: EASE_OUT } },
+}
+
+const TAB_CARD_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 16, filter: 'blur(6px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    // Limpia el backdrop-root residual (mismo patrón que SectionReveal)
+    transitionEnd: { filter: 'none' },
+    transition: { duration: DUR_SLOW, ease: EASE_OUT },
+  },
+}
 
 /**
  * Tier ancla por pestaña (AUDIT_ADDENDUM: UN solo badge de ancla — «Más elegido»
@@ -96,6 +112,7 @@ const PLAN_DERISKERS: Record<string, string[]> = {
 }
 
 export function ServiciosContent() {
+  const prefersReducedMotion = useReducedMotion()
   const [tab, setTab] = useState<'web' | 'mobile'>('web')
   /** Drawer de detalle por plan (solo uno abierto a la vez). */
   const [openPlanDrawerId, setOpenPlanDrawerId] = useState<string | null>(null)
@@ -197,7 +214,7 @@ export function ServiciosContent() {
         <ServiciosTabQuerySync onSelectMobile={selectMobileTab} />
       </Suspense>
       {/* Pricing cards */}
-      <section id="pricing" className="py-16 pb-24">
+      <section id="pricing" className="scroll-mt-24 py-16 pb-24">
         <div className="mx-auto max-w-6xl px-6">
           <SectionReveal>
             <div className="mb-12 flex items-end justify-between gap-6">
@@ -226,7 +243,7 @@ export function ServiciosContent() {
             <motion.div
               className="sticky top-16 z-30 -mx-2 px-2 py-2 md:static md:top-auto md:z-auto md:mx-0 md:px-0 md:py-0"
               animate={{ opacity: isTabSticky ? 1 : 0.92 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+              transition={{ duration: 0.2, ease: EASE_OUT }}
               style={{
                 background: isTabSticky ? 'var(--color-surface)' : 'transparent',
                 backdropFilter: isTabSticky ? 'blur(8px)' : 'blur(0px)',
@@ -278,25 +295,27 @@ export function ServiciosContent() {
           <AnimatePresence mode="wait">
             <motion.div
               key={tab}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+              variants={prefersReducedMotion ? undefined : TAB_GRID_VARIANTS}
+              initial={prefersReducedMotion ? false : 'hidden'}
+              whileInView={prefersReducedMotion ? undefined : 'visible'}
+              viewport={{ once: true, amount: 0.1 }}
+              animate={prefersReducedMotion ? { opacity: 1 } : undefined}
+              exit={prefersReducedMotion ? { opacity: 0, transition: { duration: 0 } } : 'exit'}
               className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
             >
-              {plans.map((plan, i) => (
-                <div
+              {plans.map((plan) => (
+                <motion.div
                   key={plan.id}
-                  className={ANCHOR_PLAN_IDS.has(plan.id) ? 'md:-mt-4 md:mb-4' : ''}
+                  variants={prefersReducedMotion ? undefined : TAB_CARD_VARIANTS}
+                  className={cn('h-full', ANCHOR_PLAN_IDS.has(plan.id) && 'md:-mt-4 md:mb-4')}
                 >
                   <UnifiedPricingCard
                     plan={plan}
-                    index={i}
                     onOpenDrawer={() => setOpenPlanDrawerId(plan.id)}
                     isDrawerOpen={openPlanDrawerId === plan.id}
                     deriskers={PLAN_DERISKERS[plan.id]}
                   />
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </AnimatePresence>
@@ -428,13 +447,11 @@ function ServicePlanDrawer({
 
 function UnifiedPricingCard({
   plan,
-  index,
   onOpenDrawer,
   isDrawerOpen,
   deriskers,
 }: {
   plan: PricingPlan
-  index: number
   onOpenDrawer: () => void
   isDrawerOpen: boolean
   deriskers?: string[]
@@ -442,20 +459,18 @@ function UnifiedPricingCard({
   const isAnchor = ANCHOR_PLAN_IDS.has(plan.id)
 
   return (
-    <SectionReveal delay={index * 0.1} className="h-full">
-      {/* Ancla en light: superficie blanca elevada con sombra navy estratificada
-          (el glow 60px es lenguaje de dark); dark conserva el render original. */}
+    <>
+      {/* Ancla: superficie E3 — double-bezel + noise (spec §3/§6), única de la
+          sección. El resto queda en glass E2. El reveal lo maneja el stagger
+          del contenedor de tabs (TAB_CARD_VARIANTS). */}
       <div
         className={cn(
           'group/card relative h-full overflow-hidden rounded-2xl transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none',
           isAnchor
             ? cn(
+                'bento-surface--framed noise-overlay rounded-[var(--radius-shell)]',
                 'border border-[rgba(var(--color-primary-rgb),0.6)]',
-                'bg-[var(--color-surface-lowest)] dark:bg-[var(--color-surface-high)]',
-                'shadow-[0_2px_6px_rgba(24,32,60,0.05),0_24px_56px_-20px_rgba(24,32,60,0.20),0_0_28px_-10px_rgba(var(--color-primary-rgb),0.25),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]',
-                'hover:shadow-[0_4px_10px_rgba(24,32,60,0.07),0_32px_64px_-20px_rgba(24,32,60,0.26),0_0_36px_-10px_rgba(var(--color-primary-rgb),0.35),0_0_0_1px_rgba(var(--color-primary-rgb),0.12)]',
-                'dark:shadow-[0_0_60px_rgba(var(--color-primary-rgb),0.18),0_0_0_1px_rgba(var(--color-primary-rgb),0.08)]',
-                'dark:hover:shadow-[0_0_72px_rgba(var(--color-primary-rgb),0.26),0_0_0_1px_rgba(var(--color-primary-rgb),0.14)]',
+                'hover:shadow-[var(--shadow-card-hover)]',
               )
             : cn(
                 'glass-card border border-[var(--glass-border)] hover:border-[rgba(var(--color-primary-rgb),0.3)]',
@@ -512,18 +527,28 @@ function UnifiedPricingCard({
             {plan.name}
           </h3>
 
-          {/* Price block — sin tachados ni "-XX%": el precio es el precio */}
+          {/* Price block — sin tachados ni "-XX%": el precio es el precio.
+              Ticket con contraste 200/800 (spec §10): prefijo ARS extralight
+              REAL junto a la cifra extrabold. */}
           <div className="mb-4 pb-4" style={{ borderBottom: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
             {plan.price !== null ? (
               <>
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0">
                   <span
                     className={cn(
+                      'font-extralight uppercase tracking-wide',
+                      isAnchor ? 'text-xl text-[var(--color-primary)]' : 'text-lg text-[var(--color-on-surface-variant)]',
+                    )}
+                  >
+                    ARS
+                  </span>
+                  <span
+                    className={cn(
                       'font-extrabold tracking-tight tabular-nums',
                       isAnchor ? 'text-[2.75rem] leading-none text-[var(--color-primary)]' : 'text-4xl text-[var(--color-on-surface)]',
                     )}
                   >
-                    {formatARS(plan.price)}
+                    {formatARS(plan.price).replace(/^\$\s?/, '')}
                   </span>
                   {plan.billing === 'month' && (
                     <span className="text-base font-semibold text-[var(--color-on-surface-variant)]">/mes</span>
@@ -612,7 +637,7 @@ function UnifiedPricingCard({
               onClick={onOpenDrawer}
               aria-expanded={isDrawerOpen}
               aria-controls={`service-plan-drawer-${plan.id}`}
-              className="group/detail inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent px-4 text-sm font-medium text-[var(--color-on-surface-variant)] transition-all duration-200 hover:border-[rgba(var(--color-primary-rgb),0.25)] hover:text-[var(--color-primary)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+              className="group/detail inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent px-4 text-sm font-medium text-[var(--color-on-surface-variant)] transition-[border-color,color,transform] duration-200 hover:border-[rgba(var(--color-primary-rgb),0.25)] hover:text-[var(--color-primary)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
             >
               Ver detalle completo
               <ArrowRightIcon className="size-4 opacity-60 transition-transform duration-200 group-hover/detail:translate-x-0.5 group-hover/detail:opacity-100" />
@@ -620,7 +645,7 @@ function UnifiedPricingCard({
           </div>
         </div>
       </div>
-    </SectionReveal>
+    </>
   )
 }
 

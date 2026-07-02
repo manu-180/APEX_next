@@ -1,15 +1,26 @@
 'use client'
 
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import {
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CodeRainBg } from '@/components/ui/code-rain-bg'
 import { TiltCard } from '@/components/ui/tilt-card'
+import { REVEAL_ITEM_VARIANTS } from '@/components/ui/section-reveal'
 import { ArrowRightIcon, ExternalLinkIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { PROJECTS, ROUTES } from '@/lib/constants'
+import { DUR_REVEAL, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils/cn'
 
@@ -18,17 +29,9 @@ import { cn } from '@/lib/utils/cn'
    llms.txt y claims ya publicados en el sitio (footer: respuesta <1 h).
    ──────────────────────────────────────────────────────────────────────────── */
 
-const YEARS_EXP = new Date().getFullYear() - 2021
-
 /** Mensaje prellenado propio de esta página (el tracking vive en WhatsAppOutboundLink). */
 const WA_MSG_SOBRE_MI =
   'Hola Manuel, leí tu página y me interesa trabajar con vos. Tengo un proyecto para contarte. ¿Lo charlamos?'
-
-const HERO_METRICS = [
-  { value: `${YEARS_EXP}+`, label: 'años construyendo software' },
-  { value: '8+', label: 'productos y sitios en producción' },
-  { value: '<1 h', label: 'respuesta por WhatsApp' },
-] as const
 
 const FICHA_ROWS = [
   { label: 'Disponibilidad', value: '1-2 proyectos por vez' },
@@ -46,16 +49,26 @@ const PRINCIPIOS = [
 ] as const
 
 /* Botón de dinero: SIEMPRE sólido verde WhatsApp (jerarquía del addendum).
-   #25D366/#128C7E es la única excepción de hex permitida (elemento WhatsApp). */
+   Gradiente y sombra desde la fuente única lib/constants/whatsapp-ui (spec §12).
+   Hover: overlay white/10 por opacity (nada de brightness) + iconos cinéticos. */
 const WA_BTN_CLASS =
-  'inline-flex items-center justify-center gap-2.5 rounded-xl font-bold text-white select-none ' +
-  'transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] ' +
+  'group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-xl font-bold text-white select-none ' +
+  'transition-[transform,box-shadow] duration-300 hover:scale-[1.02] active:scale-[0.98] motion-reduce:hover:scale-100 ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] ' +
-  // Sombra: glow verde en dark; en light, apoyo navy + verde profundo (patrón .btn-wa)
-  'shadow-[0_2px_5px_rgba(24,32,60,0.08),0_4px_18px_rgba(18,140,126,0.30)] dark:shadow-[0_4px_20px_rgba(37,211,102,0.3)]'
+  WA_SHADOW_CLASS
 
 const WA_BTN_STYLE: CSSProperties = {
-  background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+  background: WA_GRADIENT,
+}
+
+/** Overlay de hover del CTA WhatsApp: solo opacity (compositado). */
+function WaHoverOverlay() {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+    />
+  )
 }
 
 const DIRECT_BENEFITS = [
@@ -138,8 +151,107 @@ const STACK_BENEFITS = [
 ] as const
 
 /* ────────────────────────────────────────────────────────────────────────────
+   Screenshots reales de la "prueba de capacidad" — mapa estático de rutas.
+   Los archivos viven en public/projects/showcase/ (compartidos con el
+   muestrario). Si un producto no tiene entrada (o la imagen falla en runtime),
+   la celda cae al monograma outline (.section-number).
+   ──────────────────────────────────────────────────────────────────────────── */
+const PRODUCT_SHOTS: Partial<Record<(typeof PRODUCTOS)[number]['name'], string>> = {
+  Handy: '/projects/showcase/handy.webp',
+  Assistify: '/projects/showcase/assistify.webp',
+  'Byluma Invita': '/projects/showcase/luma-invita.webp',
+  'Mi Lugar en el Mundo': '/projects/showcase/moda.webp',
+}
+
+/**
+ * Preview visual de la celda bento: screenshot real con máscara de gradiente
+ * a transparente + borde hairline; hover translate/scale transform-only con
+ * la curva firma (`ease-out` ya apunta a var(--ease-out)). Fallback: monograma
+ * outline reutilizando .section-number. Sin noise encima (spec §6).
+ */
+function ProductShot({ name }: { name: (typeof PRODUCTOS)[number]['name'] }) {
+  const [failed, setFailed] = useState(false)
+  const src = PRODUCT_SHOTS[name]
+  const showImage = Boolean(src) && !failed
+
+  return (
+    <div
+      className="relative mt-auto aspect-[16/9] overflow-hidden rounded-lg border border-[var(--glass-border)]"
+      aria-hidden="true"
+    >
+      {showImage ? (
+        <Image
+          src={src as string}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 40vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover object-top transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:scale-100"
+          style={{
+            maskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+          }}
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        /* Fallback: monograma outline sobre tinte sutil del tema */
+        <div
+          className="flex h-full items-center justify-center"
+          style={{ background: 'rgba(var(--color-primary-rgb), 0.05)' }}
+        >
+          <span
+            className="section-number transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            style={{ fontSize: '4rem' } as CSSProperties}
+          >
+            {name[0]}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Count-up de métricas del hero — useMotionValue + animate (cero re-renders:
+   el MotionValue se renderiza directo como hijo de motion.span). Con
+   reduced-motion o valores no numéricos ("<1 h") queda estático.
+   ──────────────────────────────────────────────────────────────────────────── */
+function CountUpValue({ value }: { value: string }) {
+  const prefersReducedMotion = useReducedMotion()
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-40px' })
+
+  const match = /^(\d+)([\s\S]*)$/.exec(value)
+  const target = match ? parseInt(match[1], 10) : 0
+  const suffix = match ? match[2] : ''
+
+  const count = useMotionValue(0)
+  const rounded = useTransform(count, (v) => String(Math.round(v)))
+
+  const animatable = Boolean(match) && !prefersReducedMotion
+
+  useEffect(() => {
+    if (!animatable || !inView) return
+    const controls = animate(count, target, { duration: DUR_REVEAL, ease: EASE_OUT })
+    return () => controls.stop()
+    // `count` es estable (useMotionValue); target/inView son las deps reales.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animatable, inView, target])
+
+  if (!animatable) return <span ref={ref}>{value}</span>
+
+  return (
+    <span ref={ref}>
+      <motion.span>{rounded}</motion.span>
+      {suffix}
+    </span>
+  )
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
    Reveal — wrapper scroll-reveal propio con `useReducedMotion()` (contrato de
    FOUNDATION_NOTES: los `initial={{opacity:0}}` de Framer necesitan el hook).
+   Upgrade v2: reveal firma del spec §2 (y+blur one-shot, curva firma) con
+   offset `x` opcional para entradas laterales.
    ──────────────────────────────────────────────────────────────────────────── */
 
 /**
@@ -198,29 +310,107 @@ function Reveal({
   children,
   className,
   delay = 0,
+  x = 0,
 }: {
   children: ReactNode
   className?: string
   delay?: number
+  /** Offset horizontal de entrada (px). Si se define, reemplaza al y vertical. */
+  x?: number
 }) {
   const prefersReducedMotion = useReducedMotion()
   return (
     <motion.div
       className={className}
-      initial={prefersReducedMotion ? false : { opacity: 0, y: 32 }}
-      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+      initial={
+        prefersReducedMotion
+          ? false
+          : { opacity: 0, x, y: x === 0 ? 28 : 0, filter: 'blur(6px)' }
+      }
+      whileInView={
+        prefersReducedMotion
+          ? undefined
+          : {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              filter: 'blur(0px)',
+              // Un filter residual crea un backdrop-root y rompería los
+              // backdrop-filter internos: se limpia al terminar (ver SectionReveal).
+              transitionEnd: { filter: 'none' },
+            }
+      }
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: DUR_REVEAL, delay, ease: EASE_OUT }}
     >
       {children}
     </motion.div>
   )
 }
 
-export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: boolean }) {
+export function SobreMiContent({
+  hasFounderPhoto = false,
+  yearsExp = 5,
+}: {
+  hasFounderPhoto?: boolean
+  /** Se calcula en el server (page.tsx) para evitar el mismatch de hidratación
+   *  que producía `new Date()` en el módulo cliente. */
+  yearsExp?: number
+}) {
   const headerRef = useRef<HTMLElement>(null)
   const bgCursorRef = useRef({ x: -1, y: -1, active: false })
   const prefersReducedMotion = useReducedMotion()
+
+  const heroMetrics = [
+    { value: `${yearsExp}+`, label: 'años construyendo software' },
+    { value: '8+', label: 'productos y sitios en producción' },
+    { value: '<1 h', label: 'respuesta por WhatsApp' },
+  ] as const
+
+  /* ── Narrativa scroll-driven (§02): línea vertical de progreso que conecta
+        los beneficios 01→03. GSAP ScrollTrigger con scrub, transform-only,
+        gated por gsap.matchMedia — con reduced-motion la línea queda estática
+        (estado final por CSS). Patrón de referencia: useGsapReveal. ── */
+  const benefitsRef = useRef<HTMLDivElement>(null)
+  const progressLineRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const container = benefitsRef.current
+    const line = progressLineRef.current
+    if (!container || !line) return
+
+    let cleanup: (() => void) | undefined
+
+    void (async () => {
+      const gsap = (await import('gsap')).default
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const mm = gsap.matchMedia()
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.fromTo(
+          line,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: 'none',
+            transformOrigin: 'top center',
+            scrollTrigger: {
+              trigger: container,
+              start: 'top 75%',
+              end: 'bottom 55%',
+              scrub: 0.6,
+            },
+          }
+        )
+      })
+      cleanup = () => mm.revert()
+    })()
+
+    return () => cleanup?.()
+  }, [])
+
   const { scrollYProgress } = useScroll({ target: headerRef, offset: ['start start', 'end start'] })
   const headerOpacity = useTransform(scrollYProgress, [0.4, 1], [1, 0])
   const headerMask = useTransform(scrollYProgress, [0.2, 0.8],
@@ -268,7 +458,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
             <Reveal>
               <p className="editorial-label editorial-label--primary mb-6">Sobre mí</p>
 
-              <h1 className="heading-display text-balance text-4xl sm:text-5xl md:text-6xl mb-6">
+              <h1 className="heading-display heading-display--tight text-balance text-4xl sm:text-5xl md:text-6xl mb-6">
                 <span className="block text-[var(--color-on-surface-variant)]">
                   No contratás una agencia.
                 </span>
@@ -294,8 +484,9 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                   className={cn(WA_BTN_CLASS, 'px-7 py-3.5 text-base')}
                   style={WA_BTN_STYLE}
                 >
-                  <WhatsAppIcon className="size-5" />
-                  Escribime por WhatsApp
+                  <WaHoverOverlay />
+                  <WhatsAppIcon className="relative size-5 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:rotate-0 motion-reduce:group-hover:scale-100" />
+                  <span className="relative">Escribime por WhatsApp</span>
                 </WhatsAppOutboundLink>
                 <p className="text-xs leading-snug text-[var(--color-on-surface-variant)] opacity-90">
                   Te respondo en menos de 1 hora.
@@ -303,15 +494,15 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                 </p>
               </div>
 
-              {/* Strip de métricas reales */}
+              {/* Strip de métricas reales — count-up al entrar en viewport */}
               <div className="flex flex-wrap gap-x-10 gap-y-5">
-                {HERO_METRICS.map((m, i) => (
+                {heroMetrics.map((m, i) => (
                   <motion.div
                     key={m.label}
                     initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.25 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.5, delay: 0.25 + i * 0.08, ease: EASE_OUT }}
                     className="border-l-2 pl-4"
                     style={{ borderColor: 'rgba(var(--color-primary-rgb), 0.35)' }}
                   >
@@ -319,7 +510,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                       className="font-heading text-2xl md:text-3xl font-extrabold tabular-nums theme-transition"
                       style={{ color: 'var(--color-primary)' }}
                     >
-                      {m.value}
+                      <CountUpValue value={m.value} />
                     </p>
                     <p className="text-[11px] uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-80 mt-0.5">
                       {m.label}
@@ -340,13 +531,16 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                 01
               </span>
 
+              {/* Superficie E3: double-bezel (--framed) + grain. El padding vive
+                  en el wrapper interior (el shell reserva el bezel-pad). */}
               <div
-                className="relative rounded-2xl glass-card glow-border p-6 md:p-7"
+                className="bento-surface bento-surface--framed noise-overlay relative"
                 data-hover
                 data-inspector-title="Ficha técnica del founder"
                 data-inspector-desc="Tarjeta tipo expediente: quién atiende tu proyecto, con qué condiciones y con qué stack. El punto verde es el mismo indicador de presencia que usa el resto del sitio."
                 data-inspector-cat="Copy · Conversion"
               >
+              <div className="relative z-10 p-6 md:p-7">
                 {/* Cabecera: foto real (o fallback "MN") + nombre */}
                 {/* TODO Manuel: subir public/manuel.jpg */}
                 <div className="flex items-center gap-4 mb-5">
@@ -396,6 +590,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                   ))}
                 </div>
               </div>
+              </div>
             </Reveal>
           </div>
         </div>
@@ -412,7 +607,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
               02
             </span>
             <p className="editorial-label mb-6">Trabajar directo</p>
-            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl">
+            <h2 className="heading-display heading-display--tight text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl">
               <span className="block text-[var(--color-on-surface-variant)]">
                 Una agencia te cobra sus capas.
               </span>
@@ -433,8 +628,20 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
           </Reveal>
 
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
-            {/* Beneficios numerados, editorial */}
-            <div>
+            {/* Beneficios numerados, editorial + línea de progreso scroll-driven */}
+            <div ref={benefitsRef} className="relative lg:pl-8">
+              {/* Línea que se dibuja con el scroll (scaleY vía GSAP scrub).
+                  Estado final visible por defecto: con reduced-motion queda
+                  estática, sin animación. */}
+              <div
+                ref={progressLineRef}
+                aria-hidden="true"
+                className="absolute bottom-2 left-0 top-2 hidden w-px lg:block"
+                style={{
+                  background:
+                    'linear-gradient(to bottom, rgba(var(--color-primary-rgb), 0.5), rgba(var(--color-primary-rgb), 0.08))',
+                }}
+              />
               {DIRECT_BENEFITS.map((b, i) => (
                 <Reveal key={b.n} delay={i * 0.08}>
                   {i > 0 && <div className="divider-theme my-7" aria-hidden="true" />}
@@ -464,8 +671,8 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
               ))}
             </div>
 
-            {/* Honestidad: lo que NO hago */}
-            <Reveal delay={0.2}>
+            {/* Honestidad: lo que NO hago — entra desde la derecha (x:+24) */}
+            <Reveal delay={0.2} x={24}>
               <div
                 className="rounded-2xl p-6 md:p-7 h-full"
                 style={{
@@ -505,23 +712,36 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
             </Reveal>
           </div>
 
-          {/* Principios no negociables — pills (copy oro de la auditoría) */}
-          <Reveal delay={0.1}>
-            <ul className="mt-12 flex flex-wrap gap-2.5" aria-label="Principios de trabajo">
-              {PRINCIPIOS.map((p) => (
-                <li
-                  key={p}
-                  className="rounded-full px-4 py-2 text-xs font-semibold theme-transition text-[var(--color-on-surface)]"
-                  style={{
-                    background: 'rgba(var(--color-primary-rgb), 0.08)',
-                    border: '1px solid rgba(var(--color-primary-rgb), 0.22)',
-                  }}
-                >
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+          {/* Principios no negociables — pills (copy oro de la auditoría).
+              Entrada staggerada por li (STAGGER_BASE) + hover con lift sutil.
+              Base bg/border por clases (no inline) para que el hover gane. */}
+          <motion.ul
+            className="mt-12 flex flex-wrap gap-2.5"
+            aria-label="Principios de trabajo"
+            initial={prefersReducedMotion ? false : 'hidden'}
+            whileInView={prefersReducedMotion ? undefined : 'visible'}
+            viewport={{ once: true, margin: '-60px' }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: STAGGER_BASE, delayChildren: 0.1 } },
+            }}
+          >
+            {PRINCIPIOS.map((p) => (
+              <motion.li
+                key={p}
+                variants={prefersReducedMotion ? undefined : REVEAL_ITEM_VARIANTS}
+                className={cn(
+                  'rounded-full px-4 py-2 text-xs font-semibold text-[var(--color-on-surface)]',
+                  'border border-[rgba(var(--color-primary-rgb),0.22)] bg-[rgba(var(--color-primary-rgb),0.08)]',
+                  'transition-[transform,background-color,border-color] duration-300 ease-out',
+                  'hover:-translate-y-0.5 hover:border-[rgba(var(--color-primary-rgb),0.4)] hover:bg-[rgba(var(--color-primary-rgb),0.14)]',
+                  'motion-reduce:transition-none motion-reduce:hover:translate-y-0'
+                )}
+              >
+                {p}
+              </motion.li>
+            ))}
+          </motion.ul>
         </div>
       </section>
 
@@ -536,7 +756,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
               03
             </span>
             <p className="editorial-label editorial-label--primary mb-6">Prueba de capacidad</p>
-            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl mb-5">
+            <h2 className="heading-display heading-display--tight text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl mb-5">
               <span className="block text-[var(--color-on-surface-variant)]">
                 No te muestro mockups.
               </span>
@@ -585,7 +805,10 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                   <p className="text-sm leading-relaxed text-[var(--color-on-surface-variant)] mb-5">
                     {p.desc}
                   </p>
-                  <p className="mt-auto font-mono text-xs text-[var(--color-on-surface-variant)] opacity-70 transition-colors duration-200 group-hover:text-[var(--color-primary)] group-hover:opacity-100">
+                  {/* Preview real del producto (o monograma outline de fallback):
+                      "no te muestro mockups" ahora muestra el producto de verdad */}
+                  <ProductShot name={p.name} />
+                  <p className="mt-4 font-mono text-xs text-[var(--color-on-surface-variant)] opacity-70 transition-colors duration-200 group-hover:text-[var(--color-primary)] group-hover:opacity-100">
                     {p.domain} ↗
                   </p>
                 </a>
@@ -606,7 +829,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
               04
             </span>
             <p className="editorial-label mb-6">El stack</p>
-            <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl">
+            <h2 className="heading-display heading-display--tight text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl">
               <span className="block text-[var(--color-on-surface-variant)]">
                 Tecnología elegida
               </span>
@@ -701,7 +924,7 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                 <div className="max-w-2xl">
                   <p className="editorial-label editorial-label--primary mb-6">Contacto directo</p>
 
-                  <h2 className="heading-display text-balance text-3xl sm:text-4xl md:text-5xl mb-4">
+                  <h2 className="heading-display heading-display--tight text-balance text-3xl sm:text-4xl md:text-5xl mb-4">
                     <span className="block text-[var(--color-on-surface-variant)]">
                       Trabajo con 1-2 clientes a la vez.
                     </span>
@@ -725,9 +948,10 @@ export function SobreMiContent({ hasFounderPhoto = false }: { hasFounderPhoto?: 
                       className={cn(WA_BTN_CLASS, 'h-14 px-8 text-base')}
                       style={WA_BTN_STYLE}
                     >
-                      <WhatsAppIcon className="size-5" />
-                      Escribime por WhatsApp
-                      <ArrowRightIcon className="size-4" />
+                      <WaHoverOverlay />
+                      <WhatsAppIcon className="relative size-5 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:rotate-0 motion-reduce:group-hover:scale-100" />
+                      <span className="relative">Escribime por WhatsApp</span>
+                      <ArrowRightIcon className="relative size-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
                     </WhatsAppOutboundLink>
                     <Link
                       href={ROUTES.contact}

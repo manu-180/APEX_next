@@ -113,11 +113,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         inspectorActive={inspector.isActive}
         onToggleInspector={inspector.toggle}
       />
+      {/* pt = altura real del navbar (h-14 mobile / h-16 md+) — sin el aire
+          fantasma de 8px que dejaba el 4rem fijo. En inspector-mode la barra
+          del inspector está anclada a 4rem fijo (inspector-overlay), así que
+          ahí el cálculo sigue siendo 4rem + 2.25rem en todos los breakpoints. */}
       <main
         className={
           inspector.isActive
             ? 'min-h-dvh pt-[calc(4rem+2.25rem+env(safe-area-inset-top,0px))]'
-            : 'min-h-dvh pt-[calc(4rem+env(safe-area-inset-top,0px))]'
+            : 'min-h-dvh pt-[calc(3.5rem+env(safe-area-inset-top,0px))] md:pt-[calc(4rem+env(safe-area-inset-top,0px))]'
         }
       >
         {children}

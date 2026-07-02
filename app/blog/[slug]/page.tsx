@@ -11,7 +11,12 @@ import { VERTICALS } from '@/lib/data/verticals'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon } from '@/components/ui/icons'
-import { BlogBlockRenderer } from '@/components/blog/blog-block-renderer'
+import {
+  BlogBlockRenderer,
+  BlogToc,
+  ReadingProgress,
+  type TocHeading,
+} from '@/components/blog/blog-block-renderer'
 import { BreadcrumbJsonLd } from '@/components/seo/json-ld'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
 import { APP_URL } from '@/lib/constants'
@@ -69,6 +74,24 @@ const CATEGORY_LABELS: Record<string, string> = {
   estrategia: 'Estrategia',
 }
 
+/** Texto plano de un bloque con markdown inline (para ids y TOC). */
+function plainText(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .trim()
+}
+
+/** Slug estable para anchors de headings — server-side, misma fuente que el TOC. */
+function slugifyHeading(text: string): string {
+  return plainText(text)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-+|-+$)/g, '')
+}
+
 export default async function BlogPostPage({
   params,
 }: {
@@ -80,6 +103,23 @@ export default async function BlogPostPage({
 
   const url = `${APP_URL.replace(/\/$/, '')}/blog/${post.slug}`
   const related = getRelatedPosts(slug, 3)
+
+  // Anchors por heading (server-side, sin colisiones) + datos del TOC.
+  // La misma lista alimenta los ids del renderer y los links del índice.
+  const seenSlugs = new Map<string, number>()
+  const headingIds = post.blocks.map((block) => {
+    if (block.type !== 'heading') return undefined
+    const base = slugifyHeading(block.text) || 'seccion'
+    const n = seenSlugs.get(base) ?? 0
+    seenSlugs.set(base, n + 1)
+    return n === 0 ? base : `${base}-${n + 1}`
+  })
+  const tocHeadings: TocHeading[] = post.blocks.flatMap((block, i) =>
+    block.type === 'heading'
+      ? [{ id: headingIds[i]!, text: plainText(block.text), level: block.level }]
+      : [],
+  )
+  const firstParagraphIdx = post.blocks.findIndex((b) => b.type === 'paragraph')
 
   // FAQ schema — critical para AEO
   const faqSchema = post.faq.length > 0
@@ -133,6 +173,9 @@ export default async function BlogPostPage({
       <SafeJsonLd data={blogPostingSchema} />
       {faqSchema && <SafeJsonLd data={faqSchema} />}
 
+      {/* Barra de progreso de lectura — 2px bajo el navbar, solo transform */}
+      <ReadingProgress />
+
       {/* ── Hero del post ──────────────────────────────────────────── */}
       <section className="relative pt-24 sm:pt-32 pb-12 overflow-hidden">
         <GridBackground />
@@ -145,7 +188,7 @@ export default async function BlogPostPage({
           }}
         />
 
-        <div className="relative z-10 mx-auto max-w-3xl px-6">
+        <div className="relative z-10 mx-auto max-w-[42rem] px-6">
           <nav className="mb-8 flex items-center gap-2 text-xs text-[var(--color-on-surface-variant)]">
             <Link
               href="/"
@@ -181,7 +224,7 @@ export default async function BlogPostPage({
             </time>
           </div>
 
-          <h1 className="font-heading text-balance text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-[var(--color-on-surface)] mb-6">
+          <h1 className="font-heading text-balance text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-[var(--color-on-surface)] mb-6">
             {post.title}
           </h1>
 
@@ -208,9 +251,24 @@ export default async function BlogPostPage({
 
       {/* ── Contenido del post ─────────────────────────────────────── */}
       <article className="relative pb-16">
-        <div className="mx-auto max-w-3xl px-6">
+        {/* Measure editorial: 42rem ≈ 68ch (spec §10 lectura larga) */}
+        <div className="relative mx-auto max-w-[42rem] px-6">
+          {/* TOC sticky — solo xl, estado activo por IntersectionObserver */}
+          {tocHeadings.length >= 3 && (
+            <aside className="absolute bottom-0 left-full top-0 hidden w-60 pl-10 xl:block">
+              <div className="sticky top-28">
+                <BlogToc headings={tocHeadings} />
+              </div>
+            </aside>
+          )}
+
           {post.blocks.map((block, i) => (
-            <BlogBlockRenderer key={i} block={block} />
+            <BlogBlockRenderer
+              key={i}
+              block={block}
+              headingId={headingIds[i]}
+              isFirst={i === firstParagraphIdx}
+            />
           ))}
 
           {/* FAQ del post — citable por LLMs */}
@@ -290,7 +348,7 @@ export default async function BlogPostPage({
 
       {/* ── CTA + internal linking a páginas money ───────────────────── */}
       <section className="relative pb-4">
-        <div className="mx-auto max-w-3xl px-6">
+        <div className="mx-auto max-w-[42rem] px-6">
           <div
             className="rounded-2xl p-6 sm:p-8 border"
             style={{
@@ -373,8 +431,8 @@ export default async function BlogPostPage({
                   className="group block rounded-xl p-5 border
                     transition-[transform,box-shadow,border-color] duration-300 ease-out will-change-transform
                     hover:-translate-y-1 hover:border-[rgba(var(--color-primary-rgb),0.4)]
-                    hover:shadow-[0_12px_34px_-18px_rgba(var(--color-primary-rgb),0.4)]
-                    active:translate-y-0 active:duration-100
+                    hover:shadow-[var(--shadow-card-hover)]
+                    active:translate-y-0 active:scale-[0.985] active:duration-100
                     focus-visible:outline-none focus-visible:-translate-y-1
                     focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
                     motion-reduce:transition-none motion-reduce:hover:translate-y-0"
