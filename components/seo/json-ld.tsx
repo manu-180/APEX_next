@@ -72,7 +72,13 @@ export function WebSiteJsonLd() {
  * Habilita rich snippets de precio en SERPs y AEO/LLM citation.
  */
 export function ServiceJsonLd() {
-  const services = [
+  const services: Array<{
+    slug: string
+    name: string
+    price?: number
+    description: string
+    serviceType: string
+  }> = [
     {
       slug: 'landing-page',
       name: 'Landing Page',
@@ -97,18 +103,11 @@ export function ServiceJsonLd() {
       serviceType: 'Diseño y desarrollo de e-commerce',
     },
     {
-      slug: 'app-producto',
-      name: 'App Producto',
-      price: 580000,
-      description: 'Tu negocio en el celular de cada cliente, en App Store y Google Play.',
-      serviceType: 'Desarrollo de app móvil',
-    },
-    {
-      slug: 'app-operaciones',
-      name: 'App + Operaciones',
-      price: 1150000,
-      description: 'App para clientes y panel para gestionar pedidos, roles, pagos y reportes.',
-      serviceType: 'Desarrollo de app móvil + backend',
+      slug: 'software-a-medida',
+      name: 'Software y apps a medida',
+      description:
+        'Apps iOS y Android, sistemas web, paneles, integraciones y automatizaciones con IA. Presupuesto por proyecto, definido en una videollamada.',
+      serviceType: 'Desarrollo de software a medida',
     },
   ]
 
@@ -121,13 +120,17 @@ export function ServiceJsonLd() {
     provider: { '@id': PERSON_ID },
     areaServed: { '@type': 'Country', name: 'Argentina' },
     description: s.description,
-    offers: {
-      '@type': 'Offer',
-      price: s.price,
-      priceCurrency: 'ARS',
-      availability: 'https://schema.org/InStock',
-      url: `${APP_URL.replace(/\/$/, '')}/servicios`,
-    },
+    ...(s.price != null
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: s.price,
+            priceCurrency: 'ARS',
+            availability: 'https://schema.org/InStock',
+            url: `${APP_URL.replace(/\/$/, '')}/servicios`,
+          },
+        }
+      : {}),
   }))
 
   return <SafeJsonLd data={data} />

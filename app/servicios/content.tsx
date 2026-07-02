@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect, useLayoutEffect, Suspense } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
@@ -9,6 +10,7 @@ import {
   CheckIcon,
   ArrowRightIcon,
   WhatsAppIcon,
+  CalendarIcon,
   BotLodeIcon,
   AssistifyIcon,
   ContactEngineIcon,
@@ -19,7 +21,7 @@ import { ProjectsSheet, type SheetEntry } from '@/components/ui/projects-sheet'
 import { ServiceDrawer } from '@/components/ui/ServiceDrawer'
 import { ServiceDrawerContent, type ServiceDrawerContentProps } from '@/components/ui/ServiceDrawerContent'
 import { cn } from '@/lib/utils/cn'
-import { BRAND_IMAGE_SRC } from '@/lib/constants'
+import { BRAND_IMAGE_SRC, ROUTES } from '@/lib/constants'
 import { whatsappUrl, waMsgPlan } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { WEB_PLANS, APP_PLANS, formatARS, type PricingPlan } from '@/lib/types/services'
@@ -261,7 +263,7 @@ export function ServiciosContent() {
                       aria-pressed={tab === t}
                       className="relative px-6 py-2.5 rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                       data-hover
-                      data-inspector-title={t === 'web' ? 'Pestaña Sitio Web' : 'Pestaña App móvil'}
+                      data-inspector-title={t === 'web' ? 'Pestaña Sitio Web' : 'Pestaña App a medida'}
                       data-inspector-desc="El botón activo no se redibuja a mano: hay una sola 'pastilla' que viaja de un lado al otro con física de resorte (layoutId en Framer Motion). Es la misma sensación que un interruptor premium de un salpicadero, pero en tu navegador."
                       data-inspector-cat="Motion · Spring"
                     >
@@ -284,7 +286,7 @@ export function ServiciosContent() {
                             : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]'
                         )}
                       >
-                        {t === 'web' ? 'Sitio Web' : 'Aplicación Móvil'}
+                        {t === 'web' ? 'Sitio Web' : 'App a medida'}
                       </span>
                     </button>
                   ))}
@@ -293,42 +295,45 @@ export function ServiciosContent() {
             </motion.div>
           </div>
           <AnimatePresence mode="wait">
+            {/* Wrapper de crossfade: exit simple y determinista (opacity) para que
+                mode="wait" siempre complete el swap Web↔App. El stagger de cards y
+                el reveal del panel viven en los hijos, no en este contenedor. */}
             <motion.div
               key={tab}
-              variants={prefersReducedMotion ? undefined : TAB_GRID_VARIANTS}
-              initial={prefersReducedMotion ? false : 'hidden'}
-              whileInView={prefersReducedMotion ? undefined : 'visible'}
-              viewport={{ once: true, amount: 0.1 }}
-              animate={prefersReducedMotion ? { opacity: 1 } : undefined}
-              exit={prefersReducedMotion ? { opacity: 0, transition: { duration: 0 } } : 'exit'}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
+              initial={prefersReducedMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: prefersReducedMotion ? 0 : DUR_FAST, ease: EASE_OUT } }}
+              transition={{ duration: prefersReducedMotion ? 0 : DUR_FAST, ease: EASE_OUT }}
             >
-              {plans.map((plan) => (
+              {tab === 'web' ? (
                 <motion.div
-                  key={plan.id}
-                  variants={prefersReducedMotion ? undefined : TAB_CARD_VARIANTS}
-                  className={cn('h-full', ANCHOR_PLAN_IDS.has(plan.id) && 'md:-mt-4 md:mb-4')}
+                  variants={prefersReducedMotion ? undefined : TAB_GRID_VARIANTS}
+                  initial={prefersReducedMotion ? false : 'hidden'}
+                  whileInView={prefersReducedMotion ? undefined : 'visible'}
+                  viewport={{ once: true, amount: 0.1 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : undefined}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
                 >
-                  <UnifiedPricingCard
-                    plan={plan}
-                    onOpenDrawer={() => setOpenPlanDrawerId(plan.id)}
-                    isDrawerOpen={openPlanDrawerId === plan.id}
-                    deriskers={PLAN_DERISKERS[plan.id]}
-                  />
+                  {plans.map((plan) => (
+                    <motion.div
+                      key={plan.id}
+                      variants={prefersReducedMotion ? undefined : TAB_CARD_VARIANTS}
+                      className={cn('h-full', ANCHOR_PLAN_IDS.has(plan.id) && 'md:-mt-4 md:mb-4')}
+                    >
+                      <UnifiedPricingCard
+                        plan={plan}
+                        onOpenDrawer={() => setOpenPlanDrawerId(plan.id)}
+                        isDrawerOpen={openPlanDrawerId === plan.id}
+                        deriskers={PLAN_DERISKERS[plan.id]}
+                      />
+                    </motion.div>
+                  ))}
                 </motion.div>
-              ))}
+              ) : (
+                <CustomSoftwarePanel />
+              )}
             </motion.div>
           </AnimatePresence>
-          {/* Altura reservada: evita salto de layout al mostrar/ocultar el texto solo en App */}
-          <div className="mx-auto mt-10 min-h-[4.75rem] max-w-2xl flex items-start justify-center">
-            {tab === 'mobile' ? (
-              <p className="text-center text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
-                <span className="font-semibold text-[var(--color-on-surface)]">Apps: producto vivo, no proyecto cerrado.</span>{' '}
-                El fee mensual incluye mejoras, soporte y nuevas funcionalidades cada mes.
-                A diferencia de los sitios web, en apps la relación es continua: la app sigue evolucionando después de la entrega.
-              </p>
-            ) : null}
-          </div>
         </div>
       </section>
 
@@ -646,6 +651,144 @@ function UnifiedPricingCard({
         </div>
       </div>
     </>
+  )
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   PANEL A MEDIDA — reemplaza las 3 cards de app por una sola oferta de
+   desarrollo de software a medida. Sin precio de lista: la conversación (video-
+   llamada) es el próximo paso. Superficie E3 (double-bezel + grain) y layout
+   asimétrico de 2 columnas, coherente con los paneles de decisión del sitio.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/** Lo que cubre el proyecto a medida — apps, web, sistemas, integraciones, IA. */
+const CUSTOM_SOFTWARE_CAPABILITIES = [
+  'Apps móviles iOS + Android (Flutter)',
+  'Aplicaciones y sistemas web a medida (Next.js)',
+  'Paneles de administración y dashboards',
+  'Integraciones: MercadoPago, WhatsApp, AFIP y otras APIs',
+  'Automatizaciones y funciones con inteligencia artificial',
+  'Backend, base de datos e infraestructura (Supabase)',
+] as const
+
+/** De-riskers: la charla no cuesta y el precio queda cerrado por escrito. */
+const CUSTOM_SOFTWARE_DERISKERS = [
+  'Videollamada sin cargo',
+  'Alcance y precio por escrito',
+  'Sin compromiso',
+] as const
+
+/** Mensaje de WhatsApp para coordinar la videollamada del proyecto a medida. */
+const WA_MSG_CUSTOM_SOFTWARE =
+  'Hola Manuel, quiero contarte un proyecto de software a medida. ¿Coordinamos una videollamada para verlo?'
+
+function CustomSoftwarePanel() {
+  return (
+    <div
+      className="relative overflow-hidden bento-surface bento-surface--framed noise-overlay"
+      data-hover
+      data-inspector-title="Panel a medida"
+      data-inspector-desc="Cuando el proyecto no entra en un plan cerrado, se cotiza a medida: una sola card que abre la conversación (videollamada) en lugar de mostrar un precio de lista."
+      data-inspector-cat="UX · Conversión"
+    >
+      {/* Hairline decorativa superior (spec §4) */}
+      <div
+        aria-hidden
+        className="absolute top-0 inset-x-0 h-px pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb), 0.5) 50%, transparent)',
+        }}
+      />
+
+      <div className="relative z-10 grid grid-cols-1 gap-8 p-6 sm:p-8 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+        {/* Izquierda — propuesta + acción */}
+        <div className="flex flex-col">
+          <div className="mb-5">
+            <Badge variant="outline">Proyecto a medida</Badge>
+          </div>
+
+          <h3 className="heading-display text-balance text-2xl sm:text-3xl md:text-4xl mb-4">
+            <span className="block text-[var(--color-on-surface-variant)]">Apps y software</span>
+            <strong className="block text-[var(--color-on-surface)]">hechos a tu medida.</strong>
+          </h3>
+
+          <p className="mb-6 max-w-md text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+            Apps para iOS y Android, sistemas web, paneles internos, integraciones y
+            automatizaciones con IA. Si se puede programar, lo armamos. Como cada proyecto es
+            único, no hay precio de lista: lo definimos juntos en una videollamada y te lo dejo
+            por escrito antes de arrancar.
+          </p>
+
+          {/* De-riskers visibles */}
+          <ul className="mb-7 flex flex-wrap gap-1.5">
+            {CUSTOM_SOFTWARE_DERISKERS.map((d) => (
+              <li
+                key={d}
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-[var(--color-on-surface)]"
+                style={{
+                  background: 'rgba(var(--color-primary-rgb), 0.08)',
+                  border: '1px solid rgba(var(--color-primary-rgb), 0.22)',
+                }}
+              >
+                <CheckIcon className="size-3 shrink-0 text-[var(--color-primary)]" />
+                {d}
+              </li>
+            ))}
+          </ul>
+
+          {/* Acciones — CTA de dinero verde WhatsApp + agenda en ghost */}
+          <div className="mt-auto space-y-2.5">
+            <WhatsAppOutboundLink
+              waHref={whatsappUrl(WA_MSG_CUSTOM_SOFTWARE)}
+              className={cn(
+                'group/wa btn-tech inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-semibold text-white select-none',
+                'transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.97]',
+                'motion-reduce:transform-none motion-reduce:transition-none',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                WA_SHADOW_CLASS,
+              )}
+              style={{ background: WA_GRADIENT }}
+            >
+              <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover/wa:scale-110 motion-reduce:transform-none" />
+              Coordinar una videollamada
+            </WhatsAppOutboundLink>
+
+            <Link
+              href={ROUTES.contact}
+              className="group/detail inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent px-4 text-sm font-medium text-[var(--color-on-surface-variant)] transition-[border-color,color,transform] duration-200 hover:border-[rgba(var(--color-primary-rgb),0.25)] hover:text-[var(--color-primary)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+            >
+              <CalendarIcon className="size-4 opacity-70 transition-opacity duration-200 group-hover/detail:opacity-100" />
+              Agendar una reunión de 15 min
+              <ArrowRightIcon className="size-4 opacity-60 transition-transform duration-200 group-hover/detail:translate-x-0.5 group-hover/detail:opacity-100" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Derecha — qué incluye "todo el desarrollo de software" */}
+        <div className="lg:border-l lg:border-[rgba(var(--color-primary-rgb),0.12)] lg:pl-12">
+          <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-on-surface-variant)] opacity-60">
+            Qué puedo construir
+          </p>
+          <ul className="space-y-3">
+            {CUSTOM_SOFTWARE_CAPABILITIES.map((c) => (
+              <li key={c} className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface-variant)]">
+                <span
+                  className="mt-0.5 size-4 flex-shrink-0 rounded-full inline-flex items-center justify-center"
+                  style={{ background: 'rgba(var(--color-primary-rgb), 0.12)' }}
+                >
+                  <CheckIcon className="size-2.5 text-[var(--color-primary)]" />
+                </span>
+                {c}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-xs italic leading-relaxed text-[var(--color-on-surface-variant)] opacity-75">
+            ¿No lo ves en la lista? Escribime igual — casi seguro también se puede.
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
 

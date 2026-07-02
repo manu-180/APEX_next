@@ -14,8 +14,7 @@ Todos los proyectos incluyen revisiones. Si el cliente no está conforme al fina
 - Landing Page: ARS 300.000 — entrega en 15 días. Página de conversión con diseño premium que captura consultas 24/7.
 - Web Interactiva: ARS 600.000 — entrega en 15 días. Incluye reservas, cotizaciones o pagos automatizados.
 - Tienda Online (E-commerce): ARS 900.000 — entrega en 15 días. Catálogo, carrito y medios de pago integrados.
-- App Móvil MVP: desde ARS 580.000/mes — tu negocio en iOS y Android con fee mensual sin permanencia.
-- App Móvil + Operaciones: desde ARS 1.150.000/mes — app para clientes y panel admin para pedidos, roles y reportes.
+- Software y apps a medida: presupuesto por proyecto, definido en una videollamada. Incluye apps iOS y Android, sistemas web, paneles de administración, integraciones (MercadoPago, WhatsApp, AFIP, APIs) y automatizaciones con IA.
 
 ## Diferenciadores clave
 

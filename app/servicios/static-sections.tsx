@@ -8,7 +8,7 @@ import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
-import { WEB_PLANS, APP_PLANS, formatARS } from '@/lib/types/services'
+import { WEB_PLANS, formatARS } from '@/lib/types/services'
 import { ROUTES } from '@/lib/constants'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { DELAY_AFTER_PANEL, DUR_BASE, DUR_REVEAL, DUR_SLOW, EASE_OUT, STAGGER_LOOSE } from '@/lib/motion'
@@ -30,11 +30,9 @@ const SERVICIOS_FAQ_GROUPS = [
 /* ────────────────────────────────────────────────────────────────────────────
    HERO — corto, orientado a decisión (brief §3 /servicios)
    Izquierda: claim + CTA WhatsApp contextual. Derecha: panel de decisión con
-   los planes y precios reales (desde WEB_PLANS/APP_PLANS — nunca hardcodeados).
+   los planes y precios reales (desde WEB_PLANS — nunca hardcodeados).
    ──────────────────────────────────────────────────────────────────────────── */
 export function ServiciosHero() {
-  const appBasePrice = APP_PLANS[0]?.price
-
   const decisionRows: Array<{ name: string; meta: string; price: string; href: string }> = [
     ...WEB_PLANS.map((plan) => ({
       name: plan.name,
@@ -43,9 +41,9 @@ export function ServiciosHero() {
       href: '#pricing',
     })),
     {
-      name: 'App iOS + Android',
-      meta: 'Producto vivo',
-      price: appBasePrice ? `${formatARS(appBasePrice)} /mes` : 'Fee mensual',
+      name: 'App o software a medida',
+      meta: 'Proyecto a medida',
+      price: 'A cotizar',
       href: `${ROUTES.servicios}?tab=mobile#pricing`,
     },
     {
@@ -70,7 +68,7 @@ export function ServiciosHero() {
             </h1>
 
             <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg mb-8 leading-relaxed">
-              Tres planes de web, planes de app y una calculadora para estimar el tuyo.
+              Tres planes de web y planes de app, con precio publicado.
               Elegís, me escribís por WhatsApp y en 24-48 h tenés un boceto gratis —
               antes de pagar nada.
             </p>
