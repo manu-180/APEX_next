@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback, useState } from 'react'
 import Image from 'next/image'
-import { motion, useMotionValue, useSpring, animate } from 'framer-motion'
+import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
@@ -41,7 +41,6 @@ export function ProjectCardPremium({
   className,
 }: ProjectCardPremiumProps): JSX.Element {
   const cardRef = useRef<HTMLElement>(null)
-  const shimmerRef = useRef<HTMLDivElement>(null)
   const spotlightRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useRef(false)
   // Espejo reactivo del ref para condicionar props de JSX (whileTap, shimmer).
@@ -66,20 +65,6 @@ export function ProjectCardPremium({
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
   }, [])
-
-  useEffect(() => {
-    // El shimmer del borde es decorativo y continuo: lo apagamos en reduced-motion.
-    if (reducedMotion) return
-    const shimmerEl = shimmerRef.current
-    if (!shimmerEl) return
-    const controls = animate(0, 360, {
-      duration: 6,
-      repeat: Infinity,
-      ease: 'linear',
-      onUpdate: (v) => shimmerEl.style.setProperty('--shimmer-angle', `${v}deg`),
-    })
-    return () => controls.stop()
-  }, [reducedMotion])
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -177,11 +162,12 @@ export function ProjectCardPremium({
           }}
         />
 
-        {/* Shimmer border — conic-gradient rotated via framer-motion animate() */}
+        {/* Shimmer border — conic-gradient rotado por CSS (.card-shimmer):
+            pausado en idle, corre en hover o con el tema activo (spec §1). */}
         <div
-          ref={shimmerRef}
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 rounded-2xl"
+          className="card-shimmer pointer-events-none absolute inset-0 z-10 rounded-2xl"
+          data-active={isActive ? 'true' : undefined}
           style={
             {
               padding: '1px',

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { EASE_OUT } from '@/lib/motion'
 import { cn } from '@/lib/utils/cn'
 import { CheckIcon, XIcon } from '@/components/ui/icons'
 
@@ -45,7 +46,6 @@ export function useToast(): ToastContextValue {
   return ctx
 }
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
 let counter = 0 // fuente de id monotónica (sin Date.now/random)
 
 export function ToastProvider({ children }: { children: ReactNode }) {

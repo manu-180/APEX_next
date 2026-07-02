@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Oxanium } from 'next/font/google'
+import { Oxanium, Syne } from 'next/font/google'
 import { ThemeModeProvider } from '@/components/providers/theme-mode-provider'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
@@ -17,7 +17,9 @@ const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
 const oxanium = Oxanium({
   subsets: ['latin'],
   variable: '--font-oxanium',
-  weight: ['300', '400', '600', '700', '800'],
+  // El peso 200 es OBLIGATORIO: el contraste 200/800 de .heading-display debe
+  // ser real, no sintetizado (APEX Design Language v2 §10).
+  weight: ['200', '300', '400', '600', '700', '800'],
   preload: true,
   /**
    * `display: 'optional'` impide que el navegador retrase el primer paint
@@ -31,6 +33,21 @@ const oxanium = Oxanium({
   fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
 
+/**
+ * Syne 700/800 — display font (headings vía --font-heading en globals.css).
+ * `display: 'optional'` igual que Oxanium: el h1 del hero (LCP) usa
+ * .heading-display, así que cero FOUT y cero layout shift; en first-visit con
+ * red lenta renderiza la fallback y Syne aparece desde la segunda vista.
+ */
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  weight: ['700', '800'],
+  preload: true,
+  display: 'optional',
+  adjustFontFallback: true,
+})
+
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -38,7 +55,8 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#050508' },
-    { media: '(prefers-color-scheme: light)', color: '#F4F5FA' },
+    // Igual a --color-surface-base del modo light (antes #F4F5FA, mismatch)
+    { media: '(prefers-color-scheme: light)', color: '#F4F6FB' },
   ],
 }
 
@@ -83,7 +101,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" suppressHydrationWarning className={`dark ${oxanium.variable}`}>
+    <html lang="es-AR" suppressHydrationWarning className={`dark ${oxanium.variable} ${syne.variable}`}>
       <head>
         {/* Preconnect a dominios críticos de third-party — TLS handshake en paralelo */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

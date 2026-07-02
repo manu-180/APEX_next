@@ -39,11 +39,13 @@ const config: Config = {
         online:     '#34B27B',
         offline:    '#E57373',
 
-        // Raw theme primaries (for reference / JS use)
+        // Raw theme primaries (for reference / JS use) — paridad con los 10 data-themes
         'theme-neutral':        '#64748B',
         'theme-flutter':        '#0175C2',
+        'theme-nextjs':         '#A1A1AA',
         'theme-supabase':       '#3ECF8E',
         'theme-riverpod':       '#6E56F8',
+        'theme-typescript':     '#3178C6',
         'theme-botlode':        '#FFC000',
         'theme-assistify':      '#00A8E8',
         'theme-contact-engine': '#15803D',
@@ -65,13 +67,21 @@ const config: Config = {
         header:  '-0.03125em', // -0.5px at 16px — headlines
       },
 
-      // ─── Box Shadows (glow effects) ──────────────────────────────────
+      // ─── Box Shadows ─────────────────────────────────────────────────
+      // Los glows (.shadow-glow-sm/.shadow-glow/.shadow-glow-lg) viven SOLO
+      // en globals.css (versión rgba con alpha correcto) — no redefinir acá.
       boxShadow: {
-        'glow-sm': '0 0 12px 2px var(--color-primary)',
-        'glow':    '0 0 24px 4px var(--color-primary)',
-        'glow-lg': '0 0 40px 8px var(--color-primary)',
+        'card-hover': 'var(--shadow-card-hover)',
         'card-hover-light': '0 10px 30px 0 rgba(0,0,0,0.10)',
         'card-base-light':  '0 7px 22px 0 rgba(0,0,0,0.07)',
+      },
+
+      // ─── Transition Timing (spec §1) ─────────────────────────────────
+      // `ease-out` de Tailwind y el default de todas las transition-*
+      // apuntan a la curva firma del sitio.
+      transitionTimingFunction: {
+        DEFAULT: 'var(--ease-out)',
+        out: 'var(--ease-out)',
       },
 
       // ─── Backdrop Blur ───────────────────────────────────────────────

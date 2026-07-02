@@ -1,7 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react'
-import { useReducedMotion } from 'framer-motion'
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+} from 'framer-motion'
+import { SPRING_TILT } from '@/lib/motion'
 import { cn } from '@/lib/utils/cn'
 
 interface GlowCardProps {
@@ -15,6 +22,11 @@ interface GlowCardProps {
   onClick?: (e: MouseEvent<HTMLDivElement>) => void
 }
 
+/**
+ * GlowCard v2 (spec §7/§8.3): tilt 3D con useMotionValue + useSpring y
+ * spotlight radial vía useMotionTemplate — cero re-renders en mousemove.
+ * API pública idéntica a v1.
+ */
 export function GlowCard({
   children,
   className,
@@ -26,43 +38,56 @@ export function GlowCard({
 }: GlowCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
   const [isHovered, setIsHovered] = useState(false)
   const baseX = restTilt?.x ?? 0
   const baseY = restTilt?.y ?? 0
-  const [tilt, setTilt] = useState({ x: baseX, y: baseY })
+
+  // Posición del cursor en % (spotlight) + tilt en grados — motion values
+  // seteados en onMouseMove, nunca useState (spec §7).
+  const mx = useMotionValue(50)
+  const my = useMotionValue(50)
+  const tiltX = useMotionValue(baseX)
+  const tiltY = useMotionValue(baseY)
+  const springX = useSpring(tiltX, SPRING_TILT)
+  const springY = useSpring(tiltY, SPRING_TILT)
 
   useEffect(() => {
-    if (!isHovered) setTilt({ x: baseX, y: baseY })
-  }, [baseX, baseY, isHovered])
+    if (!isHovered) {
+      tiltX.set(baseX)
+      tiltY.set(baseY)
+    }
+  }, [baseX, baseY, isHovered, tiltX, tiltY])
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 100
     const y = ((e.clientY - rect.top) / rect.height) * 100
-    setMousePos({ x, y })
+    mx.set(x)
+    my.set(y)
 
     // Sin inclinación 3D bajo prefers-reduced-motion; el resplandor que sigue
     // al cursor (opacidad/posición, sin rotar) permanece como feedback de hover.
     if (prefersReducedMotion) return
-    const tiltX = ((y - 50) / 50) * -tiltIntensity
-    const tiltY = ((x - 50) / 50) * tiltIntensity
-    setTilt({ x: tiltX, y: tiltY })
+    tiltX.set(((y - 50) / 50) * -tiltIntensity)
+    tiltY.set(((x - 50) / 50) * tiltIntensity)
   }
 
   const handleMouseLeave = () => {
     setIsHovered(false)
-    setTilt({ x: baseX, y: baseY })
-    setMousePos({ x: 50, y: 50 })
+    tiltX.set(baseX)
+    tiltY.set(baseY)
+    mx.set(50)
+    my.set(50)
   }
 
-  const glowGradient = glowColor
-    ? `radial-gradient(300px circle at ${mousePos.x}% ${mousePos.y}%, ${glowColor}, transparent 60%)`
-    : `radial-gradient(300px circle at ${mousePos.x}% ${mousePos.y}%, rgba(var(--color-primary-rgb), 0.15), transparent 60%)`
+  // Spotlight (spec §7): radial que sigue el cursor, fundiendo a transparente.
+  const glowGradient = useMotionTemplate`radial-gradient(300px circle at ${mx}% ${my}%, ${
+    glowColor ?? 'rgba(var(--color-primary-rgb), 0.15)'
+  }, transparent 60%)`
 
   return (
-    <div
+    <motion.div
       ref={cardRef}
       className={cn(
         'group relative overflow-hidden rounded-xl',
@@ -74,24 +99,26 @@ export function GlowCard({
         className
       )}
       style={{
-        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: isHovered
-          ? 'transform 0.1s ease-out'
-          : 'transform 0.4s cubic-bezier(0.33, 1, 0.68, 1)',
+        rotateX: springX,
+        rotateY: springY,
+        transformPerspective: 800,
       }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
+      data-hover
     >
       {/* Mouse-tracking radial glow overlay */}
-      <div
+      <motion.div
+        aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{ background: glowGradient }}
       />
 
       {/* Inner glow on hover */}
       <div
+        aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-10 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
           boxShadow: 'inset 0 0 60px rgba(var(--color-primary-rgb), 0.06)',
@@ -100,6 +127,6 @@ export function GlowCard({
 
       {/* Content */}
       <div className="relative z-20">{children}</div>
-    </div>
+    </motion.div>
   )
 }

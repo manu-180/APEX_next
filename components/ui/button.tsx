@@ -34,8 +34,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-busy={isLoading || undefined}
         data-loading={isLoading ? '' : undefined}
         className={cn(
-          'relative inline-flex items-center justify-center gap-2 font-semibold select-none',
-          'transition-all duration-300 ease-out',
+          // `group` habilita iconos cinéticos (group-hover:translate-x-1) en todos los CTAs
+          'group relative inline-flex items-center justify-center gap-2 font-semibold select-none',
+          // Solo propiedades animables baratas — nunca transition-all (spec §1)
+          'transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-300 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
           'disabled:pointer-events-none disabled:opacity-50',
           isLoading && 'cursor-wait',
@@ -53,6 +55,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variant === 'ghost' && [
             'text-[var(--color-on-surface-variant)]',
             'hover:bg-[var(--color-surface-high)] hover:text-[var(--color-on-surface)]',
+            'active:scale-[0.98] active:bg-[var(--color-surface-highest)]',
           ],
           variant === 'outline' && [
             'btn-outline-tech',
@@ -61,7 +64,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           ],
           size === 'sm' && 'h-9 px-4 text-sm',
           size === 'md' && 'h-11 px-6 text-sm',
-          size === 'lg' && 'h-13 px-8 text-base',
+          size === 'lg' && 'h-14 px-8 text-base',
           className
         )}
         data-hover

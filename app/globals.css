@@ -23,15 +23,16 @@ a {
 /* ═══════════════════════════════════════════════════════════════════════════
    DESIGN TOKENS — Single source of truth. No arbitrary values in components.
    ─────────────────────────────────────────────────────────────────────────
-   TYPOGRAPHY NOTE: layout.tsx must load Syne via next/font/google and expose
-   it as `--font-syne`. Pending task — see audit report. Until then, headings
-   fall back to a system sans-serif.
+   TYPOGRAPHY NOTE: layout.tsx carga Syne 700/800 (display) vía next/font y la
+   expone como `--font-syne`; Oxanium 200–800 es el cuerpo técnico. La firma
+   tipográfica del sitio es el contraste Oxanium 200 + Syne 800 en el mismo
+   heading (ver .heading-display).
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
   /* ── Fonts ───────────────────────────────────────────────────────────── */
-  /* Oxanium: both headings and body — consistent tech feel */
-  --font-heading: var(--font-oxanium), 'Oxanium', ui-sans-serif, system-ui, sans-serif;
+  /* Syne: SOLO display (headings via --font-heading). Oxanium: body/técnico. */
+  --font-heading: var(--font-syne), var(--font-oxanium), 'Oxanium', ui-sans-serif, system-ui, sans-serif;
   --font-body:    var(--font-oxanium), ui-sans-serif, system-ui, sans-serif;
   --font-mono:    var(--font-oxanium), ui-monospace, monospace;
 
@@ -108,6 +109,26 @@ a {
   --z-modal:    80;
   --z-toast:    100;
   --z-tooltip:  120;
+
+  /* ── Motion (spec §1) — curva firma única + duraciones ───────────────── */
+  /* Espejo JS en lib/motion.ts (EASE_OUT, DUR_*): si cambia uno, cambia el otro. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);           /* firma — default universal */
+  --ease-in-out-custom: cubic-bezier(0.65, 0, 0.35, 1); /* solo cross-fades simétricos */
+  --dur-fast: 150ms;   /* micro: color, opacity de links, focus */
+  --dur-base: 300ms;   /* hover de cards, botones, iconos cinéticos */
+  --dur-slow: 600ms;   /* transiciones de superficie */
+  --dur-reveal: 800ms; /* entradas de sección */
+
+  /* ── Double-bezel (spec §3) — radio interior = exterior − padding ────── */
+  --radius-shell: 1.25rem;
+  --bezel-pad: 0.375rem; /* 6px */
+  --radius-core: calc(var(--radius-shell) - var(--bezel-pad));
+
+  /* ── Sombra hover estándar de card (spec §5) ─────────────────────────── */
+  --shadow-card-hover: 0 14px 40px -20px rgba(var(--color-primary-rgb), 0.4);
+
+  /* ── Noise (spec §6) — un solo asset SVG estático, cero requests ─────── */
+  --noise-url: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.8'%20numOctaves='3'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='160'%20height='160'%20filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -136,7 +157,8 @@ a {
     color: var(--color-on-surface);
     /* Refuerzo: misma pila que font-sans (Oxanium vía --font-oxanium en <html>) */
     font-family: var(--font-oxanium), ui-sans-serif, system-ui, sans-serif;
-    transition: background-color 0.4s ease, color 0.3s ease;
+    /* Cross-fade simétrico de modo/tema → curva in-out (spec §1) */
+    transition: background-color 0.4s var(--ease-in-out-custom), color var(--dur-base) var(--ease-in-out-custom);
   }
 
   /* Títulos: no selección ni cursor de texto (evita la barra tipo “editable”) */
@@ -179,7 +201,16 @@ a {
 
   --color-on-surface:         rgba(255, 255, 255, 0.92);
   --color-on-surface-variant: rgba(255, 255, 255, 0.50);
+  /* Triplete del variant para alphas custom — mata los fallbacks 140,140,140 */
+  --color-on-surface-variant-rgb: 255, 255, 255;
+  /* Tinta reforzada para líneas finas sobre superficies claras (en dark = variant) */
+  --color-ink-strong: var(--color-on-surface-variant);
+  /* Lectura larga (blog): on-surface al 85% (spec §10) */
+  --color-on-surface-reading: rgba(255, 255, 255, 0.85);
   --color-primary-foreground: #ffffff;
+
+  /* Sombras SIEMPRE tintadas (spec §5) — slate-950 azulado, coherente con #050508 */
+  --shadow-tint-rgb: 2, 6, 23;
 
   /* Accent: single secondary color — cyan tech. Use rgba(var(--color-accent-rgb), x) for alpha. */
   --color-accent:     #06B6D4;
@@ -211,8 +242,8 @@ a {
   --particle-rgb-2: 59, 130, 246;
   --particle-rgb-3: 124, 58, 237;
 
-  /* Scrim de overlays (drawers/modals) sobre la página */
-  --scrim-bg: rgba(0, 0, 0, 0.60);
+  /* Scrim de overlays (drawers/modals) sobre la página — tintado (spec §5) */
+  --scrim-bg: rgba(var(--shadow-tint-rgb), 0.60);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -230,7 +261,13 @@ a {
 
   --color-on-surface:         rgba(11, 15, 26, 0.94);
   --color-on-surface-variant: rgba(11, 15, 26, 0.64);
+  --color-on-surface-variant-rgb: 11, 15, 26;
+  --color-ink-strong: rgba(11, 15, 26, 0.80);
+  --color-on-surface-reading: rgba(11, 15, 26, 0.85);
   --color-primary-foreground: #ffffff;
+
+  /* Sombras tintadas: navy existente del sistema light (spec §5) */
+  --shadow-tint-rgb: 24, 32, 60;
 
   --color-accent:     #0E7490;
   --color-accent-rgb: 14, 116, 144;
@@ -259,7 +296,7 @@ a {
   --particle-rgb-2: 29, 78, 216;
   --particle-rgb-3: 109, 40, 217;
 
-  --scrim-bg: rgba(24, 32, 60, 0.38);
+  --scrim-bg: rgba(var(--shadow-tint-rgb), 0.38);
 
   /* Sombras navy estratificadas — el "glow" del modo light */
   --shadow-card:    0 1px 2px rgba(24, 32, 60, 0.05), 0 8px 24px -12px rgba(24, 32, 60, 0.14);
@@ -371,11 +408,15 @@ a {
   .bg-primary-20 { background-color: rgba(var(--color-primary-rgb), 0.20); }
   .border-primary-40 { border-color: rgba(var(--color-primary-rgb), 0.40); }
 
-  .scrollbar-none {
+  /* Ocultar scrollbar — definición única. `.scrollbar-none` queda como alias
+     legado de `.no-scrollbar` (consumidor actual: app/contacto). */
+  .scrollbar-none,
+  .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  .scrollbar-none::-webkit-scrollbar {
+  .scrollbar-none::-webkit-scrollbar,
+  .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
@@ -396,9 +437,15 @@ a {
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
+  /* Glass v2 (spec §4): blur + borde + FILO DE LUZ — highlight interior
+     superior white/6 + drop tintada. Eleva todas las GlowCard de una vez. */
   .dark .glass-card {
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+      0 8px 32px -12px rgba(var(--shadow-tint-rgb), 0.5);
   }
 
   .light .glass-card {
@@ -481,8 +528,8 @@ a {
     transform: translateX(125%) skewX(-11deg);
     /* Solo al entrar: el brillo recorre la tarjeta */
     transition:
-      transform 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.32s ease;
+      transform 0.62s var(--ease-out),
+      opacity 0.32s var(--ease-out);
   }
 
   /* Light: el destello blanco no se ve sobre superficie clara — barrido en tinta */
@@ -585,13 +632,13 @@ a {
     background-color: rgba(56, 189, 248, 0.05);
   }
 
-  /* ── Theme transition ──────────────────────────────────────────────── */
+  /* ── Theme transition (cross-fade simétrico → curva in-out, spec §1) ── */
   .theme-transition {
     transition:
-      color 0.3s ease,
-      background-color 0.3s ease,
-      border-color 0.3s ease,
-      box-shadow 0.3s ease;
+      color var(--dur-base) var(--ease-in-out-custom),
+      background-color var(--dur-base) var(--ease-in-out-custom),
+      border-color var(--dur-base) var(--ease-in-out-custom),
+      box-shadow var(--dur-base) var(--ease-in-out-custom);
   }
 
   /* ── Typography utilities ──────────────────────────────────────────── */
@@ -612,21 +659,13 @@ a {
 
   /* ── Hover lift ────────────────────────────────────────────────────── */
   .hover-lift {
-    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
-                box-shadow 0.3s ease;
+    transition: transform var(--dur-base) var(--ease-out),
+                box-shadow var(--dur-base) var(--ease-out);
   }
   .hover-lift:hover {
     transform: translateY(-2px);
   }
 
-  /* ── Scrollbar hide ────────────────────────────────────────────────── */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -697,13 +736,19 @@ a {
     var(--color-surface-low);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  /* E1 (spec §3): filo interior + drop primaria sutil + drop tintada */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 16px 40px -20px rgba(var(--color-primary-rgb), 0.12),
+    0 8px 24px -16px rgba(var(--shadow-tint-rgb), 0.5);
+  transition: border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
 }
 
 .bento-surface:hover {
   border-color: rgba(var(--color-primary-rgb), 0.35);
   box-shadow:
     0 0 30px -8px rgba(var(--color-primary-rgb), 0.25),
+    0 8px 24px -16px rgba(var(--shadow-tint-rgb), 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -723,6 +768,115 @@ a {
     0 0 22px -10px rgba(var(--color-primary-rgb), 0.20);
 }
 
+/* ── Double-bezel (spec §3): shell + core, radios concéntricos SIEMPRE ─────
+   calculados (interior = exterior − padding). Patrón de dos elementos:
+   <div class="bezel-shell"><div class="bezel-core">…</div></div> */
+.bezel-shell {
+  border-radius: var(--radius-shell);
+  padding: var(--bezel-pad);
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-outline);
+}
+
+.bezel-core {
+  border-radius: var(--radius-core);
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.light .bezel-core {
+  background: var(--color-surface-lowest);
+  border-color: rgba(11, 15, 26, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.90);
+}
+
+/* ── Variante enmarcada E3 (spec §3): double-bezel sobre .bento-surface ────
+   Uso: class="bento-surface bento-surface--framed". El elemento pasa a ser el
+   shell (tinte primary 0.03–0.08) y ::before dibuja la superficie core.
+   z-index: 0 crea stacking context propio para que el core (z:-1) quede sobre
+   el fondo del shell pero bajo todo el contenido. */
+.bento-surface--framed {
+  z-index: 0;
+  padding: var(--bezel-pad);
+  border-radius: var(--radius-shell);
+  background:
+    linear-gradient(165deg, rgba(var(--color-primary-rgb), 0.08) 0%, rgba(var(--color-primary-rgb), 0.03) 45%, transparent 75%),
+    var(--color-surface-low);
+  /* E3: filo interior + drop primaria + drop tintada */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 16px 40px -20px rgba(var(--color-primary-rgb), 0.22),
+    0 8px 24px -16px rgba(var(--shadow-tint-rgb), 0.5);
+}
+
+.bento-surface--framed::before {
+  content: '';
+  position: absolute;
+  inset: var(--bezel-pad);
+  z-index: -1;
+  border-radius: var(--radius-core);
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.light .bento-surface--framed {
+  background:
+    linear-gradient(165deg, rgba(var(--color-primary-rgb), 0.07) 0%, rgba(var(--color-primary-rgb), 0.03) 45%, transparent 75%),
+    var(--color-surface-low);
+  box-shadow:
+    var(--shadow-card-lg),
+    0 0 22px -10px rgba(var(--color-primary-rgb), 0.20);
+}
+
+.light .bento-surface--framed::before {
+  background: var(--color-surface-lowest);
+  border-color: rgba(11, 15, 26, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.90);
+}
+
+/* ── Noise por superficie (spec §6) — SOLO superficies E3 ──────────────────
+   No aplicar a cards chicas ni sobre screenshots. `:where()` deja la posición
+   con especificidad cero: cualquier utility de posición del consumidor gana. */
+:where(.noise-overlay) {
+  position: relative;
+}
+
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--noise-url);
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.light .noise-overlay::after {
+  opacity: 0.015;
+}
+
+/* ── Noise global (spec §6): grain fijo que mata el banding de los fondos ──
+   Sobre los fondos decorativos (z-auto), bajo el contenido de sección (z-10),
+   navbar y modales. Estático: exento del nuke de reduced-motion. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background-image: var(--noise-url);
+  opacity: 0.02;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.light body::after {
+  opacity: 0.015;
+}
+
 /* ── Divider con gradiente del tema (para <div> o <hr>) ──────────────────── */
 .divider-theme {
   height: 1px;
@@ -736,18 +890,27 @@ a {
   );
 }
 
-/* ── Display heading: contraste extremo de peso (200 + 800 de Oxanium) ───── */
-/* Solo tipografía — el color se compone con Tailwind. <strong>/<b> = 800. */
+/* ── Display heading: contraste extremo — Oxanium 200 + Syne 800 ──────────
+   Firma tipográfica del sitio (spec §10): la base fina usa el cuerpo técnico
+   (Oxanium 200 REAL, no sintetizado) y el énfasis usa el display (--font-heading
+   → Syne 800). Solo tipografía — el color se compone con Tailwind. */
 .heading-display {
-  font-family: var(--font-heading);
+  font-family: var(--font-body);
   font-weight: var(--weight-thin);
   line-height: var(--leading-tight);
-  letter-spacing: -0.01em;
+  letter-spacing: clamp(-0.035em, -0.5vw, -0.015em);
+  text-wrap: balance;
 }
 
 .heading-display strong,
 .heading-display b {
+  font-family: var(--font-heading);
   font-weight: var(--weight-extrabold);
+}
+
+/* Variante para h1/h2 ≥5xl (tracking fijo más contenido) */
+.heading-display--tight {
+  letter-spacing: -0.025em;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -755,7 +918,7 @@ a {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .btn-tech {
-  border-radius: 0 12px 12px 12px;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
   position: relative;
   overflow: hidden;
 }
@@ -778,7 +941,7 @@ a {
 }
 
 .btn-tech:hover::after {
-  animation: btn-scan-light 600ms ease-out forwards;
+  animation: btn-scan-light var(--dur-slow) var(--ease-out) forwards;
 }
 
 @keyframes btn-scan-light {
@@ -821,7 +984,7 @@ a {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 0 12px 12px 12px;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
   padding: 1.5px;
   background: conic-gradient(
     from var(--border-angle, 0deg),
@@ -838,7 +1001,7 @@ a {
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
   opacity: 0;
-  transition: opacity 300ms ease;
+  transition: opacity var(--dur-base) var(--ease-out);
   pointer-events: none;
   z-index: 1;
 }
@@ -895,7 +1058,7 @@ a {
 
 /* CTA "abriendo": pulso breve que acusa el click antes de que ocurra la navegación. */
 .cta-opening {
-  animation: cta-opening-pulse 900ms ease-out;
+  animation: cta-opening-pulse 900ms var(--ease-out);
 }
 
 @keyframes cta-opening-pulse {
@@ -903,9 +1066,52 @@ a {
   100% { box-shadow: 0 0 0 12px rgba(var(--color-primary-rgb), 0); }
 }
 
+/* ── Borde shimmer rotativo — CSS compositado, PAUSADO en idle (spec §1) ───
+   Reemplaza el loop rAF de Framer de ProjectCardPremium. Idle = quieto;
+   corre como recompensa de hover o cuando la card está activa.
+   `linear` es correcto acá: rotación continua (misma familia que un marquee). */
+@property --shimmer-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes rotate-shimmer {
+  to { --shimmer-angle: 360deg; }
+}
+
+.card-shimmer {
+  animation: rotate-shimmer 6s linear infinite;
+  animation-play-state: paused;
+}
+
+.group:hover .card-shimmer,
+.card-shimmer[data-active='true'] {
+  animation-play-state: running;
+}
+
+/* ── Skeleton sweep (solo background-position) — reemplazo de animate-pulse ─ */
+@keyframes shimmer-sweep {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.shimmer-sweep {
+  background-image: linear-gradient(
+    110deg,
+    var(--color-surface-low) 30%,
+    var(--color-surface-high) 50%,
+    var(--color-surface-low) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.4s var(--ease-in-out-custom) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .skeleton::after { animation: none; }
   .cta-opening { animation: none; }
+  .card-shimmer { animation: none; }
+  .shimmer-sweep { animation: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -926,17 +1132,17 @@ a {
   border: 1px solid rgba(var(--color-primary-rgb), 0.14);
   box-shadow:
     0 0 0 1px rgba(var(--color-primary-rgb), 0.04),
-    0 8px 48px rgba(0, 0, 0, 0.45),
+    0 8px 48px rgba(var(--shadow-tint-rgb), 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     inset 0 -1px 0 rgba(var(--color-primary-rgb), 0.05);
-  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
 }
 
 .cta-tech-card:hover {
   border-color: rgba(var(--color-primary-rgb), 0.28);
   box-shadow:
     0 0 0 1px rgba(var(--color-primary-rgb), 0.06),
-    0 12px 64px rgba(0, 0, 0, 0.5),
+    0 12px 64px rgba(var(--shadow-tint-rgb), 0.5),
     0 0 40px -10px rgba(var(--color-primary-rgb), 0.20),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     inset 0 0 60px -20px rgba(var(--color-primary-rgb), 0.04);
@@ -993,7 +1199,7 @@ a {
   );
   box-shadow: 0 0 10px 1px rgba(var(--color-primary-rgb), 0.3);
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s var(--ease-out);
 }
 
 .group:hover .cta-scan-line::after {
@@ -1011,7 +1217,7 @@ a {
 /* Grid mesh: un poco más visible en hover */
 .cta-grid-mesh {
   opacity: 0.45;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s var(--ease-out);
 }
 
 .group:hover .cta-grid-mesh {
@@ -1213,7 +1419,7 @@ a {
 }
 
 .card-wave-pressed {
-  animation: card-wave-press 350ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation: card-wave-press 350ms var(--ease-out) forwards;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1255,7 +1461,7 @@ a {
   margin: -0.4rem calc(-1 * var(--footer-link-pad-x));
   border-radius: 4px;
   color: var(--color-on-surface-variant);
-  transition: color 120ms ease;
+  transition: color var(--dur-fast) var(--ease-out);
 }
 .footer-link:hover {
   color: var(--color-primary);
@@ -1272,7 +1478,7 @@ a {
   background: linear-gradient(to right, rgba(var(--color-primary-rgb), 0.7), transparent);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 130ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--dur-fast) var(--ease-out);
 }
 .footer-link:hover::after {
   transform: scaleX(1);
@@ -1293,7 +1499,7 @@ a {
   color: var(--color-on-surface-variant);
   background-color: var(--color-surface-highest);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint-rgb), 0.25);
 }
 
 /* Light: tecla física real — blanca, borde tinta, sombra de apoyo */
@@ -1374,7 +1580,7 @@ a {
   color: #fff;
   background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
   box-shadow: 0 10px 28px -10px rgba(37, 211, 102, 0.45);
-  transition: filter 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  transition: filter 200ms var(--ease-out), transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 .btn-wa:hover {
   filter: brightness(1.08);
@@ -1415,7 +1621,7 @@ a {
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   box-shadow:
-    0 18px 48px -16px rgba(0, 0, 0, 0.55),
+    0 18px 48px -16px rgba(var(--shadow-tint-rgb), 0.55),
     inset 0 0 0 1px rgba(255, 255, 255, 0.04),
     0 0 28px -10px rgba(var(--color-primary-rgb), 0.4);
   color: #ffffff;
@@ -1441,14 +1647,12 @@ a {
    estable; cualquier opacity:0 inicial pospone esa medición. */
 
 /* ── Hero — animaciones cuidadosas que NO afectan el LCP ─────────────────── */
-/* La columna izquierda (donde vive el h1 LCP) se sirve visible desde el
-   primer paint. Solo aplicamos una animación leve a la columna derecha que
-   no es candidata a LCP. */
+/* Columna derecha (no candidata a LCP): rise leve por card. */
 .apex-feature-card {
-  transition: transform 0.18s ease-out;
+  transition: transform 0.18s var(--ease-out);
   opacity: 0;
   transform: translateY(16px);
-  animation: apex-hero-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: apex-hero-rise 0.55s var(--ease-out) forwards;
 }
 .apex-feature-card:nth-child(1) { animation-delay: 0.05s; }
 .apex-feature-card:nth-child(2) { animation-delay: 0.13s; }
@@ -1466,9 +1670,50 @@ a {
   }
 }
 
+/* ── Hero v2 — coreografía de entrada de la columna izquierda ──────────────
+   Cascada one-shot con blur (spec §2) para eyebrow, párrafo, CTAs y strip.
+   EXCEPCIÓN LCP SAGRADA: el h1 usa la variante transform-only — jamás anima
+   opacity ni blur, se sirve visible en el primer frame.
+   fill-mode `backwards`: oculto solo durante el delay; al terminar NO queda
+   filter residual (blur(0) permanente crearía un backdrop-root y rompería
+   backdrop-filter internos). */
+@keyframes apex-hero-rise-blur {
+  from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0px); }
+}
+
+@keyframes apex-hero-slide {
+  from { transform: translateY(18px); }
+  to   { transform: translateY(0); }
+}
+
+.apex-hero-col-left > * {
+  animation: apex-hero-rise-blur var(--dur-reveal) var(--ease-out) backwards;
+}
+
+/* LCP: solo transform */
+.apex-hero-col-left > h1 {
+  animation-name: apex-hero-slide;
+}
+
+.apex-hero-col-left > :nth-child(1) { animation-delay: 0s; }
+.apex-hero-col-left > :nth-child(2) { animation-delay: 0.05s; }
+.apex-hero-col-left > :nth-child(3) { animation-delay: 0.12s; }
+.apex-hero-col-left > :nth-child(4) { animation-delay: 0.2s; }
+.apex-hero-col-left > :nth-child(5) { animation-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-hero-col-left > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
 /* ── Nav underline transition (CSS, sin framer-motion) ─────────────────── */
 .apex-nav-underline {
-  transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: left 0.32s var(--ease-out), width 0.32s var(--ease-out);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1504,21 +1749,21 @@ a {
 }
 
 /* Entry stagger */
-.nf-badge { animation: nf-fade-up 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-badge { animation: nf-fade-up 0.55s 0.08s var(--ease-out) both; }
 .nf-four  {
   animation:
-    nf-fade-up 0.65s 0.18s cubic-bezier(0.22,1,0.36,1) both,
+    nf-fade-up 0.65s 0.18s var(--ease-out) both,
     nf-flicker 10s  ease-in-out 1.2s infinite;
 }
-.nf-sub   { animation: nf-fade-up 0.6s 0.28s cubic-bezier(0.22,1,0.36,1) both; }
-.nf-desc  { animation: nf-fade-up 0.6s 0.36s cubic-bezier(0.22,1,0.36,1) both; }
-.nf-ctas  { animation: nf-fade-up 0.6s 0.44s cubic-bezier(0.22,1,0.36,1) both; }
-.nf-nav   { animation: nf-fade-up 0.6s 0.54s cubic-bezier(0.22,1,0.36,1) both; }
-.nf-term  { animation: nf-fade-up 0.6s 0.62s cubic-bezier(0.22,1,0.36,1) both; }
+.nf-sub   { animation: nf-fade-up 0.6s 0.28s var(--ease-out) both; }
+.nf-desc  { animation: nf-fade-up 0.6s 0.36s var(--ease-out) both; }
+.nf-ctas  { animation: nf-fade-up 0.6s 0.44s var(--ease-out) both; }
+.nf-nav   { animation: nf-fade-up 0.6s 0.54s var(--ease-out) both; }
+.nf-term  { animation: nf-fade-up 0.6s 0.62s var(--ease-out) both; }
 .nf-cur   { animation: nf-cursor  1s   step-end infinite; }
 
 /* Nav link hover */
-.nf-nav-link { transition: color 0.2s ease; }
+.nf-nav-link { transition: color var(--dur-fast) var(--ease-out); }
 .nf-nav-link:hover { color: var(--color-primary); }
 
 /* Corner brackets */
@@ -1540,30 +1785,30 @@ a {
 /* top-left */
 .nf-tl { top: 0; left: 0; }
 .nf-tl::before { top: 0; left: 0; transform-origin: left center;
-  animation: nf-scale-x 0.35s 0.72s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-x 0.35s 0.72s var(--ease-out) both; }
 .nf-tl::after  { top: 0; left: 0; transform-origin: center top;
-  animation: nf-scale-y 0.35s 0.72s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-y 0.35s 0.72s var(--ease-out) both; }
 
 /* top-right */
 .nf-tr { top: 0; right: 0; }
 .nf-tr::before { top: 0; right: 0; transform-origin: right center;
-  animation: nf-scale-x 0.35s 0.78s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-x 0.35s 0.78s var(--ease-out) both; }
 .nf-tr::after  { top: 0; right: 0; transform-origin: center top;
-  animation: nf-scale-y 0.35s 0.78s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-y 0.35s 0.78s var(--ease-out) both; }
 
 /* bottom-left */
 .nf-bl { bottom: 0; left: 0; }
 .nf-bl::before { bottom: 0; left: 0; transform-origin: left center;
-  animation: nf-scale-x 0.35s 0.84s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-x 0.35s 0.84s var(--ease-out) both; }
 .nf-bl::after  { bottom: 0; left: 0; transform-origin: center bottom;
-  animation: nf-scale-y 0.35s 0.84s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-y 0.35s 0.84s var(--ease-out) both; }
 
 /* bottom-right */
 .nf-br { bottom: 0; right: 0; }
 .nf-br::before { bottom: 0; right: 0; transform-origin: right center;
-  animation: nf-scale-x 0.35s 0.90s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-x 0.35s 0.90s var(--ease-out) both; }
 .nf-br::after  { bottom: 0; right: 0; transform-origin: center bottom;
-  animation: nf-scale-y 0.35s 0.90s cubic-bezier(0.22,1,0.36,1) both; }
+  animation: nf-scale-y 0.35s 0.90s var(--ease-out) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .nf-badge, .nf-four, .nf-sub, .nf-desc, .nf-ctas, .nf-nav, .nf-term {
