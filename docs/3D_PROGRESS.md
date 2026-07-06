@@ -4,6 +4,14 @@ Integración 3D (three.js + Meshy) en APEX_next. Iniciado 2026-07-05.
 
 ## Estado: DEPLOYADO a producción ✅ (tanda 2: museo `85c4047` + founder `fb01d87`, live en theapexweb.com)
 
+### Tanda 3 (2026-07-06) — interacción + founder premium (pedido de Manuel)
+- **Rotación por drag** en ApexCore, MeshyShowroom y FounderBust: `OrbitControls` (drei) con `enablePan/Zoom=false`, `enableDamping` (inercia), `rotateSpeed 0.9`, sin límites polares → se agarra y gira para cualquier lado. Cursor `grab`/`grabbing` vía `className="cursor-grab active:cursor-grabbing"` en el `<Canvas>`. `touchAction: 'pan-y'` (mobile: swipe horizontal = tornamesa, vertical = scroll de página; NO atrapa el scroll). El auto-spin se pausa mientras se arrastra (ref `dragging` compartido con `onStart/onEnd`).
+- **Cambio de forma/tema al CLICK, no al hover**: se sacó el `previewThemeFn` (onMouseEnter/Leave) de los swatches de `/lab` (lab-client) y home (home-3d-showcase). Quedó solo `applyTheme` en onClick. Se quitó el follow-cursor y el CameraRig de ApexCore (los reemplaza OrbitControls).
+- **Founder 3D premium con color**: material iridiscente (`iridescence:1`, `iridescenceThicknessRange [120,500]`) + clearcoat + sheen tintado por theme + `Environment` con lightformers de color (violeta/rosa/cian) → escultura tornasol, deja de ser monocromática. Bloom sutil agregado. Verificado visualmente en prod.
+- **Copy /lab**: título "De un prompt a un objeto" → "De la idea a un objeto real" (Manuel: "prompt queda como que es re fácil"); subcopy reescrito (craft + "agarrá uno y movelo"). Se sacaron los números 01–04 del selector de artefactos. Hints actualizados ("arrastrá para rotar").
+- **CTAs /lab**: "Quiero algo así para mi marca" → `WhatsAppOutboundLink` con `WA_MSG_LAB` (pide boceto gratis, número 5491134272488). "Ver qué cuesta cada nivel" → `Link` directo (sin `<button>` anidado) a `/servicios#casos-reales`.
+- **Crash de /lab**: NO era bug del código. Build de prod local renderiza /lab sin crash bajo todos los themes (incl. logo/SVGLoader) y con las secciones below-fold montadas. Era deploy viejo en Vercel / chunks cacheados en el browser de Manuel → lo resuelve el redeploy + hard-refresh.
+
 ## Modelo
 Opus 4.8 (Manuel pidió Fable; el switch aplica desde su próximo mensaje). Ingeniería pesada → Opus recomendado.
 
