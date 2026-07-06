@@ -145,8 +145,20 @@ export function Home3DShowcase() {
           </Link>
         </div>
 
-        {/* ── Stage 3D (columna ancha) ── */}
-        <div className="relative order-1 h-[360px] w-full md:h-[460px] lg:order-2 lg:h-[520px]">
+        {/* ── Stage 3D (columna ancha) ──
+            El máscara radial funde los bordes del canvas en el negro de la sección:
+            sin él, el bloom del objeto llega hasta el borde del <canvas> y dibuja un
+            rectángulo duro (se nota en themes saturados). Así el objeto "flota" en el
+            espacio como en /lab, en vez de quedar encerrado en una caja. */}
+        <div
+          className="relative order-1 h-[360px] w-full md:h-[460px] lg:order-2 lg:h-[520px]"
+          style={{
+            WebkitMaskImage:
+              'radial-gradient(ellipse 76% 80% at 50% 50%, #000 56%, rgba(0,0,0,0) 90%)',
+            maskImage:
+              'radial-gradient(ellipse 76% 80% at 50% 50%, #000 56%, rgba(0,0,0,0) 90%)',
+          }}
+        >
           {inView ? <ApexCore /> : <CorePoster />}
         </div>
       </div>
