@@ -372,13 +372,23 @@ export function ServiciosShowcase() {
                   Algunos son productos propios; otros, clientes reales. El próximo puede ser tu
                   proyecto: contame qué tenés en mente y te muestro cómo se vería.
                 </p>
-                <Link
-                  href={ROUTES.muestrario}
-                  className="group/ml mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
-                >
-                  Ver el muestrario completo
-                  <ArrowRightIcon className="size-3.5 transition-transform duration-200 group-hover/ml:translate-x-0.5" />
-                </Link>
+                <span className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+                  <Link
+                    href={ROUTES.muestrario}
+                    className="group/ml inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
+                  >
+                    Ver el muestrario completo
+                    <ArrowRightIcon className="size-3.5 transition-transform duration-200 group-hover/ml:translate-x-0.5" />
+                  </Link>
+                  <Link
+                    href={`${ROUTES.lab}#museo`}
+                    prefetch={false}
+                    className="group/m3d inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
+                  >
+                    Verlos flotando en 3D
+                    <ArrowRightIcon className="size-3.5 transition-transform duration-200 group-hover/m3d:translate-x-0.5" />
+                  </Link>
+                </span>
               </div>
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(

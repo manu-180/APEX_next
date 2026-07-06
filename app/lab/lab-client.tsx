@@ -7,15 +7,17 @@ import { ROUTES } from '@/lib/constants'
 import { useApexTheme } from '@/hooks/useTheme'
 import { THEMES } from '@/lib/types/theme'
 import { ARTIFACTS } from '@/lib/three/artifacts'
-import { ArrowRightIcon } from '@/components/ui/icons'
+import { MUSEUM_CASES, type MuseumCase } from '@/lib/three/museum'
+import { ArrowRightIcon, ExternalLinkIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
 
 /**
  * APEX Lab — campo de demostración 3D.
  * Sección 1: APEX Core (theme engine hecho materia, procedural, theme-reactive).
  * Sección 2: Showroom de artefactos generados con Meshy AI (texto → 3D).
- * Los Canvas se montan client-only (three.js no SSR); el showroom espera a
- * entrar en viewport (IO) para no bajar su bundle+modelos hasta que hace falta.
+ * Sección 3: Museo de casos — los sitios reales de /servicios como slabs 3D.
+ * Los Canvas se montan client-only (three.js no SSR); showroom y museo esperan
+ * a entrar en viewport (IO) para no bajar su bundle+modelos hasta que hace falta.
  */
 
 function StagePoster({ label }: { label: string }) {
@@ -42,6 +44,73 @@ const MeshyShowroom = dynamic(() => import('@/components/three/meshy-showroom/Me
   ssr: false,
   loading: () => <StagePoster label="cargando artefacto" />,
 })
+
+const CaseMuseum = dynamic(() => import('@/components/three/case-museum/CaseMuseum'), {
+  ssr: false,
+  loading: () => <StagePoster label="montando museo" />,
+})
+
+/** Hook local: montar un stage 3D recién cuando entra al viewport. */
+function useInViewOnce(rootMargin = '250px') {
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [rootMargin])
+  return { ref, inView }
+}
+
+/**
+ * Stage del museo con su caption de hover. Vive como componente propio para
+ * que el hover (que cambia por frame de mouse) no re-renderice toda la página.
+ */
+function MuseumStage({ themeHex }: { themeHex: string }) {
+  const { ref, inView } = useInViewOnce()
+  const [focus, setFocus] = useState<MuseumCase | null>(null)
+
+  return (
+    <>
+      <div ref={ref} className="relative mx-auto mt-8 h-[62vh] max-h-[560px] min-h-[420px] w-full">
+        {inView ? <CaseMuseum themeHex={themeHex} onHoverChange={setFocus} /> : <StagePoster label="montando museo" />}
+      </div>
+
+      {/* Caption fija (sin layout shift): qué pieza estás mirando */}
+      <div className="mx-auto mt-4 flex min-h-[64px] max-w-2xl flex-col items-center justify-center text-center">
+        {focus ? (
+          <>
+            <p className="flex items-center gap-2.5 text-sm font-semibold text-white">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: 'var(--color-primary)' }}>
+                {focus.tierNumeral} · {focus.tierLabel}
+              </span>
+              {focus.name}
+              <span className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">
+                {focus.domain}
+                <ExternalLinkIcon className="size-3" aria-hidden />
+              </span>
+            </p>
+            <p className="mt-1 text-[13px] font-light leading-relaxed text-white/55">{focus.blurb}</p>
+          </>
+        ) : (
+          <p className="text-[13px] font-light text-white/45">
+            Pasá el mouse por una pieza para inspeccionarla · clic para abrir el sitio real en producción
+          </p>
+        )}
+      </div>
+    </>
+  )
+}
 
 export function LabClient() {
   const { activeConfig, applyTheme, previewThemeFn } = useApexTheme()
@@ -259,6 +328,71 @@ export function LabClient() {
                 )}
               >
                 Quiero algo así para mi marca
+                <ArrowRightIcon
+                  className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
+                  aria-hidden
+                />
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ Sección 3 — Museo de casos reales ═══════════ */}
+      <section
+        id="museo"
+        className="relative overflow-hidden py-20 md:py-28"
+        style={{ backgroundColor: 'var(--color-surface-base)' }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(1000px 600px at 50% 38%, rgba(var(--color-primary-rgb), 0.11), transparent 62%)',
+          }}
+        />
+
+        <div className="relative z-[2] mx-auto max-w-6xl px-6 md:px-10">
+          <header className="mx-auto max-w-2xl text-center">
+            <div className="flex items-center justify-center gap-3 font-mono text-[12px] uppercase tracking-[0.34em] text-white/45">
+              <span className="h-[6px] w-[6px] rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
+              APEX // MUSEO
+            </div>
+            <h2 className="mt-4 text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold leading-[1.05] tracking-tight text-white">
+              {MUSEUM_CASES.length} proyectos reales,{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(96deg,#EAF0FA,var(--color-primary))',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                en el espacio.
+              </span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-[15px] font-light leading-relaxed text-white/55">
+              No son mockups: cada pieza es un sitio funcionando hoy en producción.
+              Inspeccionala en 3D y abrila con un clic.
+            </p>
+          </header>
+
+          <MuseumStage themeHex={activeConfig.primary} />
+
+          <div className="mt-8 flex justify-center">
+            <Link href={`${ROUTES.servicios}#casos-reales`} prefetch={false}>
+              <button
+                type="button"
+                className={cn(
+                  'group inline-flex items-center justify-center gap-2 font-semibold select-none',
+                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                  'btn-tech btn-outline-tech text-[var(--color-primary)]',
+                  'min-h-12 px-7 py-3 text-sm rounded-xl',
+                )}
+              >
+                Ver qué cuesta cada nivel
                 <ArrowRightIcon
                   className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
                   aria-hidden
