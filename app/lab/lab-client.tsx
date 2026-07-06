@@ -9,6 +9,8 @@ import { THEMES } from '@/lib/types/theme'
 import { ARTIFACTS } from '@/lib/three/artifacts'
 import { MUSEUM_CASES, type MuseumCase } from '@/lib/three/museum'
 import { ArrowRightIcon, ExternalLinkIcon } from '@/components/ui/icons'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { whatsappUrl, WA_MSG_LAB } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils/cn'
 
 /**
@@ -113,7 +115,7 @@ function MuseumStage({ themeHex }: { themeHex: string }) {
 }
 
 export function LabClient() {
-  const { activeConfig, applyTheme, previewThemeFn } = useApexTheme()
+  const { activeConfig, applyTheme } = useApexTheme()
   const [artifactIdx, setArtifactIdx] = useState(0)
   const artifactRef = useRef<HTMLDivElement>(null)
   const [artifactInView, setArtifactInView] = useState(false)
@@ -196,7 +198,7 @@ export function LabClient() {
               <br />
               webgl · three.js · r3f
               <br />
-              <span style={{ color: 'var(--color-primary)' }}>◇</span> mové el mouse
+              <span style={{ color: 'var(--color-primary)' }}>◇</span> arrastrá para rotar
             </div>
             <ApexCore />
           </div>
@@ -208,8 +210,6 @@ export function LabClient() {
                 <button
                   key={t.id}
                   onClick={(e) => applyTheme(t.id, e)}
-                  onMouseEnter={() => previewThemeFn(t.id)}
-                  onMouseLeave={() => previewThemeFn(null)}
                   className="group flex items-center gap-2 rounded-[10px] border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-300"
                   style={{
                     borderColor: active ? 'rgba(var(--color-primary-rgb),0.6)' : 'rgba(255,255,255,0.08)',
@@ -229,7 +229,7 @@ export function LabClient() {
           </div>
 
           <p className="mt-5 text-center text-[13px] font-light text-white/45">
-            Clic en un color para aplicar el tema a todo el sitio · pasá el mouse para previsualizar · el objeto sigue tu cursor
+            Clic en un color para aplicar el tema a todo el sitio · agarrá el objeto y arrastralo para verlo desde cualquier ángulo
           </p>
         </div>
       </section>
@@ -256,7 +256,7 @@ export function LabClient() {
               APEX // ARTEFACTOS
             </div>
             <h2 className="mt-4 text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold leading-[1.05] tracking-tight text-white">
-              De un prompt{' '}
+              De la idea{' '}
               <span
                 style={{
                   background: 'linear-gradient(96deg,#EAF0FA,var(--color-primary))',
@@ -265,12 +265,12 @@ export function LabClient() {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                a un objeto.
+                a un objeto real.
               </span>
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-[15px] font-light leading-relaxed text-white/55">
-              Estos cuatro los generé con IA (Meshy, texto a 3D), los optimicé y los traje a WebGL.
-              Objetos navegables en el navegador — no imágenes. Elegí uno.
+              Los modelé con IA, los optimicé a mano y los traje a WebGL en tiempo real.
+              Objetos que girás y mirás desde cualquier ángulo — no son imágenes. Agarrá uno y movelo.
             </p>
           </header>
 
@@ -287,25 +287,17 @@ export function LabClient() {
                 <button
                   key={a.id}
                   onClick={() => setArtifactIdx(i)}
-                  className="flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-left transition-all duration-300"
+                  className="flex flex-col rounded-xl border px-4 py-2.5 text-left transition-all duration-300"
                   style={{
                     borderColor: active ? 'rgba(var(--color-primary-rgb),0.6)' : 'rgba(255,255,255,0.08)',
                     background: active ? 'rgba(var(--color-primary-rgb),0.08)' : 'rgba(255,255,255,0.02)',
                     boxShadow: active ? '0 8px 26px -16px rgba(var(--color-primary-rgb),0.9)' : 'none',
                   }}
                 >
-                  <span
-                    className="font-mono text-[10px] uppercase tracking-[0.18em]"
-                    style={{ color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.35)' }}
-                  >
-                    0{i + 1}
+                  <span className="text-sm font-semibold" style={{ color: active ? '#EAF0FA' : 'rgba(255,255,255,0.6)' }}>
+                    {a.name}
                   </span>
-                  <span className="flex flex-col">
-                    <span className="text-sm font-semibold" style={{ color: active ? '#EAF0FA' : 'rgba(255,255,255,0.6)' }}>
-                      {a.name}
-                    </span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{a.tag}</span>
-                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{a.tag}</span>
                 </button>
               )
             })}
@@ -316,24 +308,25 @@ export function LabClient() {
           </p>
 
           <div className="mt-10 flex justify-center">
-            <Link href={ROUTES.contact} prefetch={false}>
-              <button
-                type="button"
-                className={cn(
-                  'group inline-flex items-center justify-center gap-2 font-semibold select-none',
-                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech btn-outline-tech text-[var(--color-primary)]',
-                  'min-h-12 px-7 py-3 text-sm rounded-xl',
-                )}
-              >
-                Quiero algo así para mi marca
-                <ArrowRightIcon
-                  className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
-                  aria-hidden
-                />
-              </button>
-            </Link>
+            <WhatsAppOutboundLink
+              waHref={whatsappUrl(WA_MSG_LAB)}
+              data-inspector-title="CTA WhatsApp del lab (artefactos)"
+              data-inspector-desc="Pide el boceto 3D gratis por WhatsApp. Tracking en openWhatsAppWithThankYouPage."
+              data-inspector-cat="Conversión"
+              className={cn(
+                'group inline-flex items-center justify-center gap-2 font-semibold select-none',
+                'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                'btn-tech btn-outline-tech text-[var(--color-primary)]',
+                'min-h-12 px-7 py-3 text-sm rounded-xl',
+              )}
+            >
+              Quiero algo así para mi marca
+              <ArrowRightIcon
+                className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
+                aria-hidden
+              />
+            </WhatsAppOutboundLink>
           </div>
         </div>
       </section>
@@ -381,23 +374,22 @@ export function LabClient() {
           <MuseumStage themeHex={activeConfig.primary} />
 
           <div className="mt-8 flex justify-center">
-            <Link href={`${ROUTES.servicios}#casos-reales`} prefetch={false}>
-              <button
-                type="button"
-                className={cn(
-                  'group inline-flex items-center justify-center gap-2 font-semibold select-none',
-                  'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                  'btn-tech btn-outline-tech text-[var(--color-primary)]',
-                  'min-h-12 px-7 py-3 text-sm rounded-xl',
-                )}
-              >
-                Ver qué cuesta cada nivel
-                <ArrowRightIcon
-                  className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
-                  aria-hidden
-                />
-              </button>
+            <Link
+              href={`${ROUTES.servicios}#casos-reales`}
+              prefetch={false}
+              className={cn(
+                'group inline-flex items-center justify-center gap-2 font-semibold select-none',
+                'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+                'btn-tech btn-outline-tech text-[var(--color-primary)]',
+                'min-h-12 px-7 py-3 text-sm rounded-xl',
+              )}
+            >
+              Ver qué cuesta cada nivel
+              <ArrowRightIcon
+                className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
+                aria-hidden
+              />
             </Link>
           </div>
         </div>

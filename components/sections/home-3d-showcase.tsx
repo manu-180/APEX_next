@@ -40,7 +40,7 @@ const ApexCore = dynamic(() => import('@/components/three/apex-core/ApexCore'), 
 export function Home3DShowcase() {
   const ref = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(false)
-  const { activeConfig, applyTheme, previewThemeFn } = useApexTheme()
+  const { activeConfig, applyTheme } = useApexTheme()
 
   useEffect(() => {
     const el = ref.current
@@ -112,8 +112,6 @@ export function Home3DShowcase() {
                 <button
                   key={t.id}
                   onClick={(e) => applyTheme(t.id, e)}
-                  onMouseEnter={() => previewThemeFn(t.id)}
-                  onMouseLeave={() => previewThemeFn(null)}
                   aria-label={`Aplicar tema ${t.name}`}
                   className="h-6 w-6 rounded-md transition-transform duration-200 hover:scale-110"
                   style={{

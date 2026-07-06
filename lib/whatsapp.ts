@@ -29,6 +29,9 @@ export const WA_MSG_NAV = WA_MSG_GENERIC
 /** Página Sobre mí — CTA final */
 export const WA_MSG_ABOUT = `Hola, quiero potenciarme con tecnología. ¿Agendamos una reunión?`
 
+/** Lab — CTA de los artefactos 3D: el visitante pide su boceto 3D gratis. */
+export const WA_MSG_LAB = `Hola Manuel, vi los objetos 3D de tu laboratorio y quiero algo así para mi marca. ¿Arrancamos con el boceto gratis?`
+
 /** Pie — link “WhatsApp” */
 export const WA_MSG_FOOTER_LINK = WA_MSG_GENERIC
 

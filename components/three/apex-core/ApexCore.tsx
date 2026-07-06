@@ -1,9 +1,9 @@
 'use client'
 
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Environment, Lightformer, Edges } from '@react-three/drei'
+import { Environment, Lightformer, Edges, OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react'
 import * as THREE from 'three'
 import { useApexTheme } from '@/hooks/useTheme'
 import type { ThemeId } from '@/lib/types/theme'
@@ -15,11 +15,15 @@ import { getShapeGeometry } from '@/lib/three/logoGeometry'
  * Un icosaedro facetado con material físico (metal + clearcoat) que refracta
  * el color del theme activo. Replica el ADN de ParticleField:
  *  - client-only (montado con next/dynamic ssr:false por quien lo consume)
- *  - respeta prefers-reduced-motion (sin auto-spin; solo reacciona al cursor)
+ *  - respeta prefers-reduced-motion (sin auto-spin)
  *  - pausa el render loop cuando la pestaña queda oculta (ahorra CPU/batería)
  *
+ * Interacción: gira solo, suave. Se puede AGARRAR con el mouse (cursor manita)
+ * o con el dedo (touch) y rotar para cualquier lado con inercia — OrbitControls
+ * sobre la cámara. Mientras se arrastra, el auto-spin se pausa.
+ *
  * El color viene de useApexTheme().activeConfig.primary y se interpola suave
- * frame a frame (mismo efecto que el mockup que validamos).
+ * frame a frame.
  */
 
 function usePrefersReducedMotion(): boolean {
@@ -41,8 +45,17 @@ function easeOutBack(x: number): number {
   return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
 }
 
-function Artifact({ themeId, hex, reduced }: { themeId: ThemeId; hex: string; reduced: boolean }) {
-  const tilt = useRef<THREE.Group>(null!)
+function Artifact({
+  themeId,
+  hex,
+  reduced,
+  dragging,
+}: {
+  themeId: ThemeId
+  hex: string
+  reduced: boolean
+  dragging: MutableRefObject<boolean>
+}) {
   const spin = useRef<THREE.Mesh>(null!)
   const mat = useRef<THREE.MeshPhysicalMaterial>(null!)
   const cur = useMemo(() => new THREE.Color(hex), [])
@@ -68,7 +81,7 @@ function Artifact({ themeId, hex, reduced }: { themeId: ThemeId; hex: string; re
     }
   }, [isCore])
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     const d = Math.min(delta, 0.05)
 
     // Transición suave del color hacia el theme activo.
@@ -97,51 +110,32 @@ function Artifact({ themeId, hex, reduced }: { themeId: ThemeId; hex: string; re
       }
     }
 
-    // Auto-spin (con boost durante el swap), apagado con reduced-motion.
-    if (spin.current && !reduced) {
+    // Auto-spin (con boost durante el swap). Se pausa mientras el usuario
+    // arrastra para rotar a mano, y con reduced-motion.
+    if (spin.current && !reduced && !dragging.current) {
       const boost = changing ? 2.6 : 1
       spin.current.rotation.y += d * 0.34 * boost
       spin.current.rotation.x += d * 0.08
     }
-
-    // Tilt hacia el cursor, con lerp (el objeto "sigue" el mouse).
-    if (tilt.current) {
-      const px = state.pointer.x
-      const py = state.pointer.y
-      tilt.current.rotation.y += (px * 0.5 - tilt.current.rotation.y) * 0.05
-      tilt.current.rotation.x += (-py * 0.4 - tilt.current.rotation.x) * 0.05
-    }
   })
 
   return (
-    <group ref={tilt}>
-      <mesh ref={spin} geometry={geometry} dispose={null}>
-        <meshPhysicalMaterial
-          ref={mat}
-          color={hex}
-          emissive={hex}
-          emissiveIntensity={0.55}
-          metalness={0.92}
-          roughness={0.16}
-          clearcoat={1}
-          clearcoatRoughness={0.18}
-          envMapIntensity={1.35}
-          flatShading
-        />
-        {isCore && <Edges threshold={12} scale={1.003} color="#ffffff" />}
-      </mesh>
-    </group>
+    <mesh ref={spin} geometry={geometry} dispose={null}>
+      <meshPhysicalMaterial
+        ref={mat}
+        color={hex}
+        emissive={hex}
+        emissiveIntensity={0.55}
+        metalness={0.92}
+        roughness={0.16}
+        clearcoat={1}
+        clearcoatRoughness={0.18}
+        envMapIntensity={1.35}
+        flatShading
+      />
+      {isCore && <Edges threshold={12} scale={1.003} color="#ffffff" />}
+    </mesh>
   )
-}
-
-/** Parallax sutil de cámara con el cursor — refuerza la profundidad. */
-function CameraRig() {
-  useFrame((state) => {
-    state.camera.position.x += (state.pointer.x * 0.45 - state.camera.position.x) * 0.03
-    state.camera.position.y += (state.pointer.y * 0.32 - state.camera.position.y) * 0.03
-    state.camera.lookAt(0, 0, 0)
-  })
-  return null
 }
 
 /** Pausa el render loop cuando la pestaña no está visible. */
@@ -159,6 +153,7 @@ export default function ApexCore() {
   const { activeConfig } = useApexTheme()
   const reduced = usePrefersReducedMotion()
   const frameloop = useVisibilityFrameloop()
+  const dragging = useRef(false)
 
   return (
     <Canvas
@@ -166,7 +161,8 @@ export default function ApexCore() {
       dpr={[1, 1.8]}
       camera={{ position: [0, 0, 4.5], fov: 42 }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      style={{ width: '100%', height: '100%', touchAction: 'none' }}
+      className="cursor-grab active:cursor-grabbing"
+      style={{ width: '100%', height: '100%', touchAction: 'pan-y' }}
     >
       <Suspense fallback={null}>
         <ambientLight intensity={0.35} />
@@ -176,8 +172,21 @@ export default function ApexCore() {
           <Lightformer form="rect" intensity={1.5} position={[-4, 1, 2]} scale={[3, 5, 1]} color={activeConfig.primary} />
           <Lightformer form="circle" intensity={1.1} position={[4, -2, 3]} scale={[3, 3, 1]} color="#ffffff" />
         </Environment>
-        <Artifact themeId={activeConfig.id} hex={activeConfig.primary} reduced={reduced} />
-        <CameraRig />
+        <Artifact themeId={activeConfig.id} hex={activeConfig.primary} reduced={reduced} dragging={dragging} />
+        <OrbitControls
+          makeDefault
+          enablePan={false}
+          enableZoom={false}
+          enableDamping
+          dampingFactor={0.08}
+          rotateSpeed={0.9}
+          onStart={() => {
+            dragging.current = true
+          }}
+          onEnd={() => {
+            dragging.current = false
+          }}
+        />
         <EffectComposer>
           <Bloom mipmapBlur intensity={0.9} luminanceThreshold={0.55} luminanceSmoothing={0.35} radius={0.75} />
         </EffectComposer>
