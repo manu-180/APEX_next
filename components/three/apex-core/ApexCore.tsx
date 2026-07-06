@@ -6,6 +6,8 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useApexTheme } from '@/hooks/useTheme'
+import type { ThemeId } from '@/lib/types/theme'
+import { getShapeGeometry } from '@/lib/three/logoGeometry'
 
 /**
  * APEX Core — el "theme engine hecho materia".
@@ -32,16 +34,39 @@ function usePrefersReducedMotion(): boolean {
   return reduced
 }
 
-function Artifact({ hex, reduced }: { hex: string; reduced: boolean }) {
+/** easeOutBack — leve overshoot al final, para el "pop" de la forma nueva. */
+function easeOutBack(x: number): number {
+  const c1 = 1.70158
+  const c3 = c1 + 1
+  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
+}
+
+function Artifact({ themeId, hex, reduced }: { themeId: ThemeId; hex: string; reduced: boolean }) {
   const tilt = useRef<THREE.Group>(null!)
   const spin = useRef<THREE.Mesh>(null!)
   const mat = useRef<THREE.MeshPhysicalMaterial>(null!)
   const cur = useMemo(() => new THREE.Color(hex), [])
   const tgt = useMemo(() => new THREE.Color(hex), [])
 
+  // Forma actualmente montada vs la del theme activo. Cuando difieren se anima un
+  // "swap": la forma vieja se encoge a un punto, se cambia la geometría y la nueva
+  // crece con un pop. El color se interpola aparte → sigue fluido durante el swap.
+  const [renderId, setRenderId] = useState<ThemeId>(themeId)
+  const phase = useRef(1) // 0 = punto · 1 = tamaño completo
+
+  const { geometry, isCore } = useMemo(() => getShapeGeometry(renderId), [renderId])
+
   useEffect(() => {
     tgt.set(hex)
   }, [hex, tgt])
+
+  // flatShading solo para el núcleo (facetado); los logos van lisos.
+  useEffect(() => {
+    if (mat.current) {
+      mat.current.flatShading = isCore
+      mat.current.needsUpdate = true
+    }
+  }, [isCore])
 
   useFrame((state, delta) => {
     const d = Math.min(delta, 0.05)
@@ -53,9 +78,29 @@ function Artifact({ hex, reduced }: { hex: string; reduced: boolean }) {
       mat.current.emissive.copy(cur).multiplyScalar(0.42)
     }
 
-    // Auto-spin (se apaga con reduced-motion).
+    // Transición de forma: encoger → swap de geometría → crecer con pop.
+    const changing = renderId !== themeId
+    if (reduced) {
+      if (changing) setRenderId(themeId) // sin motion: swap inmediato
+      phase.current = 1
+      if (spin.current) spin.current.scale.setScalar(1)
+    } else {
+      if (changing) {
+        phase.current = Math.max(0, phase.current - d * 5) // ~0.2s hasta el punto
+        if (phase.current <= 0.001) setRenderId(themeId) // swap en el punto
+      } else {
+        phase.current = Math.min(1, phase.current + d * 3.4) // crecer de vuelta
+      }
+      if (spin.current) {
+        const s = changing ? phase.current : Math.max(0.0001, easeOutBack(phase.current))
+        spin.current.scale.setScalar(s)
+      }
+    }
+
+    // Auto-spin (con boost durante el swap), apagado con reduced-motion.
     if (spin.current && !reduced) {
-      spin.current.rotation.y += d * 0.34
+      const boost = changing ? 2.6 : 1
+      spin.current.rotation.y += d * 0.34 * boost
       spin.current.rotation.x += d * 0.08
     }
 
@@ -70,8 +115,7 @@ function Artifact({ hex, reduced }: { hex: string; reduced: boolean }) {
 
   return (
     <group ref={tilt}>
-      <mesh ref={spin}>
-        <icosahedronGeometry args={[1.45, 0]} />
+      <mesh ref={spin} geometry={geometry} dispose={null}>
         <meshPhysicalMaterial
           ref={mat}
           color={hex}
@@ -84,7 +128,7 @@ function Artifact({ hex, reduced }: { hex: string; reduced: boolean }) {
           envMapIntensity={1.35}
           flatShading
         />
-        <Edges threshold={12} scale={1.003} color="#ffffff" />
+        {isCore && <Edges threshold={12} scale={1.003} color="#ffffff" />}
       </mesh>
     </group>
   )
@@ -132,7 +176,7 @@ export default function ApexCore() {
           <Lightformer form="rect" intensity={1.5} position={[-4, 1, 2]} scale={[3, 5, 1]} color={activeConfig.primary} />
           <Lightformer form="circle" intensity={1.1} position={[4, -2, 3]} scale={[3, 3, 1]} color="#ffffff" />
         </Environment>
-        <Artifact hex={activeConfig.primary} reduced={reduced} />
+        <Artifact themeId={activeConfig.id} hex={activeConfig.primary} reduced={reduced} />
         <CameraRig />
         <EffectComposer>
           <Bloom mipmapBlur intensity={0.9} luminanceThreshold={0.55} luminanceSmoothing={0.35} radius={0.75} />

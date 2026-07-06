@@ -99,9 +99,9 @@ export function Home3DShowcase() {
           </h2>
 
           <p className="mb-8 max-w-md text-base leading-relaxed text-[var(--color-on-surface-variant)]">
-            Esto es 3D real corriendo en tu navegador, ahora mismo. Tocá un color y mirá cómo
-            responde todo el sitio. Es la misma clase de experiencia premium que puedo construir
-            para tu marca.
+            Esto es 3D real corriendo en tu navegador, ahora mismo. Tocá un color y mirá al objeto
+            cambiar de forma junto con todo el sitio. Es la misma clase de experiencia premium que
+            puedo construir para tu marca.
           </p>
 
           {/* Swatches de theme — el gancho interactivo */}
