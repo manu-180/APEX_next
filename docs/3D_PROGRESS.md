@@ -18,10 +18,13 @@ Opus 4.8 (Manuel pidió Fable; el switch aplica desde su próximo mensaje). Inge
 - Build verde, three code-split (home 120kB / lab 118kB First Load), 0 errores en prod.
 
 ## Pendiente (siguiente tanda — cada una es un bloque sustancial)
-- [ ] **Museo de casos**: los 15 casos reales de `/servicios` (`servicios-showcase.tsx`) como slabs 3D flotantes con profundidad. Alto impacto en conversión.
-- [ ] **Founder 3D**: busto estilizado (Meshy image-to-3D desde foto) en `founder.tsx` — NO realista (uncanny).
-- [ ] **Micro-momentos**: logo APEX que se ensambla en el load; íconos de feature cards del hero como mini-objetos 3D.
+- [x] **Museo de casos**: HECHO y deployado (commit `85c4047`, 2026-07-05). Los 7 casos reales (no eran 15) como slabs 3D en `/lab#museo` (`components/three/case-museum/`), + link desde `/servicios`.
+- [ ] **Founder 3D**: EN CURSO — **sesión A** (museo). GLB crudo ya generado (`public/models/apex-founder-raw.glb`, image-to-3D sin textura → se renderiza como escultura theme-reactive). Script: `scripts/meshy/founder.mjs`.
+- [ ] **Micro-momentos**: EN CURSO — **sesión B** (paralela): ApexCore muta a la forma del logo del theme (`lib/three/logo-shapes.ts`, `lib/three/logoGeometry.ts`, edits a `ApexCore.tsx` + copy de `home-3d-showcase.tsx`). Sesión A NO toca esos archivos.
 - [ ] Pulir iluminación del showroom Meshy (los objetos metálicos se ven algo grises en algunos ángulos).
+
+### ⚠️ Coordinación multi-sesión (2026-07-05)
+Hay DOS sesiones trabajando en el mismo working tree. Reparto: **A** = museo (hecho) + founder 3D · **B** = micro-momentos/ApexCore logo morph. Antes de commitear: `git add` SOLO archivos propios; no rehacer tareas del otro. La key de Meshy en `.env.local` es válida (verificada 2026-07-05).
 
 ## Gotchas
 - Dev en Windows: hydration mismatch **fantasma** por cache de chunks al editar clases (NO en prod). Verificar con `npm run build` + `npm start`.

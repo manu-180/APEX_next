@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { motion, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
@@ -26,6 +27,16 @@ const WA_MSG_FOUNDER =
   'Hola Manuel, leí quién está detrás de APEX y quiero contarte mi proyecto. ¿Lo charlamos?'
 
 const YEARS_EXP = new Date().getFullYear() - 2021
+
+/**
+ * Busto 3D del founder (Meshy image-to-3D + material theme-reactive).
+ * Se carga on-demand recién cuando el visitante toca "Verme en 3D":
+ * el chunk de three.js no entra al critical path de la home.
+ */
+const FounderBust = dynamic(() => import('@/components/three/founder-bust/FounderBust'), {
+  ssr: false,
+  loading: () => null,
+})
 
 /** Verdades canónicas (AUDIT_ADDENDUM) — nada inflado. */
 const FOUNDER_STATS = [
@@ -59,6 +70,7 @@ const LIVE_PRODUCTS = [
 function FounderPortrait() {
   const imgRef = useRef<HTMLImageElement | null>(null)
   const [photoLoaded, setPhotoLoaded] = useState(false)
+  const [show3D, setShow3D] = useState(false)
 
   useEffect(() => {
     const el = imgRef.current
@@ -104,6 +116,42 @@ function FounderPortrait() {
         )}
         onLoad={() => setPhotoLoaded(true)}
       />
+
+      {/* Capa 3D — busto escultórico theme-reactive, montado solo al activar.
+          La foto queda debajo mientras carga el chunk → transición sin hueco. */}
+      {show3D && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(120% 100% at 50% 30%, rgba(var(--color-primary-rgb), 0.16), transparent 65%), var(--color-surface-base)',
+          }}
+        >
+          <FounderBust />
+        </div>
+      )}
+
+      {/* Toggle foto ↔ 3D */}
+      <button
+        type="button"
+        onClick={() => setShow3D((v) => !v)}
+        aria-pressed={show3D}
+        className={cn(
+          'absolute right-2.5 top-2.5 z-10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5',
+          'font-mono text-[10px] font-bold uppercase tracking-[0.14em] select-none',
+          'transition-[background-color,border-color,color] duration-300 ease-out',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
+        )}
+        style={{
+          borderColor: 'rgba(var(--color-primary-rgb), 0.4)',
+          background: show3D ? 'rgba(var(--color-primary-rgb), 0.16)' : 'rgba(10, 14, 20, 0.55)',
+          color: show3D ? 'var(--color-primary)' : 'rgba(255,255,255,0.85)',
+          backdropFilter: 'blur(6px)',
+        }}
+      >
+        <span aria-hidden style={{ color: 'var(--color-primary)' }}>◇</span>
+        {show3D ? 'Ver foto' : 'Verme en 3D'}
+      </button>
     </div>
   )
 }
