@@ -46,3 +46,13 @@ next-env.d.ts
 .playwright-mcp/
 graphify-out/
 404-page.png
+
+# Meshy — artefactos transitorios de generación (no commitear)
+scripts/meshy/.raw/
+scripts/meshy/.backup/
+scripts/meshy/*.log
+scripts/meshy/contact-sheet.png
+scripts/meshy/roster-manifest.json
+
+# Screenshots de verificación del muestrario
+muestrario-*.png

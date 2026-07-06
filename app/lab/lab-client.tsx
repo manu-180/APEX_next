@@ -6,8 +6,9 @@ import { useEffect, useRef, useState } from 'react'
 import { ROUTES } from '@/lib/constants'
 import { useApexTheme } from '@/hooks/useTheme'
 import { THEMES } from '@/lib/types/theme'
-import { ARTIFACTS } from '@/lib/three/artifacts'
+import { ARTIFACTS, CATEGORIES, artifactsOf, type Artifact, type CategoryId } from '@/lib/three/artifacts'
 import { MUSEUM_CASES, type MuseumCase } from '@/lib/three/museum'
+import { MuestrarioSelector } from '@/components/three/meshy-showroom/MuestrarioSelector'
 import { ArrowRightIcon, ExternalLinkIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl, WA_MSG_LAB } from '@/lib/whatsapp'
@@ -116,7 +117,8 @@ function MuseumStage({ themeHex }: { themeHex: string }) {
 
 export function LabClient() {
   const { activeConfig, applyTheme } = useApexTheme()
-  const [artifactIdx, setArtifactIdx] = useState(0)
+  const [activeCat, setActiveCat] = useState<CategoryId>('reliquias')
+  const [activeId, setActiveId] = useState<string>(ARTIFACTS[0].id)
   const artifactRef = useRef<HTMLDivElement>(null)
   const [artifactInView, setArtifactInView] = useState(false)
 
@@ -136,7 +138,17 @@ export function LabClient() {
     return () => io.disconnect()
   }, [])
 
-  const activeArtifact = ARTIFACTS[artifactIdx]
+  const activeArtifact = ARTIFACTS.find((a) => a.id === activeId) ?? ARTIFACTS[0]
+
+  const selectCategory = (cat: CategoryId) => {
+    setActiveCat(cat)
+    const first = artifactsOf(cat)[0]
+    if (first) setActiveId(first.id)
+  }
+  const selectArtifact = (art: Artifact) => {
+    setActiveId(art.id)
+    setActiveCat(art.category)
+  }
 
   return (
     <>
@@ -255,7 +267,7 @@ export function LabClient() {
           <header className="mx-auto max-w-2xl text-center">
             <div className="flex items-center justify-center gap-3 font-mono text-[12px] uppercase tracking-[0.34em] text-white/45">
               <span className="h-[6px] w-[6px] rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
-              APEX // ARTEFACTOS
+              APEX // MUESTRARIO
             </div>
             <h2 className="mt-4 text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold leading-[1.05] tracking-tight text-white">
               De la idea{' '}
@@ -271,43 +283,35 @@ export function LabClient() {
               </span>
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-[15px] font-light leading-relaxed text-white/55">
-              Los modelé con IA, los optimicé a mano y los traje a WebGL en tiempo real.
-              Objetos que girás y mirás desde cualquier ángulo — no son imágenes. Agarrá uno y movelo.
+              {ARTIFACTS.length} objetos modelados con IA, optimizados a mano y traídos a WebGL, en{' '}
+              {CATEGORIES.length} categorías. Elegí uno, agarralo y miralo desde cualquier ángulo — no son imágenes.
             </p>
           </header>
 
           {/* Stage del artefacto */}
           <div className="relative mx-auto mt-8 h-[52vh] max-h-[520px] min-h-[380px] w-full">
-            {artifactInView ? <MeshyShowroom index={artifactIdx} /> : <StagePoster label="cargando artefacto" />}
+            {artifactInView ? (
+              <MeshyShowroom file={activeArtifact.file} scale={activeArtifact.scale} />
+            ) : (
+              <StagePoster label="cargando artefacto" />
+            )}
           </div>
 
-          {/* Selector */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-            {ARTIFACTS.map((a, i) => {
-              const active = i === artifactIdx
-              return (
-                <button
-                  key={a.id}
-                  onClick={() => setArtifactIdx(i)}
-                  className="flex flex-col rounded-xl border px-4 py-2.5 text-left transition-all duration-300"
-                  style={{
-                    borderColor: active ? 'rgba(var(--color-primary-rgb),0.6)' : 'rgba(255,255,255,0.08)',
-                    background: active ? 'rgba(var(--color-primary-rgb),0.08)' : 'rgba(255,255,255,0.02)',
-                    boxShadow: active ? '0 8px 26px -16px rgba(var(--color-primary-rgb),0.9)' : 'none',
-                  }}
-                >
-                  <span className="text-sm font-semibold" style={{ color: active ? '#EAF0FA' : 'rgba(255,255,255,0.6)' }}>
-                    {a.name}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{a.tag}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          <p className="mt-5 text-center text-[13px] font-light text-white/45">
-            {activeArtifact.blurb} · arrastrá para rotar · generado con Meshy AI
+          {/* Caption de la pieza activa */}
+          <p className="mx-auto mt-4 max-w-xl text-center text-[13px] font-light text-white/50">
+            <b className="font-semibold text-white/80">{activeArtifact.name}</b> — {activeArtifact.blurb}
+            <span className="text-white/35"> · arrastrá para rotar</span>
           </p>
+
+          {/* Selector premium: categorías + rail de piezas */}
+          <div className="mt-6">
+            <MuestrarioSelector
+              activeCat={activeCat}
+              activeId={activeId}
+              onSelectCategory={selectCategory}
+              onSelectArtifact={selectArtifact}
+            />
+          </div>
 
           <div className="mt-10 flex justify-center">
             <WhatsAppOutboundLink
