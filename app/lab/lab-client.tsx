@@ -206,11 +206,13 @@ export function LabClient() {
           <div className="relative z-[3] mt-2 flex flex-wrap justify-center gap-2.5">
             {THEMES.map((t) => {
               const active = activeConfig.id === t.id
+              const showName = !['botlode', 'assistify', 'contact-engine', 'luma-invita'].includes(t.id)
               return (
                 <button
                   key={t.id}
                   onClick={(e) => applyTheme(t.id, e)}
-                  className="group flex items-center gap-2 rounded-[10px] border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-300"
+                  aria-label={`Aplicar tema ${t.name}`}
+                  className={`group flex items-center rounded-[10px] border font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-300 ${showName ? 'gap-2 px-3 py-2' : 'p-2'}`}
                   style={{
                     borderColor: active ? 'rgba(var(--color-primary-rgb),0.6)' : 'rgba(255,255,255,0.08)',
                     background: active ? 'rgba(var(--color-primary-rgb),0.08)' : 'rgba(255,255,255,0.02)',
@@ -222,7 +224,7 @@ export function LabClient() {
                     className="h-[11px] w-[11px] rounded-[3px]"
                     style={{ background: t.primary, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)' }}
                   />
-                  {t.name}
+                  {showName && t.name}
                 </button>
               )
             })}
