@@ -18,6 +18,7 @@ export const ROUTES = {
   home:        '/',
   servicios:   '/servicios',
   muestrario:  '/muestrario',
+  lab:         '/lab',
   tecnologias: '/tecnologias',
   about:       '/sobre-mi',
   contact:     '/contacto',

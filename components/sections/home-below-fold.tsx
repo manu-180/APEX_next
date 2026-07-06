@@ -36,6 +36,11 @@ const HomeProcessSection = dynamic(
   { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
 )
 
+const Home3DShowcase = dynamic(
+  () => import('./home-3d-showcase').then((m) => m.Home3DShowcase),
+  { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
+)
+
 const TrustedClientsSection = dynamic(
   () => import('./trusted-clients').then((m) => m.TrustedClientsSection),
   { loading: () => <SectionSkeleton className="py-16 md:py-20" /> },
@@ -60,6 +65,7 @@ export function HomeBelowFold() {
       <TrustedClientsSection />
       <ClientBenefitsSection />
       <HomeProcessSection />
+      <Home3DShowcase />
       <FounderSection />
       <HomeFinalCtaSection />
     </>
