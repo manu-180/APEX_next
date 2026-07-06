@@ -2,7 +2,7 @@
 
 Integración 3D (three.js + Meshy) en APEX_next. Iniciado 2026-07-05.
 
-## Estado: DEPLOYADO a producción ✅ (commit `5aa7dfc`, live en theapexweb.com)
+## Estado: DEPLOYADO a producción ✅ (tanda 2: museo `85c4047` + founder `fb01d87`, live en theapexweb.com)
 
 ## Modelo
 Opus 4.8 (Manuel pidió Fable; el switch aplica desde su próximo mensaje). Ingeniería pesada → Opus recomendado.
@@ -19,7 +19,7 @@ Opus 4.8 (Manuel pidió Fable; el switch aplica desde su próximo mensaje). Inge
 
 ## Pendiente (siguiente tanda — cada una es un bloque sustancial)
 - [x] **Museo de casos**: HECHO y deployado (commit `85c4047`, 2026-07-05). Los 7 casos reales (no eran 15) como slabs 3D en `/lab#museo` (`components/three/case-museum/`), + link desde `/servicios`.
-- [ ] **Founder 3D**: EN CURSO — **sesión A** (museo). GLB crudo ya generado (`public/models/apex-founder-raw.glb`, image-to-3D sin textura → se renderiza como escultura theme-reactive). Script: `scripts/meshy/founder.mjs`.
+- [x] **Founder 3D**: HECHO y deployado (commit `fb01d87`, 2026-07-05). Busto Meshy image-to-3D sin textura (`public/models/apex-founder.glb`, 810 KB) + material theme-reactive; toggle "Verme en 3D" en el retrato de `founder.tsx`, chunk on-demand. Script: `scripts/meshy/founder.mjs`.
 - [ ] **Micro-momentos**: EN CURSO — **sesión B** (paralela): ApexCore muta a la forma del logo del theme (`lib/three/logo-shapes.ts`, `lib/three/logoGeometry.ts`, edits a `ApexCore.tsx` + copy de `home-3d-showcase.tsx`). Sesión A NO toca esos archivos.
 - [ ] Pulir iluminación del showroom Meshy (los objetos metálicos se ven algo grises en algunos ángulos).
 
