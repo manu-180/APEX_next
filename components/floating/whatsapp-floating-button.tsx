@@ -80,7 +80,10 @@ export function WhatsAppFloatingButton() {
           // Press/hover táctil — sólo con motion permitido.
           'motion-safe:hover:scale-[1.03] motion-safe:active:scale-[0.94] active:opacity-95',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'p-2 gap-0 overflow-hidden',
+          // NO overflow-hidden al colapsar: recorta el status dot (esquina del avatar)
+          // contra el círculo. El label ya se auto-recorta (overflow-hidden + max-w-0)
+          // y en mobile está hidden, así que no hace falta clip a nivel botón.
+          isExpanded ? 'p-2 sm:pl-2 sm:pr-5 sm:py-2 sm:gap-3' : 'p-2 gap-0',
         )}
       >
         {/* Glow pulse sutil — usa color del tema, no verde clásico */}
