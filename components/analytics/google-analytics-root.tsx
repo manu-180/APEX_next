@@ -7,6 +7,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void
+    dataLayer?: IArguments[]
   }
 }
 
@@ -53,6 +54,33 @@ function GaRoutePageViews({ gaId }: { gaId: string }) {
 export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
   const [activate, setActivate] = useState(false)
 
+  /**
+   * Cola sincrónica, sin red. Define `window.gtag` y encola `js` + `config`
+   * apenas hidrata, mucho antes de que gtag.js baje.
+   *
+   * Sin esto, quien llega de un anuncio y clickea el CTA en los primeros
+   * segundos encuentra `window.gtag === undefined` y `trackGoogleAdsConversion`
+   * hace `return` en silencio: el clic pago se cobra y la conversión no se
+   * registra. Justo los visitantes de más intención son los que se perdían.
+   *
+   * El orden importa: gtag.js procesa `dataLayer` en secuencia, así que `js` y
+   * `config` tienen que estar encolados ANTES que cualquier evento de
+   * conversión o el evento se descarta por falta de config.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (typeof window.gtag === 'function') return
+
+    window.dataLayer = window.dataLayer || []
+    window.gtag = function gtag() {
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer!.push(arguments)
+    }
+    window.gtag('js', new Date())
+    window.gtag('config', gaId, { transport_type: 'beacon' })
+    window.gtag('config', AW_ID, { transport_type: 'beacon' })
+  }, [gaId])
+
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (activate) return
@@ -81,14 +109,9 @@ export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
 
   return (
     <>
-      <Script id="google-gtag-bootstrap" strategy="lazyOnload">{`
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        window.gtag = window.gtag || gtag;
-        window.gtag('js', new Date());
-        window.gtag('config', '${gaId}', { transport_type: 'beacon' });
-        window.gtag('config', '${AW_ID}', { transport_type: 'beacon' });
-      `}</Script>
+      {/* `js` y los `config` ya quedaron encolados en dataLayer al hidratar
+          (ver efecto de arriba). Acá sólo falta bajar gtag.js, que consume la
+          cola en orden al ejecutarse. */}
       <Script
         id="google-gtag-src"
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}

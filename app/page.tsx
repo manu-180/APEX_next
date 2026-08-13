@@ -1,5 +1,6 @@
 import { HeroSection } from '@/components/sections/hero'
 import { HomeBelowFold } from '@/components/sections/home-below-fold'
+import { LegacyHashRedirect } from '@/components/seo/legacy-hash-redirect'
 
 /**
  * Home — hero estático crítico arriba, resto en componente separado que se
@@ -14,6 +15,7 @@ export const dynamicParams = false
 export default function HomePage() {
   return (
     <>
+      <LegacyHashRedirect />
       <HeroSection />
       <HomeBelowFold />
     </>
