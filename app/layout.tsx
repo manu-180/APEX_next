@@ -8,7 +8,7 @@ import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-roo
 import { MetaPixel } from '@/components/analytics/meta-pixel'
 import { SentryProvider } from '@/components/providers/sentry-provider'
 import { PostHogProviderWrapper, PostHogPageView } from '@/components/providers/posthog-provider'
-import { APP_URL, BRAND_IMAGE_SRC } from '@/lib/constants'
+import { APP_URL } from '@/lib/constants'
 import './globals.css'
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
@@ -76,11 +76,12 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   alternates: { canonical: APP_URL },
-  icons: {
-    icon: [{ url: BRAND_IMAGE_SRC, type: 'image/png', sizes: '32x32' }],
-    apple: [{ url: BRAND_IMAGE_SRC, sizes: '180x180', type: 'image/png' }],
-    shortcut: BRAND_IMAGE_SRC,
-  },
+  // Sin `icons`: declararlo acá pisa la convención de archivos de Next. Los
+  // íconos salen de app/favicon.ico + app/icon.png + app/apple-icon.png, que
+  // Next linkea con el tamaño real de cada archivo. Antes los tres apuntaban a
+  // /apex-logo.png (96 px) declarando "32x32" y "180x180": tamaños mentidos que
+  // el navegador reescala mal, y /favicon.ico daba 404 — que es de donde Chrome
+  // saca el ícono para la omnibox, el historial y los marcadores.
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
