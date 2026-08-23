@@ -19,10 +19,29 @@ function isPlaceholder(label: string): boolean {
   return label === '' || label.startsWith('TODO_')
 }
 
-function trackGoogleAdsConversion(label: string) {
+/**
+ * Dispara una conversión de Google Ads.
+ *
+ * Los casos en los que NO se registra quedan en consola a propósito: una
+ * conversión perdida en silencio es plata de campaña que se gasta sin dejar
+ * rastro, y es exactamente el tipo de fallo que no se descubre hasta el
+ * cierre de mes.
+ */
+function trackGoogleAdsConversion(label: string, name: string): void {
   if (typeof window === 'undefined') return
-  if (typeof window.gtag !== 'function') return
-  if (isPlaceholder(label)) return
+
+  if (isPlaceholder(label)) {
+    console.warn(`[apex:ads] la conversión "${name}" no tiene label configurado: no se registra.`)
+    return
+  }
+
+  if (typeof window.gtag !== 'function') {
+    console.warn(
+      `[apex:ads] gtag no está disponible todavía: se pierde la conversión "${name}". ` +
+        'Revisá NEXT_PUBLIC_GA_MEASUREMENT_ID y que GoogleAnalyticsRoot esté montado.',
+    )
+    return
+  }
 
   window.gtag('event', 'conversion', {
     send_to: `${GOOGLE_ADS_ACCOUNT_ID}/${label}`,
@@ -30,9 +49,9 @@ function trackGoogleAdsConversion(label: string) {
 }
 
 export const trackGoogleAdsWhatsAppClick = () => {
-  trackGoogleAdsConversion(GOOGLE_ADS_WHATSAPP_LABEL)
+  trackGoogleAdsConversion(GOOGLE_ADS_WHATSAPP_LABEL, 'WhatsApp Click')
 }
 
 export const trackGoogleAdsHeroCtaClick = () => {
-  trackGoogleAdsConversion(GOOGLE_ADS_HERO_CTA_LABEL)
+  trackGoogleAdsConversion(GOOGLE_ADS_HERO_CTA_LABEL, 'Hero CTA')
 }

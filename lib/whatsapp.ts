@@ -52,3 +52,24 @@ export function waMsgEstimator(params: {
       : '• (solo base)'
   return `Hola, usé el estimador de tu web (${tipo}).\n${list}\nTotal referencia: ${params.totalFormatted}\n¿Lo revisamos juntos?`
 }
+
+/** Hosts a los que aceptamos mandar a un visitante desde un CTA o desde /gracias. */
+const WHATSAPP_HOSTS = new Set(['wa.me', 'api.whatsapp.com', 'web.whatsapp.com'])
+
+/**
+ * Valida que una URL sea realmente de WhatsApp antes de usarla como destino.
+ *
+ * `/gracias?wa=<url>` viaja en la query string, así que es entrada controlable
+ * por cualquiera: sin este chequeo se puede publicar un link de theapexweb.com
+ * cuyo botón principal ("Ir a WhatsApp ahora") apunte a otro dominio.
+ */
+export function isTrustedWhatsAppUrl(value: string | null | undefined): boolean {
+  if (!value) return false
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch {
+    return false // no parsea como URL absoluta → no es de WhatsApp
+  }
+  return url.protocol === 'https:' && WHATSAPP_HOSTS.has(url.hostname)
+}

@@ -157,7 +157,7 @@ for r in gaql(f"""
 # --------------------------------------------------------------- assets
 section("ASSETS (sitelinks, callouts, snippets)")
 for r in gaql(f"""
-    SELECT campaign_asset.asset, campaign_asset.field_type, campaign_asset.status,
+    SELECT campaign.id, campaign_asset.asset, campaign_asset.field_type, campaign_asset.status,
            asset.type, asset.sitelink_asset.link_text, asset.sitelink_asset.description1,
            asset.sitelink_asset.description2, asset.callout_asset.callout_text,
            asset.structured_snippet_asset.header, asset.structured_snippet_asset.values,

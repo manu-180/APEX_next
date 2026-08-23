@@ -1,10 +1,11 @@
 'use client'
 
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
+import { isTrustedWhatsAppUrl } from '@/lib/whatsapp'
 import { WA_GRADIENT, WA_GREEN, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
 import { DELAY_AFTER_PANEL, DUR_REVEAL, DUR_SLOW, EASE_OUT } from '@/lib/motion'
 
@@ -67,8 +68,23 @@ function WhatsAppIcon({ className, style }: { className?: string; style?: React.
 
 export function GraciasContent() {
   const searchParams = useSearchParams()
+  // `URLSearchParams.get` YA devuelve el valor decodificado. Decodificar otra
+  // vez rompía el mensaje: el texto quedaba con espacios y `&` crudos, así que
+  // todo lo que venía después del primer `&` se perdía (caso estimador).
   const waParam = searchParams.get('wa')
-  const waHref = waParam ? decodeURIComponent(waParam) : FALLBACK_WA
+  // El parámetro viaja en la URL, o sea que lo controla cualquiera: sólo lo
+  // usamos si realmente apunta a WhatsApp.
+  const waIsTrusted = isTrustedWhatsAppUrl(waParam)
+  const waHref = waIsTrusted && waParam ? waParam : FALLBACK_WA
+
+  useEffect(() => {
+    if (waParam && !waIsTrusted) {
+      console.warn(
+        '[apex:whatsapp] se ignoró el parámetro ?wa= porque no es una URL de WhatsApp:',
+        waParam,
+      )
+    }
+  }, [waParam, waIsTrusted])
 
   // Rama reduced propia para TODO el Framer de la página: el nuke CSS global
   // no alcanza a las animaciones inline (spec §11). Con reduced-motion se
@@ -155,7 +171,7 @@ export function GraciasContent() {
           transition={{ delay: 0.3, duration: DUR_SLOW, ease: EASE_OUT }}
           className="mx-auto mt-3 max-w-md text-base leading-relaxed text-[var(--color-on-surface-variant)]"
         >
-          {waParam
+          {waIsTrusted
             ? 'WhatsApp ya debería estar abierto. Si no, usá el botón de abajo.'
             : 'Tocá el botón y seguimos por WhatsApp.'}
         </motion.p>
@@ -176,10 +192,12 @@ export function GraciasContent() {
           transition={{ delay: 0.45, type: 'spring', stiffness: 240, damping: 22 }}
           className="mt-8 flex flex-col items-center gap-4"
         >
+          {/* Sin target="_blank" a propósito: este botón es el rescate para
+              quien NO pudo abrir la pestaña nueva (navegadores in-app, Custom
+              Tabs). Abrirlo con _blank fallaría por el mismo motivo; la
+              navegación en la misma pestaña siempre llega. */}
           <a
             href={waHref}
-            target="_blank"
-            rel="noopener noreferrer"
             className={`group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-3 text-sm font-bold text-white
               transition-transform duration-300 ease-out hover:scale-[1.02] active:scale-[0.98]
               motion-reduce:transition-none motion-reduce:hover:scale-100 ${WA_SHADOW_CLASS_LG}`}
