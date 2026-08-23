@@ -166,10 +166,30 @@ esperable, no conclusiones.
 
 ## Pendiente de Manuel
 
-1. **Activar conversiones mejoradas para clientes potenciales.** El campo
-   `enhanced_conversions_for_leads_enabled` es de solo lectura por API: hay que
-   darlo en la consola, una vez.
-2. **Definir el valor de un lead.** Sin la tasa de cierre real no hay forma
+1. **Definir el valor de un lead.** Sin la tasa de cierre real no hay forma
    honesta de asignar valor. Con ese dato se activa la puja por valor.
-3. **Decidir si el presupuesto de $5.000/día sigue.** Son ~$150.000/mes. No se
+2. **Decidir si el presupuesto de $5.000/día sigue.** Son ~$150.000/mes. No se
    tocó: subirlo o bajarlo es decisión de negocio, no técnica.
+
+---
+
+## Conversiones avanzadas para clientes potenciales: dejar APAGADO
+
+`enhanced_conversions_for_leads_enabled = false` es la configuración **correcta**
+para APEX, no un pendiente. La propia consola lo dice al intentar activarlo:
+
+> "Si las conversiones avanzadas de clientes potenciales están desactivadas, el
+> ID de clic de Google (GCLID) se utilizará para medir los clientes potenciales
+> que generaron conversiones sin conexión."
+
+Es **excluyente, no aditivo**. Encendido, la medición offline pasa a depender de
+mail o teléfono hasheados tomados de un **formulario del sitio**. APEX no tiene
+formulario: la conversión es un clic a WhatsApp, así que no habría dato que
+cruzar y se perdería el único camino que sí funciona.
+
+Apagado, el mecanismo es **GCLID** — que ya viaja en la URL porque el
+auto-tagging está activo, y es lo que espera la conversion action
+`UPLOAD_CLICKS` creada en el punto 8.
+
+Revisar esta decisión solo si algún día se agrega un formulario que capture mail
+o teléfono.
