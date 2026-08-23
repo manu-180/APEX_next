@@ -65,16 +65,38 @@ for r in gaql(f"""
         check("desktop sin castigo de puja", abs(cc.bid_modifier - 1.0) < 0.001,
               f"bid_modifier={cc.bid_modifier:.2f}")
 
-# --- keywords pausadas
-PAUSADAS = [55815017073, 142318757, 299155369813]
+# --- estado esperado de las keywords que se tocaron
+#
+# Solo queda pausada la que no convirtio en TRES meses. Las otras dos se
+# pausaron el 22-08 mirando 30 dias y se reactivaron el 23-08: con ~5
+# conversiones al mes, una ventana de 30 dias no distingue "no convierte" de
+# "todavia no le toco". A 90 dias tienen 2 conversiones cada una, con CPA mejor
+# que el promedio de la cuenta.
+ESPERADO = {
+    55815017073:  "PAUSED",   # cuanto se cobra por hacer una pagina web: $16.950, 0 conv en 3 meses
+    142318757:    "ENABLED",  # hacer una pagina web: 2 conv, CPA $9.177
+    299155369813: "ENABLED",  # cuanto sale una pagina web: 2 conv, CPA $9.969
+}
 for r in gaql(f"""
     SELECT campaign.id, ad_group_criterion.criterion_id, ad_group_criterion.keyword.text,
            ad_group_criterion.status FROM ad_group_criterion
     WHERE campaign.id = {CAMPAIGN_ID}
-      AND ad_group_criterion.criterion_id IN ({','.join(map(str, PAUSADAS))})
+      AND ad_group_criterion.criterion_id IN ({','.join(map(str, ESPERADO))})
 """):
     k = r.ad_group_criterion
-    check(f"keyword pausada: {k.keyword.text[:38]}", k.status.name == "PAUSED", k.status.name)
+    esperado = ESPERADO[k.criterion_id]
+    check(f"keyword {k.keyword.text[:34]} -> {esperado}",
+          k.status.name == esperado, k.status.name)
+
+# --- negativas que NO pueden volver: matan busquedas de compra
+PROHIBIDAS = ["web me", "tarifario", "3d", "que necesito", "qué necesito"]
+negs_actuales = {r.campaign_criterion.keyword.text.lower() for r in gaql(f"""
+    SELECT campaign.id, campaign_criterion.keyword.text FROM campaign_criterion
+    WHERE campaign.id = {CAMPAIGN_ID} AND campaign_criterion.negative = TRUE
+      AND campaign_criterion.type = 'KEYWORD'
+""")}
+volvieron = [n for n in PROHIBIDAS if n in negs_actuales]
+check("ninguna negativa asesina volvio", not volvieron, f"volvieron={volvieron}")
 
 # --- keyword nueva
 nueva = gaql(f"""
