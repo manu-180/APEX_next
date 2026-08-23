@@ -207,7 +207,10 @@ a {
   --color-ink-strong: var(--color-on-surface-variant);
   /* Lectura larga (blog): on-surface al 85% (spec §10) */
   --color-on-surface-reading: rgba(255, 255, 255, 0.85);
-  --color-primary-foreground: #ffffff;
+  /* En dark el primary es CLARO, así que lo que va encima tiene que ser oscuro.
+     Con blanco daba 3.36:1 (falla incluso el 4.5:1 de texto); con la base
+     oscura da 6.06:1. Único consumidor: el check de turno agendado. */
+  --color-primary-foreground: #050508;
 
   /* Sombras SIEMPRE tintadas (spec §5) — slate-950 azulado, coherente con #050508 */
   --shadow-tint-rgb: 2, 6, 23;
@@ -307,10 +310,16 @@ a {
    THEME DEFINITIONS — primary color per data-theme
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Neutral = tema por defecto (lo que ve el 100% del tráfico pago).
+   Medido: el viejo #64748B daba 4.28:1 sobre --color-surface-base dark y
+   4.40:1 sobre el light — por debajo del 4.5:1 de WCAG AA en AMBOS modos,
+   justo donde el primary se usa como TEXTO (eyebrows, links, CTAs).
+   Se separa en dos valores del mismo hue slate: claro para dark, oscuro
+   para light. Peor caso ahora: 4.60:1 (dark, sobre surface-highest). */
 [data-theme="neutral"],
 :root {
-  --color-primary:     #64748B;
-  --color-primary-rgb: 100, 116, 139;
+  --color-primary:     #7F8DA4;
+  --color-primary-rgb: 127, 141, 164;
 }
 
 [data-theme="flutter"] {
@@ -372,7 +381,15 @@ a {
 /* ── Light overrides por tema ──────────────────────────────────────────────
    Mismo hue de marca, oscurecido hasta contraste AA (≥4.5:1) sobre blanco:
    el primary se usa como TEXTO (labels, links, nav activo) en light.
-   flutter / neutral / nextjs(ya tiene) / contact-engine pasan sin cambio. */
+   Medido 2026-08-23: en dark siguen por debajo de AA flutter (4.19),
+   riverpod (4.22), typescript (4.49), contact-engine (4.06) y
+   luma-invita (4.37 sobre superficies altas). Son colores de marca
+   oficiales y no los ve el trafico pago, que entra siempre en neutral:
+   cambiarlos es decision de diseno, no de accesibilidad. */
+.light[data-theme="neutral"] {
+  --color-primary:     #505E72;
+  --color-primary-rgb: 80, 94, 114;
+}
 .light[data-theme="supabase"] {
   --color-primary:     #047857;
   --color-primary-rgb: 4, 120, 87;
@@ -403,6 +420,28 @@ a {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @layer utilities {
+  /* ── Área táctil de 44×44 sin agrandar el control visible ────────────────
+     Centra un ::before transparente de 44×44 (o del tamaño del control, el
+     que sea mayor) sobre el elemento. El diseño no se mueve ni un píxel;
+     lo único que crece es la zona que capta el dedo.
+
+     Uso: agregar `relative tap-44` en el className. La clase NO fija
+     `position` a propósito — así no pelea especificidad con `.absolute` de
+     Tailwind en controles que ya están posicionados (ahí va `tap-44` solo).
+
+     Ojo al vecino: dos controles con tap-44 necesitan ≥44px de paso entre
+     centros o sus áreas se pisan. Por eso algunos `gap` suben junto con la
+     clase — un área que se solapa provoca toques en el control equivocado. */
+  .tap-44::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
   .bg-primary-8  { background-color: rgba(var(--color-primary-rgb), 0.08); }
   .bg-primary-12 { background-color: rgba(var(--color-primary-rgb), 0.12); }
   .bg-primary-20 { background-color: rgba(var(--color-primary-rgb), 0.20); }
@@ -1454,11 +1493,20 @@ body::after {
 }
 .footer-link {
   --footer-link-pad-x: 0.55rem;
+  /* 12px arriba + 20px de línea + 12px abajo = 44px de alto tocable.
+     Antes: 0.4rem de padding → 32.8px, por debajo del mínimo de 44px. */
+  --footer-link-pad-y: 0.75rem;
   position: relative;
-  display: inline-block;
+  /* inline-flex (no flex): la caja sigue midiendo lo que el texto, así el
+     subrayado del ::after no se estira a todo el ancho de la columna. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   /* Área de hover/clic más generosa sin desalinear respecto al título de columna */
-  padding: 0.4rem var(--footer-link-pad-x);
-  margin: -0.4rem calc(-1 * var(--footer-link-pad-x));
+  padding: var(--footer-link-pad-y) var(--footer-link-pad-x);
+  /* Solo el margen horizontal es negativo: el vertical tiene que quedar en 0
+     para que dos links seguidos no solapen sus áreas de toque. */
+  margin: 0 calc(-1 * var(--footer-link-pad-x));
   border-radius: 4px;
   color: var(--color-on-surface-variant);
   transition: color var(--dur-fast) var(--ease-out);
@@ -1470,7 +1518,9 @@ body::after {
 .footer-link::after {
   content: '';
   position: absolute;
-  bottom: 5px;
+  /* Pegado al texto, no al borde de la caja: la caja ahora es más alta que
+     el texto por el padding que da los 44px de área táctil. */
+  bottom: calc(var(--footer-link-pad-y) - 1.4px);
   /* Misma anchura que el texto: sin invadir el padding “invisible” del hit area */
   left: var(--footer-link-pad-x);
   width: calc(100% - 2 * var(--footer-link-pad-x));

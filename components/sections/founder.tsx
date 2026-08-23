@@ -137,7 +137,9 @@ function FounderPortrait() {
         onClick={() => setShow3D((v) => !v)}
         aria-pressed={show3D}
         className={cn(
-          'absolute right-2.5 top-2.5 z-10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5',
+          // Ya es `absolute`, así que `tap-44` va sin `relative`: el ::before
+          // se posiciona contra el propio botón.
+          'tap-44 absolute right-2.5 top-2.5 z-10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5',
           'font-mono text-[10px] font-bold uppercase tracking-[0.14em] select-none',
           'transition-[background-color,border-color,color] duration-300 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
@@ -252,7 +254,7 @@ export function FounderSection() {
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
+                    className="relative tap-44 text-xs font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
                   >
                     {p.name}
                   </a>
@@ -300,7 +302,7 @@ export function FounderSection() {
               <Link
                 href={ROUTES.about}
                 prefetch={false}
-                className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
+                className="group relative tap-44 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
               >
                 Conocé mi historia
                 <ArrowRightIcon
@@ -350,7 +352,7 @@ export function FounderSection() {
                 <dl className="grid grid-cols-3 gap-2 text-center">
                   {FOUNDER_STATS.map((s) => (
                     <div key={s.label} className="flex flex-col-reverse">
-                      <dt className="text-[9px] leading-tight text-[var(--color-on-surface-variant)]">
+                      <dt className="text-xs leading-tight text-[var(--color-on-surface-variant)]">
                         {s.label}
                       </dt>
                       <dd

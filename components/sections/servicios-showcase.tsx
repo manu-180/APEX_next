@@ -171,7 +171,7 @@ function ShowcaseCard({
               {site.name}
             </h4>
             <span
-              className="inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.14em]"
+              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-black uppercase tracking-[0.14em]"
               style={{
                 color: 'var(--color-on-surface-variant)',
                 background: 'rgba(var(--color-primary-rgb),0.08)',
@@ -190,7 +190,7 @@ function ShowcaseCard({
             {site.highlights.map((h) => (
               <li
                 key={h}
-                className="inline-flex items-center rounded-md px-2 py-1 text-[10px] font-semibold text-[var(--color-on-surface)]"
+                className="inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-[var(--color-on-surface)]"
                 style={{
                   background: 'rgba(var(--color-primary-rgb),0.07)',
                   border: '1px solid rgba(var(--color-primary-rgb),0.16)',
@@ -274,7 +274,7 @@ function TierRail({ tier }: { tier: ShowcaseTier }) {
 
       <a
         href="#pricing"
-        className="group/plan mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)]"
+        className="group/plan relative tap-44 mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)]"
       >
         Ver qué incluye este plan
         <ArrowRightIcon className="size-3.5 opacity-60 transition-transform duration-200 group-hover/plan:translate-x-0.5 group-hover/plan:opacity-100" />
@@ -375,7 +375,7 @@ export function ServiciosShowcase() {
                 <span className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
                   <Link
                     href={ROUTES.muestrario}
-                    className="group/ml inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
+                    className="group/ml relative tap-44 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
                   >
                     Ver el muestrario completo
                     <ArrowRightIcon className="size-3.5 transition-transform duration-200 group-hover/ml:translate-x-0.5" />
@@ -383,7 +383,7 @@ export function ServiciosShowcase() {
                   <Link
                     href={`${ROUTES.lab}#museo`}
                     prefetch={false}
-                    className="group/m3d inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
+                    className="group/m3d relative tap-44 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] outline-none transition-colors hover:opacity-80 focus-visible:underline"
                   >
                     Verlos flotando en 3D
                     <ArrowRightIcon className="size-3.5 transition-transform duration-200 group-hover/m3d:translate-x-0.5" />

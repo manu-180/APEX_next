@@ -76,7 +76,10 @@ export function FaqAccordion({ items, groups }: FaqAccordionProps) {
                     <span
                       aria-hidden
                       className="w-7 shrink-0 font-mono text-xs font-bold tabular-nums"
-                      style={{ color: 'rgba(var(--color-primary-rgb), 0.6)' }}
+                      /* 0.6 daba 2.6:1 sobre la superficie de la FAQ: el número
+                         se veía como una mancha. 0.9 lo deja en 4.85:1 (light)
+                         y 5.05:1 (dark) sin perder el aire de la numeración. */
+                      style={{ color: 'rgba(var(--color-primary-rgb), 0.9)' }}
                     >
                       {String(i + 1).padStart(2, '0')}
                     </span>

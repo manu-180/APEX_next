@@ -105,7 +105,11 @@ export function Home3DShowcase() {
           </p>
 
           {/* Swatches de theme — el gancho interactivo */}
-          <div className="mb-8 flex flex-wrap items-center gap-2">
+          {/* gap-3 + swatch de 32px = 44px de paso entre centros, que es lo que
+              necesitan las áreas de `tap-44` para no pisarse entre sí. A 375px
+              esto reparte los 10 swatches en dos filas: diez targets de 44px no
+              entran en una sola línea, y un target de 24px no es tocable. */}
+          <div className="mb-8 flex flex-wrap items-center gap-3">
             {THEMES.map((t) => {
               const active = activeConfig.id === t.id
               return (
@@ -113,7 +117,7 @@ export function Home3DShowcase() {
                   key={t.id}
                   onClick={(e) => applyTheme(t.id, e)}
                   aria-label={`Aplicar tema ${t.name}`}
-                  className="h-6 w-6 rounded-md transition-transform duration-200 hover:scale-110"
+                  className="relative tap-44 h-8 w-8 rounded-md transition-transform duration-200 hover:scale-110"
                   style={{
                     background: t.primary,
                     boxShadow: active
@@ -125,23 +129,27 @@ export function Home3DShowcase() {
             })}
           </div>
 
-          <Link href={ROUTES.lab} prefetch={false}>
-            <button
-              type="button"
-              className={cn(
-                'group inline-flex items-center justify-center gap-2 font-semibold select-none',
-                'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-                'btn-tech btn-outline-tech text-[var(--color-primary)]',
-                'min-h-12 px-7 py-3 text-sm rounded-xl',
-              )}
-            >
-              Entrar al laboratorio
-              <ArrowRightIcon
-                className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
-                aria-hidden
-              />
-            </button>
+          {/* Los estilos van en el propio <Link>, no en un <button> adentro:
+              un botón anidado en un link es HTML inválido (control dentro de
+              control, lector de pantalla anuncia dos cosas) y además dejaba el
+              <a> como caja inline de 16px de alto. Ahora el link mide los 48px
+              del botón, que es lo que el dedo tiene que encontrar. */}
+          <Link
+            href={ROUTES.lab}
+            prefetch={false}
+            className={cn(
+              'group inline-flex items-center justify-center gap-2 font-semibold select-none',
+              'transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.01] active:scale-[0.97]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              'btn-tech btn-outline-tech text-[var(--color-primary)]',
+              'min-h-12 px-7 py-3 text-sm rounded-xl',
+            )}
+          >
+            Entrar al laboratorio
+            <ArrowRightIcon
+              className="size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transform-none"
+              aria-hidden
+            />
           </Link>
         </div>
 

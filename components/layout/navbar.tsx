@@ -18,7 +18,10 @@ const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
 // press feedback (active:scale) y focus-visible siempre visible. El tamaño
 // (size-9 / size-11) lo decide cada botón según dónde se muestra (≥44px en mobile).
 const ICON_BTN = cn(
-  'flex items-center justify-center rounded-lg outline-none',
+  // `relative tap-44`: los controles-icono miden 36px en md+ y ahi no llegan
+  // al minimo tactil. El ::before invisible los lleva a 44x44 sin cambiar el
+  // tamano dibujado (con gap-2 del contenedor el paso queda justo en 44).
+  'relative tap-44 flex items-center justify-center rounded-lg outline-none',
   'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]',
   'transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.92]',
   'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
@@ -198,9 +201,12 @@ export function Navbar({
         {/* Grain del glass (spec §6) — bajo el contenido, hereda el radio del pill */}
         <span aria-hidden className="noise-overlay pointer-events-none absolute inset-0 -z-10 rounded-[inherit]" />
         <div className="mx-auto flex h-14 w-full min-w-0 max-w-6xl flex-row items-center justify-between gap-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] md:h-16">
+        {/* En mobile el texto "APEX" se oculta y queda solo el isotipo de 32×32,
+            por debajo del mínimo táctil. `tap-44` le da 44×44 de área sin
+            agrandar el logo. */}
         <Link
           href="/"
-          className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 group"
+          className="relative tap-44 flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 group"
           prefetch={false}
         >
           <ApexLogoMark priority />
@@ -217,7 +223,7 @@ export function Navbar({
           {NAV_LINKS.map((link) => {
             const active = !link.external && pathname === link.href
             const navClass = cn(
-              'relative px-4 py-2 text-sm font-medium rounded-lg outline-none',
+              'relative tap-44 px-4 py-2 text-sm font-medium rounded-lg outline-none',
               'transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.97]',
               'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
               active
@@ -341,8 +347,15 @@ export function Navbar({
             aria-label="Ver muestrario de proyectos"
             className={cn(
               'group/cta relative inline-flex items-center justify-center gap-2 overflow-hidden',
-              'h-9 pl-3.5 pr-3 rounded-xl font-heading text-sm font-semibold tracking-tight',
-              'text-[var(--color-on-primary)]',
+              // h-11 = 44px. El CTA es `hidden md:inline-flex` y el navbar mide
+              // 64px en md+, asi que entra sin apretar. `overflow-hidden` del
+              // propio Link recorta el ::before de tap-44, por eso va altura real.
+              'h-11 pl-3.5 pr-3 rounded-xl font-heading text-sm font-semibold tracking-tight',
+              // --color-on-primary NO existe en globals.css: la declaracion era
+              // invalida y el CTA heredaba el color de texto del body. Medido a
+              // 1280: blanco 0.92 sobre el degrade slate en dark = 3.36:1.
+              // --color-primary-foreground si esta definido y va por tema.
+              'text-[var(--color-primary-foreground)]',
               'transition-[transform,box-shadow] duration-300 ease-out active:scale-[0.97]',
               'shadow-[0_2px_10px_-2px_rgba(var(--color-primary-rgb),0.5),inset_0_1px_0_rgba(255,255,255,0.22)]',
               'hover:shadow-[0_8px_24px_-6px_rgba(var(--color-primary-rgb),0.7),inset_0_1px_0_rgba(255,255,255,0.28)]',

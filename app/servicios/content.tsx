@@ -261,7 +261,7 @@ export function ServiciosContent() {
                       key={t}
                       onClick={() => handleTabChange(t)}
                       aria-pressed={tab === t}
-                      className="relative px-6 py-2.5 rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                      className="relative min-h-[44px] px-6 py-3 rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                       data-hover
                       data-inspector-title={t === 'web' ? 'Pestaña Sitio Web' : 'Pestaña App a medida'}
                       data-inspector-desc="El botón activo no se redibuja a mano: hay una sola 'pastilla' que viaja de un lado al otro con física de resorte (layoutId en Framer Motion). Es la misma sensación que un interruptor premium de un salpicadero, pero en tu navegador."

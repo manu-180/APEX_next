@@ -24,8 +24,10 @@ export const THEMES: ThemeConfig[] = [
   {
     id: 'neutral',
     name: 'Neutral',
-    primary: '#64748B',
-    primaryRgb: '100, 116, 139',
+    // Debe coincidir con --color-primary de [data-theme="neutral"] en
+    // globals.css. El valor anterior (#64748B) no llegaba a AA en ningun tema.
+    primary: '#7F8DA4',
+    primaryRgb: '127, 141, 164',
     surfaceBase: { dark: '#111318', light: '#F4F6F8' },
   },
   {

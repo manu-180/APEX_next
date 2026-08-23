@@ -561,7 +561,7 @@ export function SobreMiContent({
                 <dl className="space-y-3.5 mb-5">
                   {FICHA_ROWS.map((row) => (
                     <div key={row.label} className="flex items-baseline justify-between gap-4">
-                      <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-70 shrink-0">
+                      <dt className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-70 shrink-0">
                         {row.label}
                       </dt>
                       <dd className="text-sm font-medium text-right text-[var(--color-on-surface)]">
@@ -578,7 +578,7 @@ export function SobreMiContent({
                   {['Flutter', 'Next.js', 'Supabase', 'TypeScript'].map((t) => (
                     <span
                       key={t}
-                      className="rounded px-2 py-1 text-[10px] font-mono font-semibold theme-transition"
+                      className="rounded px-2 py-1 text-xs font-mono font-semibold theme-transition"
                       style={{
                         background: 'rgba(var(--color-primary-rgb), 0.08)',
                         color: 'rgba(var(--color-primary-rgb), 0.85)',
@@ -684,7 +684,7 @@ export function SobreMiContent({
                 data-inspector-desc="Anti-pitch deliberado: decir que no a ciertas prácticas es parte de la propuesta. Genera más confianza que cualquier promesa."
                 data-inspector-cat="Copy · Conversion"
               >
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] mb-5 text-red-600 dark:text-red-400">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] mb-5 text-red-700 dark:text-red-400">
                   Lo que NO hago
                 </p>
                 <ul className="space-y-3.5">
@@ -694,7 +694,7 @@ export function SobreMiContent({
                       className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--color-on-surface-variant)]"
                     >
                       <span
-                        className="inline-flex size-4 shrink-0 items-center justify-center rounded-full mt-0.5 text-[10px] font-bold text-red-600 dark:text-red-400"
+                        className="inline-flex size-4 shrink-0 items-center justify-center rounded-full mt-0.5 text-xs font-bold text-red-700 dark:text-red-400"
                         style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)' }}
                         aria-hidden
                       >
@@ -860,7 +860,7 @@ export function SobreMiContent({
             <Reveal delay={0.2}>
               <Link
                 href={ROUTES.tecnologias}
-                className="group mt-4 inline-flex items-center gap-2 rounded text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                className="group relative tap-44 mt-4 inline-flex items-center gap-2 rounded text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
               >
                 Ver el stack completo en detalle
                 <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
@@ -955,7 +955,7 @@ export function SobreMiContent({
                     </WhatsAppOutboundLink>
                     <Link
                       href={ROUTES.contact}
-                      className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                      className="group relative tap-44 inline-flex items-center gap-1.5 rounded text-sm font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
                     >
                       ¿Preferís una llamada? Agendá 15 minutos, gratis
                       <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />

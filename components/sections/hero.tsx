@@ -149,7 +149,7 @@ function FeatureCard({ f }: { f: (typeof FEATURES)[number] }) {
             {f.icon}
           </span>
           <p
-            className="font-mono text-[9px] font-bold tracking-[0.18em] opacity-40 transition-opacity duration-150 group-hover:opacity-100"
+            className="font-mono text-[11px] font-bold tracking-[0.18em] opacity-40 transition-opacity duration-150 group-hover:opacity-100"
             style={{ color: 'var(--color-primary)' }}
           >
             {f.tag}
@@ -390,7 +390,7 @@ export function HeroSection() {
                 border: '1px solid var(--glass-border)',
               }}
             >
-              <p className="mb-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-60">
+              <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-60">
                 Productos propios · online ahora
               </p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -400,7 +400,7 @@ export function HeroSection() {
                       href={p.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)]"
+                      className="relative tap-44 text-xs font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:text-[var(--color-primary)]"
                     >
                       {p.name}
                     </a>

@@ -62,7 +62,7 @@ const focusRing =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]'
 
 const inputBase =
-  'w-full rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-[border-color,box-shadow,transform,background-color] duration-200'
+  'w-full min-h-[44px] rounded-xl border bg-[var(--color-surface-lowest)] px-4 py-2.5 text-base md:text-sm text-[var(--color-on-surface)] placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] outline-none transition-[border-color,box-shadow,transform,background-color] duration-200'
 
 /* Light: campos blancos nítidos — borde tinta visible y foco con anillo del tema.
    Dark conserva el borde surface-high y el glow original. */
@@ -637,7 +637,7 @@ function BookingCalendar() {
                 aria-hidden="true"
                 className="flex min-w-[52px] flex-shrink-0 animate-pulse flex-col items-center rounded-xl border border-transparent bg-[var(--color-surface-high)]/40 px-3 py-2 text-center"
               >
-                <span className="invisible text-[10px] font-medium uppercase">lun</span>
+                <span className="invisible text-xs font-medium uppercase">lun</span>
                 <span className="invisible text-lg font-bold tabular-nums">00</span>
               </div>
             ))}
@@ -666,7 +666,7 @@ function BookingCalendar() {
                 data-inspector-desc="Día disponible; domingos excluidos por constantes. Hover eleva la pastilla; al elegir queda con halo del tema."
                 data-inspector-cat="UX · Motion"
               >
-                <span className="text-[10px] font-medium uppercase">
+                <span className="text-xs font-medium uppercase">
                   {d.toLocaleDateString('es-AR', { weekday: 'short' })}
                 </span>
                 <span className="text-lg font-bold tabular-nums">{d.getDate()}</span>
@@ -722,7 +722,7 @@ function BookingCalendar() {
           >
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <p className={cn(microLabel, 'mb-0')}>Horario</p>
-              <div className="flex items-center gap-3 text-[10px] text-[var(--color-on-surface-variant)]">
+              <div className="flex items-center gap-3 text-xs text-[var(--color-on-surface-variant)]">
                 <span className="inline-flex items-center gap-1">
                   <span className="size-2 rounded-sm bg-[var(--color-surface-high)]" /> Ocupado
                 </span>
@@ -883,7 +883,7 @@ function BookingCalendar() {
                     type="tel"
                     inputMode="numeric"
                     autoComplete="tel-national"
-                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-base text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] md:text-sm"
+                    className="min-h-[44px] min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-base text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] md:text-sm"
                     aria-describedby="booking-wa-help"
                   />
                 </div>

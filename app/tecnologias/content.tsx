@@ -137,7 +137,7 @@ export function TecnologiasContent() {
                       >
                         {stat.value}
                       </div>
-                      <div className="text-[10px] uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-75 leading-tight mt-0.5">
+                      <div className="text-xs uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-75 leading-tight mt-0.5">
                         {stat.label}
                       </div>
                     </motion.div>

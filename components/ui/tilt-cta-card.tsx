@@ -137,7 +137,15 @@ export function TiltCtaCard({
             y visible como halo en el borde (profundidad real del preserve-3d) */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full opacity-60 blur-3xl"
+          /* Con -right-16 el blob se iba 64px más allá del borde de la tarjeta
+             y ensanchaba el documento (414px en un viewport de 375) → scroll
+             horizontal en /muestrario y /tecnologias. El offset negativo solo
+             entra en xl, que es el primer breakpoint donde el contenedor
+             (max-w-6xl = 1152px) deja los 64px de aire a cada lado que el blob
+             necesita; medido a 768 y 1024 todavía desbordaba.
+             El halo no cambia: blur-3xl es ink overflow, pinta fuera de la caja
+             sin sumar ancho scrolleable. */
+          className="pointer-events-none absolute right-0 -top-20 h-52 w-52 rounded-full opacity-60 blur-3xl xl:-right-16"
           style={{
             background: 'rgba(var(--color-primary-rgb), 0.26)',
             ...(prefersReducedMotion ? {} : { transform: 'translateZ(-20px)' }),

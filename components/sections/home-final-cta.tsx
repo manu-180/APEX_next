@@ -266,7 +266,7 @@ export function HomeFinalCtaSection() {
 
             <Link
               href={ROUTES.contact}
-              className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
+              className="group relative tap-44 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-on-surface-variant)] transition-colors hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)] focus-visible:outline-none"
             >
               Ver todas las opiniones
               <ArrowRightIcon

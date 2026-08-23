@@ -250,10 +250,10 @@ export function PreviewCard(props: PreviewCardProps) {
           {/* flag destacada (ej. "Nuevo") */}
           {flag && (
             <span
-              className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white shadow-sm"
+              className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-[var(--color-primary-foreground)] shadow-sm"
               style={{ background: 'rgba(var(--color-primary-rgb),0.95)' }}
             >
-              <span className="size-1.5 rounded-full bg-white/90" />
+              <span className="size-1.5 rounded-full bg-current opacity-90" />
               {flag}
             </span>
           )}
@@ -270,7 +270,7 @@ export function PreviewCard(props: PreviewCardProps) {
               </h4>
               {badge && (
                 <span
-                  className="inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.14em]"
+                  className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-black uppercase tracking-[0.14em]"
                   style={{
                     color: 'var(--color-on-surface-variant)',
                     background: 'rgba(var(--color-primary-rgb),0.08)',
@@ -289,7 +289,7 @@ export function PreviewCard(props: PreviewCardProps) {
                 {tags.map((t) => (
                   <li
                     key={t}
-                    className="inline-flex items-center rounded-md px-2 py-1 text-[10px] font-semibold text-[var(--color-on-surface)]"
+                    className="inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-[var(--color-on-surface)]"
                     style={{
                       background: 'rgba(var(--color-primary-rgb),0.07)',
                       border: '1px solid rgba(var(--color-primary-rgb),0.16)',

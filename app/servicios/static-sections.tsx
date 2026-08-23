@@ -608,7 +608,7 @@ export function ServiciosComparisonTable() {
               <table className="w-full min-w-[640px] border-collapse">
                 <thead>
                   <tr
-                    className="text-left text-[10px] font-bold uppercase tracking-wider"
+                    className="text-left text-xs font-bold uppercase tracking-wider"
                     style={{
                       backgroundColor: 'rgba(var(--color-primary-rgb), 0.05)',
                       color: 'var(--color-on-surface-variant)',
@@ -792,7 +792,7 @@ export function ServiciosStaticFaq() {
               waHref={whatsappUrl(
                 'Hola, tengo una duda que no encontré en el FAQ de tu web. ¿Me la respondés?',
               )}
-              className="group inline-flex items-center gap-2.5 rounded-xl text-sm font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+              className="group relative tap-44 inline-flex items-center gap-2.5 rounded-xl text-sm font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
             >
               <span
                 className="inline-flex size-8 items-center justify-center rounded-full text-white transition-transform duration-200 group-hover:scale-105"

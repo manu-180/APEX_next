@@ -166,7 +166,10 @@ export function MuestrarioGallery({ demos }: { demos: LabDemo[] }) {
         </SectionReveal>
 
         <SectionReveal delay={0.05}>
-          <div className="mb-8 flex flex-wrap gap-2">
+          {/* gap-y-4 mantiene 46px de paso vertical entre filas de chips: el
+              pill sigue midiendo 30px de alto, pero su área táctil es de 44px
+              y con gap-2 las filas se solapaban. */}
+          <div className="mb-8 flex flex-wrap gap-x-3 gap-y-4">
             {PRICE_FILTERS.map((f) => {
               const isActive = f === active
               return (
@@ -176,10 +179,10 @@ export function MuestrarioGallery({ demos }: { demos: LabDemo[] }) {
                   onClick={() => setActive(f)}
                   aria-pressed={isActive}
                   className={cn(
-                    'rounded-full px-3.5 py-1.5 text-xs font-semibold outline-none transition-[color,background-color,border-color] duration-200',
+                    'relative tap-44 rounded-full px-3.5 py-1.5 text-xs font-semibold outline-none transition-[color,background-color,border-color] duration-200',
                     'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
                     isActive
-                      ? 'text-white'
+                      ? 'text-[var(--color-primary-foreground)]'
                       : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]',
                   )}
                   style={

@@ -381,7 +381,7 @@ export function BudgetCalculatorSection() {
                   </div>
                   <span
                     className={cn(
-                      'mt-1.5 block font-mono text-[9px] font-bold uppercase tracking-[0.18em] transition-colors duration-200',
+                      'mt-1.5 block font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-colors duration-200',
                       filled || active
                         ? 'text-[var(--color-primary)]'
                         : 'text-[var(--color-on-surface-variant)] opacity-60',
@@ -787,7 +787,7 @@ function OptionButton({
             animate={{ opacity: 1, x: 0 }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, x: 4 }}
             transition={{ duration: 0.15, ease: EASE_OUT }}
-            className="pointer-events-none absolute right-2.5 top-2 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-primary)]"
+            className="pointer-events-none absolute right-2.5 top-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-primary)]"
           >
             ▸ SEL
           </motion.span>

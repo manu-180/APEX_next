@@ -149,10 +149,13 @@ export function Footer() {
               Escribime por WhatsApp
             </WhatsAppOutboundLink>
 
-            {/* Contacto visible: número real, clic abre WhatsApp */}
+            {/* Contacto visible: número real, clic abre WhatsApp.
+                mt-2 + py-3 deja la misma separación visual que el mt-5 previo,
+                pero la caja pasa de 20px a 44px de alto tocable: era el peor
+                target del sitio y está en el camino de conversión. */}
             <WhatsAppOutboundLink
               waHref={WHATSAPP_FOOTER_HREF}
-              className="group mt-5 flex w-fit items-center gap-2.5 text-sm text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:text-[var(--color-on-surface)]"
+              className="group mt-2 flex w-fit items-center gap-2.5 py-3 text-sm text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:text-[var(--color-on-surface)]"
               data-hover
               data-inspector-title="Número visible"
               data-inspector-desc="Contacto a la vista, sin formularios de por medio — el clic abre la misma conversación de WhatsApp."
@@ -173,7 +176,7 @@ export function Footer() {
             {/* ── Servicios ─────────────────────────────────────────── */}
             <nav aria-label="Servicios" className="min-w-0">
               <h3 className="footer-heading mb-5">Servicios</h3>
-              <ul className="space-y-1.5">
+              <ul className="space-y-0.5">
                 {SERVICIOS_LINKS.map((l) => (
                   <li key={l.label}>
                     <Link
@@ -194,7 +197,7 @@ export function Footer() {
             {/* ── Explorar ──────────────────────────────────────────── */}
             <nav aria-label="Explorar" className="min-w-0">
               <h3 className="footer-heading mb-5">Explorar</h3>
-              <ul className="space-y-1.5">
+              <ul className="space-y-0.5">
                 {EXPLORAR_LINKS.map((l) =>
                   l.external ? (
                     <li key={l.label}>

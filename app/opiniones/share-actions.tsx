@@ -42,7 +42,7 @@ export function ShareActions({ url, waMessage }: { url: string; waMessage: strin
         <button
           type="button"
           onClick={copy}
-          className="shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-[var(--color-primary)] transition-[background-color,transform] duration-150
+          className="relative tap-44 shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-[var(--color-primary)] transition-[background-color,transform] duration-150
             hover:bg-[rgba(var(--color-primary-rgb),0.08)]
             active:scale-[0.97]
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
