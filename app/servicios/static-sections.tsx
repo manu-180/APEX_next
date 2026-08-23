@@ -63,8 +63,8 @@ export function ServiciosHero() {
             <p className="editorial-label editorial-label--primary mb-6">Servicios y precios</p>
 
             <h1 className="heading-display text-balance text-4xl sm:text-5xl md:text-6xl mb-5">
-              <span className="block text-[var(--color-on-surface-variant)]">Software a medida,</span>
-              <strong className="block text-[var(--color-on-surface)]">con precio publicado.</strong>
+              <span className="block text-[var(--color-on-surface-variant)]">Páginas web y apps a medida,</span>
+              <strong className="block text-[var(--color-on-surface)]">con el precio publicado.</strong>
             </h1>
 
             <p className="text-pretty text-[var(--color-on-surface-variant)] max-w-lg mb-8 leading-relaxed">

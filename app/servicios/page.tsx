@@ -15,9 +15,9 @@ import { ServiciosShowcase } from '@/components/sections/servicios-showcase'
 import { AfipAddonSection } from '@/components/sections/afip-addon'
 
 export const metadata: Metadata = {
-  title: 'Desarrollo de software Argentina | Precios',
+  title: 'Páginas web a medida en Argentina | Precios desde $300.000',
   description:
-    'Desarrollo de software a medida para empresas y emprendedores. Precio fijo, entrega garantizada en 15 días. Web, e-commerce y apps móviles desde ARS 300k.',
+    'Páginas web a medida desde ARS 300.000, con precio fijo y entrega garantizada en 15 días. Webs, e-commerce y apps móviles para empresas y emprendedores en Argentina.',
   keywords: [
     'desarrollo de software argentina',
     'desarrollo web argentina',
