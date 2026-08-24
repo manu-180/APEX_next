@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react'
 import {
-  motion,
+  m,
   useMotionTemplate,
   useMotionValue,
   useReducedMotion,
@@ -87,7 +87,7 @@ export function GlowCard({
   }, transparent 60%)`
 
   return (
-    <motion.div
+    <m.div
       ref={cardRef}
       className={cn(
         'group relative overflow-hidden rounded-xl',
@@ -110,7 +110,7 @@ export function GlowCard({
       data-hover
     >
       {/* Mouse-tracking radial glow overlay */}
-      <motion.div
+      <m.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{ background: glowGradient }}
@@ -127,6 +127,6 @@ export function GlowCard({
 
       {/* Content */}
       <div className="relative z-20">{children}</div>
-    </motion.div>
+    </m.div>
   )
 }

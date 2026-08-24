@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useId, useRef, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowRightIcon, ExternalLinkIcon } from '@/components/ui/icons'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ProjectItem, ThemeId } from '@/lib/types/theme'
@@ -127,7 +127,7 @@ export function ProjectsSheet({
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -138,7 +138,7 @@ export function ProjectsSheet({
 
           {/* Sheet — centrado, ancho máximo tipo bottom-sheet premium */}
           <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 sm:px-4 pointer-events-none">
-            <motion.div
+            <m.div
               ref={panelRef}
               role="dialog"
               aria-modal="true"
@@ -196,7 +196,7 @@ export function ProjectsSheet({
                     const Icon = entry.icon
                     const thumb = entry.thumbnailSrc
                     return (
-                      <motion.button
+                      <m.button
                         key={entry.project.themeId}
                         initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -234,12 +234,12 @@ export function ProjectsSheet({
                           </p>
                         </div>
                         <ArrowRightIcon className="h-3.5 w-3.5 text-[var(--color-on-surface-variant)] flex-shrink-0" />
-                      </motion.button>
+                      </m.button>
                     )
                   }
 
                   return (
-                    <motion.a
+                    <m.a
                       key={entry.name}
                       href={entry.url}
                       target="_blank"
@@ -262,7 +262,7 @@ export function ProjectsSheet({
                         <p className="text-xs text-[var(--color-on-surface-variant)]">Ver proyecto</p>
                       </div>
                       <ExternalLinkIcon className="h-3.5 w-3.5 text-[var(--color-on-surface-variant)] flex-shrink-0" />
-                    </motion.a>
+                    </m.a>
                   )
                 })
               ) : (
@@ -280,7 +280,7 @@ export function ProjectsSheet({
                 </div>
               )}
             </div>
-            </motion.div>
+            </m.div>
           </div>
         </>
       )}

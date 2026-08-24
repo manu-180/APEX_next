@@ -6,31 +6,53 @@ import { AppShell } from '@/components/layout/app-shell'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
 import { MetaPixel } from '@/components/analytics/meta-pixel'
-import { SentryProvider } from '@/components/providers/sentry-provider'
-import { PostHogProviderWrapper, PostHogPageView } from '@/components/providers/posthog-provider'
 import { APP_URL } from '@/lib/constants'
 import './globals.css'
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
 
+/**
+ * Oxanium como FUENTE VARIABLE: un solo woff2 cubre todo el eje 200-800
+ * (antes: 6 archivos discretos, ~6 requests y ~100KB+). El peso 200 del
+ * contraste 200/800 de .heading-display sigue siendo real — el eje variable
+ * lo interpola nativamente, no lo sintetiza.
+ */
 const oxanium = Oxanium({
   subsets: ['latin'],
   variable: '--font-oxanium',
-  // El peso 200 es OBLIGATORIO: el contraste 200/800 de .heading-display debe
-  // ser real, no sintetizado (APEX Design Language v2 §10).
-  weight: ['200', '300', '400', '600', '700', '800'],
   preload: true,
   /**
    * `display: 'optional'` impide que el navegador retrase el primer paint
    * esperando la WebFont. Si la fuente no está cacheada y no carga en ~100ms,
    * se usa la fallback del sistema para SIEMPRE (sin FOUT en el texto LCP).
-   * Tradeoff aceptado: usuarios first-visit ven Oxanium recién en la 2da visita.
-   * Esto convierte una solicitud render-blocking de ~200ms en cero.
    */
   display: 'optional',
   adjustFontFallback: true,
   fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+})
+
+/**
+ * Speculation Rules (Chromium): prerender de la próxima página al hover
+ * (eagerness moderate). Colapsa el LCP de las navegaciones internas a ~0ms.
+ * Exclusiones: /gracias dispara conversiones al montarse (un prerender
+ * falsearía una conversión), /lab monta WebGL (caro para especular) y /api.
+ * Safari/Firefox lo ignoran — mejora progresiva, nunca regresión.
+ */
+const SPECULATION_RULES = JSON.stringify({
+  prerender: [
+    {
+      where: {
+        and: [
+          { href_matches: '/*' },
+          { not: { href_matches: '/gracias*' } },
+          { not: { href_matches: '/lab*' } },
+          { not: { href_matches: '/api/*' } },
+        ],
+      },
+      eagerness: 'moderate',
+    },
+  ],
 })
 
 export const viewport: Viewport = {
@@ -95,17 +117,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WebSiteJsonLd />
         <ServiceJsonLd />
         <LocalBusinessJsonLd />
+        <script
+          type="speculationrules"
+          dangerouslySetInnerHTML={{ __html: SPECULATION_RULES }}
+        />
       </head>
       <body className={oxanium.className}>
-        <PostHogProviderWrapper>
-          <PostHogPageView />
-          <ThemeModeProvider>
-            <ApexThemeProvider>
-              <AppShell>{children}</AppShell>
-            </ApexThemeProvider>
-          </ThemeModeProvider>
-        </PostHogProviderWrapper>
-        <SentryProvider />
+        <ThemeModeProvider>
+          <ApexThemeProvider>
+            <AppShell>{children}</AppShell>
+          </ApexThemeProvider>
+        </ThemeModeProvider>
         {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}
         {metaPixelId ? <MetaPixel pixelId={metaPixelId} /> : null}
       </body>

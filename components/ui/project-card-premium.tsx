@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback, useState } from 'react'
 import Image from 'next/image'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { m, useMotionValue, useSpring } from 'framer-motion'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
@@ -128,7 +128,7 @@ export function ProjectCardPremium({
 
   return (
     <div style={{ perspective: '1200px' }} className={className}>
-      <motion.article
+      <m.article
         ref={cardRef as React.RefObject<HTMLElement>}
         role="button"
         tabIndex={0}
@@ -326,7 +326,7 @@ export function ProjectCardPremium({
             </span>
           </div>
         </div>
-      </motion.article>
+      </m.article>
     </div>
   )
 }

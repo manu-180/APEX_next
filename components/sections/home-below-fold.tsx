@@ -37,7 +37,7 @@ const HomeProcessSection = dynamic(
 )
 
 const Home3DShowcase = dynamic(
-  () => import('./home-3d-showcase').then((m) => m.Home3DShowcase),
+  () => import('./theme-showcase').then((m) => m.Home3DShowcase),
   { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
 )
 
@@ -60,14 +60,30 @@ export function HomeBelowFold() {
   // Orden objetivo (DESIGN_BRIEF §3): prueba social inmediata (01) →
   // problema/solución (02) → proceso con boceto gratis (03) → founder (04) →
   // CTA final (05). La serie de numeración editorial queda sin agujeros.
+  //
+  // .cv-auto (content-visibility): el renderer no hace layout/paint de las
+  // secciones hasta que se acercan al viewport — el primer frame de la home
+  // solo pinta el hero.
   return (
     <>
-      <TrustedClientsSection />
-      <ClientBenefitsSection />
-      <HomeProcessSection />
-      <Home3DShowcase />
-      <FounderSection />
-      <HomeFinalCtaSection />
+      <div className="cv-auto-sm">
+        <TrustedClientsSection />
+      </div>
+      <div className="cv-auto">
+        <ClientBenefitsSection />
+      </div>
+      <div className="cv-auto">
+        <HomeProcessSection />
+      </div>
+      <div className="cv-auto">
+        <Home3DShowcase />
+      </div>
+      <div className="cv-auto">
+        <FounderSection />
+      </div>
+      <div className="cv-auto">
+        <HomeFinalCtaSection />
+      </div>
     </>
   )
 }

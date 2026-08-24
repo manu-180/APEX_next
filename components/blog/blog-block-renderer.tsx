@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
+import { m, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import type { BlogBlock } from '@/lib/data/blog-posts'
 import { ArrowRightIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
@@ -308,7 +308,7 @@ export function ReadingProgress() {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <motion.div
+    <m.div
       aria-hidden
       className="pointer-events-none fixed left-0 right-0 z-40 h-0.5 origin-left"
       style={{

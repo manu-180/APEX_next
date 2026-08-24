@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   animate,
-  motion,
+  m,
   useInView,
   useMotionValue,
   useReducedMotion,
@@ -212,7 +212,7 @@ function ProductShot({ name }: { name: (typeof PRODUCTOS)[number]['name'] }) {
 
 /* ────────────────────────────────────────────────────────────────────────────
    Count-up de métricas del hero — useMotionValue + animate (cero re-renders:
-   el MotionValue se renderiza directo como hijo de motion.span). Con
+   el MotionValue se renderiza directo como hijo de m.span). Con
    reduced-motion o valores no numéricos ("<1 h") queda estático.
    ──────────────────────────────────────────────────────────────────────────── */
 function CountUpValue({ value }: { value: string }) {
@@ -241,7 +241,7 @@ function CountUpValue({ value }: { value: string }) {
 
   return (
     <span ref={ref}>
-      <motion.span>{rounded}</motion.span>
+      <m.span>{rounded}</m.span>
       {suffix}
     </span>
   )
@@ -320,31 +320,23 @@ function Reveal({
 }) {
   const prefersReducedMotion = useReducedMotion()
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={
         prefersReducedMotion
           ? false
-          : { opacity: 0, x, y: x === 0 ? 28 : 0, filter: 'blur(6px)' }
+          : { opacity: 0, x, y: x === 0 ? 28 : 0 }
       }
       whileInView={
         prefersReducedMotion
           ? undefined
-          : {
-              opacity: 1,
-              x: 0,
-              y: 0,
-              filter: 'blur(0px)',
-              // Un filter residual crea un backdrop-root y rompería los
-              // backdrop-filter internos: se limpia al terminar (ver SectionReveal).
-              transitionEnd: { filter: 'none' },
-            }
+          : { opacity: 1, x: 0, y: 0 }
       }
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: DUR_REVEAL, delay, ease: EASE_OUT }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -380,35 +372,71 @@ export function SobreMiContent({
     const line = progressLineRef.current
     if (!container || !line) return
 
-    let cleanup: (() => void) | undefined
+    const mql = window.matchMedia('(prefers-reduced-motion: no-preference)')
 
-    void (async () => {
-      const gsap = (await import('gsap')).default
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      gsap.registerPlugin(ScrollTrigger)
+    let rafId = 0
+    let listening = false
 
-      const mm = gsap.matchMedia()
-      mm.add('(prefers-reduced-motion: no-preference)', () => {
-        gsap.fromTo(
-          line,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: 'none',
-            transformOrigin: 'top center',
-            scrollTrigger: {
-              trigger: container,
-              start: 'top 75%',
-              end: 'bottom 55%',
-              scrub: 0.6,
-            },
+    // Progreso scrubbed equivalente a ScrollTrigger start 'top 75%' / end
+    // 'bottom 55%': la línea escala 0→1 mientras la sección cruza esa ventana.
+    const update = () => {
+      rafId = 0
+      const rect = container.getBoundingClientRect()
+      const vh = window.innerHeight
+      const total = 0.2 * vh + rect.height
+      const p = Math.min(1, Math.max(0, (0.75 * vh - rect.top) / Math.max(1, total)))
+      line.style.transformOrigin = 'top center'
+      line.style.transform = `scaleY(${p.toFixed(3)})`
+    }
+
+    const onScroll = () => {
+      if (!rafId) rafId = requestAnimationFrame(update)
+    }
+
+    const stop = () => {
+      if (!listening) return
+      listening = false
+      window.removeEventListener('scroll', onScroll)
+      if (rafId) {
+        cancelAnimationFrame(rafId)
+        rafId = 0
+      }
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && mql.matches) {
+          if (!listening) {
+            listening = true
+            window.addEventListener('scroll', onScroll, { passive: true })
+            update()
           }
-        )
-      })
-      cleanup = () => mm.revert()
-    })()
+        } else {
+          stop()
+        }
+      },
+      { rootMargin: '120px' },
+    )
 
-    return () => cleanup?.()
+    const applyGate = () => {
+      if (mql.matches) {
+        io.observe(container)
+      } else {
+        io.disconnect()
+        stop()
+        // Reduced-motion: línea completa estática (estado final).
+        line.style.transform = 'scaleY(1)'
+      }
+    }
+
+    applyGate()
+    mql.addEventListener('change', applyGate)
+
+    return () => {
+      mql.removeEventListener('change', applyGate)
+      io.disconnect()
+      stop()
+    }
   }, [])
 
   const { scrollYProgress } = useScroll({ target: headerRef, offset: ['start start', 'end start'] })
@@ -421,7 +449,7 @@ export function SobreMiContent({
   return (
     <>
       {/* ══ 01 · HERO — asimétrico: narrativa + ficha técnica ══════════════ */}
-      <motion.section
+      <m.section
         ref={headerRef}
         className="relative overflow-hidden pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24"
         style={
@@ -496,9 +524,9 @@ export function SobreMiContent({
 
               {/* Strip de métricas reales — count-up al entrar en viewport */}
               <div className="flex flex-wrap gap-x-10 gap-y-5">
-                {heroMetrics.map((m, i) => (
-                  <motion.div
-                    key={m.label}
+                {heroMetrics.map((metric, i) => (
+                  <m.div
+                    key={metric.label}
                     initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -510,12 +538,12 @@ export function SobreMiContent({
                       className="font-heading text-2xl md:text-3xl font-extrabold tabular-nums theme-transition"
                       style={{ color: 'var(--color-primary)' }}
                     >
-                      <CountUpValue value={m.value} />
+                      <CountUpValue value={metric.value} />
                     </p>
                     <p className="text-[11px] uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-80 mt-0.5">
-                      {m.label}
+                      {metric.label}
                     </p>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </Reveal>
@@ -594,7 +622,7 @@ export function SobreMiContent({
             </Reveal>
           </div>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* ══ 02 · TRABAJAR DIRECTO — sin agencia = precio + velocidad ═══════ */}
       <section className="relative py-16 md:py-24">
@@ -715,7 +743,7 @@ export function SobreMiContent({
           {/* Principios no negociables — pills (copy oro de la auditoría).
               Entrada staggerada por li (STAGGER_BASE) + hover con lift sutil.
               Base bg/border por clases (no inline) para que el hover gane. */}
-          <motion.ul
+          <m.ul
             className="mt-12 flex flex-wrap gap-2.5"
             aria-label="Principios de trabajo"
             initial={prefersReducedMotion ? false : 'hidden'}
@@ -727,7 +755,7 @@ export function SobreMiContent({
             }}
           >
             {PRINCIPIOS.map((p) => (
-              <motion.li
+              <m.li
                 key={p}
                 variants={prefersReducedMotion ? undefined : REVEAL_ITEM_VARIANTS}
                 className={cn(
@@ -739,9 +767,9 @@ export function SobreMiContent({
                 )}
               >
                 {p}
-              </motion.li>
+              </m.li>
             ))}
-          </motion.ul>
+          </m.ul>
         </div>
       </section>
 

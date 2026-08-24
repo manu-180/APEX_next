@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { GridBackground } from '@/components/ui/grid-background'
@@ -44,7 +44,7 @@ export function TecnologiasContent() {
 
   return (
     <>
-      <motion.section
+      <m.section
         ref={headerRef}
         className="relative pt-28 sm:pt-32 md:pt-40 pb-12 md:pb-16 overflow-hidden"
         style={{
@@ -122,7 +122,7 @@ export function TecnologiasContent() {
               <aside className="lg:min-w-[200px]" aria-label="Métricas del stack">
                 <div className="grid grid-cols-3 lg:grid-cols-1 gap-3 lg:gap-4">
                   {HERO_STATS.map((stat, i) => (
-                    <motion.div
+                    <m.div
                       key={stat.label}
                       initial={prefersReducedMotion ? false : { opacity: 0, x: 16 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -140,7 +140,7 @@ export function TecnologiasContent() {
                       <div className="text-xs uppercase tracking-wider text-[var(--color-on-surface-variant)] opacity-75 leading-tight mt-0.5">
                         {stat.label}
                       </div>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
               </aside>
@@ -151,7 +151,7 @@ export function TecnologiasContent() {
               Exactamente 2 copias y x a -50%: el desplazamiento equivale al
               ancho de UNA copia (pr-12 interno en vez de gap del padre), así
               el loop no salta. `linear` es correcto acá (marquee continuo). */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -164,7 +164,7 @@ export function TecnologiasContent() {
             }}
             aria-hidden
           >
-            <motion.div
+            <m.div
               className="flex whitespace-nowrap"
               animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
               transition={
@@ -189,10 +189,10 @@ export function TecnologiasContent() {
                   ))}
                 </div>
               ))}
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </div>
-      </motion.section>
+      </m.section>
 
       <TechCardsSection />
 

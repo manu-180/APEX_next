@@ -12,7 +12,7 @@
 
 import { type ReactNode } from 'react'
 import {
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -78,7 +78,7 @@ export function TiltCtaCard({
 
   return (
     <div style={{ perspective: 1000 }}>
-      <motion.div
+      <m.div
         data-hover
         data-inspector-title={inspectorTitle}
         data-inspector-desc={inspectorDesc}
@@ -123,7 +123,7 @@ export function TiltCtaCard({
       >
         {/* Glare — recorta por su propio radio (rounded-[inherit]): el shell no
             puede llevar overflow-hidden porque aplastaría el preserve-3d */}
-        <motion.div
+        <m.div
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
           style={{
@@ -159,7 +159,7 @@ export function TiltCtaCard({
         >
           {children}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   )
 }

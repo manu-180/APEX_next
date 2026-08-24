@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useId, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { EASE_OUT } from '@/lib/motion'
 import { cn } from '@/lib/utils/cn'
 
@@ -94,7 +94,7 @@ export function FaqAccordion({ items, groups }: FaqAccordionProps) {
                       {item.q}
                     </span>
                   </span>
-                  <motion.span
+                  <m.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={
                       prefersReducedMotion
@@ -116,7 +116,7 @@ export function FaqAccordion({ items, groups }: FaqAccordionProps) {
                     >
                       <path d="m6 9 6 6 6-6" />
                     </svg>
-                  </motion.span>
+                  </m.span>
                 </button>
               </h3>
 
@@ -134,7 +134,7 @@ export function FaqAccordion({ items, groups }: FaqAccordionProps) {
               ) : (
                 <AnimatePresence initial={false}>
                   {isOpen && (
-                    <motion.div
+                    <m.div
                       id={panelId}
                       role="region"
                       aria-labelledby={buttonId}
@@ -148,21 +148,15 @@ export function FaqAccordion({ items, groups }: FaqAccordionProps) {
                       }}
                       style={{ overflow: 'hidden' }}
                     >
-                      {/* Blur solo en la entrada one-shot (spec §1) */}
-                      <motion.p
-                        initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
-                        animate={{
-                          opacity: 1,
-                          y: 0,
-                          filter: 'blur(0px)',
-                          transitionEnd: { filter: 'none' },
-                        }}
+                      <m.p
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.08 }}
                         className={answerClassName}
                       >
                         {item.a}
-                      </motion.p>
-                    </motion.div>
+                      </m.p>
+                    </m.div>
                   )}
                 </AnimatePresence>
               )}

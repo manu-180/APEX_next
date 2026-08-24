@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { Variants } from 'framer-motion'
-import { animate, motion, useInView, useReducedMotion } from 'framer-motion'
+import { animate, m, useInView, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CheckIcon, WhatsAppIcon, XIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
@@ -112,7 +112,7 @@ export function ClientBenefitsSection() {
       </span>
 
       <div className="relative z-10 mx-auto max-w-6xl px-6">
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           whileInView={
             prefersReducedMotion
@@ -127,11 +127,11 @@ export function ClientBenefitsSection() {
             <span className="block text-[var(--color-on-surface-variant)]">Tenés un buen negocio.</span>
             <strong className="block text-[var(--color-on-surface)]">Online, nadie lo nota.</strong>
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="grid items-start gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14">
           {/* ── Columna problema (agitación) ──────────────────────────── */}
-          <motion.div
+          <m.div
             initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
             whileInView={
               prefersReducedMotion
@@ -145,7 +145,7 @@ export function ClientBenefitsSection() {
             data-inspector-desc="Fórmula PAS: dolores concretos del dueño de pyme, sin estadísticas inventadas."
             data-inspector-cat="Copy · Conversión"
           >
-            <motion.ul
+            <m.ul
               className="space-y-5"
               variants={prefersReducedMotion ? undefined : LIST_CONTAINER}
               initial={prefersReducedMotion ? false : 'hidden'}
@@ -153,7 +153,7 @@ export function ClientBenefitsSection() {
               viewport={{ once: true, amount: 0.3 }}
             >
               {PAINS.map((pain) => (
-                <motion.li
+                <m.li
                   key={pain}
                   variants={prefersReducedMotion ? undefined : LIST_ITEM}
                   className="group flex items-start gap-3.5"
@@ -167,19 +167,19 @@ export function ClientBenefitsSection() {
                   <p className="text-pretty text-base leading-relaxed text-[var(--color-on-surface-variant)] transition-colors duration-200 group-hover:text-[var(--color-on-surface)] sm:text-lg">
                     {pain}
                   </p>
-                </motion.li>
+                </m.li>
               ))}
-            </motion.ul>
+            </m.ul>
 
             <div className="divider-theme my-7" aria-hidden="true" />
 
             <p className="text-pretty text-sm font-medium text-[var(--color-on-surface)]">
               Cada día así, hay clientes que te buscaron y le compraron a otro.
             </p>
-          </motion.div>
+          </m.div>
 
           {/* ── Columna solución (elevada, rompe la simetría) ─────────── */}
-          <motion.div
+          <m.div
             initial={prefersReducedMotion ? false : { opacity: 0, y: 32 }}
             whileInView={
               prefersReducedMotion
@@ -199,7 +199,7 @@ export function ClientBenefitsSection() {
               <strong className="text-[var(--color-on-surface)]">trabaja para vos.</strong>
             </h3>
 
-            <motion.ul
+            <m.ul
               className="mt-6 space-y-3.5"
               aria-label="Qué incluye trabajar con APEX"
               variants={prefersReducedMotion ? undefined : LIST_CONTAINER}
@@ -208,16 +208,16 @@ export function ClientBenefitsSection() {
               viewport={{ once: true, amount: 0.25 }}
             >
               {SOLUTIONS.map((line) => (
-                <motion.li
+                <m.li
                   key={line}
                   variants={prefersReducedMotion ? undefined : LIST_ITEM}
                   className="group flex gap-2.5 text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:text-[var(--color-on-surface)] sm:text-base"
                 >
                   <CheckIcon className="mt-0.5 size-4 shrink-0 text-[var(--color-primary)] transition-transform duration-200 group-hover:scale-110" aria-hidden />
                   <span>{line}</span>
-                </motion.li>
+                </m.li>
               ))}
-            </motion.ul>
+            </m.ul>
 
             <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
               <AnimatedMetric value={15} suffix="d" label="Entrega garantizada" />
@@ -243,7 +243,7 @@ export function ClientBenefitsSection() {
                 Sin compromiso, sin tecnicismos.
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>
@@ -294,7 +294,7 @@ function ProcessStepRow({ step, order }: { step: ProcessStep; order: number }) {
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <motion.li
+    <m.li
       initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
       whileInView={
         prefersReducedMotion
@@ -341,7 +341,7 @@ function ProcessStepRow({ step, order }: { step: ProcessStep; order: number }) {
           {step.description}
         </p>
       </div>
-    </motion.li>
+    </m.li>
   )
 }
 
@@ -366,7 +366,7 @@ export function HomeProcessSection() {
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <div className="grid items-start gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           {/* ── Header sticky a la izquierda (asimetría editorial) ───── */}
-          <motion.div
+          <m.div
             initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
             whileInView={
               prefersReducedMotion
@@ -404,7 +404,7 @@ export function HomeProcessSection() {
                 Si el boceto no te convence, no pagás nada.
               </p>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* ── Timeline de pasos ─────────────────────────────────────── */}
           <div className="relative">

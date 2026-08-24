@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef } from 'react'
-import { motion, useInView, useReducedMotion } from 'framer-motion'
+import { m, useInView, useReducedMotion } from 'framer-motion'
 import { TECH_STACK, type ThemeId } from '@/lib/types/theme'
 import { useApexTheme } from '@/hooks/useTheme'
 import { useGsapReveal } from '@/hooks/useGsapReveal'
@@ -100,7 +100,7 @@ export function TechCardsSection() {
                   'linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.55) 0%, rgba(var(--color-accent-rgb), 0.38) 48%, rgba(var(--color-primary-rgb), 0.28) 100%)',
               }}
             >
-              <div className="relative flex w-full items-center gap-3.5 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-surface-low)_90%,transparent)] px-5 py-3.5 backdrop-blur-xl theme-transition dark:bg-[color-mix(in_srgb,var(--color-surface-low)_82%,transparent)] sm:px-6 sm:py-4">
+              <div className="relative flex w-full items-center gap-3.5 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-surface-low)_94%,transparent)] px-5 py-3.5 theme-transition dark:bg-[color-mix(in_srgb,var(--color-surface-low)_88%,transparent)] sm:px-6 sm:py-4">
                 <span
                   aria-hidden
                   className="pointer-events-none absolute inset-x-8 top-0 z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-[rgba(var(--color-primary-rgb),0.35)] to-transparent"
@@ -115,7 +115,7 @@ export function TechCardsSection() {
                 />
                 <span aria-hidden className="relative z-[2] flex size-[22px] shrink-0 items-center justify-center">
                   {!prefersReducedMotion && hintInView ? (
-                    <motion.span
+                    <m.span
                       className="absolute inset-0 rounded-full border border-[rgba(var(--color-primary-rgb),0.45)]"
                       animate={{ scale: [1, 1.28, 1], opacity: [0.55, 0, 0.55] }}
                       transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}

@@ -97,7 +97,7 @@ const LIVE_PRODUCTS = [
 function FeatureCard({ f }: { f: (typeof FEATURES)[number] }) {
   return (
     <div
-      className="apex-feature-card group relative overflow-hidden rounded-lg backdrop-blur-[20px] saturate-150"
+      className="apex-feature-card group relative overflow-hidden rounded-lg backdrop-blur-[10px]"
       style={{
         backgroundColor: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
@@ -231,8 +231,8 @@ export function HeroSection() {
         <div className="pointer-events-none absolute inset-0">
           <ParticleField
             externalMouse={particleMouseRef}
-            particleCount={150}
-            connectionDistance={140}
+            particleCount={90}
+            connectionDistance={120}
             mouseForce={1.45}
             mouseImpulseScale={0.58}
             returnDelayMs={3000}
@@ -384,7 +384,7 @@ export function HeroSection() {
 
             {/* Productos propios online — prueba verificable, links reales */}
             <div
-              className="mt-1 rounded-md px-4 py-3 backdrop-blur-[20px] saturate-150"
+              className="mt-1 rounded-md px-4 py-3 backdrop-blur-[10px]"
               style={{
                 backgroundColor: 'var(--glass-bg)',
                 border: '1px solid var(--glass-border)',

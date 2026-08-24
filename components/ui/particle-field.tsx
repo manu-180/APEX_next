@@ -261,15 +261,20 @@ export function ParticleField({
 
       ctx.clearRect(0, 0, w, h)
 
+      const mouseRadiusSq = mouseRadius * mouseRadius
+      const connectionDistanceSq = connectionDistance * connectionDistance
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
         if (mouse.active && !isResetWindow) {
           const dx = p.x - mouse.x
           const dy = p.y - mouse.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
+          const distSq = dx * dx + dy * dy
 
-          if (dist > 0.001 && dist < mouseRadius) {
+          // Prefiltro con distancia² — sqrt solo cuando el punto está en radio.
+          if (distSq > 0.000001 && distSq < mouseRadiusSq) {
+            const dist = Math.sqrt(distSq)
             const force = (1 - dist / mouseRadius) * mouseForce
             p.vx += (dx / dist) * force * mouseImpulseScale
             p.vy += (dy / dist) * force * mouseImpulseScale
@@ -310,14 +315,16 @@ export function ParticleField({
         ctx.fillStyle = `rgba(${colorsRef.current[p.colorIndex]}, ${p.alpha})`
         ctx.fill()
 
+        // Sin sqrt en el loop O(n²): comparamos distancia² y el falloff usa
+        // (1 - d²/c²) — visualmente equivalente, miles de sqrt menos por frame.
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j]
           const dx = p.x - p2.x
           const dy = p.y - p2.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
+          const distSq = dx * dx + dy * dy
 
-          if (dist < connectionDistance) {
-            const alpha = (1 - dist / connectionDistance) * lineAlphaMax
+          if (distSq < connectionDistanceSq) {
+            const alpha = (1 - distSq / connectionDistanceSq) * lineAlphaMax
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)

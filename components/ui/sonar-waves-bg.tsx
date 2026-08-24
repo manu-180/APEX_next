@@ -20,6 +20,9 @@ const MAX_WAVES_PER_EMITTER = 3
 const MOBILE_BREAKPOINT = 768
 const CURSOR_ACTIVATION_RADIUS = 90
 const CURSOR_COOLDOWN_MS = 900
+/** Cap de devicePixelRatio: 1.5 ya se ve nítido y evita duplicar el costo de
+ *  rasterizado en pantallas Retina/4K con GPUs integradas (spec de perf). */
+const MAX_DPR = 1.5
 
 // Emitter definitions: main center + 4 distributed points
 const EMITTER_DEFS: Array<{ px: number; py: number; autoInterval: number }> = [
@@ -57,12 +60,24 @@ export function SonarWavesBg({
   const internalCursorRef = useRef({ x: -1, y: -1, active: false })
   const cursorRef = externalCursorRef ?? internalCursorRef
 
+  const isMobile = useCallback((): boolean => {
+    return typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT
+  }, [])
+
+  const prefersReducedMotion = useCallback((): boolean => {
+    return (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+  }, [])
+
+  /** Vía rápida animada (rAF): ni mobile ni reduced-motion. */
   const isEnabled = useCallback((): boolean => {
     if (typeof window === 'undefined') return false
-    if (window.innerWidth < MOBILE_BREAKPOINT) return false
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+    if (isMobile()) return false
+    if (prefersReducedMotion()) return false
     return true
-  }, [])
+  }, [isMobile, prefersReducedMotion])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -76,7 +91,7 @@ export function SonarWavesBg({
       const { width, height } = parent.getBoundingClientRect()
       const w = Math.max(1, Math.floor(width))
       const h = Math.max(1, Math.floor(height))
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
       canvas.width = Math.floor(w * dpr)
       canvas.height = Math.floor(h * dpr)
       canvas.style.width = `${w}px`
@@ -94,6 +109,29 @@ export function SonarWavesBg({
       const lw = canvas.clientWidth
       const lh = canvas.clientHeight
       if (lw > 0 && lh > 0) ctx.clearRect(0, 0, lw, lh)
+    }
+
+    /**
+     * prefers-reduced-motion: un único frame estático — los puntos de los
+     * emisores en reposo, sin pulso ni ondas — y CERO rAF. Se repinta solo
+     * ante resize; no depende de IntersectionObserver/visibility porque no
+     * hay loop que pausar (ya es gratis en reposo).
+     */
+    const drawStaticFrame = () => {
+      syncSize()
+      const lw = canvas.clientWidth
+      const lh = canvas.clientHeight
+      if (lw < 1 || lh < 1) return
+      ctx.clearRect(0, 0, lw, lh)
+      const rgb = readPrimaryRgb(canvas)
+      for (const def of EMITTER_DEFS) {
+        const cx = def.px * lw
+        const cy = def.py * lh
+        ctx.beginPath()
+        ctx.fillStyle = `rgba(${rgb}, 0.35)`
+        ctx.arc(cx, cy, 1.5, 0, Math.PI * 2)
+        ctx.fill()
+      }
     }
 
     const tick = (now: number) => {
@@ -198,7 +236,9 @@ export function SonarWavesBg({
     }
 
     // Pausa cooperativa por viewport (IntersectionObserver) + pestaña activa
-    // (visibilitychange): no propagamos ondas mientras nadie las mira.
+    // (visibilitychange): no propagamos ondas mientras nadie las mira. Solo
+    // gatean la vía ANIMADA — el frame estático de reduced-motion no tiene
+    // loop que pausar.
     let isIntersecting = true
     let isPageVisible = !document.hidden
 
@@ -210,24 +250,32 @@ export function SonarWavesBg({
       rafIdRef.current = requestAnimationFrame(tick)
     }
 
-    const onResize = () => {
-      if (!isEnabled()) {
+    /** Único punto de entrada tras cualquier cambio de condición (mount,
+     *  resize, toggle de reduced-motion): decide entre animado / frame
+     *  estático / nada (mobile), sin duplicar la lógica de gating. */
+    const applyMode = () => {
+      if (isMobile()) {
         stop()
+        return
+      }
+      if (prefersReducedMotion()) {
+        stop()
+        drawStaticFrame()
         return
       }
       if (runningRef.current) syncSize()
       else start()
     }
 
-    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onReduceChange = () => {
-      if (!isEnabled()) stop()
-      else start()
-    }
+    const onResize = () => applyMode()
+    const onReduceChange = () => applyMode()
 
     const io = new IntersectionObserver(
       (entries) => {
         isIntersecting = entries[0]?.isIntersecting ?? true
+        // El frame estático (mobile o reduced-motion) no depende de
+        // intersección: no hay rAF corriendo que valga la pena pausar.
+        if (isMobile() || prefersReducedMotion()) return
         if (isIntersecting) start()
         else stop()
       },
@@ -237,15 +285,17 @@ export function SonarWavesBg({
 
     const handleVisibility = () => {
       isPageVisible = !document.hidden
+      if (isMobile() || prefersReducedMotion()) return
       if (isPageVisible) start()
       else stop()
     }
     document.addEventListener('visibilitychange', handleVisibility)
 
+    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
     mqReduce.addEventListener('change', onReduceChange)
     window.addEventListener('resize', onResize)
 
-    start()
+    applyMode()
 
     return () => {
       io.disconnect()
@@ -254,7 +304,7 @@ export function SonarWavesBg({
       window.removeEventListener('resize', onResize)
       stop()
     }
-  }, [isEnabled])
+  }, [isEnabled, isMobile, prefersReducedMotion])
 
   return (
     <div

@@ -19,7 +19,7 @@
 
 import { useState, type MouseEvent } from 'react'
 import Image from 'next/image'
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
+import { m, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 import { BrowserChrome } from '@/components/ui/browser-chrome'
 import { ExternalLinkIcon } from '@/components/ui/icons'
@@ -200,7 +200,7 @@ export function PreviewCard(props: PreviewCardProps) {
 
   return (
     <div className={cn('h-full', className)} style={{ perspective: 1000 }}>
-      <motion.a
+      <m.a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
@@ -315,7 +315,7 @@ export function PreviewCard(props: PreviewCardProps) {
             </span>
           </div>
         </div>
-      </motion.a>
+      </m.a>
     </div>
   )
 }

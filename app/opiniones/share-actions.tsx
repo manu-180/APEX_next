@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { DUR_FAST, EASE_OUT } from '@/lib/motion'
 
@@ -49,7 +49,7 @@ export function ShareActions({ url, waMessage }: { url: string; waMessage: strin
         >
           <AnimatePresence mode="wait" initial={false}>
             {copied ? (
-              <motion.span
+              <m.span
                 key="copied"
                 initial={swapInitial}
                 animate={{ opacity: 1, y: 0 }}
@@ -58,9 +58,9 @@ export function ShareActions({ url, waMessage }: { url: string; waMessage: strin
                 className="inline-flex items-center gap-1"
               >
                 <CheckIcon className="size-3.5" /> Copiado
-              </motion.span>
+              </m.span>
             ) : (
-              <motion.span
+              <m.span
                 key="copy"
                 initial={swapInitial}
                 animate={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ export function ShareActions({ url, waMessage }: { url: string; waMessage: strin
                 className="inline-block"
               >
                 Copiar
-              </motion.span>
+              </m.span>
             )}
           </AnimatePresence>
         </button>

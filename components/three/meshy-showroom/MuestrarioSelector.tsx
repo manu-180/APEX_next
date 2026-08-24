@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { CATEGORIES, artifactsOf, type Artifact, type CategoryId } from '@/lib/three/artifacts'
 import { cn } from '@/lib/utils/cn'
@@ -111,7 +111,7 @@ export function MuestrarioSelector({
                 {c.kicker}
               </span>
               {active && (
-                <motion.span
+                <m.span
                   layoutId="muestrario-cat-underline"
                   className="absolute -bottom-0.5 left-3 right-3 h-[2px] rounded-full"
                   style={{ background: c.accent, boxShadow: `0 0 10px 0 ${c.accent}` }}
@@ -134,7 +134,7 @@ export function MuestrarioSelector({
       </div>
 
       {/* ── Nivel 2 — rail de piezas ── */}
-      <motion.div
+      <m.div
         ref={railRef}
         key={activeCat}
         initial={{ opacity: 0, y: 8 }}
@@ -196,7 +196,7 @@ export function MuestrarioSelector({
             </button>
           )
         })}
-      </motion.div>
+      </m.div>
     </div>
   )
 }

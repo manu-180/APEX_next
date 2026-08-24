@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import Link from 'next/link'
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
+import { m, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { ArrowRightIcon, CheckIcon, StarIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
@@ -70,14 +70,14 @@ function MagneticCta({ children, className }: { children: ReactNode; className?:
   }
 
   return (
-    <motion.div
+    <m.div
       className={className}
       style={active ? { x, y } : undefined}
       onMouseMove={active ? handleMove : undefined}
       onMouseLeave={active ? handleLeave : undefined}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -121,7 +121,7 @@ export function HomeFinalCtaSection() {
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
           {/* ── Acción ────────────────────────────────────────────── */}
-          <motion.div
+          <m.div
             initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
             whileInView={
               prefersReducedMotion
@@ -148,7 +148,7 @@ export function HomeFinalCtaSection() {
             </p>
 
             {/* De-riskers */}
-            <motion.ul
+            <m.ul
               className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2.5"
               variants={
                 prefersReducedMotion
@@ -160,7 +160,7 @@ export function HomeFinalCtaSection() {
               viewport={{ once: true, amount: 0.5 }}
             >
               {DE_RISKERS.map((item) => (
-                <motion.li
+                <m.li
                   key={item}
                   variants={
                     prefersReducedMotion
@@ -175,9 +175,9 @@ export function HomeFinalCtaSection() {
                     aria-hidden
                   />
                   {item}
-                </motion.li>
+                </m.li>
               ))}
-            </motion.ul>
+            </m.ul>
 
             {/* CTA dominante — único botón de la sección (magnetic, spec §8.6) */}
             <div className="mt-9">
@@ -224,10 +224,10 @@ export function HomeFinalCtaSection() {
                 </Link>
               </p>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* ── Prueba social de cierre: review real ──────────────── */}
-          <motion.figure
+          <m.figure
             initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
             whileInView={
               prefersReducedMotion
@@ -274,7 +274,7 @@ export function HomeFinalCtaSection() {
                 aria-hidden
               />
             </Link>
-          </motion.figure>
+          </m.figure>
         </div>
       </div>
     </section>

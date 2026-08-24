@@ -1462,6 +1462,43 @@ body::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CONTENT-VISIBILITY — el renderer saltea layout/paint de secciones fuera de
+   pantalla (Chromium/Firefox/Safari 18+; donde no existe, no-op inocuo).
+   contain-intrinsic-size reserva un alto estimado y recuerda el real tras el
+   primer render (`auto`), así el scrollbar no salta.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+.cv-auto-sm {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME SHOWCASE CORE — artefacto CSS que reemplazó al WebGL de la home.
+   Solo transform (compositor puro): rotaciones lentas continuas, cero rAF.
+   El nuke global de reduced-motion (abajo) las congela solo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes apex-spin {
+  to { transform: rotate(360deg); }
+}
+
+.apex-gem-spin {
+  animation: apex-spin 26s linear infinite;
+}
+
+.apex-orbit {
+  animation: apex-spin 18s linear infinite;
+}
+
+.apex-orbit-reverse {
+  animation: apex-spin 30s linear infinite reverse;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    REDUCED MOTION
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence, useReducedMotion, type PanInfo } from 'framer-motion'
+import { m, AnimatePresence, useReducedMotion, type PanInfo } from 'framer-motion'
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
 import { EASE_OUT, DELAY_AFTER_PANEL } from '@/lib/motion'
@@ -146,15 +146,14 @@ export function MobileDrawer({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop — scrim tintado (--scrim-bg, spec §5) para legibilidad del
-              contenido detrás; el blur añade separación. */}
-          <motion.div
+          {/* Backdrop — scrim tintado (--scrim-bg, spec §5). Sin backdrop-blur:
+              re-filtrar el viewport entero durante el fade+spring del panel
+              costaba frames enteros en móviles; el scrim sólido separa igual. */}
+          <m.div
             aria-hidden="true"
             className="fixed inset-0"
             style={{
               background: 'var(--scrim-bg)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
               zIndex: 79,
             }}
             initial={{ opacity: 0 }}
@@ -165,7 +164,7 @@ export function MobileDrawer({
           />
 
           {/* Drawer */}
-          <motion.div
+          <m.div
             ref={drawerRef}
             role="dialog"
             aria-modal="true"
@@ -174,8 +173,9 @@ export function MobileDrawer({
             style={{
               width: 'min(85vw, 360px)',
               height: '100dvh',
+              // Fondo sólido: el backdrop-blur(24px) previo era invisible sobre
+              // surface-low opaco y re-filtraba cada frame del spring/drag.
               background: 'var(--color-surface-low)',
-              backdropFilter: 'blur(24px)',
               borderLeft: '1px solid var(--glass-border)',
               zIndex: 80,
             }}
@@ -235,19 +235,19 @@ export function MobileDrawer({
                   const linkStyle = { padding: '0.875rem 1rem' }
 
                   return (
-                    <motion.li
+                    <m.li
                       key={link.href}
-                      // Reveal firma (spec §2): blur one-shot en cascada tras el
-                      // spring del panel. Reduced → fade simple sin blur ni y.
+                      // Cascada opacity+y tras el spring del panel — sin blur
+                      // animado (costaba frames justo durante el spring).
                       initial={
                         shouldReduceMotion
                           ? { opacity: 0 }
-                          : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                          : { opacity: 0, y: 14 }
                       }
                       animate={
                         shouldReduceMotion
                           ? { opacity: 1 }
-                          : { opacity: 1, y: 0, filter: 'blur(0px)' }
+                          : { opacity: 1, y: 0 }
                       }
                       transition={
                         shouldReduceMotion
@@ -287,7 +287,7 @@ export function MobileDrawer({
                           </span>
                         </Link>
                       )}
-                    </motion.li>
+                    </m.li>
                   )
                 })}
               </ul>
@@ -346,7 +346,7 @@ export function MobileDrawer({
                 </div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>
@@ -355,7 +355,7 @@ export function MobileDrawer({
 
 function ActiveDot() {
   return (
-    <motion.span
+    <m.span
       layoutId="mobile-drawer-active"
       className="size-1.5 rounded-full flex-shrink-0"
       style={{

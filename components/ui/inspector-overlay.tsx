@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useTheme } from '@/components/providers/theme-mode-provider'
 
 interface TooltipInfo {
@@ -136,7 +136,7 @@ export function InspectorOverlay({ onDisable }: { onDisable: () => void }) {
         }}
       >
         {/* Scanning sweep — usa el primario del tema (Flutter, Next, etc.) */}
-        <motion.div
+        <m.div
           className="pointer-events-none absolute inset-y-0 w-32"
           style={{
             background:
@@ -173,7 +173,7 @@ export function InspectorOverlay({ onDisable }: { onDisable: () => void }) {
             {/* Live component label */}
             <AnimatePresence mode="wait">
               {activeTitle ? (
-                <motion.span
+                <m.span
                   key={activeTitle}
                   initial={{ opacity: 0, x: -5 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -182,9 +182,9 @@ export function InspectorOverlay({ onDisable }: { onDisable: () => void }) {
                   className="max-w-[min(52vw,28rem)] truncate text-[10px] font-mono text-on-surface"
                 >
                   {activeTitle}
-                </motion.span>
+                </m.span>
               ) : (
-                <motion.span
+                <m.span
                   key="hint"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -193,7 +193,7 @@ export function InspectorOverlay({ onDisable }: { onDisable: () => void }) {
                   className="text-[10px] font-mono text-[var(--color-hint)]"
                 >
                   Pasa el mouse sobre cualquier elemento
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
           </div>
@@ -243,7 +243,7 @@ function TooltipCard({ tooltip }: { tooltip: TooltipInfo }) {
   const categoryShadow = `0 0 0 1px ${alpha(color, isLight ? 0.14 : 0.1)}, 0 0 28px -8px ${alpha(color, isLight ? 0.2 : 0.22)}`
 
   return (
-    <motion.div
+    <m.div
       className="fixed z-[200] pointer-events-none"
       style={{
         left: tooltip.x,
@@ -314,6 +314,6 @@ function TooltipCard({ tooltip }: { tooltip: TooltipInfo }) {
           }}
         />
       </div>
-    </motion.div>
+    </m.div>
   )
 }

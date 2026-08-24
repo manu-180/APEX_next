@@ -101,7 +101,7 @@ export function CodeRainBg({
       return
     }
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
     const targetW = Math.floor(w * dpr)
     const targetH = Math.floor(h * dpr)
 

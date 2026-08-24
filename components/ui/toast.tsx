@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { EASE_OUT } from '@/lib/motion'
 import { cn } from '@/lib/utils/cn'
 import { CheckIcon, XIcon } from '@/components/ui/icons'
@@ -108,7 +108,7 @@ function Toaster({
     >
       <AnimatePresence initial={false}>
         {toasts.map((t) => (
-          <motion.div
+          <m.div
             key={t.id}
             layout={!reduce}
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.97 }}
@@ -122,7 +122,7 @@ function Toaster({
             className="pointer-events-auto w-full max-w-sm"
           >
             <ToastCard toast={t} onDismiss={() => onDismiss(t.id)} />
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

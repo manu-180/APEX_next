@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { SHORTCUTS } from '@/lib/constants'
 import { EASE_OUT, STAGGER_TIGHT, DELAY_AFTER_PANEL } from '@/lib/motion'
 import { XIcon } from '@/components/ui/icons'
@@ -74,7 +74,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
           aria-modal="true"
           aria-labelledby="shortcuts-modal-title"
         >
-          <motion.div
+          <m.div
             aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -83,7 +83,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
             onClick={onClose}
             className="absolute inset-0 bg-[var(--scrim-bg)] backdrop-blur-sm"
           />
-          <motion.div
+          <m.div
             ref={panelRef}
             tabIndex={-1}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 16 }}
@@ -153,7 +153,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>
@@ -176,7 +176,7 @@ function ShortcutRow({
   const prefersReducedMotion = useReducedMotion()
   return (
     // Cascada de filas densas (spec §9): STAGGER_TIGHT tras el settle del panel.
-    <motion.div
+    <m.div
       initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={
@@ -204,6 +204,6 @@ function ShortcutRow({
         )}
         <span className="kbd-key">{shortcutKey}</span>
       </kbd>
-    </motion.div>
+    </m.div>
   )
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { motion, type Variants } from 'framer-motion'
+import { m, type Variants } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
@@ -202,12 +202,10 @@ const PROCESS_STEPS = [
    Reduced-motion: SectionReveal degrada a estado final (los hijos con
    variants nunca reciben "hidden" sin propagación del contenedor). */
 const PROCESS_PANEL_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 24, filter: 'blur(6px)' },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
-    transitionEnd: { filter: 'none' },
     transition: {
       duration: DUR_REVEAL,
       ease: EASE_OUT,
@@ -218,12 +216,10 @@ const PROCESS_PANEL_VARIANTS: Variants = {
 }
 
 const PROCESS_ITEM_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 16, filter: 'blur(6px)' },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
-    transitionEnd: { filter: 'none' },
     transition: { duration: DUR_SLOW, ease: EASE_OUT },
   },
 }
@@ -264,7 +260,7 @@ export function ServiciosProcess() {
         </SectionReveal>
 
         <SectionReveal delay={0.1} stagger={STAGGER_LOOSE}>
-          <motion.div
+          <m.div
             variants={PROCESS_PANEL_VARIANTS}
             className="bento-surface overflow-hidden"
             data-hover
@@ -285,7 +281,7 @@ export function ServiciosProcess() {
               <div className="mb-6 flex flex-col items-stretch justify-center sm:flex-row sm:items-center">
                 {PROCESS_STEPS.map(({ step, title, sub, highlight }, i, arr) => (
                   <div key={step} className="flex flex-col items-center sm:flex-row sm:flex-1">
-                    <motion.div
+                    <m.div
                       variants={PROCESS_ITEM_VARIANTS}
                       className={cn(
                         'flex w-full flex-col items-center rounded-xl px-4 py-5 text-center sm:flex-1',
@@ -323,12 +319,12 @@ export function ServiciosProcess() {
                       >
                         {sub}
                       </span>
-                    </motion.div>
+                    </m.div>
 
                     {i < arr.length - 1 && (
                       <div aria-hidden className="my-2 flex items-center justify-center sm:my-0 sm:px-1">
                         {/* Conectores que se dibujan (transform-only) entre paso y paso */}
-                        <motion.span
+                        <m.span
                           variants={PROCESS_CONNECTOR_X_VARIANTS}
                           className="hidden h-px w-6 origin-left sm:block"
                           style={{
@@ -336,7 +332,7 @@ export function ServiciosProcess() {
                               'linear-gradient(90deg, rgba(var(--color-primary-rgb), 0.2), rgba(var(--color-primary-rgb), 0.55))',
                           }}
                         />
-                        <motion.span
+                        <m.span
                           variants={PROCESS_CONNECTOR_Y_VARIANTS}
                           className="block h-5 w-px origin-top sm:hidden"
                           style={{
@@ -350,14 +346,14 @@ export function ServiciosProcess() {
                 ))}
               </div>
 
-              <motion.p
+              <m.p
                 variants={PROCESS_ITEM_VARIANTS}
                 className="text-center text-[11px] uppercase tracking-[0.2em] text-[var(--color-on-surface-variant)] opacity-50"
               >
                 Sin vueltas · Sin sorpresas · Sin letra chica
-              </motion.p>
+              </m.p>
             </div>
-          </motion.div>
+          </m.div>
         </SectionReveal>
       </div>
     </section>

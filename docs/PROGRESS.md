@@ -1,7 +1,36 @@
 # PROGRESS — Refactor pre-campaña + fix funnel WhatsApp
 
-> Última actualización: 2026-07-02 (sesión Claude)
+> Última actualización: 2026-08-24 (sesión Claude — overhaul de performance)
 > Objetivo: dejar theapexweb.com listo para campaña — funnel WhatsApp funcionando end-to-end + rediseño premium orientado a conversión.
+
+---
+
+## -2. OVERHAUL DE PERFORMANCE — "la página se siente ultra lenta" (2026-08-24)
+
+**Diagnóstico:** el sitio ya estaba optimizado de *carga* (dynamic imports, ISR, font optional) pero era lento de **runtime**: three.js montándose en la home al scrollear (bloom + GPU), animaciones de `filter: blur()` en cada reveal (re-rasterizado por frame en GPU integrada), gtag+Sentry+PostHog cargando LOS TRES en el primer mousemove, gsap entrando en todas las páginas vía `await import('gsap')` (invisible al grep de imports estáticos), y backdrop-filter caro en chrome sticky.
+
+**Eliminado del sitio (código + deps):**
+- `@sentry/nextjs`, `posthog-js`, `gsap` fuera de package.json (18 → 15 deps). GA queda solo, con su cola de conversiones intacta (`GoogleAnalyticsRoot` — NO tocar, es la señal de Ads).
+- `botlode-chat.tsx` (37 KB, cero imports) y `budget-calculator.tsx` (36 KB, cero imports — ya estaba trackeado como “definida pero sin renderizar”).
+- three.js fuera de la home: `home-3d-showcase.tsx` → `theme-showcase.tsx` (core 100% CSS theme-reactive, mismos swatches/CTA; keyframes `apex-spin` en globals). `FounderBust` borrado (queda la foto). El 3D real vive SOLO en `/lab`.
+
+**Reescrito:**
+- Todos los scrubs gsap → vanilla IO + scroll pasivo + rAF con las MISMAS firmas: `use-parallax-number.ts`, `useGsapReveal.ts` (nombre legado, ya sin gsap), watermark del footer, línea de progreso de sobre-mí.
+- framer-motion → `LazyMotion` con `domMax` **async** (`lib/motion-features.ts`) + barrido `motion.*`→`m.*` en ~35 archivos + `strict` en app-shell. Gotcha real: `heroMetrics.map((m) => <m.div>)` — el parámetro del map sombreaba al `m` de framer (error de tipos + crash runtime); renombrado a `metric`. Revisar shadowing SIEMPRE tras un barrido de renombre.
+- Blur animations eliminadas en 10+ archivos (variants quedan opacity/transform only). El truco `transitionEnd: { filter: 'none' }` ya no hace falta.
+- `/contacto` particionado (agente): `booking-calendar.tsx` + `reviews-section.tsx` como chunks dinámicos ssr:true; `@supabase/supabase-js` fuera del First Load (cadena verificada). `/servicios` (agente): ServiceDrawerContent/ProjectDrawer/ProjectsSheet/AfipAddon on-demand; hallazgo: ProjectsSheet hoy es inalcanzable (setSheetPlanId nunca se llama con valor) — gate implementado igual.
+- Canvas: DPR cap 1.5 en los 4 fondos, frame estático en reduced-motion, pausa IO+visibility completa; particle-field sin `sqrt` en el loop O(n²) y 150→90 partículas en hero.
+- Glass diet: navbar blur 16px+saturate → 8px; hero cards 20px+saturate → 10px; drawer mobile a fondo sólido (el blur(24) era invisible sobre surface opaco y re-filtraba durante el spring); marquee tecnologías sin backdrop-blur.
+- Oxanium → **fuente variable** (1 woff2 cubre 200-800; antes 6 archivos). `content-visibility: auto` (`.cv-auto`) en secciones below-fold de la home + footer. **Speculation Rules** en layout: prerender al hover (excluye /gracias — dispararía conversión falsa —, /lab y /api).
+
+**Medición First Load JS (antes → después):** ver tabla en el commit / reporte de sesión. Baseline: home 121 kB · contacto 224 kB · servicios 209 kB · shared 88.2 kB.
+
+**Verificado:** `tsc --noEmit` ✓ · build ✓ · dev browser: 9 páginas consola limpia, switch de themes en vivo (supabase → #3ECF8E), Ctrl+Y dark toggle, drawer de servicios abre con chunk on-demand, booking+reviews renderizan, /lab conserva WebGL. Hydration mismatch visto en /lab en DEV = cache ISR stale del dev server (gotcha ya documentado), verificar contra build.
+
+**Gotchas nuevos:**
+- gsap se cargaba vía `await import('gsap')` — un grep de `from 'gsap'` da falso negativo; buscar también `import('`.
+- El nuke global de reduced-motion en globals.css (animation-duration 0.01ms) congela solo las animaciones CSS nuevas — no requieren guard propio.
+- Firma del sitio intacta: 7 themes + data-theme + wave + inspector + shortcuts + presencia del muestrario. Nada de eso se tocó por dentro.
 
 ---
 

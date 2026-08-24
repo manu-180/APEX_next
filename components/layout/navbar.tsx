@@ -3,7 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
+import { m, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
 import { useTheme } from '@/components/providers/theme-mode-provider'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
@@ -182,8 +182,10 @@ export function Navbar({
           )}
           style={{
             backgroundColor: 'var(--nav-bg)',
-            backdropFilter: 'blur(16px) saturate(140%)',
-            WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+            // 8px sin saturate: el navbar refiltra su franja en CADA frame de
+            // scroll — bajar el radio recorta ese costo fijo a menos de la mitad.
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             // Siempre 1px de borde (sin salto de layout); solo cambia el color.
             border: scrolled
               ? '1px solid rgba(var(--color-primary-rgb), 0.18)'
@@ -335,7 +337,7 @@ export function Navbar({
 
           {/* Wrapper magnético: mueve el CTA completo sin pisar los transforms
               propios del Link (active:scale). El Link conserva hover/focus. */}
-          <motion.span
+          <m.span
             className="hidden md:inline-flex"
             style={{ x: magnetSpringX, y: magnetSpringY }}
             onPointerMove={handleCtaMagnet}
@@ -378,7 +380,7 @@ export function Navbar({
               className="relative size-3.5 opacity-70 transition-[transform,opacity] duration-300 ease-out group-hover/cta:translate-x-0.5 group-hover/cta:opacity-100"
             />
           </Link>
-          </motion.span>
+          </m.span>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -390,7 +392,7 @@ export function Navbar({
             {/* Hamburger morph: 2 líneas que colapsan al centro y rotan ±45°
                 (transform-only, spring 380/26). Reduced-motion → cross corto. */}
             <span aria-hidden className="relative block size-5">
-              <motion.span
+              <m.span
                 className="absolute left-0 top-1/2 -mt-px block h-0.5 w-5 rounded-full bg-current"
                 initial={false}
                 animate={mobileOpen ? { y: 0, rotate: 45 } : { y: -3.5, rotate: 0 }}
@@ -400,7 +402,7 @@ export function Navbar({
                     : { type: 'spring' as const, stiffness: 380, damping: 26 }
                 }
               />
-              <motion.span
+              <m.span
                 className="absolute left-0 top-1/2 -mt-px block h-0.5 w-5 rounded-full bg-current"
                 initial={false}
                 animate={mobileOpen ? { y: 0, rotate: -45 } : { y: 3.5, rotate: 0 }}

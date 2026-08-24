@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 interface WaveConfig {
   key: number
@@ -83,7 +83,7 @@ function WaveEffect({
       style={{ zIndex: 9998 }}
     >
       {/* Capa principal: flash radial suave (evita clip-path para reducir jank). */}
-      <motion.div
+      <m.div
         className="absolute rounded-full"
         style={{
           left: x - 140,
@@ -99,7 +99,7 @@ function WaveEffect({
       />
 
       {/* ── Layer 3: Primary glowing shockwave ring ───────────────────────── */}
-      <motion.div
+      <m.div
         className="absolute rounded-full"
         style={{
           left: x - 95,
@@ -115,7 +115,7 @@ function WaveEffect({
       />
 
       {!simpleMode && (
-        <motion.div
+        <m.div
           className="absolute rounded-full"
           style={{
             left: x - 65,
@@ -131,7 +131,7 @@ function WaveEffect({
       )}
 
       {/* ── Layer 6: Origin burst (radial flash) ─────────────────────────── */}
-      <motion.div
+      <m.div
         className="absolute rounded-full"
         style={{
           left: x - 44,
@@ -152,7 +152,7 @@ function WaveEffect({
       />
 
       {/* ── Layer 7: Inner hot core (bright point flash) ─────────────────── */}
-      <motion.div
+      <m.div
         className="absolute rounded-full"
         style={{
           left: x - 8,

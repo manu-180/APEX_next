@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { LazyMotion } from 'framer-motion'
 import { useState, useCallback, useEffect, type ReactNode, type MouseEvent } from 'react'
 import { useTheme } from '@/components/providers/theme-mode-provider'
 import { useApexThemeActions } from '@/hooks/useTheme'
@@ -41,6 +42,13 @@ const WhatsAppFloatingButton = dynamic(
 // Context exports for child components
 export { useApexTheme } from '@/hooks/useTheme'
 export { useInspector } from '@/hooks/useInspector'
+
+/**
+ * Features de framer-motion como chunk async: el First Load lleva solo los
+ * shells `m.*`; el runtime (domMax) baja en paralelo sin bloquear nada.
+ */
+const loadMotionFeatures = () =>
+  import('@/lib/motion-features').then((mod) => mod.default)
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme()
@@ -105,6 +113,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [])
 
   return (
+    <LazyMotion features={loadMotionFeatures} strict>
     <ToastProvider>
     <div className={inspector.isActive ? 'inspector-mode' : ''}>
       <Navbar
@@ -138,5 +147,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       )}
     </div>
     </ToastProvider>
+    </LazyMotion>
   )
 }

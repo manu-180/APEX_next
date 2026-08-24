@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { ArrowRightIcon, CheckIcon, StarIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
@@ -73,12 +73,10 @@ const benefitItemVariants = {
   hidden: {
     opacity: 0,
     y: 14,
-    filter: 'blur(6px)',
   },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: {
       duration: 0.34,
       ease: EASE_OUT,
@@ -161,14 +159,14 @@ export function ServiceDrawerContent({
             Lo que ganás
           </p>
 
-          <motion.ul
+          <m.ul
             initial="hidden"
             animate="visible"
             variants={shouldReduceMotion ? undefined : benefitsContainerVariants}
             className="overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[rgba(11,15,26,0.02)] dark:border-white/10 dark:bg-[rgba(255,255,255,0.01)]"
           >
             {benefits.map((benefit, index) => (
-              <motion.li
+              <m.li
                 key={`${benefit.number}-${benefit.title}`}
                 variants={shouldReduceMotion ? undefined : benefitItemVariants}
                 initial={shouldReduceMotion ? { opacity: 1, y: 0 } : undefined}
@@ -187,9 +185,9 @@ export function ServiceDrawerContent({
                 {index < benefits.length - 1 && (
                   <div className="col-span-2 mt-4 h-px w-full bg-gradient-to-r from-transparent via-[rgba(11,15,26,0.10)] dark:via-white/15 to-transparent" />
                 )}
-              </motion.li>
+              </m.li>
             ))}
-          </motion.ul>
+          </m.ul>
         </section>
 
         <section className="space-y-2.5">

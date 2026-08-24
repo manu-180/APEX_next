@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ReactNode } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 
 interface TiltCardProps {
@@ -56,7 +56,7 @@ export function TiltCard({ children, className, glowColor, tiltMax = 10 }: TiltC
   }
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
@@ -82,6 +82,6 @@ export function TiltCard({ children, className, glowColor, tiltMax = 10 }: TiltC
         }}
       />
       {children}
-    </motion.div>
+    </m.div>
   )
 }

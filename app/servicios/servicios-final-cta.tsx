@@ -1,7 +1,7 @@
 'use client'
 
 import type { CSSProperties, MouseEvent } from 'react'
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
+import { m, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
@@ -47,7 +47,7 @@ function MagneticWhatsAppCta() {
   }
 
   return (
-    <motion.div
+    <m.div
       style={{ x: springX, y: springY }}
       onMouseMove={handleMouseMove}
       onMouseLeave={resetPull}
@@ -67,7 +67,7 @@ function MagneticWhatsAppCta() {
         <WhatsAppIcon className="size-5 transition-transform duration-200 group-hover:scale-110 motion-reduce:transform-none" />
         Hablemos por WhatsApp
       </WhatsAppOutboundLink>
-    </motion.div>
+    </m.div>
   )
 }
 

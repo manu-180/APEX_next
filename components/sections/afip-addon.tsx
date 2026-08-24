@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { Variants } from 'framer-motion'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
@@ -54,7 +54,7 @@ export function AfipAddonSection() {
   return (
     <section className="relative py-16 sm:py-20">
       <div className="mx-auto max-w-5xl px-6">
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           whileInView={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -99,7 +99,7 @@ export function AfipAddonSection() {
                 cualquier servicio que necesite emitir factura A o B sin volverse loco.
               </p>
 
-              <motion.ul
+              <m.ul
                 className="grid gap-2.5 sm:grid-cols-2 mb-7"
                 variants={prefersReducedMotion ? undefined : BENEFITS_CONTAINER}
                 initial={prefersReducedMotion ? false : 'hidden'}
@@ -107,7 +107,7 @@ export function AfipAddonSection() {
                 viewport={{ once: true, amount: 0.3 }}
               >
                 {AFIP_BENEFITS.map((b) => (
-                  <motion.li
+                  <m.li
                     key={b}
                     variants={prefersReducedMotion ? undefined : BENEFITS_ITEM}
                     className="group/row flex items-start gap-2.5 text-sm"
@@ -122,9 +122,9 @@ export function AfipAddonSection() {
                       <CheckIcon className="size-2.5" />
                     </span>
                     <span className="text-[var(--color-on-surface)]">{b}</span>
-                  </motion.li>
+                  </m.li>
                 ))}
-              </motion.ul>
+              </m.ul>
 
               <button
                 type="button"
@@ -184,7 +184,7 @@ export function AfipAddonSection() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

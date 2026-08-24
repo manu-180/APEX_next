@@ -3,70 +3,85 @@
 /**
  * useParallaxNumber — parallax editorial de los `.section-number` gigantes.
  *
- * GSAP ScrollTrigger con scrub 0.6: el número se desplaza yPercent -18
- * (transform-only) mientras la sección atraviesa el viewport. Solo lg+
- * (los números viven en `hidden lg:block`) y gated por prefers-reduced-motion
- * vía gsap.matchMedia (spec §11 — regla de 3 capas).
- *
- * SSR-safe: GSAP se importa dinámicamente dentro del useEffect
- * (mismo patrón que hooks/useGsapReveal.ts).
+ * Implementación vanilla (antes GSAP ScrollTrigger, ~70 kB que se cargaban
+ * en la home solo para esto): scroll pasivo + rAF, transform-only.
+ * El número se desplaza yPercent 0→-18 mientras su sección atraviesa el
+ * viewport. Solo lg+ (los números viven en `hidden lg:block`) y gated por
+ * prefers-reduced-motion.
  */
 
 import { useEffect, type RefObject } from 'react'
 
-/** registerPlugin es idempotente, pero evitamos la llamada repetida. */
-let gsapReady = false
-
 export function useParallaxNumber(ref: RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (typeof window === 'undefined') return
-
     const el = ref.current
     if (!el) return
 
-    let cleanup: (() => void) | undefined
-    let cancelled = false
+    const mql = window.matchMedia(
+      '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
+    )
 
-    void (async () => {
-      const gsap = (await import('gsap')).default
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+    let rafId = 0
+    let listening = false
+    const section: HTMLElement = (el.closest('section') as HTMLElement) ?? el
 
-      if (cancelled) return
+    const update = () => {
+      rafId = 0
+      const rect = section.getBoundingClientRect()
+      const vh = window.innerHeight
+      // Progreso 0→1 de la sección atravesando el viewport (top bottom → bottom top)
+      const p = Math.min(1, Math.max(0, (vh - rect.top) / (vh + rect.height)))
+      el.style.transform = `translate3d(0, ${(-18 * p).toFixed(2)}%, 0)`
+    }
 
-      if (!gsapReady) {
-        gsap.registerPlugin(ScrollTrigger)
-        gsapReady = true
+    const onScroll = () => {
+      if (!rafId) rafId = requestAnimationFrame(update)
+    }
+
+    const startListening = () => {
+      if (listening) return
+      listening = true
+      window.addEventListener('scroll', onScroll, { passive: true })
+      update()
+    }
+
+    const stopListening = () => {
+      if (!listening) return
+      listening = false
+      window.removeEventListener('scroll', onScroll)
+      if (rafId) {
+        cancelAnimationFrame(rafId)
+        rafId = 0
       }
+    }
 
-      const mm = gsap.matchMedia()
+    // Solo escucha scroll mientras la sección está cerca del viewport.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && mql.matches) startListening()
+        else stopListening()
+      },
+      { rootMargin: '80px' },
+    )
 
-      // Solo desktop y solo si el usuario no pidió reduced-motion.
-      mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
-        const tween = gsap.to(el, {
-          yPercent: -18,
-          // `ease: none` es correcto en scrub: el scroll es el driver y
-          // cualquier otra curva distorsionaría el mapeo (no es un loop).
-          ease: 'none',
-          scrollTrigger: {
-            trigger: el.closest('section') ?? el,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 0.6,
-          },
-        })
+    const applyGate = () => {
+      if (mql.matches) {
+        io.observe(section)
+      } else {
+        io.disconnect()
+        stopListening()
+        el.style.transform = ''
+      }
+    }
 
-        return () => {
-          tween.scrollTrigger?.kill()
-          tween.kill()
-        }
-      })
-
-      cleanup = () => mm.revert()
-    })()
+    applyGate()
+    mql.addEventListener('change', applyGate)
 
     return () => {
-      cancelled = true
-      cleanup?.()
+      mql.removeEventListener('change', applyGate)
+      io.disconnect()
+      stopListening()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

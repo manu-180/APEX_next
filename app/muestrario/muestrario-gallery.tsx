@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { PreviewCard } from './preview-card'
 import { cn } from '@/lib/utils/cn'
@@ -208,23 +208,15 @@ export function MuestrarioGallery({ demos }: { demos: LabDemo[] }) {
           {animated ? (
             <AnimatePresence mode="popLayout">
               {filtered.map((item, i) => (
-                <motion.div
+                <m.div
                   key={item.id}
                   layout
-                  initial={{ opacity: 0, y: 12, filter: 'blur(6px)' }}
-                  whileInView={{
-                    opacity: 1,
-                    y: 0,
-                    filter: 'blur(0px)',
-                    // Limpia el backdrop-root residual (el pill "Ver en vivo"
-                    // interno usa backdrop-blur) — mismo patrón que SectionReveal.
-                    transitionEnd: { filter: 'none' },
-                  }}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
                   exit={{
                     opacity: 0,
                     scale: 0.96,
-                    filter: 'blur(6px)',
                     transition: { duration: DUR_BASE, ease: EASE_OUT },
                   }}
                   transition={{
@@ -236,7 +228,7 @@ export function MuestrarioGallery({ demos }: { demos: LabDemo[] }) {
                   className={cn('h-full', bentoSpan(i))}
                 >
                   {renderCard(item, i)}
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
           ) : (

@@ -122,11 +122,15 @@ function readPrimaryRgb(): string {
   return raw.length > 0 ? raw : '128, 128, 128'
 }
 
-function motionAllowed(): boolean {
+/**
+ * Es un efecto que sigue al cursor: no tiene sentido en touch, así que se
+ * apaga por completo (ni siquiera un frame estático) por debajo de 768px.
+ * Prefers-reduced-motion se resuelve aparte (ver `reducedMotion` state) para
+ * poder mostrar un frame fijo en vez de nada.
+ */
+function isViewportEligible(): boolean {
   if (typeof window === 'undefined') return false
-  if (window.innerWidth < 768) return false
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
-  return true
+  return window.innerWidth >= 768
 }
 
 type Pulse = {
@@ -154,7 +158,8 @@ export function CircuitBoardBg({
   const pulsesRef = useRef<Pulse[]>([])
   const nextPulseAtRef = useRef(0)
   const rafRef = useRef<number | null>(null)
-  const [enabled, setEnabled] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
 
   const internalCursorRef = useRef<CursorState>({ x: -1, y: -1, active: false })
   const cursorRef = externalCursorRef ?? internalCursorRef
@@ -171,7 +176,9 @@ export function CircuitBoardBg({
       return
     }
 
-    const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2)
+    // Cap 1.5 (no 2): mitad de píxeles a rasterizar en pantallas Retina, sin
+    // pérdida perceptible en un fondo de líneas finas (mismo criterio que particle-field.tsx).
+    const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 1.5)
     canvas.width = Math.round(w * dpr)
     canvas.height = Math.round(h * dpr)
 
@@ -189,26 +196,65 @@ export function CircuitBoardBg({
   }, [])
 
   useEffect(() => {
-    setEnabled(motionAllowed())
+    setMounted(isViewportEligible())
+    const syncViewport = () => setMounted(isViewportEligible())
+    window.addEventListener('resize', syncViewport)
 
-    const sync = () => setEnabled(motionAllowed())
-    window.addEventListener('resize', sync)
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    mq.addEventListener('change', sync)
+    setReducedMotion(mq.matches)
+    const syncMotion = () => setReducedMotion(mq.matches)
+    mq.addEventListener('change', syncMotion)
 
     return () => {
-      window.removeEventListener('resize', sync)
-      mq.removeEventListener('change', sync)
+      window.removeEventListener('resize', syncViewport)
+      mq.removeEventListener('change', syncMotion)
     }
   }, [])
 
   useEffect(() => {
-    if (!enabled) return
+    if (!mounted) return
 
     const canvas = canvasRef.current
     if (!canvas) return
 
     resizeAndRebuild()
+
+    // ── prefers-reduced-motion: un solo frame estático, sin rAF ni listeners
+    // de cursor/IntersectionObserver/visibilitychange (no hay loop que pausar). ──
+    if (reducedMotion) {
+      const drawStaticFrame = () => {
+        const ctx = canvas.getContext('2d')
+        const graph = graphRef.current
+        if (!ctx || !graph) return
+        const rgb = readPrimaryRgb()
+        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
+        ctx.lineCap = 'round'
+        for (const [a, b] of graph.edges) {
+          const na = graph.nodes[a]!
+          const nb = graph.nodes[b]!
+          ctx.lineWidth = 1
+          ctx.strokeStyle = `rgba(${rgb}, 0.05)`
+          ctx.beginPath()
+          ctx.moveTo(na.x, na.y)
+          ctx.lineTo(nb.x, nb.y)
+          ctx.stroke()
+        }
+        for (const n of graph.nodes) {
+          ctx.beginPath()
+          ctx.arc(n.x, n.y, 2.5, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${rgb}, 0.08)`
+          ctx.fill()
+        }
+      }
+
+      drawStaticFrame()
+      const onStaticResize = () => {
+        resizeAndRebuild()
+        drawStaticFrame()
+      }
+      window.addEventListener('resize', onStaticResize)
+      return () => window.removeEventListener('resize', onStaticResize)
+    }
 
     const onResize = () => {
       resizeAndRebuild()
@@ -498,9 +544,9 @@ export function CircuitBoardBg({
       document.removeEventListener('visibilitychange', handleVisibility)
       stop()
     }
-  }, [enabled, resizeAndRebuild])
+  }, [mounted, reducedMotion, resizeAndRebuild])
 
-  if (!enabled) return null
+  if (!mounted) return null
 
   return (
     <canvas

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, type ReactNode } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { m, useScroll, useTransform } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CircuitBoardBg } from '@/components/ui/circuit-board-bg'
 
@@ -22,7 +22,7 @@ export function ServiciosHeroShell({ children }: { children: ReactNode }) {
   )
 
   return (
-    <motion.section
+    <m.section
       ref={headerRef}
       className="relative pt-20 pb-12 overflow-hidden"
       style={{
@@ -51,6 +51,6 @@ export function ServiciosHeroShell({ children }: { children: ReactNode }) {
       <GridBackground />
       <CircuitBoardBg cursorRef={bgCursorRef} />
       <div className="relative z-10 mx-auto max-w-6xl px-6">{children}</div>
-    </motion.section>
+    </m.section>
   )
 }

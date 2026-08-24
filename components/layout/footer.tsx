@@ -42,48 +42,86 @@ export function Footer() {
   const watermarkRef = useRef<HTMLDivElement>(null)
 
   // Parallax de marca (spec §1/§11): el watermark APEX se desplaza -30→30px
-  // y su stroke se intensifica 0.05→0.10 scrubbed al scroll. GSAP se importa
-  // dinámicamente (client-only) y gsap.matchMedia gatea desktop + reduced-motion.
+  // y su stroke se intensifica 0.05→0.10 scrubbed al scroll. Vanilla (scroll
+  // pasivo + rAF, antes GSAP): solo corre con el footer en viewport, lg+ y
+  // sin reduced-motion.
   useEffect(() => {
     const el = watermarkRef.current
     if (!el) return
-    let cleanup: (() => void) | undefined
 
-    void (async () => {
-      const gsap = (await import('gsap')).default
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      gsap.registerPlugin(ScrollTrigger)
+    const mql = window.matchMedia(
+      '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
+    )
+    const footerEl = (el.closest('footer') as HTMLElement) ?? el
 
-      const mm = gsap.matchMedia()
-      // Solo lg+ (el watermark es hidden lg:block) y sin reduced-motion.
-      mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
-        gsap.fromTo(
-          el,
-          { y: -30, '--sn-stroke-alpha': 0.05 },
-          {
-            y: 30,
-            '--sn-stroke-alpha': 0.1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: el.closest('footer') ?? el,
-              start: 'top bottom',
-              end: 'bottom bottom',
-              scrub: 0.6,
-            },
-          },
-        )
-      })
+    let rafId = 0
+    let listening = false
 
-      cleanup = () => mm.revert()
-    })()
+    const update = () => {
+      rafId = 0
+      const rect = footerEl.getBoundingClientRect()
+      const vh = window.innerHeight
+      // 0 cuando el top del footer toca el borde inferior del viewport;
+      // 1 cuando el bottom del footer llega al borde inferior.
+      const p = Math.min(1, Math.max(0, (vh - rect.top) / Math.max(1, rect.height)))
+      el.style.transform = `translate3d(0, ${(-30 + 60 * p).toFixed(1)}px, 0)`
+      el.style.setProperty('--sn-stroke-alpha', (0.05 + 0.05 * p).toFixed(3))
+    }
 
-    return () => cleanup?.()
+    const onScroll = () => {
+      if (!rafId) rafId = requestAnimationFrame(update)
+    }
+
+    const stop = () => {
+      if (!listening) return
+      listening = false
+      window.removeEventListener('scroll', onScroll)
+      if (rafId) {
+        cancelAnimationFrame(rafId)
+        rafId = 0
+      }
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && mql.matches) {
+          if (!listening) {
+            listening = true
+            window.addEventListener('scroll', onScroll, { passive: true })
+            update()
+          }
+        } else {
+          stop()
+        }
+      },
+      { rootMargin: '80px' },
+    )
+
+    const applyGate = () => {
+      if (mql.matches) {
+        io.observe(footerEl)
+      } else {
+        io.disconnect()
+        stop()
+        el.style.transform = ''
+        el.style.removeProperty('--sn-stroke-alpha')
+      }
+    }
+
+    applyGate()
+    mql.addEventListener('change', applyGate)
+
+    return () => {
+      mql.removeEventListener('change', applyGate)
+      io.disconnect()
+      stop()
+    }
   }, [])
 
   return (
     <footer
       id="site-footer"
-      className="relative overflow-hidden"
+      className="cv-auto relative overflow-hidden"
       style={{ backgroundColor: 'var(--footer-bg)' }}
     >
       {/* Separador superior con gradiente del tema */}

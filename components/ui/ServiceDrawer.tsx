@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, motion, useDragControls, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useDragControls, useReducedMotion } from 'framer-motion'
 import {
   useCallback,
   useEffect,
@@ -191,7 +191,7 @@ export function ServiceDrawer({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[80]">
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -201,7 +201,7 @@ export function ServiceDrawer({
           />
 
           <div className="pointer-events-none absolute inset-0 flex items-end justify-end md:items-stretch">
-            <motion.div
+            <m.div
               ref={dialogRef}
               id={dialogId}
               role="dialog"
@@ -253,7 +253,7 @@ export function ServiceDrawer({
                     <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
                       {title}
                     </h2>
-                    <motion.button
+                    <m.button
                       ref={closeButtonRef}
                       type="button"
                       aria-label="Cerrar panel"
@@ -268,7 +268,7 @@ export function ServiceDrawer({
                       }}
                     >
                       <XIcon className="h-4 w-4" />
-                    </motion.button>
+                    </m.button>
                   </div>
                 </div>
               ) : (
@@ -288,7 +288,7 @@ export function ServiceDrawer({
                     <h2 id={titleId} className="pr-2 text-lg font-bold leading-tight text-[var(--color-on-surface)]">
                       {title}
                     </h2>
-                    <motion.button
+                    <m.button
                       ref={closeButtonRef}
                       type="button"
                       aria-label="Cerrar panel"
@@ -303,7 +303,7 @@ export function ServiceDrawer({
                       }}
                     >
                       <XIcon className="h-4 w-4" />
-                    </motion.button>
+                    </m.button>
                   </div>
                 </>
               )}
@@ -311,7 +311,7 @@ export function ServiceDrawer({
               <div className="relative overflow-y-auto px-5 pb-6 pt-4 md:px-6 md:pb-7 md:pt-5">
                 {children}
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       )}

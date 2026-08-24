@@ -1,25 +1,21 @@
 'use client'
 
 /**
- * useGsapReveal — GSAP ScrollTrigger scroll-reveal hook.
+ * useGsapReveal — scroll-reveal one-shot. (El nombre quedó por compatibilidad
+ * con sus consumidores; GSAP ya no existe en el sitio.)
  *
- * Global consistency contract:
- *   ease     → 'power3.out'          (same as Framer Motion [0.22, 1, 0.36, 1] feel)
- *   duration → 0.7s
- *   y offset → 40px (default)
- *   start    → 'top 85%'
+ * Implementación vanilla: IntersectionObserver dispara una transición CSS
+ * opacity+transform con stagger opcional. Misma firma y mismo feel que la
+ * versión GSAP (power3.out ≈ cubic-bezier(0.22, 1, 0.36, 1), 0.7 s, y 40px).
  *
- * Accessibility: fully respects prefers-reduced-motion — no animation is
- * registered when the user has requested reduced motion.
- *
- * SSR-safe: all GSAP code lives inside useEffect (client-only), ScrollTrigger
- * is dynamically imported to avoid any Next.js SSR issue.
+ * Accesibilidad: con prefers-reduced-motion no se registra nada — el
+ * contenido queda visible en su estado final.
  */
 
 import { useEffect, type RefObject } from 'react'
 
-/** Module-level flag — registerPlugin is idempotent but we avoid the call overhead. */
-let gsapReady = false
+const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const DURATION_S = 0.7
 
 export interface GsapRevealOptions {
   /** CSS selector for children to stagger. If omitted, the container itself animates. */
@@ -32,8 +28,15 @@ export interface GsapRevealOptions {
   stagger?: number
   /** Extra delay before the animation starts (s). Default: 0 */
   delay?: number
-  /** ScrollTrigger start value. Default: 'top 85%' */
+  /** Punto de disparo estilo ScrollTrigger ('top 85%'). Default: 'top 85%' */
   start?: string
+}
+
+/** 'top 85%' → el reveal dispara cuando el top del bloque cruza el 85% del viewport. */
+function startToRootMargin(start: string | undefined): string {
+  const match = /top\s+(\d+)%/.exec(start ?? '')
+  const pct = match ? Number(match[1]) : 85
+  return `0px 0px -${Math.min(40, Math.max(0, 100 - pct))}% 0px`
 }
 
 export function useGsapReveal(
@@ -41,59 +44,63 @@ export function useGsapReveal(
   options: GsapRevealOptions = {}
 ) {
   useEffect(() => {
-    // SSR guard
     if (typeof window === 'undefined') return
-
-    // Accessibility — skip all animations when reduced-motion is requested
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const el = ref.current
     if (!el) return
 
-    // Keep a reference to the GSAP context for cleanup
-    // eslint-disable-next-line prefer-const
-    let cleanup: (() => void) | undefined
+    const targets: HTMLElement[] = options.selector
+      ? Array.from(el.querySelectorAll<HTMLElement>(options.selector))
+      : [el]
+    if (targets.length === 0) return
 
-    void (async () => {
-      const gsap = (await import('gsap')).default
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+    const y = options.y ?? 40
+    const x = options.x ?? 0
+    const stagger = options.stagger ?? 0
+    const delay = options.delay ?? 0
 
-      if (!gsapReady) {
-        gsap.registerPlugin(ScrollTrigger)
-        gsapReady = true
-      }
+    for (const t of targets) {
+      t.style.opacity = '0'
+      t.style.transform = `translate(${x}px, ${y}px)`
+    }
 
-      const targets: Element[] = options.selector
-        ? Array.from(el.querySelectorAll<Element>(options.selector))
-        : [el]
+    let timeoutId = 0
 
-      if (targets.length === 0) return
-
-      const ctx = gsap.context(() => {
-        gsap.fromTo(
-          targets,
-          { opacity: 0, y: options.y ?? 40, x: options.x ?? 0 },
-          {
-            opacity: 1,
-            y: 0,
-            x: 0,
-            duration: 0.7,
-            ease: 'power3.out',
-            delay: options.delay ?? 0,
-            stagger: options.stagger ?? 0,
-            scrollTrigger: {
-              trigger: el,
-              start: options.start ?? 'top 85%',
-              toggleActions: 'play none none none',
-            },
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        io.disconnect()
+        targets.forEach((t, i) => {
+          const d = delay + i * stagger
+          t.style.transition = `opacity ${DURATION_S}s ${EASE} ${d}s, transform ${DURATION_S}s ${EASE} ${d}s`
+          t.style.opacity = '1'
+          t.style.transform = 'translate(0px, 0px)'
+        })
+        // Limpieza de estilos inline al terminar la cascada completa.
+        const totalMs = (delay + stagger * (targets.length - 1) + DURATION_S) * 1000
+        timeoutId = window.setTimeout(() => {
+          for (const t of targets) {
+            t.style.transition = ''
+            t.style.opacity = ''
+            t.style.transform = ''
           }
-        )
-      })
+        }, totalMs + 60)
+      },
+      { rootMargin: startToRootMargin(options.start) },
+    )
 
-      cleanup = () => ctx.revert()
-    })()
+    io.observe(el)
 
-    return () => cleanup?.()
+    return () => {
+      io.disconnect()
+      if (timeoutId) window.clearTimeout(timeoutId)
+      for (const t of targets) {
+        t.style.transition = ''
+        t.style.opacity = ''
+        t.style.transform = ''
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // run once on mount — GSAP owns the animation lifecycle
+  }, [])
 }

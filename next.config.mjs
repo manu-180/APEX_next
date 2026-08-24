@@ -91,7 +91,6 @@ const nextConfig = {
     optimizePackageImports: [
       'framer-motion',
       'lucide-react',
-      'posthog-js',
     ],
     optimizeCss: true,
     scrollRestoration: true,

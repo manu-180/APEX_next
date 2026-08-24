@@ -9,12 +9,8 @@ export default function GlobalError({
   error: Error & { digest?: string };
 }) {
   useEffect(() => {
-    // Sentry se carga dynamically para no impactar el bundle base.
-    if (typeof window === 'undefined') return;
-    if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return;
-    import('@sentry/nextjs')
-      .then((Sentry) => Sentry.captureException(error))
-      .catch(() => {});
+    // Visible en la consola del navegador y en los logs de Vercel (via report).
+    console.error('[apex:global-error]', error);
   }, [error]);
 
   return (

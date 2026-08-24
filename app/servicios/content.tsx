@@ -2,10 +2,12 @@
 
 import { useState, useCallback, useRef, useEffect, useLayoutEffect, Suspense } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
-import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
+import { m, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   CheckIcon,
   ArrowRightIcon,
@@ -16,10 +18,9 @@ import {
   ContactEngineIcon,
   LumaInvitaIcon,
 } from '@/components/ui/icons'
-import { ProjectDrawer } from '@/components/ui/project-drawer'
-import { ProjectsSheet, type SheetEntry } from '@/components/ui/projects-sheet'
+import type { SheetEntry } from '@/components/ui/projects-sheet'
 import { ServiceDrawer } from '@/components/ui/ServiceDrawer'
-import { ServiceDrawerContent, type ServiceDrawerContentProps } from '@/components/ui/ServiceDrawerContent'
+import type { ServiceDrawerContentProps } from '@/components/ui/ServiceDrawerContent'
 import { cn } from '@/lib/utils/cn'
 import { BRAND_IMAGE_SRC, ROUTES } from '@/lib/constants'
 import { whatsappUrl, waMsgPlan } from '@/lib/whatsapp'
@@ -29,6 +30,67 @@ import { PROJECTS, type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { DUR_FAST, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
+
+/**
+ * ServiceDrawerContent solo se ve cuando el usuario abre el drawer de un plan
+ * (click en "Ver detalle completo"). Antes viajaba en el chunk inicial de
+ * /servicios vía import estático; con next/dynamic queda en su propio chunk,
+ * pedido recién al abrir — nunca se necesita en el HTML SSR (el mismo texto
+ * ya está en las cards de pricing) así que ssr:false es seguro.
+ */
+const ServiceDrawerContent = dynamic(
+  () => import('@/components/ui/ServiceDrawerContent').then((m) => m.ServiceDrawerContent),
+  { ssr: false, loading: () => <ServiceDrawerContentSkeleton /> },
+)
+
+/** Placeholder mientras se descarga el chunk del drawer — reserva el bloque, sin layout jump. */
+function ServiceDrawerContentSkeleton() {
+  return (
+    <div className="space-y-6 pb-4 md:space-y-7" aria-hidden="true">
+      <div className="space-y-3">
+        <Skeleton className="h-6 w-28 rounded-full" />
+        <Skeleton className="h-9 w-2/3" />
+        <Skeleton className="h-7 w-1/3" />
+      </div>
+      <Skeleton className="h-20 w-full rounded-2xl" />
+      <Skeleton className="h-52 w-full rounded-2xl" />
+      <Skeleton className="h-36 w-full rounded-2xl" />
+      <Skeleton className="h-14 w-full rounded-2xl" />
+    </div>
+  )
+}
+
+/**
+ * ProjectsSheet (13 KB fuente) y ProjectDrawer (47 KB fuente) son overlays
+ * completos (chrome + backdrop propios) que solo existen para mostrar casos
+ * relacionados a un plan — hoy reservados para un CTA futuro (`sheetPlanId`
+ * nunca se setea a un valor no-null todavía, ver comentario en su useState).
+ * Van a next/dynamic, cada uno como overlay independiente (no hay shell
+ * estático separable sin tocar esos archivos, fuera de ownership acá).
+ * ssr:false: son 100% interactivos, arrancan cerrados, no aportan nada al
+ * HTML inicial.
+ */
+const ProjectsSheet = dynamic(
+  () => import('@/components/ui/projects-sheet').then((m) => m.ProjectsSheet),
+  { ssr: false, loading: () => <OverlayLoadingFallback /> },
+)
+
+const ProjectDrawer = dynamic(
+  () => import('@/components/ui/project-drawer').then((m) => m.ProjectDrawer),
+  { ssr: false, loading: () => <OverlayLoadingFallback /> },
+)
+
+/** Backdrop + spinner mínimo mientras se descarga el chunk de un overlay pesado. */
+function OverlayLoadingFallback() {
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-[var(--scrim-bg)]"
+      aria-hidden="true"
+    >
+      <span className="size-8 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent motion-reduce:animate-none" />
+    </div>
+  )
+}
 
 // Projects that open the full drawer — kept for future use
 const PLAN_RELATED_PROJECTS: Record<string, ThemeId[]> = {
@@ -86,13 +148,10 @@ const TAB_GRID_VARIANTS: Variants = {
 }
 
 const TAB_CARD_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 16, filter: 'blur(6px)' },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
-    // Limpia el backdrop-root residual (mismo patrón que SectionReveal)
-    transitionEnd: { filter: 'none' },
     transition: { duration: DUR_SLOW, ease: EASE_OUT },
   },
 }
@@ -121,6 +180,17 @@ export function ServiciosContent() {
   /** Panel inferior de ejemplos / drawer — reservado para un CTA dedicado; no enlazar al acordeón. */
   const [sheetPlanId, setSheetPlanId] = useState<string | null>(null)
   const [drawerProject, setDrawerProject] = useState<ProjectItem | null>(null)
+  /**
+   * Gate de montaje para los overlays dinámicos: ProjectsSheet/ProjectDrawer
+   * arrancan sin montar (su chunk nunca se pide) y quedan montados para
+   * siempre desde la primera vez que se abren — así next/dynamic solo
+   * dispara el fetch al abrir, y las animaciones de cierre (que necesitan
+   * el componente montado con open=false) siguen funcionando en re-aperturas.
+   */
+  const everOpenedSheetRef = useRef(false)
+  everOpenedSheetRef.current ||= sheetPlanId !== null
+  const everOpenedProjectDrawerRef = useRef(false)
+  everOpenedProjectDrawerRef.current ||= drawerProject !== null
 
   const scrollYBeforeTabChange = useRef<number | null>(null)
   const isFirstTabLayoutEffect = useRef(true)
@@ -242,17 +312,26 @@ export function ServiciosContent() {
           </SectionReveal>
           <div ref={tabStickySentinelRef} aria-hidden className="h-px w-full" />
           <div className="mb-8">
-            <motion.div
-              className="sticky top-16 z-30 -mx-2 px-2 py-2 md:static md:top-auto md:z-auto md:mx-0 md:px-0 md:py-0"
+            <m.div
+              className="relative sticky top-16 z-30 -mx-2 px-2 py-2 md:static md:top-auto md:z-auto md:mx-0 md:px-0 md:py-0"
               animate={{ opacity: isTabSticky ? 1 : 0.92 }}
               transition={{ duration: 0.2, ease: EASE_OUT }}
-              style={{
-                background: isTabSticky ? 'var(--color-surface)' : 'transparent',
-                backdropFilter: isTabSticky ? 'blur(8px)' : 'blur(0px)',
-                WebkitBackdropFilter: isTabSticky ? 'blur(8px)' : 'blur(0px)',
-                borderBottom: isTabSticky ? '1px solid rgba(var(--color-primary-rgb), 0.16)' : '1px solid transparent',
-              }}
             >
+              {/* Fondo con blur FIJO (nunca se anima el radio, solo el opacity vía clase —
+                  animar backdrop-filter fuerza repintado costoso en cada frame de scroll). */}
+              <div
+                aria-hidden
+                className={cn(
+                  'pointer-events-none absolute inset-0 -z-10 transition-opacity duration-200',
+                  isTabSticky ? 'opacity-100' : 'opacity-0',
+                )}
+                style={{
+                  background: 'var(--color-surface)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  borderBottom: '1px solid rgba(var(--color-primary-rgb), 0.16)',
+                }}
+              />
               <div className="flex justify-center">
                 {/* Tab toggle — HUD switch justo encima de las cards de planes */}
                 <div className="inline-flex rounded-xl glass-card p-1">
@@ -268,7 +347,7 @@ export function ServiciosContent() {
                       data-inspector-cat="Motion · Spring"
                     >
                       {tab === t && (
-                        <motion.span
+                        <m.span
                           layoutId="tab-thumb"
                           className="absolute inset-0 rounded-lg shadow-glow-sm"
                           style={{
@@ -292,13 +371,13 @@ export function ServiciosContent() {
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
           <AnimatePresence mode="wait">
             {/* Wrapper de crossfade: exit simple y determinista (opacity) para que
                 mode="wait" siempre complete el swap Web↔App. El stagger de cards y
                 el reveal del panel viven en los hijos, no en este contenedor. */}
-            <motion.div
+            <m.div
               key={tab}
               initial={prefersReducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -306,7 +385,7 @@ export function ServiciosContent() {
               transition={{ duration: prefersReducedMotion ? 0 : DUR_FAST, ease: EASE_OUT }}
             >
               {tab === 'web' ? (
-                <motion.div
+                <m.div
                   variants={prefersReducedMotion ? undefined : TAB_GRID_VARIANTS}
                   initial={prefersReducedMotion ? false : 'hidden'}
                   whileInView={prefersReducedMotion ? undefined : 'visible'}
@@ -315,7 +394,7 @@ export function ServiciosContent() {
                   className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
                 >
                   {plans.map((plan) => (
-                    <motion.div
+                    <m.div
                       key={plan.id}
                       variants={prefersReducedMotion ? undefined : TAB_CARD_VARIANTS}
                       className={cn('h-full', ANCHOR_PLAN_IDS.has(plan.id) && 'md:-mt-4 md:mb-4')}
@@ -326,53 +405,58 @@ export function ServiciosContent() {
                         isDrawerOpen={openPlanDrawerId === plan.id}
                         deriskers={PLAN_DERISKERS[plan.id]}
                       />
-                    </motion.div>
+                    </m.div>
                   ))}
-                </motion.div>
+                </m.div>
               ) : (
                 <CustomSoftwarePanel />
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
       </section>
 
-      {/* ProjectsSheet: solo con sheetPlanId explícito; independiente del drawer de detalle */}
-      <ProjectsSheet
-        planName={plans.find(p => p.id === sheetPlanId)?.name ?? ''}
-        entries={(() => {
-          if (!sheetPlanId) return []
-          const relatedIds = PLAN_RELATED_PROJECTS[sheetPlanId] ?? []
-          const entries: SheetEntry[] = relatedIds
-            .map(id => PROJECTS.find(p => p.themeId === id))
-            .filter((p): p is ProjectItem => !!p)
-            .map(project => ({
-              type: 'drawer' as const,
-              project,
-              icon: PROJECT_ICONS[project.themeId],
-              thumbnailSrc: PROJECT_THUMB_SRC[project.themeId],
-            }))
-          const cases = PLAN_EXTERNAL_CASES[sheetPlanId] ?? []
-          cases.forEach(cs =>
-            entries.push({
-              type: 'external' as const,
-              name: cs.name,
-              url: cs.url,
-              imageSrc: cs.imageSrc,
-            }),
-          )
-          return entries
-        })()}
-        isOpen={sheetPlanId !== null}
-        onClose={() => setSheetPlanId(null)}
-        onOpenProject={openProjectDrawer}
-      />
+      {/* ProjectsSheet: solo con sheetPlanId explícito; independiente del drawer de detalle.
+          Gateado por everOpenedSheetRef — no se monta (ni se pide su chunk) hasta el primer open. */}
+      {everOpenedSheetRef.current && (
+        <ProjectsSheet
+          planName={plans.find(p => p.id === sheetPlanId)?.name ?? ''}
+          entries={(() => {
+            if (!sheetPlanId) return []
+            const relatedIds = PLAN_RELATED_PROJECTS[sheetPlanId] ?? []
+            const entries: SheetEntry[] = relatedIds
+              .map(id => PROJECTS.find(p => p.themeId === id))
+              .filter((p): p is ProjectItem => !!p)
+              .map(project => ({
+                type: 'drawer' as const,
+                project,
+                icon: PROJECT_ICONS[project.themeId],
+                thumbnailSrc: PROJECT_THUMB_SRC[project.themeId],
+              }))
+            const cases = PLAN_EXTERNAL_CASES[sheetPlanId] ?? []
+            cases.forEach(cs =>
+              entries.push({
+                type: 'external' as const,
+                name: cs.name,
+                url: cs.url,
+                imageSrc: cs.imageSrc,
+              }),
+            )
+            return entries
+          })()}
+          isOpen={sheetPlanId !== null}
+          onClose={() => setSheetPlanId(null)}
+          onOpenProject={openProjectDrawer}
+        />
+      )}
 
-      <ProjectDrawer
-        project={drawerProject}
-        open={drawerProject !== null}
-        onClose={closeDrawer}
-      />
+      {everOpenedProjectDrawerRef.current && (
+        <ProjectDrawer
+          project={drawerProject}
+          open={drawerProject !== null}
+          onClose={closeDrawer}
+        />
+      )}
 
       <ServicePlanDrawer
         plan={plans.find((candidate) => candidate.id === openPlanDrawerId) ?? null}

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Image from 'next/image'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { BrowserChrome } from '@/components/ui/browser-chrome'
 import { ExternalLinkIcon, WhatsAppIcon } from '@/components/ui/icons'
@@ -79,7 +79,7 @@ function FeaturedClientCard() {
   const parallaxY = useTransform(scrollYProgress, [0, 1], [-12, 12])
 
   return (
-    <motion.div
+    <m.div
       ref={cardRef}
       initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
       whileInView={
@@ -113,7 +113,7 @@ function FeaturedClientCard() {
         {/* z-[1]: el screenshot queda por encima del grain (spec §6: no noise
             sobre screenshots) */}
         <div className="relative z-[1] aspect-[16/10] overflow-hidden sm:aspect-auto sm:min-h-[260px] sm:flex-1">
-          <motion.div
+          <m.div
             className="absolute -inset-y-3 inset-x-0"
             style={prefersReducedMotion ? undefined : { y: parallaxY }}
           >
@@ -129,7 +129,7 @@ function FeaturedClientCard() {
               )}
               sizes="(max-width: 1024px) 100vw, 55vw"
             />
-          </motion.div>
+          </m.div>
 
           {/* Hover CTA overlay */}
           <div
@@ -171,7 +171,7 @@ function FeaturedClientCard() {
           </p>
         </div>
       </a>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -183,7 +183,7 @@ function ProductCard({ product, order }: { product: OwnProduct; order: number })
   const prefersReducedMotion = useReducedMotion()
 
   return (
-    <motion.a
+    <m.a
       href={product.url}
       target="_blank"
       rel="noopener noreferrer"
@@ -254,7 +254,7 @@ function ProductCard({ product, order }: { product: OwnProduct; order: number })
         />
         {product.domain}
       </p>
-    </motion.a>
+    </m.a>
   )
 }
 
@@ -292,7 +292,7 @@ export function TrustedClientsSection() {
       </span>
 
       <div className="relative z-10 mx-auto max-w-6xl px-6">
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           whileInView={
             prefersReducedMotion
@@ -311,7 +311,7 @@ export function TrustedClientsSection() {
             Una tienda entregada a una clienta real y tres productos propios que construí y
             opero todos los días. Entrá a cualquiera y comprobalo — están online ahora.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Bento asimétrico: cliente real protagonista, productos en columna */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
@@ -326,7 +326,7 @@ export function TrustedClientsSection() {
         </div>
 
         {/* CTA contextual de la sección */}
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
           whileInView={
             prefersReducedMotion
@@ -352,7 +352,7 @@ export function TrustedClientsSection() {
           <p className="text-xs text-[var(--color-on-surface-variant)] opacity-70">
             Te respondo en menos de 1 hora.
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

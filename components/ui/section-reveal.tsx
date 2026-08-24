@@ -1,7 +1,7 @@
 'use client'
 
 import { type ReactNode, useEffect, useRef, useState } from 'react'
-import { motion, useInView, useReducedMotion, type Variants } from 'framer-motion'
+import { m, useInView, useReducedMotion, type Variants } from 'framer-motion'
 import { DUR_REVEAL, EASE_OUT } from '@/lib/motion'
 
 interface SectionRevealProps {
@@ -21,18 +21,17 @@ interface SectionRevealProps {
 /**
  * Reveal firma (spec §2) como variants de ítem, para cascadas con `stagger`:
  * <SectionReveal stagger={STAGGER_BASE}>
- *   <motion.div variants={REVEAL_ITEM_VARIANTS}>…</motion.div>
+ *   <m.div variants={REVEAL_ITEM_VARIANTS}>…</m.div>
  * </SectionReveal>
  */
 export const REVEAL_ITEM_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 24, filter: 'blur(6px)' },
+  // Solo opacity + transform: ambas compositan en GPU sin re-rasterizar.
+  // (El blur(6px) animado anterior forzaba un re-filtrado por frame de cada
+  // sección al scrollear — jank garantizado en GPUs integradas.)
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
-    // Un filter residual (aunque sea blur(0)) crea un backdrop-root y
-    // rompería los backdrop-filter internos: se limpia al terminar.
-    transitionEnd: { filter: 'none' },
     transition: { duration: DUR_REVEAL, ease: EASE_OUT },
   },
 }
@@ -70,7 +69,7 @@ export function SectionReveal({
   if (typeof stagger === 'number') {
     return (
       <div ref={ref} className={className}>
-        <motion.div
+        <m.div
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
           variants={{
@@ -79,31 +78,20 @@ export function SectionReveal({
           }}
         >
           {children}
-        </motion.div>
+        </m.div>
       </div>
     )
   }
 
   return (
     <div ref={ref} className={className}>
-      <motion.div
-        initial={{ opacity: 0, x: offset[0], y: offset[1], filter: 'blur(6px)' }}
-        animate={
-          isInView
-            ? {
-                opacity: 1,
-                x: 0,
-                y: 0,
-                filter: 'blur(0px)',
-                // Limpia el backdrop-root al terminar (ver REVEAL_ITEM_VARIANTS)
-                transitionEnd: { filter: 'none' },
-              }
-            : {}
-        }
+      <m.div
+        initial={{ opacity: 0, x: offset[0], y: offset[1] }}
+        animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
         transition={{ duration: DUR_REVEAL, delay, ease: EASE_OUT }}
       >
         {children}
-      </motion.div>
+      </m.div>
     </div>
   )
 }

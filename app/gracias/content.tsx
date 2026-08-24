@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
 import { isTrustedWhatsAppUrl } from '@/lib/whatsapp'
@@ -106,7 +106,7 @@ export function GraciasContent() {
       <section className="relative z-10 w-full max-w-lg text-center">
 
         {/* WhatsApp icon — entrada con spring + burst radial one-shot */}
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 280, damping: 18 }}
@@ -119,7 +119,7 @@ export function GraciasContent() {
           {!prefersReducedMotion && (
             <span aria-hidden className="pointer-events-none absolute inset-0 -z-10">
               {BURST_PARTICLES.map((p, i) => (
-                <motion.span
+                <m.span
                   key={i}
                   className="absolute left-1/2 top-1/2 size-1.5 rounded-full"
                   style={{
@@ -142,30 +142,30 @@ export function GraciasContent() {
             </span>
           )}
           <WhatsAppIcon className="size-12" style={{ color: WA_GREEN }} />
-        </motion.div>
+        </m.div>
 
         {/* Heading */}
-        <motion.h1
+        <m.h1
           initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
           className="font-heading text-5xl font-extrabold tracking-tight text-[var(--color-on-surface)] sm:text-6xl"
         >
           ¡Gracias!
-        </motion.h1>
+        </m.h1>
 
         {/* Tagline */}
-        <motion.p
+        <m.p
           initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: DUR_SLOW, ease: EASE_OUT }}
           className="mx-auto mt-4 font-heading text-xl font-semibold text-[var(--color-primary)]"
         >
           Tomaste la decisión correcta.
-        </motion.p>
+        </m.p>
 
         {/* Cuerpo */}
-        <motion.p
+        <m.p
           initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: DUR_SLOW, ease: EASE_OUT }}
@@ -174,10 +174,10 @@ export function GraciasContent() {
           {waIsTrusted
             ? 'WhatsApp ya debería estar abierto. Si no, usá el botón de abajo.'
             : 'Tocá el botón y seguimos por WhatsApp.'}
-        </motion.p>
+        </m.p>
 
         {/* Separador */}
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ delay: 0.4, duration: DUR_SLOW, ease: EASE_OUT }}
@@ -186,7 +186,7 @@ export function GraciasContent() {
         />
 
         {/* Acciones */}
-        <motion.div
+        <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, type: 'spring', stiffness: 240, damping: 22 }}
@@ -219,7 +219,7 @@ export function GraciasContent() {
             <HomeIcon className="size-4" />
             Volver al inicio
           </a>
-        </motion.div>
+        </m.div>
 
       </section>
     </div>

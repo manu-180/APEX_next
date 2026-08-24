@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { type ProjectItem, type ThemeId } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -351,7 +351,7 @@ const nestedStagger = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div variants={fadeUpVariants} className="flex items-center gap-2 mb-4 mt-2">
+    <m.div variants={fadeUpVariants} className="flex items-center gap-2 mb-4 mt-2">
       <div
         className="h-px flex-1 max-w-[40px]"
         style={{
@@ -372,13 +372,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
             'linear-gradient(to left, transparent, rgba(var(--color-primary-rgb), 0.15))',
         }}
       />
-    </motion.div>
+    </m.div>
   )
 }
 
 function FeatureItem({ title, desc }: { title: string; desc: string }) {
   return (
-    <motion.div variants={slideLeftVariants} className="flex gap-3 items-start">
+    <m.div variants={slideLeftVariants} className="flex gap-3 items-start">
       <div
         className="mt-[2px] flex-shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center"
         style={{
@@ -397,7 +397,7 @@ function FeatureItem({ title, desc }: { title: string; desc: string }) {
           {desc}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -411,7 +411,7 @@ function PillarCard({
   desc: string
 }) {
   return (
-    <motion.div
+    <m.div
       variants={fadeUpVariants}
       className="rounded-xl p-4 flex flex-col gap-2.5"
       style={{
@@ -430,7 +430,7 @@ function PillarCard({
       </div>
       <p className="text-xs font-bold text-[var(--color-on-surface)] leading-tight">{title}</p>
       <p className="text-[11px] text-[var(--color-on-surface-variant)] leading-relaxed">{desc}</p>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -446,7 +446,7 @@ function ModuleRow({
   isLast: boolean
 }) {
   return (
-    <motion.div variants={slideLeftVariants} className="flex gap-3">
+    <m.div variants={slideLeftVariants} className="flex gap-3">
       <div className="flex flex-col items-center flex-shrink-0">
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold"
@@ -474,7 +474,7 @@ function ModuleRow({
           {desc}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -488,7 +488,7 @@ function StoreButton({
   platform: 'android' | 'ios'
 }) {
   return (
-    <motion.a
+    <m.a
       variants={fadeUpVariants}
       href={href}
       target="_blank"
@@ -518,7 +518,7 @@ function StoreButton({
       )}
       <span className="text-sm font-semibold text-[var(--color-on-surface)]">{label}</span>
       <ExternalLinkIcon className="ml-auto h-3 w-3 text-[var(--color-on-surface-variant)] opacity-60 group-hover:opacity-100 transition-opacity" />
-    </motion.a>
+    </m.a>
   )
 }
 
@@ -624,7 +624,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
       {open && project && (
         <>
           {/* ── Overlay ──────────────────────────────────────── */}
-          <motion.div
+          <m.div
             variants={overlayVariants}
             initial={prefersReducedMotion ? false : 'hidden'}
             animate="visible"
@@ -634,7 +634,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
           />
 
           {/* ── Panel ────────────────────────────────────────── */}
-          <motion.aside
+          <m.aside
             key={project.themeId}
             ref={panelRef}
             role="dialog"
@@ -680,7 +680,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
             />
 
             {/* Close button */}
-            <motion.button
+            <m.button
               ref={closeButtonRef}
               type="button"
               onClick={onClose}
@@ -704,10 +704,10 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
               whileTap={prefersReducedMotion ? undefined : { scale: 0.88 }}
             >
               <XIcon className="h-4 w-4" />
-            </motion.button>
+            </m.button>
 
             {/* ── Scrollable content ──────────────────────────── */}
-            <motion.div
+            <m.div
               key={project.themeId}
               variants={containerVariants}
               initial={prefersReducedMotion ? 'visible' : 'hidden'}
@@ -715,7 +715,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
               className="relative p-6 md:p-8"
             >
               {/* ── Header ─────────────────────────────── */}
-              <motion.div
+              <m.div
                 variants={fadeUpVariants}
                 className="flex items-start gap-4 mb-7 pr-10"
               >
@@ -750,44 +750,44 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     {project.tagline}
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* ─────────────── BOTLODE ─────────────────────── */}
               {rich?.kind === 'botlode' && (
                 <>
-                  <motion.p
+                  <m.p
                     variants={fadeUpVariants}
                     className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed mb-7"
                   >
                     {rich.description}
-                  </motion.p>
+                  </m.p>
 
                   <SectionLabel>Los 3 Pilares</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={nestedStagger}
                     className="grid grid-cols-3 gap-2.5 mb-7"
                   >
                     {rich.pillars.map((p) => (
                       <PillarCard key={p.title} {...p} />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Cat Bot IA</SectionLabel>
-                  <motion.div variants={nestedStagger} className="space-y-3 mb-7">
+                  <m.div variants={nestedStagger} className="space-y-3 mb-7">
                     {rich.catBotFeatures.map((f) => (
                       <FeatureItem key={f.title} title={f.title} desc={f.desc} />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>BotLode History</SectionLabel>
-                  <motion.div variants={nestedStagger} className="space-y-3 mb-7">
+                  <m.div variants={nestedStagger} className="space-y-3 mb-7">
                     {rich.historyFeatures.map((f) => (
                       <FeatureItem key={f.title} title={f.title} desc={f.desc} />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Comercialización</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7"
                     style={{
@@ -802,7 +802,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                       title={rich.commerceFeature.title}
                       desc={rich.commerceFeature.desc}
                     />
-                  </motion.div>
+                  </m.div>
                 </>
               )}
 
@@ -810,7 +810,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
               {rich?.kind === 'assistify' && (
                 <>
                   <SectionLabel>El Problema</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7"
                     style={{
@@ -823,17 +823,17 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     <p className="text-[13px] text-[var(--color-on-surface-variant)] leading-relaxed">
                       {rich.problem}
                     </p>
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>La Solución</SectionLabel>
-                  <motion.div variants={nestedStagger} className="space-y-3 mb-7">
+                  <m.div variants={nestedStagger} className="space-y-3 mb-7">
                     {rich.solutionFeatures.map((f) => (
                       <FeatureItem key={f.title} title={f.title} desc={f.desc} />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Resultados</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7 flex items-start gap-3"
                     style={{
@@ -847,34 +847,34 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     <p className="text-[13px] text-[var(--color-on-surface-variant)] leading-relaxed">
                       {rich.impact}
                     </p>
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Disponible en</SectionLabel>
-                  <motion.div variants={nestedStagger} className="grid grid-cols-2 gap-3 mb-7">
+                  <m.div variants={nestedStagger} className="grid grid-cols-2 gap-3 mb-7">
                     {rich.storeLinks.map((s) => (
                       <StoreButton key={s.platform} {...s} />
                     ))}
-                  </motion.div>
+                  </m.div>
                 </>
               )}
 
               {/* ─────────────── CONTACT ENGINE ──────────────── */}
               {rich?.kind === 'contact-engine' && (
                 <>
-                  <motion.p
+                  <m.p
                     variants={fadeUpVariants}
                     className="text-[13px] text-[var(--color-on-surface-variant)] leading-relaxed mb-7"
                   >
                     {rich.tagline}
-                  </motion.p>
+                  </m.p>
 
                   <SectionLabel>Objetivos de Negocio</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={nestedStagger}
                     className="flex flex-wrap gap-2 mb-7"
                   >
                     {rich.objectives.map((obj) => (
-                      <motion.span
+                      <m.span
                         key={obj}
                         variants={fadeUpVariants}
                         className="inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold"
@@ -885,19 +885,19 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                         }}
                       >
                         {obj}
-                      </motion.span>
+                      </m.span>
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Cómo impacta en tu negocio</SectionLabel>
-                  <motion.div variants={nestedStagger} className="space-y-3 mb-7">
+                  <m.div variants={nestedStagger} className="space-y-3 mb-7">
                     {rich.impactFeatures.map((f) => (
                       <FeatureItem key={f.title} title={f.title} desc={f.desc} />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Motor Modular</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7"
                     style={{
@@ -905,7 +905,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                       border: '1px solid rgba(var(--color-primary-rgb), 0.1)',
                     }}
                   >
-                    <motion.div variants={nestedStagger}>
+                    <m.div variants={nestedStagger}>
                       {rich.modules.map((m, i) => (
                         <ModuleRow
                           key={m.title}
@@ -913,10 +913,10 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                           isLast={i === rich.modules.length - 1}
                         />
                       ))}
-                    </motion.div>
-                  </motion.div>
+                    </m.div>
+                  </m.div>
 
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7 flex items-start gap-3"
                     style={{
@@ -929,22 +929,22 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     <p className="text-[13px] italic text-[var(--color-on-surface-variant)] leading-relaxed">
                       &ldquo;{rich.quote}&rdquo;
                     </p>
-                  </motion.div>
+                  </m.div>
                 </>
               )}
 
               {/* ─────────────── LUMA INVITA ─────────────────── */}
               {rich?.kind === 'luma-invita' && (
                 <>
-                  <motion.p
+                  <m.p
                     variants={fadeUpVariants}
                     className="text-sm text-[var(--color-on-surface-variant)] leading-relaxed mb-7"
                   >
                     {rich.pitch}
-                  </motion.p>
+                  </m.p>
 
                   <SectionLabel>Roles</SectionLabel>
-                  <motion.div variants={nestedStagger} className="grid grid-cols-1 gap-2.5 mb-7">
+                  <m.div variants={nestedStagger} className="grid grid-cols-1 gap-2.5 mb-7">
                     {rich.personas.map((p, i) => (
                       <PillarCard
                         key={p.title}
@@ -953,17 +953,17 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                         desc={p.desc}
                       />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Experiencia del invitado</SectionLabel>
-                  <motion.div variants={nestedStagger} className="space-y-3 mb-7">
+                  <m.div variants={nestedStagger} className="space-y-3 mb-7">
                     {rich.experiencePillars.map((f) => (
                       <FeatureItem key={f.title} title={f.title} desc={f.desc} />
                     ))}
-                  </motion.div>
+                  </m.div>
 
                   <SectionLabel>Flujo del producto</SectionLabel>
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7"
                     style={{
@@ -971,7 +971,7 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                       border: '1px solid rgba(var(--color-primary-rgb), 0.1)',
                     }}
                   >
-                    <motion.div variants={nestedStagger}>
+                    <m.div variants={nestedStagger}>
                       {rich.flow.map((m, i) => (
                         <ModuleRow
                           key={m.title}
@@ -979,10 +979,10 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                           isLast={i === rich.flow.length - 1}
                         />
                       ))}
-                    </motion.div>
-                  </motion.div>
+                    </m.div>
+                  </m.div>
 
-                  <motion.div
+                  <m.div
                     variants={fadeUpVariants}
                     className="rounded-xl p-4 mb-7 flex items-start gap-3"
                     style={{
@@ -995,15 +995,15 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     <p className="text-[13px] italic text-[var(--color-on-surface-variant)] leading-relaxed">
                       &ldquo;{rich.quote}&rdquo;
                     </p>
-                  </motion.div>
+                  </m.div>
                 </>
               )}
 
               {/* ── Tech Stack ───────────────────────────────── */}
               <SectionLabel>Tech Stack</SectionLabel>
-              <motion.div variants={nestedStagger} className="flex flex-wrap gap-2 mb-7">
+              <m.div variants={nestedStagger} className="flex flex-wrap gap-2 mb-7">
                 {tech.map((t) => (
-                  <motion.span
+                  <m.span
                     key={t}
                     variants={fadeUpVariants}
                     className="inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-medium"
@@ -1014,12 +1014,12 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                     }}
                   >
                     {t}
-                  </motion.span>
+                  </m.span>
                 ))}
-              </motion.div>
+              </m.div>
 
               {/* ── Divider ──────────────────────────────────── */}
-              <motion.div
+              <m.div
                 variants={fadeUpVariants}
                 className="h-px mb-7"
                 style={{
@@ -1029,12 +1029,12 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
               />
 
               {/* ── CTA buttons ──────────────────────────────── */}
-              <motion.div variants={nestedStagger} className="space-y-3">
+              <m.div variants={nestedStagger} className="space-y-3">
                 {/* BotLode — dual external links */}
                 {rich?.kind === 'botlode' && (
-                  <motion.div variants={fadeUpVariants} className="grid grid-cols-2 gap-3">
+                  <m.div variants={fadeUpVariants} className="grid grid-cols-2 gap-3">
                     {rich.urls.map((u) => (
-                      <motion.a
+                      <m.a
                         key={u.href}
                         href={u.href}
                         target="_blank"
@@ -1050,14 +1050,14 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                       >
                         {u.label}
                         <ExternalLinkIcon className="h-3.5 w-3.5 opacity-70" />
-                      </motion.a>
+                      </m.a>
                     ))}
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {/* Assistify — app site link */}
                 {project.url && rich?.kind === 'assistify' && (
-                  <motion.a
+                  <m.a
                     variants={fadeUpVariants}
                     href={project.url}
                     target="_blank"
@@ -1073,11 +1073,11 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                   >
                     Visitar assistify.lat
                     <ExternalLinkIcon className="h-3.5 w-3.5 opacity-70" />
-                  </motion.a>
+                  </m.a>
                 )}
 
                 {project.url && rich?.kind === 'luma-invita' && (
-                  <motion.a
+                  <m.a
                     variants={fadeUpVariants}
                     href={project.url}
                     target="_blank"
@@ -1093,11 +1093,11 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                   >
                     Visitar bylumainvita.com
                     <ExternalLinkIcon className="h-3.5 w-3.5 opacity-70" />
-                  </motion.a>
+                  </m.a>
                 )}
 
                 {/* Primary CTA — always visible */}
-                <motion.a
+                <m.a
                   variants={fadeUpVariants}
                   href="/contacto"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all duration-200"
@@ -1115,13 +1115,13 @@ export function ProjectDrawer({ project, open, onClose }: ProjectDrawerProps) {
                 >
                   <CalendarIcon />
                   Agendar consulta gratis
-                </motion.a>
-              </motion.div>
+                </m.a>
+              </m.div>
 
               {/* Bottom padding */}
               <div className="h-10" />
-            </motion.div>
-          </motion.aside>
+            </m.div>
+          </m.aside>
         </>
       )}
     </AnimatePresence>
