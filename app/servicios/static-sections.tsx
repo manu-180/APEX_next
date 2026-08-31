@@ -532,15 +532,6 @@ const COMPARISON_ROWS: Array<{
     apexWins: false,
   },
   {
-    feature: 'Integración AFIP/ARCA',
-    apex: 'Sí (opcional)',
-    wordpress: 'Plugin externo',
-    wix: 'No',
-    tiendanube: 'Limitada',
-    agencia: 'Sí (extra)',
-    apexWins: false,
-  },
-  {
     feature: 'App móvil + Web',
     apex: 'Sí (mismo stack)',
     wordpress: 'No',
@@ -690,68 +681,6 @@ export function ServiciosComparisonTable() {
               veces la mejor opción es la más sencilla.
             </p>
           </div>
-        </div>
-      </SectionReveal>
-    </section>
-  )
-}
-
-/**
- * Acceso crawlable a las landings verticales (médicos / abogados / contadores).
- * Una row simple debajo de la comparativa con enlaces directos.
- */
-export function VerticalsBridge() {
-  const VERTICALS_LIST = [
-    { slug: 'web-para-medicos', label: 'Médicos', sub: 'Turnos online + AFIP' },
-    { slug: 'web-para-abogados', label: 'Abogados', sub: 'Consultas + agenda' },
-    { slug: 'web-para-contadores', label: 'Contadores', sub: 'Portal cliente + ARCA' },
-  ]
-
-  return (
-    <section className="my-12 mx-auto max-w-6xl px-6">
-      <SectionReveal>
-        <div className="bento-surface p-6 sm:p-8">
-          <div className="mb-5">
-            <p className="editorial-label mb-3">Verticales</p>
-            <h3 className="text-lg font-bold text-[var(--color-on-surface)] sm:text-xl">
-              ¿Sos médico, abogado o contador?
-            </h3>
-          </div>
-          <p className="mb-5 text-sm text-[var(--color-on-surface-variant)]">
-            Tenemos soluciones específicas para tu profesión: con los módulos que realmente usás
-            (turnos, agenda, AFIP, portal de clientes) y precios definidos desde el arranque.
-          </p>
-          {/* Primera card destacada: columna más ancha rompe la simetría */}
-          <ul className="grid gap-3 sm:grid-cols-[1.3fr_1fr_1fr]">
-            {VERTICALS_LIST.map((v) => (
-              <li key={v.slug}>
-                <a
-                  href={`/${v.slug}`}
-                  className="group flex items-center justify-between rounded-xl border px-4 py-3 transition-colors hover:border-[rgba(var(--color-primary-rgb),0.35)] hover:bg-[rgba(var(--color-primary-rgb),0.03)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
-                  style={{
-                    backgroundColor: 'var(--color-surface-base)',
-                    borderColor: 'var(--glass-border)',
-                  }}
-                >
-                  <div>
-                    <span className="block text-sm font-bold text-[var(--color-on-surface)]">
-                      Web para {v.label}
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-[var(--color-on-surface-variant)] opacity-75">
-                      {v.sub}
-                    </span>
-                  </div>
-                  <span
-                    aria-hidden
-                    className="text-base transition-transform duration-200 group-hover:translate-x-1"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
-                    →
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
       </SectionReveal>
     </section>

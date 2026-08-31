@@ -107,7 +107,7 @@ export function TecnologiasContent() {
                   <span className="block text-4xl sm:text-6xl md:text-7xl italic glow-text mt-2"
                     style={{ color: 'var(--color-primary)' }}
                   >
-                    No un capricho.
+                    Ninguna está de adorno.
                   </span>
                 </h1>
 

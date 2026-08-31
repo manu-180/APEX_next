@@ -786,15 +786,14 @@ export function SobreMiContent({
             <p className="editorial-label editorial-label--primary mb-6">Prueba de capacidad</p>
             <h2 className="heading-display heading-display--tight text-balance text-3xl sm:text-4xl md:text-5xl max-w-3xl mb-5">
               <span className="block text-[var(--color-on-surface-variant)]">
-                No te muestro mockups.
+                Productos que construí
               </span>
               <strong className="block text-[var(--color-on-surface)]">
-                Te muestro productos en producción.
+                y que están online hoy.
               </strong>
             </h2>
             <p className="text-pretty text-base text-[var(--color-on-surface-variant)] max-w-2xl">
-              Los construí yo y están online ahora mismo. Entrá, usalos, juzgá el nivel —
-              esa es la vara con la que hago el tuyo.
+              Entrá, usalos, juzgá el nivel — esa es la vara con la que hago el tuyo.
             </p>
           </Reveal>
 

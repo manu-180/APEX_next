@@ -750,7 +750,7 @@ const CUSTOM_SOFTWARE_CAPABILITIES = [
   'Apps móviles iOS + Android (Flutter)',
   'Aplicaciones y sistemas web a medida (Next.js)',
   'Paneles de administración y dashboards',
-  'Integraciones: MercadoPago, WhatsApp, AFIP y otras APIs',
+  'Integraciones: MercadoPago, WhatsApp y otras APIs',
   'Automatizaciones y funciones con inteligencia artificial',
   'Backend, base de datos e infraestructura (Supabase)',
 ] as const

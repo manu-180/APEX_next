@@ -16,6 +16,10 @@ const JOBS = {
   assistify: 'assistify.png',
   'taller-marcelo': 'taller-marcelo.png',
   botlode: 'public/projects/botlode.png', // fallback: sitio caído al capturar
+  // apostillas: capturado con api.microlink.io (2560x1600) — el mismo servicio
+  // que usa lab-demos.ts para las previews en vivo. Playwright MCP está
+  // desactivado, microlink no necesita API key.
+  apostillas: 'apostillas.png',
   moda: 'moda.png',
   'poncho-spanish': 'poncho-spanish.png',
 }

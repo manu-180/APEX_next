@@ -48,8 +48,8 @@ export const SERVICIOS_FAQ_ITEMS = [
     a: '100% tuyo desde el día uno. Vive en un repositorio (GitHub) con tu cuenta como propietaria. Si mañana querés seguir con otro desarrollador, te llevás todo sin pedir permiso ni perder un archivo. Cero lock-in.',
   },
   {
-    q: '¿Pueden integrar MercadoPago, AFIP o WhatsApp Business?',
-    a: 'Sí, los tres. MercadoPago para cobrar online (incluido en los planes que lo necesitan), WhatsApp para que cada consulta te llegue directo al teléfono, y facturación electrónica AFIP/ARCA automática como addon: suma entre $200.000 y $400.000 según complejidad, y emite factura A o B con CAE sin que cargues nada a mano.',
+    q: '¿Pueden integrar MercadoPago, facturación o WhatsApp Business?',
+    a: 'Sí. MercadoPago para cobrar online (incluido en los planes que lo necesitan) y WhatsApp para que cada consulta te llegue directo al teléfono. Si tu negocio necesita facturación electrónica u otra integración puntual, lo evaluamos en el boceto: te digo si aplica y cuánto suma antes de que arranquemos.',
   },
   {
     q: '¿Qué pasa después de la entrega?',
