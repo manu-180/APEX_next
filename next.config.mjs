@@ -7,6 +7,20 @@ const nextConfig = {
 
   async headers() {
     return [
+      // DEV ONLY — en desarrollo los chunks de /_next/static salen con
+      // `immutable, max-age=1 año`. Si el nombre del chunk no cambia (mismo
+      // puerto, misma ruta), el navegador nunca los revalida y termina
+      // ejecutando JS viejo contra HTML nuevo → falsos "hydration mismatch"
+      // imposibles de diagnosticar. En producción los nombres llevan hash,
+      // así que esto no aplica y el caching agresivo se mantiene intacto.
+      ...(process.env.NODE_ENV === 'development'
+        ? [
+            {
+              source: '/_next/static/:path*',
+              headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+            },
+          ]
+        : []),
       {
         source: '/',
         headers: [
