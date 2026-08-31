@@ -39,6 +39,10 @@ interface OwnProduct {
   domain: string
   url: string
   tagline: string
+  /** Captura real del sitio (public/projects/showcase). El producto se MUESTRA,
+      no se describe — patrón de estudios tipo Locomotive/Büro: el trabajo
+      visual es la prueba, el texto acompaña. */
+  screenshot: string
 }
 
 /** Descripciones verificables, tomadas del propio sitio (theme.ts / llms.txt). */
@@ -48,18 +52,21 @@ const OWN_PRODUCTS: OwnProduct[] = [
     domain: 'handy.theapexweb.com',
     url: PROJECTS.handy,
     tagline: 'Herramientas web rápidas y prácticas para el día a día.',
+    screenshot: '/projects/showcase/handy.webp',
   },
   {
     name: 'Byluma Invita',
     domain: 'bylumainvita.com',
     url: PROJECTS.byluma,
     tagline: 'Invitaciones digitales personalizadas para eventos y celebraciones.',
+    screenshot: '/projects/showcase/luma-invita.webp',
   },
   {
     name: 'Assistify',
     domain: 'assistify.lat',
     url: PROJECTS.assistify,
     tagline: 'Gestión de clases para profesores e institutos — iOS y Android.',
+    screenshot: '/projects/showcase/assistify.webp',
   },
 ]
 
@@ -206,54 +213,59 @@ function ProductCard({ product, order }: { product: OwnProduct; order: number })
       }
       data-hover
       data-inspector-title={`Producto propio: ${product.name}`}
-      data-inspector-desc="Producto construido y operado por Manuel, online en producción. Link real, verificable."
+      data-inspector-desc="Producto construido y operado por Manuel, online en producción. La captura es del sitio real: el trabajo se muestra, no se describe."
       data-inspector-cat="Conversión"
-      className={cn(
-        'group block bento-surface p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
-        order === 0 && 'overflow-hidden',
-      )}
+      className="group grid min-h-[7.5rem] grid-cols-[42%_1fr] overflow-hidden bento-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
     >
-      {/* Franja dot-grid en la primera card: rompe la repetición de la columna
-          (mismo patrón de puntos que las feature cards del hero) */}
-      {order === 0 && (
+      {/* ── Captura real, full-bleed a la izquierda ──
+          El zoom sale del borde superior (object-top): el header del sitio es
+          la parte más reconocible de una web y la que mejor "vende" el diseño. */}
+      <div className="relative overflow-hidden">
+        <Image
+          src={product.screenshot}
+          alt={`Sitio real de ${product.name}`}
+          fill
+          className={cn(
+            'object-cover object-top',
+            'transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+            !prefersReducedMotion && 'group-hover:scale-[1.06] group-hover:-translate-y-1',
+          )}
+          sizes="(max-width: 1024px) 42vw, 18vw"
+        />
+        {/* velo lateral: funde la captura con la superficie de la card */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-10 opacity-[0.05] dark:opacity-[0.03]"
-          style={{
-            backgroundImage: 'radial-gradient(circle, var(--color-primary) 1px, transparent 1px)',
-            backgroundSize: '18px 18px',
-            maskImage: 'linear-gradient(to bottom, black, transparent)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)',
-          }}
+          className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[var(--color-surface-low)] to-transparent opacity-80"
         />
-      )}
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-70">
-            Producto propio
-          </p>
-          <h3 className="font-heading text-xl font-extrabold leading-none text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)]">
+      </div>
+
+      <div className="flex min-w-0 flex-col justify-center px-4 py-3.5 sm:px-5">
+        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-on-surface-variant)] opacity-70">
+          Producto propio
+        </p>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="truncate font-heading text-lg font-extrabold leading-none text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)] sm:text-xl">
             {product.name}
           </h3>
-          <p className="mt-2 text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
-            {product.tagline}
-          </p>
+          <span
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] transition-colors duration-200 group-hover:bg-[rgba(var(--color-primary-rgb),0.12)] group-hover:text-[var(--color-primary)]"
+            aria-hidden="true"
+          >
+            <ExternalLinkIcon className="size-3.5" />
+          </span>
         </div>
-        <span
-          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[var(--color-on-surface-variant)] transition-colors duration-200 group-hover:bg-[rgba(var(--color-primary-rgb),0.12)] group-hover:text-[var(--color-primary)]"
-          aria-hidden="true"
-        >
-          <ExternalLinkIcon className="size-4" />
-        </span>
+        <p className="mt-1.5 line-clamp-2 text-pretty text-[13px] leading-snug text-[var(--color-on-surface-variant)]">
+          {product.tagline}
+        </p>
+        <p className="mt-2 flex items-center gap-1.5 font-mono text-[11px] text-[var(--color-on-surface-variant)] opacity-60">
+          <span
+            className="size-1.5 rounded-full"
+            style={{ backgroundColor: 'var(--color-online)' }}
+            aria-hidden="true"
+          />
+          {product.domain}
+        </p>
       </div>
-      <p className="mt-4 flex items-center gap-1.5 font-mono text-[11px] text-[var(--color-on-surface-variant)] opacity-60">
-        <span
-          className="size-1.5 rounded-full"
-          style={{ backgroundColor: 'var(--color-online)' }}
-          aria-hidden="true"
-        />
-        {product.domain}
-      </p>
     </m.a>
   )
 }

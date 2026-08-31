@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { Variants } from 'framer-motion'
-import { animate, m, useInView, useReducedMotion } from 'framer-motion'
+import { animate, m, useInView, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { CheckIcon, WhatsAppIcon, XIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
@@ -350,6 +350,22 @@ export function HomeProcessSection() {
   const numberRef = useRef<HTMLSpanElement>(null)
   useParallaxNumber(numberRef)
 
+  // Progreso de lectura del timeline → dibuja la línea (0 → 1 mientras la
+  // lista cruza el viewport). Spring: sigue el scroll con inercia, no clavado.
+  const timelineRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ['start 0.75', 'end 0.55'],
+  })
+  const lineProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.6 })
+
+  // La línea animada se monta SOLO en cliente: useScroll produce un transform
+  // que difiere entre el HTML del server y la primera pintura del cliente →
+  // hydration mismatch (verificado bisecando). Como es decoración pura
+  // (el riel tenue de fondo ya existe en SSR), entra post-mount sin costo.
+  const [lineMounted, setLineMounted] = useState(false)
+  useEffect(() => setLineMounted(true), [])
+
   return (
     <section className="relative overflow-hidden py-24 md:py-32">
       <GridBackground />
@@ -407,15 +423,35 @@ export function HomeProcessSection() {
           </m.div>
 
           {/* ── Timeline de pasos ─────────────────────────────────────── */}
-          <div className="relative">
+          <div ref={timelineRef} className="relative">
+            {/* Riel tenue de fondo: el recorrido completo, siempre visible */}
             <div
               aria-hidden="true"
               className="absolute bottom-6 left-[2.25rem] top-6 hidden w-px sm:left-[2.75rem] sm:block"
               style={{
                 background:
-                  'linear-gradient(to bottom, transparent, rgba(var(--color-primary-rgb), 0.25) 15%, rgba(var(--color-primary-rgb), 0.25) 85%, transparent)',
+                  'linear-gradient(to bottom, transparent, rgba(var(--color-primary-rgb), 0.12) 15%, rgba(var(--color-primary-rgb), 0.12) 85%, transparent)',
               }}
             />
+            {/* La línea se DIBUJA con el scroll (patrón timeline tipo Samara:
+                el progreso del proceso acompaña el progreso de lectura).
+                scaleY + transform-origin top: transform-only, cero reflow.
+                Spring suave para que no se sienta atada 1:1 al gesto.
+                Client-only (lineMounted): el transform de useScroll difiere
+                entre SSR y primera pintura → mismatch. El riel de fondo ya
+                da la referencia visual mientras tanto. */}
+            {lineMounted && (
+              <m.div
+                aria-hidden="true"
+                className="absolute bottom-6 left-[2.25rem] top-6 hidden w-px origin-top sm:left-[2.75rem] sm:block"
+                style={{
+                  scaleY: prefersReducedMotion ? 1 : lineProgress,
+                  background:
+                    'linear-gradient(to bottom, transparent, rgba(var(--color-primary-rgb), 0.55) 15%, rgba(var(--color-primary-rgb), 0.55) 85%, transparent)',
+                  boxShadow: '0 0 12px rgba(var(--color-primary-rgb), 0.25)',
+                }}
+              />
+            )}
             <ol className="relative space-y-8 sm:space-y-10">
               {PROCESS_STEPS.map((step, i) => (
                 <ProcessStepRow key={step.number} step={step} order={i} />

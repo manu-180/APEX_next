@@ -41,6 +41,16 @@ const Home3DShowcase = dynamic(
   { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
 )
 
+const HomePricingSection = dynamic(
+  () => import('./home-pricing').then((m) => m.HomePricingSection),
+  { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
+)
+
+const ResultsWallSection = dynamic(
+  () => import('./results-wall').then((m) => m.ResultsWallSection),
+  { loading: () => <SectionSkeleton className="py-24 md:py-32" /> },
+)
+
 const TrustedClientsSection = dynamic(
   () => import('./trusted-clients').then((m) => m.TrustedClientsSection),
   { loading: () => <SectionSkeleton className="py-16 md:py-20" /> },
@@ -74,6 +84,15 @@ export function HomeBelowFold() {
       </div>
       <div className="cv-auto">
         <HomeProcessSection />
+      </div>
+      {/* Después del proceso, la pregunta natural es "¿cuánto sale?" →
+          precios (patrón Parker) y refuerzo con resultados reales (results
+          wall) antes de pasar al founder. */}
+      <div className="cv-auto">
+        <HomePricingSection />
+      </div>
+      <div className="cv-auto">
+        <ResultsWallSection />
       </div>
       <div className="cv-auto">
         <Home3DShowcase />
