@@ -123,9 +123,10 @@ export function BookingCalendar() {
   const [contact, setContact] = useState('')
   /** Solo los 8 dígitos después del 11; +54 9 se arma al enviar. */
   const [waLocalDigits, setWaLocalDigits] = useState('')
-  /** Campo trampa. Un humano nunca lo ve ni lo tabula; un bot que autocompleta
-   *  todo lo llena y el endpoint descarta la reserva en silencio. */
-  const [honeypot, setHoneypot] = useState('')
+  /** Campo trampa (honeypot). Un humano nunca lo ve ni lo tabula; un bot que
+   *  autocompleta todo lo llena y /api/booking/whatsapp descarta el envío
+   *  devolviendo un 200 falso, sin avisarle al bot que lo detectamos. */
+  const [company, setCompany] = useState('')
   /** Snapshot para la pantalla de éxito (el hook limpia selectedHour al refrescar slots). */
   const [lastBooking, setLastBooking] = useState<{
     date: Date
@@ -244,7 +245,7 @@ export function BookingCalendar() {
       contactInfo,
       contactType: contactMethod,
       name: name.trim() || undefined,
-      honeypot,
+      honeypot: company,
     })
   }
 
@@ -370,7 +371,7 @@ export function BookingCalendar() {
               setLastBooking(null)
               setEmailTouched(false)
               setWaTouched(false)
-              setHoneypot('')
+              setCompany('')
             }}
             type="button"
           >
@@ -799,24 +800,19 @@ export function BookingCalendar() {
           )}
         </AnimatePresence>
 
-        {/* Honeypot. Fuera del viewport en vez de display:none (algunos bots
-            saltean los campos ocultos por CSS), con aria-hidden + tabIndex -1
-            para que ni el lector de pantalla ni el teclado lo alcancen. */}
-        <div
+        {/* Honeypot. Se saca del viewport en vez de usar display:none o
+            type="hidden" (los bots saltean ambos), y queda fuera del alcance
+            del teclado y del lector de pantalla con tabIndex -1 + aria-hidden. */}
+        <input
+          type="text"
+          name="company"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
           aria-hidden="true"
-          className="pointer-events-none absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden"
-        >
-          <label htmlFor="booking-company">Empresa</label>
-          <input
-            id="booking-company"
-            name="company"
-            type="text"
-            value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
-            tabIndex={-1}
-            autoComplete="off"
-          />
-        </div>
+          className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
 
         {/* El Button deshabilitado tiene disabled:pointer-events-none: el click
             cae en este wrapper y dispara el shake del campo incompleto.

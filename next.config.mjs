@@ -106,7 +106,20 @@ const nextConfig = {
       'framer-motion',
       'lucide-react',
     ],
-    optimizeCss: true,
+    /**
+     * `optimizeCss` (critters) NO se activa: en Next 14 solo corre para el
+     * Pages Router. Verificado en el árbol instalado — `critters` se importa
+     * únicamente desde `next/dist/server/post-process.js`, cuyo único llamador
+     * es `next/dist/server/render.js` (el renderer de pages/). El App Router
+     * pasa por `server/app-render/`, que nunca lo toca.
+     * Prueba empírica: con la flag en `true`, el HTML prerenderizado de la home
+     * salía con dos `<link rel="stylesheet">` bloqueantes y CERO CSS crítico
+     * inline. Dejarla encendida no optimizaba nada y hacía creer que el CSS ya
+     * estaba resuelto — que es justamente por qué el hallazgo de "recursos que
+     * bloquean el renderizado" sobrevivió tanto en PageSpeed.
+     * `critters` queda como dependencia huérfana en package.json: se puede
+     * desinstalar.
+     */
     scrollRestoration: true,
   },
 

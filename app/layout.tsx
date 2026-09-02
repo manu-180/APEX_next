@@ -110,8 +110,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-AR" suppressHydrationWarning className={`dark ${oxanium.variable}`}>
       <head>
-        {/* Preconnect a dominios críticos de third-party — TLS handshake en paralelo */}
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/*
+          Sin preconnect a fonts.gstatic.com: Oxanium entra por next/font, que
+          descarga el woff2 en build y lo sirve self-hosted desde /_next/static.
+          El navegador nunca abre una conexión a Google Fonts, así que el
+          preconnect solo gastaba un socket y un handshake TLS de más
+          (PageSpeed lo reportaba como "preconexión no utilizada").
+        */}
         {gaMeasurementId ? <link rel="dns-prefetch" href="https://www.googletagmanager.com" /> : null}
         <PersonJsonLd />
         <WebSiteJsonLd />

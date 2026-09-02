@@ -6,6 +6,7 @@ import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-li
 import { whatsappUrl } from '@/lib/whatsapp'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { ROUTES } from '@/lib/constants'
+import './not-found.css'
 
 export const metadata: Metadata = {
   title: 'Página no encontrada — 404',

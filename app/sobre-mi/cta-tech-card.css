@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CTA TECH CARD — "Deep Space Nodes"
+   ─────────────────────────────────────────────────────────────────────────
+   Vivía en app/globals.css (líneas 1162-1413). Se movió acá el 2026-09-02:
+   son ~8,5 KB de CSS plano (fuera de @layer, o sea NO purgable por Tailwind)
+   que consume UN solo archivo del sitio — app/sobre-mi/content.tsx — pero que
+   viajaba en la hoja de estilo global de las 11 rutas, incluida la home, que
+   es la landing de la campaña de Ads.
+
+   Al importarse desde el componente que lo usa, Next lo emite como chunk de
+   CSS de la ruta /sobre-mi y desaparece del critical path del resto.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cta-tech-card {
+  background:
+    radial-gradient(ellipse 90% 60% at 8% 110%, rgba(var(--color-primary-rgb), 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 55% at 92% -5%, rgba(6, 182, 212, 0.07) 0%, transparent 50%),
+    linear-gradient(155deg, rgba(var(--color-primary-rgb), 0.04) 0%, var(--color-surface-low) 55%, rgba(var(--color-primary-rgb), 0.02) 100%);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.14);
+  box-shadow:
+    0 0 0 1px rgba(var(--color-primary-rgb), 0.04),
+    0 8px 48px rgba(var(--shadow-tint-rgb), 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(var(--color-primary-rgb), 0.05);
+  transition: box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+}
+
+.cta-tech-card:hover {
+  border-color: rgba(var(--color-primary-rgb), 0.28);
+  box-shadow:
+    0 0 0 1px rgba(var(--color-primary-rgb), 0.06),
+    0 12px 64px rgba(var(--shadow-tint-rgb), 0.5),
+    0 0 40px -10px rgba(var(--color-primary-rgb), 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 60px -20px rgba(var(--color-primary-rgb), 0.04);
+}
+
+/* Light: la sombra negra 0.45/0.5 de dark aplasta sobre porcelana — capa navy */
+.light .cta-tech-card {
+  background:
+    radial-gradient(ellipse 90% 60% at 8% 110%, rgba(var(--color-primary-rgb), 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 55% at 92% -5%, rgba(var(--color-accent-rgb), 0.05) 0%, transparent 50%),
+    linear-gradient(155deg, rgba(var(--color-primary-rgb), 0.03) 0%, var(--color-surface-lowest) 55%, rgba(var(--color-primary-rgb), 0.02) 100%);
+  border-color: rgba(var(--color-primary-rgb), 0.20);
+  box-shadow:
+    0 0 0 1px rgba(var(--color-primary-rgb), 0.04),
+    0 2px 6px rgba(24, 32, 60, 0.05),
+    0 24px 64px -24px rgba(24, 32, 60, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.90);
+}
+
+.light .cta-tech-card:hover {
+  border-color: rgba(var(--color-primary-rgb), 0.36);
+  box-shadow:
+    0 0 0 1px rgba(var(--color-primary-rgb), 0.06),
+    0 4px 10px rgba(24, 32, 60, 0.06),
+    0 32px 80px -28px rgba(24, 32, 60, 0.28),
+    0 0 32px -12px rgba(var(--color-primary-rgb), 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* ─── CTA hover: scan line que barre la tarjeta ─────────────────────────── */
+.cta-scan-line {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.cta-scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: -1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-primary-rgb), 0.4) 20%,
+    rgba(var(--color-primary-rgb), 0.85) 50%,
+    rgba(var(--color-primary-rgb), 0.4) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px 1px rgba(var(--color-primary-rgb), 0.3);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease-out);
+}
+
+.group:hover .cta-scan-line::after {
+  opacity: 1;
+  animation: cta-scan-drop 3.2s ease-in-out infinite;
+}
+
+@keyframes cta-scan-drop {
+  0%   { top: -1px; opacity: 0; }
+  6%   { opacity: 1; }
+  88%  { opacity: 0.45; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Grid mesh: un poco más visible en hover */
+.cta-grid-mesh {
+  opacity: 0.45;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.group:hover .cta-grid-mesh {
+  opacity: 0.9;
+}
+
+/* Corners: pulsan más rápido en hover */
+.group:hover .cta-corner {
+  animation-duration: 1.8s !important;
+  box-shadow: 0 0 10px 2px rgba(var(--color-primary-rgb), 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-scan-line::after { display: none; }
+  .group:hover .cta-grid-mesh { opacity: 0.45; }
+}
+
+/* Floating orb lights */
+.cta-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  /* will-change applied only during animation, not statically — baseline-ui: performance */
+}
+
+.cta-orb-1 {
+  width: 380px;
+  height: 380px;
+  top: -130px;
+  left: -90px;
+  background: radial-gradient(circle, rgba(var(--color-primary-rgb), 0.13) 0%, transparent 68%);
+  filter: blur(55px);
+  animation: orb-drift-1 13s ease-in-out infinite;
+}
+
+.cta-orb-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -100px;
+  right: -60px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.11) 0%, transparent 68%);
+  filter: blur(48px);
+  animation: orb-drift-2 17s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.cta-orb-3 {
+  width: 240px;
+  height: 240px;
+  top: 50%;
+  left: 54%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.10) 0%, transparent 68%);
+  filter: blur(42px);
+  animation: orb-drift-3 21s ease-in-out infinite;
+  animation-delay: -10s;
+}
+
+@keyframes orb-drift-1 {
+  0%, 100% { transform: translate(0px, 0px); }
+  30%       { transform: translate(28px, 18px); }
+  65%       { transform: translate(-14px, 36px); }
+}
+
+@keyframes orb-drift-2 {
+  0%, 100% { transform: translate(0px, 0px); }
+  38%       { transform: translate(-38px, -22px); }
+  72%       { transform: translate(18px, -36px); }
+}
+
+@keyframes orb-drift-3 {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50%       { transform: translate(calc(-50% + 46px), calc(-50% + 28px)); }
+}
+
+/* Subtle grid mesh overlay */
+.cta-grid-mesh {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(var(--color-primary-rgb), 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--color-primary-rgb), 0.028) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 15%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 15%, transparent 80%);
+  pointer-events: none;
+}
+
+/* Top accent beam */
+.cta-top-beam {
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--color-primary-rgb), 0.45) 22%,
+    rgba(var(--color-primary-rgb), 0.85) 50%,
+    rgba(var(--color-primary-rgb), 0.45) 78%,
+    transparent
+  );
+  animation: beam-shimmer 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Bottom accent beam */
+.cta-bottom-beam {
+  position: absolute;
+  bottom: 0;
+  left: 28%;
+  right: 28%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--color-primary-rgb), 0.22) 50%,
+    transparent
+  );
+  animation: beam-shimmer 9s ease-in-out infinite;
+  animation-delay: -3.5s;
+  pointer-events: none;
+}
+
+@keyframes beam-shimmer {
+  0%, 100% { opacity: 0.35; transform: scaleX(0.75); }
+  50%       { opacity: 1;    transform: scaleX(1); }
+}
+
+/* Corner accent dots */
+.cta-corner {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(var(--color-primary-rgb), 0.5);
+  box-shadow: 0 0 6px 1px rgba(var(--color-primary-rgb), 0.4);
+  animation: corner-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cta-corner-tl { top: 12px; left: 12px; }
+.cta-corner-tr { top: 12px; right: 12px; animation-delay: -1s; }
+.cta-corner-bl { bottom: 12px; left: 12px; animation-delay: -2s; }
+.cta-corner-br { bottom: 12px; right: 12px; animation-delay: -3s; }
+
+@keyframes corner-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-orb,
+  .cta-top-beam,
+  .cta-bottom-beam,
+  .cta-corner { animation: none; }
+}
