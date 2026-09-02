@@ -2,24 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "APEX Next.js Dev",
+      "name": "apex-prod",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000,
-      "autoPort": true
-    },
-    {
-      "name": "APEX Next.js Prod",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start"],
-      "port": 3000,
-      "autoPort": true
-    },
-    {
-      "name": "faro-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "C:/MisProyectos/APEX/FARO_web"],
-      "port": 3311
+      "runtimeArgs": ["run", "start", "--", "-p", "3210"],
+      "port": 3210
     }
   ]
 }

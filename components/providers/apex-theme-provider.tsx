@@ -27,8 +27,6 @@ type ApexThemeActionsValue = {
   resetTheme: () => void
 }
 
-type ApexThemeContextValue = ApexThemeStateValue & ApexThemeActionsValue
-
 const ApexThemeStateContext = createContext<ApexThemeStateValue | null>(null)
 const ApexThemeActionsContext = createContext<ApexThemeActionsValue | null>(null)
 

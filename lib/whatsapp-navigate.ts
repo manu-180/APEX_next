@@ -66,7 +66,7 @@ function isPopupHandleUsable(popup: Window | null): boolean {
  * estrangula, y al volver el usuario el chequeo tardío lo mandaría de nuevo
  * a WhatsApp. Con el latch, ese caso ya quedó resuelto como handoff exitoso.
  */
-function confirmHandoff(waHref: string, popup: Window | null, router: AppRouterPush): void {
+function confirmHandoff(waHref: string, _popup: Window | null, router: AppRouterPush): void {
   const thankYouHref = `${WHATSAPP_THANK_YOU_ROUTE}?wa=${encodeURIComponent(waHref)}`
   let settled = false
   let timer = 0

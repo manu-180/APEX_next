@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
+// Runtime Node por defecto: next/og genera la imagen igual y la página queda
+// estática en build (edge la forzaba a dinámica en cada request de crawler).
 export const alt = 'Manuel Navarro — Desarrollo Web & Mobile | APEX'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'

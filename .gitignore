@@ -60,3 +60,4 @@ muestrario-*.png
 # Python bytecode (scripts/google-ads)
 __pycache__/
 *.py[cod]
+supabase/.temp/

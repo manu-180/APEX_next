@@ -33,7 +33,7 @@ components/
 hooks/
   useTheme.ts           # 7-theme dynamic system (data-theme on <html>)
   useInspector.ts       # X-Ray inspector mode
-  useKeyboardShortcuts.ts # Ctrl+H/A/C/S/M/T/R/W/I/K
+  useKeyboardShortcuts.ts # Ctrl+H/A/S/M/Y/R/I/K (+ Shift+H)
 
 lib/
   types/theme.ts        # ThemeId, ThemeConfig, THEMES array
@@ -53,9 +53,9 @@ Theme IDs: `neutral` | `flutter` | `supabase` | `riverpod` | `botlode` | `assist
 ## Key Functionality (all must be preserved from original APEX Flutter project)
 
 - Dynamic themes: hover preview + click to apply (persisted localStorage)
-- Light/dark toggle: Ctrl+T
+- Light/dark toggle: Ctrl+Y
 - Inspector mode (X-Ray): Ctrl+I
-- Keyboard shortcuts: Ctrl+H/A/C/S/M/T/R/W/I/K
+- Keyboard shortcuts: Ctrl+H/A/S/M/Y/R/I/K (+ Ctrl+Shift+H abre WhatsApp)
 - Real-time presence badge (Supabase Realtime)
 - Google login (Supabase OAuth)
 - APEXbot floating chatbot
@@ -66,7 +66,8 @@ Theme IDs: `neutral` | `flutter` | `supabase` | `riverpod` | `botlode` | `assist
 ## Prices (ARS) — do not modify without checking with Manuel
 
 Web: Landing $300K | Interactiva $600K | E-commerce $900K
-Mobile: Profesional $1.2M | Empresarial $2.7M | Plataforma: consultar
+Mobile: App Producto $580K/mes | App + Operaciones $1.15M/mes | Plataforma multi-app: consultar (fee mensual + eventual hito)
+(Actualizado 2026-09-02 desde lib/types/services.ts — el código es la fuente de verdad; los $1.2M/$2.7M eran del modelo viejo de pago único.)
 
 ## Admin
 

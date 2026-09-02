@@ -55,3 +55,10 @@ export const trackGoogleAdsWhatsAppClick = () => {
 export const trackGoogleAdsHeroCtaClick = () => {
   trackGoogleAdsConversion(GOOGLE_ADS_HERO_CTA_LABEL, 'Hero CTA')
 }
+
+// Reserva confirmada — crear la conversion action en Google Ads (cuenta 4869983637) y pegar el label del send_to
+const GOOGLE_ADS_BOOKING_LABEL = ''
+
+export const trackGoogleAdsBookingConfirmed = () => {
+  trackGoogleAdsConversion(GOOGLE_ADS_BOOKING_LABEL, 'Booking Confirmed')
+}

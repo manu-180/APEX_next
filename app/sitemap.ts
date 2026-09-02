@@ -23,6 +23,7 @@ const PAGE_LAST_MODIFIED = {
   sobreMi:     '2026-08-30',
   contacto:    '2026-08-24',
   opiniones:   '2026-08-24',
+  lab:         '2026-07-06',
   /** Los verticales comparten plantilla y data (`lib/data/verticals.ts`). */
   verticales:  '2026-07-02',
 } as const
@@ -50,6 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}${ROUTES.about}`,       lastModified: day(PAGE_LAST_MODIFIED.sobreMi),     changeFrequency: 'monthly', priority: 0.7  },
     { url: `${BASE}${ROUTES.contact}`,     lastModified: day(PAGE_LAST_MODIFIED.contacto),    changeFrequency: 'monthly', priority: 0.8  },
     { url: `${BASE}/opiniones`,        lastModified: day(PAGE_LAST_MODIFIED.opiniones),   changeFrequency: 'monthly', priority: 0.6  },
+    { url: `${BASE}${ROUTES.lab}`,         lastModified: day(PAGE_LAST_MODIFIED.lab),         changeFrequency: 'monthly', priority: 0.5  },
   ]
 
   const blogUrls: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
@@ -67,7 +69,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }))
 
   // Fuera del sitemap a propósito: `/gracias` (noindex, dispara conversión de
-  // Ads al montarse) y `/lab` (WebGL, no es una página comercial — sigue
-  // crawleable porque está linkeada desde el navbar).
+  // Ads al montarse).
   return [...base, ...blogUrls, ...verticalUrls]
 }

@@ -13,10 +13,6 @@ import {
   ArrowRightIcon,
   WhatsAppIcon,
   CalendarIcon,
-  BotLodeIcon,
-  AssistifyIcon,
-  ContactEngineIcon,
-  LumaInvitaIcon,
 } from '@/components/ui/icons'
 import { ServiceDrawer } from '@/components/ui/ServiceDrawer'
 import type { ServiceDrawerContentProps } from '@/components/ui/ServiceDrawerContent'
@@ -25,8 +21,6 @@ import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, waMsgPlan } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { WEB_PLANS, APP_PLANS, formatARS, type PricingPlan } from '@/lib/types/services'
-import { PROJECTS, type ProjectItem } from '@/lib/types/theme'
-import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { DUR_FAST, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
 
@@ -57,37 +51,6 @@ function ServiceDrawerContentSkeleton() {
       <Skeleton className="h-14 w-full rounded-2xl" />
     </div>
   )
-}
-
-/**
- * ProjectDrawer (47 KB fuente) es un overlay completo (chrome + backdrop
- * propio) que solo existe para mostrar el detalle de un proyecto relacionado.
- * Va a next/dynamic (no hay shell estático separable sin tocar el archivo,
- * fuera de ownership acá). ssr:false: es 100% interactivo, arranca cerrado,
- * no aporta nada al HTML inicial.
- */
-const ProjectDrawer = dynamic(
-  () => import('@/components/ui/project-drawer').then((m) => m.ProjectDrawer),
-  { ssr: false, loading: () => <OverlayLoadingFallback /> },
-)
-
-/** Backdrop + spinner mínimo mientras se descarga el chunk de un overlay pesado. */
-function OverlayLoadingFallback() {
-  return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-[var(--scrim-bg)]"
-      aria-hidden="true"
-    >
-      <span className="size-8 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent motion-reduce:animate-none" />
-    </div>
-  )
-}
-
-const PROJECT_ICONS: Record<string, React.FC<{ className?: string }>> = {
-  botlode: BotLodeIcon,
-  assistify: AssistifyIcon,
-  'contact-engine': ContactEngineIcon,
-  'luma-invita': LumaInvitaIcon,
 }
 
 /** Sincroniza la pestaña con `?tab=mobile` (useSearchParams bajo Suspense). */
@@ -142,16 +105,6 @@ export function ServiciosContent() {
   const [tab, setTab] = useState<'web' | 'mobile'>('web')
   /** Drawer de detalle por plan (solo uno abierto a la vez). */
   const [openPlanDrawerId, setOpenPlanDrawerId] = useState<string | null>(null)
-  const [drawerProject, setDrawerProject] = useState<ProjectItem | null>(null)
-  /**
-   * Gate de montaje del overlay dinámico ProjectDrawer: arranca sin montar
-   * (su chunk nunca se pide) y queda montado para siempre desde la primera
-   * vez que se abre — así next/dynamic solo dispara el fetch al abrir, y las
-   * animaciones de cierre (que necesitan el componente montado con
-   * open=false) siguen funcionando en re-aperturas.
-   */
-  const everOpenedProjectDrawerRef = useRef(false)
-  everOpenedProjectDrawerRef.current ||= drawerProject !== null
 
   const scrollYBeforeTabChange = useRef<number | null>(null)
   const isFirstTabLayoutEffect = useRef(true)
@@ -159,7 +112,6 @@ export function ServiciosContent() {
   const selectMobileTab = useCallback(() => {
     setTab('mobile')
     setOpenPlanDrawerId(null)
-    setSheetPlanId(null)
   }, [])
 
   const handleTabChange = useCallback((t: 'web' | 'mobile') => {
@@ -168,7 +120,6 @@ export function ServiciosContent() {
     }
     setTab(t)
     setOpenPlanDrawerId(null)
-    setSheetPlanId(null)
   }, [])
 
   /** Mantiene el scroll fijo al cambiar Web/App (evita saltos por cambio de altura / animaciones). */
@@ -184,14 +135,6 @@ export function ServiciosContent() {
   }, [tab])
 
   const plans = tab === 'web' ? WEB_PLANS : APP_PLANS
-
-  const openProjectDrawer = useCallback((project: ProjectItem) => {
-    setDrawerProject(project)
-  }, [])
-
-  const closeDrawer = useCallback(() => {
-    setDrawerProject(null)
-  }, [])
 
   const tabStickySentinelRef = useRef<HTMLDivElement>(null)
   const [isTabSticky, setIsTabSticky] = useState(false)
@@ -376,48 +319,6 @@ export function ServiciosContent() {
           </AnimatePresence>
         </div>
       </section>
-
-      {/* ProjectsSheet: solo con sheetPlanId explícito; independiente del drawer de detalle.
-          Gateado por everOpenedSheetRef — no se monta (ni se pide su chunk) hasta el primer open. */}
-      {everOpenedSheetRef.current && (
-        <ProjectsSheet
-          planName={plans.find(p => p.id === sheetPlanId)?.name ?? ''}
-          entries={(() => {
-            if (!sheetPlanId) return []
-            const relatedIds = PLAN_RELATED_PROJECTS[sheetPlanId] ?? []
-            const entries: SheetEntry[] = relatedIds
-              .map(id => PROJECTS.find(p => p.themeId === id))
-              .filter((p): p is ProjectItem => !!p)
-              .map(project => ({
-                type: 'drawer' as const,
-                project,
-                icon: PROJECT_ICONS[project.themeId],
-                thumbnailSrc: PROJECT_THUMB_SRC[project.themeId],
-              }))
-            const cases = PLAN_EXTERNAL_CASES[sheetPlanId] ?? []
-            cases.forEach(cs =>
-              entries.push({
-                type: 'external' as const,
-                name: cs.name,
-                url: cs.url,
-                imageSrc: cs.imageSrc,
-              }),
-            )
-            return entries
-          })()}
-          isOpen={sheetPlanId !== null}
-          onClose={() => setSheetPlanId(null)}
-          onOpenProject={openProjectDrawer}
-        />
-      )}
-
-      {everOpenedProjectDrawerRef.current && (
-        <ProjectDrawer
-          project={drawerProject}
-          open={drawerProject !== null}
-          onClose={closeDrawer}
-        />
-      )}
 
       <ServicePlanDrawer
         plan={plans.find((candidate) => candidate.id === openPlanDrawerId) ?? null}

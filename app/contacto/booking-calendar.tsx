@@ -17,6 +17,7 @@ import { BOOKING_SLOT_HOURS, BLOCKED_WEEKDAYS, formatBookingHour } from '@/lib/c
 import { useBooking } from '@/hooks/useBooking'
 import { DELAY_AFTER_PANEL, DUR_REVEAL, EASE_OUT, SPRING_FOCUS } from '@/lib/motion'
 import { bookingWhatsappLocalToE164, BOOKING_WA_LOCAL_DIGITS } from '@/lib/booking-phone'
+import { trackGoogleAdsBookingConfirmed } from '@/lib/analytics/google-ads'
 import { cn } from '@/lib/utils/cn'
 import { focusRing } from './shared'
 
@@ -173,6 +174,7 @@ export function BookingCalendar() {
   useEffect(() => {
     if (success && !successNotified.current) {
       successNotified.current = true
+      trackGoogleAdsBookingConfirmed()
       const when = lastBooking
         ? `${lastBooking.date.toLocaleDateString('es-AR', {
             weekday: 'long',

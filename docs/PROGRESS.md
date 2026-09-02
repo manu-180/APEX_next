@@ -1,7 +1,49 @@
 # PROGRESS — Refactor pre-campaña + fix funnel WhatsApp
 
-> Última actualización: 2026-08-24 (sesión Claude — overhaul de performance)
+> Última actualización: 2026-09-02 (sesión Claude — orquestador: seguridad + performance + UX/conversión + auditoría)
 > Objetivo: dejar theapexweb.com listo para campaña — funnel WhatsApp funcionando end-to-end + rediseño premium orientado a conversión.
+
+---
+
+## -3. ORQUESTADOR — blindaje, CWV, conversión y limpieza (2026-09-02)
+
+Disparador: PageSpeed móvil (LCP 2,8 s, CSS bloqueante 340 ms, 82 % CSS sin uso,
+animaciones no compuestas, preconnect inútil, llms.txt sin links) + pedido de
+Manuel de blindar seguridad/bots/fallas y maximizar conversión. Cuatro frentes
+en paralelo con ownership disjunto + ronda de review. Build y `tsc` verdes;
+verificado en browser (375 y 1280, consola limpia, sin overflow horizontal).
+
+**Seguridad y bots (docs/security/AUDIT.md tiene la matriz completa):**
+- `middleware.ts` nuevo sobre `/api/*`: 405 fuera de GET/POST/OPTIONS/HEAD, 403 a POST cross-site (Sec-Fetch-Site/Origin), rate limit 30/min/IP con 429 + Retry-After. Probado con curl contra el build.
+- `/api/booking/whatsapp`: rate limit 5/10 min/IP, 415 si no es JSON, 413 > 2 KB, honeypot `company` (200 falso sin tocar el bridge), `clientName` saneado a 60 chars una línea. El honeypot vive en `booking-calendar.tsx` → `useBooking` → route (los tres usan el nombre `company`).
+- CSP en **Report-Only** en `next.config.mjs` con `report-uri /api/csp-report` (ruta nueva que deja `[csp]` en los logs de Vercel). Sin sumidero un Report-Only no informa nada. Pasar a enforcing recién tras 1-2 semanas sin reportes legítimos.
+- Sondeo RLS en vivo con la anon key (el proyecto `osoijzjxzxdkwmobctyb` NO está en ningún MCP conectado): INSERT/UPDATE/DELETE anónimos bloqueados en `appointments`/`comments`/`profiles`. **Fuga confirmada: `profiles` legible por anónimos (19 filas con nombre + avatar de cuentas Google)** — el sitio no la usa; hay que cerrarla desde el dashboard. `appointments` SELECT no verificable (0 filas). Realtime de `appointments` sin verificar si aplica RLS.
+- `supabase/migrations/20260902_fix_lead_magnet_rls.sql`: correctiva de la policy `UPDATE using(true)` de la migración `20260521` (que aún NO está aplicada en prod). Aplicar juntas.
+
+**Performance (PageSpeed móvil):**
+- El elemento LCP real de la home es el **párrafo del hero**, no el h1: arrancaba en `opacity:0` con reveal de 800 ms. Keyframe `apex-hero-rise-blur` (la última animación con `filter` que quedaba, contradiciendo la nota del 08-24) → `apex-hero-slide`, translate3d puro. Lighthouse local: gap FCP→LCP 959 ms → 0 ms; "4 animaciones no compuestas" → 0.
+- `experimental.optimizeCss` (critters) **no hace nada en App Router** en Next 14 (solo Pages Router). Apagado y `critters` desinstalado.
+- CSS de `/sobre-mi` (`cta-tech-card.css`) y 404 (`not-found.css`) extraído a chunks por ruta: home queda con 2 hojas. `globals.css` 1911 → 1550 líneas.
+- Preconnect a `fonts.gstatic.com` eliminado (fuentes self-hosted). Logo del navbar sin `priority` (competía con el CSS en el critical path).
+- Chunk `2117` con "JS antiguo": es `polyfill-module` de Next (1,4 KB reales, no 11,6). No se toca: lo requiere Safari ≤ 15.3 del browserslist.
+- `opengraph-image` sin `runtime = 'edge'` → se genera estática en build.
+
+**UX / conversión:**
+- **Bug de medición:** los CTA de `/web-para-contadores|medicos|abogados` eran `<a href="wa.me">` planos: no disparaban conversión de Ads ni Lead de Meta ni pasaban por `/gracias`. Ahora usan `WhatsAppOutboundLink`.
+- Hero mobile: spec-strip (Gratis 24-48 h · 15 días · $300k) visible bajo `lg` (antes solo desktop). Navbar mobile con Muestrario. Drawer con CTA "Hablemos por WhatsApp".
+- `global-error.tsx` y 404 rediseñados con salida al funnel. `/gracias` con botón "Copiar" del número (rescate desktop sin WhatsApp).
+- Booking: validación en vivo del teléfono ("Te faltan N dígitos", `aria-invalid`, `role=alert`), zona horaria explícita, leyenda Libre/Ocupado, placeholder neutro, microcopy de cierre.
+- `trackGoogleAdsBookingConfirmed` agregado (no-op hasta pegar el label): **pendiente crear la conversion action "Reserva confirmada" en Ads y pegarla en `lib/analytics/google-ads.ts`.**
+
+**Auditoría / limpieza:**
+- `llms.txt` reescrito en formato estándar (H1 + 16 links Markdown) y **derivado de `lib/types/services.ts` y `lib/data/*`**: prometía "devolución si no estás conforme" y "revisiones incluidas" (falso) y listaba 5 proyectos que no existen en el muestrario.
+- Sitemap con `lastModified` reales y `/lab` incluida (decisión: indexar, está linkeada desde el navbar). Robots: `/api/` en vez de la inexistente `/button-lab`.
+- `useInspector` con try/catch en sessionStorage (Safari privado tumbaba la página). `useKeyboardShortcuts` con handlers en ref (antes remontaba el listener en cada render). Fechas del blog y reseñas con `timeZone: 'UTC'` (hydration mismatch en UTC-3).
+- tsconfig: `noUnusedLocals/Parameters`, `noImplicitOverride`, `noFallthroughCasesInSwitch` activos.
+- Borrado (0 refs verificadas): `ProjectsSheet` (inalcanzable desde 08-24), `ProjectDrawer` de `/servicios` (quedó sin caller), `project-thumbs`, `case-studies`, `text-reveal`, `project-card-premium`, carpeta `APEX_next/` (un archivo vacío), `mi-lugar.html` (195 KB de otro sitio servidos en público), exports muertos varios.
+- `CLAUDE.md` del repo corregido: precios de app reales ($580k/mes · $1.15M/mes) y atajos reales (`Ctrl+H/A/S/M/Y/R/I/K`, `Ctrl+Shift+H`). **El `CLAUDE.md` del contenedor (`APEX/CLAUDE.md`) sigue con $1.2M/$2.7M y Ctrl+T/C/W: corregirlo.**
+
+**Pendientes que requieren a Manuel:** cerrar SELECT anónimo de `profiles`; sembrar 1 fila en `appointments` y verificar como anon que `contact_info` no se lee; confirmar Realtime Authorization; aplicar migración correctiva de lead magnet; crear conversion action de reserva; assets huérfanos en `public/images/clients/` (~2,9 MB) y `apex-icon-512.png`; `ANALISIS.md` y `prompts/proyectos-redesign/` son históricos que desinforman.
 
 ---
 
