@@ -73,6 +73,32 @@ Mobile: Profesional $1.2M | Empresarial $2.7M | Plataforma: consultar
 ADMIN_UUID = `37dad3e9-531c-4657-8db6-ddebbdcfa878`
 WhatsApp: `5491134272488`
 
+## Google Ads — este sitio es la landing de una campaña activa
+
+La campaña **Apex search** (cuenta `4869983637`) manda tráfico pago acá. Antes de
+tocar performance, el contenido de `/servicios` o las landings por vertical, leer
+el registro operativo completo en el `CLAUDE.md` del contenedor (`APEX/CLAUDE.md`).
+
+Lo que hay que tener presente al programar en este repo:
+
+- **La landing es la causa raíz del problema de la campaña.** Verificado por API
+  el 2026-09-02: `post_click_quality_score` = `BELOW_AVERAGE` en casi todas las
+  keywords. Eso hunde el Quality Score y por eso la campaña pierde el 77% de las
+  subastas por Ad Rank. Cada mejora de velocidad y de relevancia de la landing es
+  plata directa en la campaña, no un lujo de ingeniería.
+- **El Quality Score tarda 2 a 4 semanas en recalcularse.** Después de un cambio
+  de performance o contenido, no evaluar antes de ese plazo.
+- **Una landing por intención gana.** Los grupos con página propia
+  (`/web-para-contadores`, `/web-para-medicos`) tienen mejor Ad Strength que los
+  que caen en `/servicios` genérico. Si se suma un vertical a la campaña, necesita
+  su propia página.
+- **No romper el tracking.** Las conversiones ya se perdieron una vez por un
+  cambio en la carga de `gtag`; hay una cola de eventos para que no se pierdan si
+  `gtag.js` todavía no cargó. No revertirla sin entender por qué está.
+
+Hay automatismos que escriben en la cuenta sin pasar por este repo, en
+`C:\Users\Manuel\apex-ads-ops\`. Si algo cambió solo en la campaña, mirar ahí.
+
 ## Diseño Visual — Reglas de Estética (NO IGNORAR)
 
 ### Tipografía
