@@ -57,11 +57,6 @@ export function WebSiteJsonLd() {
         publisher: { '@id': ORG_ID },
         author: { '@id': PERSON_ID },
         image: ABSOLUTE_BRAND_IMAGE,
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: { '@type': 'EntryPoint', urlTemplate: `${APP_URL}/?q={search_term_string}` },
-          'query-input': 'required name=search_term_string',
-        },
       }}
     />
   )
@@ -152,7 +147,6 @@ export function LocalBusinessJsonLd() {
         image: ABSOLUTE_BRAND_IMAGE,
         url: APP_URL,
         telephone: WHATSAPP_PHONE_DISPLAY,
-        email: 'manunv97@gmail.com',
         priceRange: '$$',
         areaServed: { '@type': 'Country', name: 'AR' },
         address: {
@@ -200,9 +194,6 @@ export function LocalBusinessJsonLd() {
     />
   )
 }
-
-/** @deprecated Renombrado a LocalBusinessJsonLd — alias por compatibilidad. */
-export const AggregateRatingJsonLd = LocalBusinessJsonLd
 
 /** BreadcrumbList JSON-LD para páginas internas. */
 export function BreadcrumbJsonLd({ items }: { items: { name: string; url: string }[] }) {

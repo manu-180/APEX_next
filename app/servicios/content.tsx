@@ -18,15 +18,14 @@ import {
   ContactEngineIcon,
   LumaInvitaIcon,
 } from '@/components/ui/icons'
-import type { SheetEntry } from '@/components/ui/projects-sheet'
 import { ServiceDrawer } from '@/components/ui/ServiceDrawer'
 import type { ServiceDrawerContentProps } from '@/components/ui/ServiceDrawerContent'
 import { cn } from '@/lib/utils/cn'
-import { BRAND_IMAGE_SRC, ROUTES } from '@/lib/constants'
+import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, waMsgPlan } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { WEB_PLANS, APP_PLANS, formatARS, type PricingPlan } from '@/lib/types/services'
-import { PROJECTS, type ProjectItem, type ThemeId } from '@/lib/types/theme'
+import { PROJECTS, type ProjectItem } from '@/lib/types/theme'
 import { PROJECT_THUMB_SRC } from '@/lib/constants/project-thumbs'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { DUR_FAST, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
@@ -61,20 +60,12 @@ function ServiceDrawerContentSkeleton() {
 }
 
 /**
- * ProjectsSheet (13 KB fuente) y ProjectDrawer (47 KB fuente) son overlays
- * completos (chrome + backdrop propios) que solo existen para mostrar casos
- * relacionados a un plan — hoy reservados para un CTA futuro (`sheetPlanId`
- * nunca se setea a un valor no-null todavía, ver comentario en su useState).
- * Van a next/dynamic, cada uno como overlay independiente (no hay shell
- * estático separable sin tocar esos archivos, fuera de ownership acá).
- * ssr:false: son 100% interactivos, arrancan cerrados, no aportan nada al
- * HTML inicial.
+ * ProjectDrawer (47 KB fuente) es un overlay completo (chrome + backdrop
+ * propio) que solo existe para mostrar el detalle de un proyecto relacionado.
+ * Va a next/dynamic (no hay shell estático separable sin tocar el archivo,
+ * fuera de ownership acá). ssr:false: es 100% interactivo, arranca cerrado,
+ * no aporta nada al HTML inicial.
  */
-const ProjectsSheet = dynamic(
-  () => import('@/components/ui/projects-sheet').then((m) => m.ProjectsSheet),
-  { ssr: false, loading: () => <OverlayLoadingFallback /> },
-)
-
 const ProjectDrawer = dynamic(
   () => import('@/components/ui/project-drawer').then((m) => m.ProjectDrawer),
   { ssr: false, loading: () => <OverlayLoadingFallback /> },
@@ -90,32 +81,6 @@ function OverlayLoadingFallback() {
       <span className="size-8 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent motion-reduce:animate-none" />
     </div>
   )
-}
-
-// Projects that open the full drawer — kept for future use
-const PLAN_RELATED_PROJECTS: Record<string, ThemeId[]> = {
-  web_basic: [],
-  web_interactive: ['botlode', 'assistify'],
-  web_premium: [],
-  app_mvp: [],
-  app_pro: [],
-  app_platform: [],
-}
-
-// External case studies — kept for future use
-type ExternalCaseStudy = { name: string; url: string; imageSrc: string }
-const PLAN_EXTERNAL_CASES: Record<string, ExternalCaseStudy[]> = {
-  web_basic: [
-    { name: 'Simon Mindset', url: 'https://simonmindset.com', imageSrc: BRAND_IMAGE_SRC },
-    { name: 'Pérez Yeregui', url: 'https://perez-yeregui2.vercel.app', imageSrc: BRAND_IMAGE_SRC },
-    { name: 'Metal Wailers', url: 'https://metalwailers.com', imageSrc: BRAND_IMAGE_SRC },
-    { name: 'Poncho Spanish', url: 'https://ponchospanish.com', imageSrc: BRAND_IMAGE_SRC },
-  ],
-  web_interactive: [{ name: 'Botrive', url: 'https://botrive.com', imageSrc: BRAND_IMAGE_SRC }],
-  web_premium: [
-    { name: 'Pulpiprint', url: 'https://pulpiprint.com', imageSrc: BRAND_IMAGE_SRC },
-    { name: 'MNL Tecno', url: 'https://mnltecno.com', imageSrc: BRAND_IMAGE_SRC },
-  ],
 }
 
 const PROJECT_ICONS: Record<string, React.FC<{ className?: string }>> = {
@@ -177,18 +142,14 @@ export function ServiciosContent() {
   const [tab, setTab] = useState<'web' | 'mobile'>('web')
   /** Drawer de detalle por plan (solo uno abierto a la vez). */
   const [openPlanDrawerId, setOpenPlanDrawerId] = useState<string | null>(null)
-  /** Panel inferior de ejemplos / drawer — reservado para un CTA dedicado; no enlazar al acordeón. */
-  const [sheetPlanId, setSheetPlanId] = useState<string | null>(null)
   const [drawerProject, setDrawerProject] = useState<ProjectItem | null>(null)
   /**
-   * Gate de montaje para los overlays dinámicos: ProjectsSheet/ProjectDrawer
-   * arrancan sin montar (su chunk nunca se pide) y quedan montados para
-   * siempre desde la primera vez que se abren — así next/dynamic solo
-   * dispara el fetch al abrir, y las animaciones de cierre (que necesitan
-   * el componente montado con open=false) siguen funcionando en re-aperturas.
+   * Gate de montaje del overlay dinámico ProjectDrawer: arranca sin montar
+   * (su chunk nunca se pide) y queda montado para siempre desde la primera
+   * vez que se abre — así next/dynamic solo dispara el fetch al abrir, y las
+   * animaciones de cierre (que necesitan el componente montado con
+   * open=false) siguen funcionando en re-aperturas.
    */
-  const everOpenedSheetRef = useRef(false)
-  everOpenedSheetRef.current ||= sheetPlanId !== null
   const everOpenedProjectDrawerRef = useRef(false)
   everOpenedProjectDrawerRef.current ||= drawerProject !== null
 

@@ -17,7 +17,7 @@ están en la última página. Si no, también está bien — el objetivo es que
 nadie pague de más por desconocimiento.
 
 Manuel
-[theapexweb.com](https://theapexweb.com)
+[theapexweb.com](https://www.theapexweb.com)
 
 ---
 
@@ -252,8 +252,8 @@ Soy Manuel. Diseño y programo web + apps móviles desde Argentina, full-stack.
 Stack opinado: Flutter, Next.js, Supabase, Riverpod, TypeScript.
 
 - WhatsApp directo: [+54 9 11 3427 2488](https://wa.me/5491134272488)
-- Sitio: [theapexweb.com](https://theapexweb.com)
-- Casos completos: [theapexweb.com/proyectos](https://theapexweb.com/proyectos)
+- Sitio: [theapexweb.com](https://www.theapexweb.com)
+- Casos completos: [theapexweb.com/proyectos](https://www.theapexweb.com/muestrario)
 
 Trabajo con 1-2 clientes en simultáneo. Sin overbooking. Si te interesa
 arrancar conmigo, escribime y vemos si tu proyecto encaja.
@@ -269,6 +269,6 @@ Manuel
 ---
 
 *Esta guía se actualiza dos veces al año (mayo y noviembre). La versión más
-reciente está siempre en [theapexweb.com/guia](https://theapexweb.com).*
+reciente está siempre en [theapexweb.com/guia](https://www.theapexweb.com).*
 
 *© 2026 APEX · Manuel Navarro · Buenos Aires, Argentina*

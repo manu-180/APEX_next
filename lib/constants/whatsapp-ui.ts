@@ -13,9 +13,6 @@
 /** Hex oficial del verde WhatsApp (para focus rings puntuales). */
 export const WA_GREEN = '#25D366'
 
-/** Hex oficial del teal WhatsApp (extremo oscuro del gradiente). */
-export const WA_TEAL = '#128C7E'
-
 /** Gradiente sólido del CTA de dinero (idéntico a `.btn-wa`). */
 export const WA_GRADIENT = 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)'
 

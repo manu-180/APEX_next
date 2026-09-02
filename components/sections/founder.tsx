@@ -8,7 +8,7 @@ import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
-import { PROJECTS, ROUTES } from '@/lib/constants'
+import { PROJECTS, ROUTES, YEARS_EXP } from '@/lib/constants'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { EASE_OUT } from '@/lib/motion'
 import { useParallaxNumber } from '@/hooks/use-parallax-number'
@@ -24,8 +24,6 @@ import { cn } from '@/lib/utils/cn'
 
 const WA_MSG_FOUNDER =
   'Hola Manuel, leí quién está detrás de APEX y quiero contarte mi proyecto. ¿Lo charlamos?'
-
-const YEARS_EXP = new Date().getFullYear() - 2021
 
 /** Verdades canónicas (AUDIT_ADDENDUM) — nada inflado. */
 const FOUNDER_STATS = [

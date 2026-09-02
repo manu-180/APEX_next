@@ -19,15 +19,12 @@ export function whatsappUrl(message: string): string {
 
 /**
  * CTAs generales (navbar, hero, contacto, pie, atajos). Breve, sin emoji.
- * Los mensajes contextualizados van en waMsgPlan / waMsgEstimator.
+ * Los mensajes contextualizados van en waMsgPlan.
  */
 export const WA_MSG_GENERIC = `Hola, quiero potenciarme con tecnología. ¿Charlamos?`
 
 /** Navbar “Hablemos”, hero, contacto, atajo Ctrl+Shift+H */
 export const WA_MSG_NAV = WA_MSG_GENERIC
-
-/** Página Sobre mí — CTA final */
-export const WA_MSG_ABOUT = `Hola, quiero potenciarme con tecnología. ¿Agendamos una reunión?`
 
 /** Lab — CTA de los artefactos 3D: el visitante pide su boceto 3D gratis. */
 export const WA_MSG_LAB = `Hola Manuel, vi los objetos 3D de tu laboratorio y quiero algo así para mi marca. ¿Arrancamos con el boceto gratis?`
@@ -37,20 +34,6 @@ export const WA_MSG_FOOTER_LINK = WA_MSG_GENERIC
 
 export function waMsgPlan(planName: string): string {
   return `Hola, consulto por el plan «${planName}» desde tu web. ¿Me orientás con los próximos pasos?`
-}
-
-/** Estimador: lista de módulos incluidos + total */
-export function waMsgEstimator(params: {
-  kind: 'web' | 'mobile'
-  moduleLabels: string[]
-  totalFormatted: string
-}): string {
-  const tipo = params.kind === 'web' ? 'Sitio web' : 'App móvil'
-  const list =
-    params.moduleLabels.length > 0
-      ? params.moduleLabels.map((l) => `• ${l}`).join('\n')
-      : '• (solo base)'
-  return `Hola, usé el estimador de tu web (${tipo}).\n${list}\nTotal referencia: ${params.totalFormatted}\n¿Lo revisamos juntos?`
 }
 
 /** Hosts a los que aceptamos mandar a un visitante desde un CTA o desde /gracias. */

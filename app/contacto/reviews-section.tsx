@@ -185,7 +185,7 @@ export function ReviewsSection() {
                           dateTime={r.date}
                           className="text-xs tabular-nums text-[var(--color-on-surface-variant)] opacity-60"
                         >
-                          {new Date(r.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
+                          {new Date(r.date).toLocaleDateString('es-AR', { timeZone: 'UTC', year: 'numeric', month: 'short' })}
                         </time>
                       </div>
 
@@ -217,7 +217,7 @@ export function ReviewsSection() {
                                 dateTime={reply.date}
                                 className="text-xs tabular-nums text-[var(--color-on-surface-variant)] opacity-60"
                               >
-                                {new Date(reply.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short' })}
+                                {new Date(reply.date).toLocaleDateString('es-AR', { timeZone: 'UTC', year: 'numeric', month: 'short' })}
                               </time>
                             )}
                           </p>

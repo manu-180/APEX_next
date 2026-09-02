@@ -1,6 +1,5 @@
 // ─── App Constants ───────────────────────────────────────────────────────────
 
-export const APP_NAME = 'APEX Portfolio'
 export const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.theapexweb.com'
 /** Logo / favicon / OG / previews: una sola imagen en `public/`. */
 export const BRAND_IMAGE_SRC = '/apex-logo.png' as const
@@ -12,6 +11,9 @@ export const WHATSAPP_PHONE_DISPLAY = '+54 9 11 3427 2488'
 
 // ─── Owner / Admin ────────────────────────────────────────────────────────────
 export const ADMIN_UUID = '37dad3e9-531c-4657-8db6-ddebbdcfa878'
+
+// ─── Trayectoria ─────────────────────────────────────────────────────────────
+export const YEARS_EXP = new Date().getFullYear() - 2021
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 export const ROUTES = {
@@ -55,8 +57,5 @@ export const BOOKING_SLOT_HOURS = Array.from({ length: 11 }, (_, i) => 9 + i)
 export function formatBookingHour(h: number): string {
   return `${String(h).padStart(2, '0')}:00`
 }
-
-/** @deprecated Usar BOOKING_SLOT_HOURS + formatBookingHour */
-export const BOOKING_HOURS = BOOKING_SLOT_HOURS.map(formatBookingHour)
 
 export const BLOCKED_WEEKDAYS = [0] // 0 = Sunday

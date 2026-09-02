@@ -1,6 +1,7 @@
 'use client'
 
 import './cta-tech-card.css'
+
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'

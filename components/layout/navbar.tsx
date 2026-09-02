@@ -225,7 +225,7 @@ export function Navbar({
           className="relative tap-44 flex min-w-0 shrink-0 items-center gap-2 sm:gap-3 group"
           prefetch={false}
         >
-          <ApexLogoMark priority />
+          <ApexLogoMark />
           <span className="hidden sm:block font-heading text-lg font-extrabold text-[var(--color-on-surface)] transition-colors duration-200 group-hover:text-[var(--color-primary)]">
             APEX
           </span>
