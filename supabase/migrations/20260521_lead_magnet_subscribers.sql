@@ -59,22 +59,32 @@ create trigger set_lead_magnet_updated_at
 -- RLS
 alter table public.lead_magnet_subscribers enable row level security;
 
--- Insert anónimo (vía API anon key) — el usuario se suscribe desde el form
+-- Insert anónimo (vía API anon key) — el usuario se suscribe desde el form.
+-- Corregido 2026-09-02 (auditoría, antes de aplicarse en prod):
+--   · el with check exige un email con forma mínima y topa name/project_type;
+--   · NO hay policy de UPDATE para anon: la versión anterior tenía
+--     `for update using(true) with check(true)`, que dejaba a cualquier anónimo
+--     pisar TODAS las filas (un anónimo no tiene identidad, "su propio email"
+--     no existe). El upsert se resuelve del lado servidor con service_role.
+drop policy if exists "anon can upsert own email" on public.lead_magnet_subscribers;
 drop policy if exists "anon can insert" on public.lead_magnet_subscribers;
 create policy "anon can insert"
   on public.lead_magnet_subscribers
   for insert
   to anon
-  with check (true);
+  with check (
+    email is not null
+    and char_length(email) between 3 and 254
+    and position('@' in email) > 1
+    and (name is null or char_length(name) <= 80)
+    and (project_type is null or char_length(project_type) <= 60)
+  );
 
--- Anon también puede update SU PROPIO email (upsert path) — sólo sobre el row con su email
-drop policy if exists "anon can upsert own email" on public.lead_magnet_subscribers;
-create policy "anon can upsert own email"
-  on public.lead_magnet_subscribers
-  for update
-  to anon
-  using (true)
-  with check (true);
+-- RLS no filtra columnas; GRANT sí. El anónimo sólo puede escribir los campos
+-- del formulario: no puede precargar el estado del nurture (pdf_sent_at,
+-- email_N_sent_at, converted_at...) ni envenenar las métricas.
+revoke insert on public.lead_magnet_subscribers from anon;
+grant insert (email, name, project_type, source) on public.lead_magnet_subscribers to anon;
 
 -- Sólo service_role puede leer todo (admin / edge functions)
 -- (anon NO puede leer la lista, por privacidad)

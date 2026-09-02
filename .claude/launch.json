@@ -2,9 +2,25 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "APEX Next.js Dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
       "name": "apex-prod",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start", "--", "-p", "3210"],
+      "runtimeArgs": [
+        "run",
+        "start",
+        "--",
+        "-p",
+        "3210"
+      ],
       "port": 3210
     }
   ]

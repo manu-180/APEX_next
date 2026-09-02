@@ -93,5 +93,6 @@ violaciones reales y recién ahí pasar a `Content-Security-Policy` enforcing.
    />
    ```
 3. En `handleSubmit`, pasar el valor: `await confirmBooking({ ..., honeypot: company })`
-   (el hook `useBooking` ya acepta `honeypot` y lo reenvía como `company`; el
-   route lo detecta y descarta la petición en silencio con 200 falso).
+   (el hook `useBooking` corta ANTES del INSERT en `appointments` si el honeypot
+   viene lleno, y el route lo vuelve a chequear y descarta la petición con un
+   200 de la misma forma que el éxito real).

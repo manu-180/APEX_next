@@ -35,6 +35,10 @@ export default function GlobalError({
 
   return (
     <html lang="es">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Algo salió mal — APEX</title>
+      </head>
       <body>
         {/* Fondo con profundidad (nada de negro plano): base slate + dos glows
             radiales muy tenues. Todo en CSS inline porque globals.css no cargó. */}
@@ -43,7 +47,7 @@ export default function GlobalError({
           html,body{margin:0;padding:0}
           body{
             min-height:100dvh;
-            font-family:'Oxanium',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+            font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
             color:#e6e8f0;
             background-color:#080a12;
             background-image:

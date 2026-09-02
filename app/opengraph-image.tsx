@@ -1,7 +1,10 @@
 import { ImageResponse } from 'next/og'
 
-// Runtime Node por defecto: next/og genera la imagen igual y la página queda
-// estática en build (edge la forzaba a dinámica en cada request de crawler).
+// Edge a propósito: en Next 14 next/og sobre el runtime Node revienta con
+// "Invalid URL" (fileURLToPath de la fuente Noto embebida, verificado 2026-09-02
+// en Windows; no se pudo verificar en Linux). No migrar a Node sin probarlo en
+// un preview de Vercel.
+export const runtime = 'edge'
 export const alt = 'Manuel Navarro — Desarrollo Web & Mobile | APEX'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
@@ -28,7 +31,7 @@ export default function OgImage() {
             position: 'absolute',
             inset: 0,
             backgroundImage:
-              'linear-gradient(rgba(0,175,204,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,175,204,0.06) 1px, transparent 1px)',
+              'linear-gradient(180deg, rgba(0,175,204,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,175,204,0.06) 1px, transparent 1px)',
             backgroundSize: '48px 48px',
           }}
         />

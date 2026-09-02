@@ -181,6 +181,13 @@ export function useBooking() {
       honeypot?: string
     }) => {
       if (!supabase || selectedHour === null) return
+      // Honeypot en el cliente, ANTES del INSERT: un bot que llena el campo
+      // trampa no tiene que ocupar un turno en la DB. El route lo vuelve a
+      // chequear del lado servidor para el mensaje de WhatsApp.
+      if (opts.honeypot && opts.honeypot.trim().length > 0) {
+        setSuccess(true)
+        return
+      }
       setSubmitting(true)
       setSubmitError(null)
       const dateStr = formatLocalDateYMD(selectedDate)

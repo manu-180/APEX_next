@@ -49,9 +49,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Formato no soportado.' }, { status: 415 })
   }
 
-  // 3) Tope de tamaño: leemos texto crudo y cortamos antes de parsear.
+  // 3) Tope de tamaño. Pre-filtro barato por content-length (falsificable,
+  //    pero sólo sirve para mentir hacia abajo) y medición real en bytes como
+  //    autoridad — `raw.length` son unidades UTF-16, no bytes.
+  const declared = Number(req.headers.get('content-length') ?? 0)
+  if (Number.isFinite(declared) && declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Solicitud demasiado grande.' }, { status: 413 })
+  }
   const raw = await req.text()
-  if (raw.length > MAX_BODY_BYTES) {
+  if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) {
     return NextResponse.json({ error: 'Solicitud demasiado grande.' }, { status: 413 })
   }
 
@@ -76,7 +82,10 @@ export async function POST(req: Request) {
   //    aprende nada y no gastamos un mensaje de WhatsApp.
   if (typeof body.company === 'string' && body.company.trim().length > 0) {
     console.warn('[booking] honeypot activado — petición descartada en silencio')
-    return NextResponse.json({ ok: true, client: false, admin: false })
+    // Misma forma que el éxito real y una demora corta: que el bot no pueda
+    // distinguir la trampa por el JSON ni por responder al instante.
+    await new Promise((r) => setTimeout(r, 400 + Math.random() * 600))
+    return NextResponse.json({ ok: true, client: true, admin: true })
   }
 
   const phone = typeof body.phone === 'string' ? body.phone : ''
@@ -138,7 +147,11 @@ export async function POST(req: Request) {
     const json = (await res.json().catch(() => ({}))) as Record<string, unknown>
 
     if (!res.ok) {
-      console.error('[booking] bridge apex-leads falló', res.status, json)
+      // Sólo campos conocidos: el body del bridge puede devolver el teléfono.
+      console.error('[booking] bridge apex-leads falló', res.status, {
+        code: typeof json.code === 'string' ? json.code : undefined,
+        error: typeof json.error === 'string' ? json.error.slice(0, 200) : undefined,
+      })
       return NextResponse.json(
         { error: 'No se pudo enviar la confirmación por WhatsApp.' },
         { status: 502 }

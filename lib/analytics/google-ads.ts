@@ -60,5 +60,8 @@ export const trackGoogleAdsHeroCtaClick = () => {
 const GOOGLE_ADS_BOOKING_LABEL = ''
 
 export const trackGoogleAdsBookingConfirmed = () => {
-  trackGoogleAdsConversion(GOOGLE_ADS_BOOKING_LABEL, 'Booking Confirmed')
+  // Sin label todavía (falta crear la conversion action en Ads): no-op
+  // silencioso, sin warn por cada reserva en producción.
+  if (!GOOGLE_ADS_BOOKING_LABEL) return
+  trackGoogleAdsConversion(GOOGLE_ADS_BOOKING_LABEL, 'Booking confirmado')
 }

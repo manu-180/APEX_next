@@ -82,8 +82,10 @@ const nextConfig = {
           // los logs de Vercel con prefijo `[csp]`. Después de 1-2 semanas sin
           // reportes legítimos, renombrar a `Content-Security-Policy`.
           // Orígenes: gtag/Google Ads (conversiones), Meta Pixel, Supabase
-          // (REST + Realtime wss). Next inyecta scripts inline (hidratación +
-          // Speculation Rules) → 'unsafe-inline' es obligatorio sin nonces.
+          // (REST + Realtime wss), microlink (capturas en vivo de /muestrario).
+          // Next inyecta scripts inline (hidratación + Speculation Rules) →
+          // 'unsafe-inline' es obligatorio sin nonces. Ruido esperado: el pixel
+          // ads/ga-audiences usa www.google.<ccTLD> del país del visitante.
           {
             key: 'Content-Security-Policy-Report-Only',
             value: [
@@ -94,9 +96,9 @@ const nextConfig = {
               "form-action 'self'",
               "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com https://www.google.com.ar https://www.facebook.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://analytics.google.com https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com https://www.google.com.ar https://stats.g.doubleclick.net https://www.facebook.com https://api.microlink.io",
               "font-src 'self' data:",
-              "connect-src 'self' https://osoijzjxzxdkwmobctyb.supabase.co wss://osoijzjxzxdkwmobctyb.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com https://connect.facebook.net https://www.facebook.com",
+              "connect-src 'self' https://osoijzjxzxdkwmobctyb.supabase.co wss://osoijzjxzxdkwmobctyb.supabase.co https://analytics.google.com https://*.analytics.google.com https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://stats.g.doubleclick.net https://www.google.com https://connect.facebook.net https://www.facebook.com",
               "frame-src 'self' https://td.doubleclick.net https://www.googletagmanager.com https://www.facebook.com",
               "worker-src 'self' blob:",
               'report-uri /api/csp-report',
@@ -142,8 +144,7 @@ const nextConfig = {
      * inline. Dejarla encendida no optimizaba nada y hacía creer que el CSS ya
      * estaba resuelto — que es justamente por qué el hallazgo de "recursos que
      * bloquean el renderizado" sobrevivió tanto en PageSpeed.
-     * `critters` queda como dependencia huérfana en package.json: se puede
-     * desinstalar.
+     * `critters` se desinstaló el 2026-09-02.
      */
     scrollRestoration: true,
   },
@@ -156,7 +157,4 @@ const nextConfig = {
   },
 }
 
-// Sentry se carga dynamically desde SentryProvider en runtime, no se envuelve aquí.
-// Esto evita que el SDK (~85KB) entre al bundle del cliente al inicio.
-// Trade-off: no se hace upload automático de source maps en producción.
 export default nextConfig

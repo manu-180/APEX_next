@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useInsertionEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
@@ -27,7 +27,11 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
    * sola vez y siempre lee los handlers frescos.
    */
   const handlersRef = useRef(handlers)
-  handlersRef.current = handlers
+  // En insertion effect y no en render: con render concurrente un árbol
+  // descartado podría dejar la ref apuntando a handlers de un render abandonado.
+  useInsertionEffect(() => {
+    handlersRef.current = handlers
+  })
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

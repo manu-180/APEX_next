@@ -26,7 +26,7 @@ verificado en browser (375 y 1280, consola limpia, sin overflow horizontal).
 - CSS de `/sobre-mi` (`cta-tech-card.css`) y 404 (`not-found.css`) extraído a chunks por ruta: home queda con 2 hojas. `globals.css` 1911 → 1550 líneas.
 - Preconnect a `fonts.gstatic.com` eliminado (fuentes self-hosted). Logo del navbar sin `priority` (competía con el CSS en el critical path).
 - Chunk `2117` con "JS antiguo": es `polyfill-module` de Next (1,4 KB reales, no 11,6). No se toca: lo requiere Safari ≤ 15.3 del browserslist.
-- `opengraph-image` sin `runtime = 'edge'` → se genera estática en build.
+- **`opengraph-image` estaba ROTA en producción (PNG de 0 bytes, verificado con curl):** Satori no parsea `linear-gradient(rgba(...) 1px, ...)` sin dirección explícita. Fix: `180deg`. Queda en edge: en Node, next/og de Next 14 revienta con "Invalid URL" (verificado en Windows, no probado en Linux).
 
 **UX / conversión:**
 - **Bug de medición:** los CTA de `/web-para-contadores|medicos|abogados` eran `<a href="wa.me">` planos: no disparaban conversión de Ads ni Lead de Meta ni pasaban por `/gracias`. Ahora usan `WhatsAppOutboundLink`.

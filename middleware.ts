@@ -29,6 +29,13 @@ const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 const RL_LIMIT = 30
 const RL_WINDOW_MS = 60_000
 
+// Rutas conocidas: el path entra en la clave del rate limit y no puede
+// elegirlo el atacante (/api/<random> crearía claves ilimitadas).
+const KNOWN_PATHS = new Set(['/api/booking/whatsapp', '/api/csp-report'])
+const CSP_REPORT_PATH = '/api/csp-report'
+// Una página con 20 recursos bloqueados dispara ~20 POSTs de reporte.
+const CSP_REPORT_LIMIT = 300
+
 function isAllowedOrigin(req: NextRequest): boolean {
   const secFetchSite = req.headers.get('sec-fetch-site')
   // Navegadores modernos: same-origin/none son seguros; cross-site/same-site no.
@@ -64,7 +71,14 @@ export function middleware(req: NextRequest) {
     )
   }
 
-  if (MUTATING_METHODS.has(method) && !isAllowedOrigin(req)) {
+  const pathname = req.nextUrl.pathname
+  // El navegador manda los reportes de CSP con Sec-Fetch-Dest: report y sin
+  // garantía de Origin/Sec-Fetch-Site: si el chequeo de origen los tirara con
+  // un 403 silencioso, creeríamos que la CSP está limpia y la pasaríamos a
+  // enforcing a ciegas. Se exime del origen, no del rate limit.
+  const isCspReport = pathname === CSP_REPORT_PATH
+
+  if (!isCspReport && MUTATING_METHODS.has(method) && !isAllowedOrigin(req)) {
     return NextResponse.json(
       { error: 'Origen no permitido.' },
       { status: 403 }
@@ -72,9 +86,10 @@ export function middleware(req: NextRequest) {
   }
 
   // Rate limit por IP (clave por método+ruta para no mezclar GET con POST).
-  const ip = clientIpFromHeaders(req.headers)
-  const key = `${ip}:${method}:${req.nextUrl.pathname}`
-  const rl = rateLimit(key, RL_LIMIT, RL_WINDOW_MS)
+  const ip = req.ip ?? clientIpFromHeaders(req.headers)
+  const path = KNOWN_PATHS.has(pathname) ? pathname : '/api/*'
+  const key = `${ip}:${method}:${path}`
+  const rl = rateLimit(key, isCspReport ? CSP_REPORT_LIMIT : RL_LIMIT, RL_WINDOW_MS)
   if (!rl.ok) {
     return NextResponse.json(
       { error: 'Demasiadas solicitudes. Esperá un momento y probá de nuevo.' },
