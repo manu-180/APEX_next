@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useLayoutEffect } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { m, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
-import { WHATSAPP_NUMBER } from '@/lib/constants'
+import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
 import { isTrustedWhatsAppUrl } from '@/lib/whatsapp'
 import { WA_GRADIENT, WA_GREEN, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
 import { DELAY_AFTER_PANEL, DUR_REVEAL, DUR_SLOW, EASE_OUT } from '@/lib/motion'
@@ -93,6 +93,32 @@ export function GraciasContent() {
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
+  }, [])
+
+  /* ── Rescate de escritorio ─────────────────────────────────────────────
+     Si el visitante está en una PC sin WhatsApp Desktop ni sesión de WhatsApp
+     Web, wa.me lo deja en una pantalla de QR y el lead se evapora en silencio.
+     Copiar el número al portapapeles le da una salida que no depende de que
+     ningún cliente de WhatsApp esté instalado. */
+  const [copied, setCopied] = useState(false)
+  const copyTimer = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (copyTimer.current) window.clearTimeout(copyTimer.current)
+    }
+  }, [])
+
+  const copyPhone = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(WHATSAPP_PHONE_DISPLAY)
+      setCopied(true)
+      if (copyTimer.current) window.clearTimeout(copyTimer.current)
+      copyTimer.current = window.setTimeout(() => setCopied(false), 2400)
+    } catch {
+      // Clipboard bloqueado (http, permisos): el número ya está visible en
+      // pantalla, así que el usuario puede copiarlo a mano. Sin ruido.
+    }
   }, [])
 
   return (
@@ -219,6 +245,36 @@ export function GraciasContent() {
             <HomeIcon className="size-4" />
             Volver al inicio
           </a>
+        </m.div>
+
+        {/* Rescate: número visible + copiar. Es la salida de quien está en una
+            PC sin WhatsApp instalado, donde wa.me solo muestra un QR. */}
+        <m.div
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: DUR_SLOW, ease: EASE_OUT }}
+          className="mt-10"
+        >
+          <p className="text-xs text-[var(--color-on-surface-variant)]">
+            ¿No se abrió WhatsApp? Guardá mi número y escribime cuando quieras.
+          </p>
+          <div className="mt-3 inline-flex items-center gap-1 rounded-xl border border-[var(--glass-border)] bg-[var(--color-surface-low)] p-1">
+            <span className="px-3 font-mono text-sm tabular-nums text-[var(--color-on-surface)]">
+              {WHATSAPP_PHONE_DISPLAY}
+            </span>
+            <button
+              type="button"
+              onClick={copyPhone}
+              className="inline-flex h-9 min-w-[6.5rem] items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold text-[var(--color-primary)] transition-[background-color,transform] duration-200 ease-out hover:bg-[rgba(var(--color-primary-rgb),0.1)] active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+            >
+              {copied ? '¡Copiado!' : 'Copiar'}
+            </button>
+          </div>
+          {/* Confirmación anunciada aparte del botón: cambiar su label sin
+              región viva deja al lector de pantalla sin saber qué pasó. */}
+          <span role="status" aria-live="polite" className="sr-only">
+            {copied ? 'Número copiado al portapapeles' : ''}
+          </span>
         </m.div>
 
       </section>

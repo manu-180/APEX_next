@@ -177,6 +177,8 @@ export function useBooking() {
       contactInfo: string
       contactType: 'whatsapp' | 'email'
       name?: string
+      /** Honeypot: valor del campo trampa de la UI (vacío en humanos). */
+      honeypot?: string
     }) => {
       if (!supabase || selectedHour === null) return
       setSubmitting(true)
@@ -221,6 +223,9 @@ export function useBooking() {
               dateIso: localDayToMiddayIso(selectedDate),
               hour: selectedHour,
               clientName: opts.name?.trim() || undefined,
+              // Campo trampa: la UI lo manda vacío; un bot que autocompleta
+              // todo lo llenará y el endpoint lo descarta en silencio.
+              company: opts.honeypot?.trim() || undefined,
             }),
           })
           if (!res.ok) {

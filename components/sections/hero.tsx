@@ -65,18 +65,22 @@ const FEATURES = [
     tag: 'BOCETO',
     value: 'Gratis en 24-48 h',
     desc: 'Ves cómo queda tu web antes de pagar un peso. Si no te gusta, no pagás.',
+    /** Versión condensada para el spec-strip de mobile (ver §Right column). */
+    compact: { value: 'Gratis', note: 'en 24-48 h' },
   },
   {
     icon: <TimerIcon />,
     tag: 'PLAZO',
     value: 'Entrega en 15 días',
     desc: 'Pactamos una fecha. La cumplimos. Sin excusas.',
+    compact: { value: '15 días', note: 'fecha pactada' },
   },
   {
     icon: <PriceTagIcon />,
     tag: 'PRECIO',
     value: 'Desde ARS 300k',
     desc: 'Precio cerrado por escrito desde el inicio, en 3 cuotas sin interés.',
+    compact: { value: '$300k', note: 'precio cerrado' },
   },
 ]
 
@@ -355,10 +359,54 @@ export function HeroSection() {
               </Link>
             </div>
 
-            {/* Strip de confianza — datos reales, sin métricas infladas */}
+            {/* Strip de confianza — datos reales, sin métricas infladas.
+
+                Hasta lg la columna derecha (las 3 FeatureCard con boceto/plazo/
+                precio) NO se renderiza, así que el visitante de mobile —el grueso
+                del tráfico de búsqueda— se quedaba sin las tres cifras que
+                responden su objeción real. Debajo de lg mostramos esas cifras
+                condensadas en un spec-strip; desde lg vuelven las viñetas, que
+                ahí sí complementan a las cards en vez de repetirlas. */}
             <div className="mt-8">
               <div className="divider-theme mb-4" aria-hidden="true" />
-              <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+
+              <dl
+                className="grid grid-cols-3 overflow-hidden rounded-xl border lg:hidden"
+                style={{
+                  backgroundColor: 'var(--glass-bg)',
+                  borderColor: 'var(--glass-border)',
+                }}
+              >
+                {FEATURES.map((f, i) => (
+                  <div
+                    key={f.tag}
+                    className={cn(
+                      'min-w-0 px-2 py-3 text-center sm:px-3',
+                      i > 0 && 'border-l',
+                    )}
+                    style={i > 0 ? { borderColor: 'var(--glass-border)' } : undefined}
+                  >
+                    <dt
+                      className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] opacity-70"
+                      style={{ color: 'var(--color-primary)' }}
+                    >
+                      {f.tag}
+                    </dt>
+                    <dd className="mt-1 text-sm font-extrabold leading-tight tabular-nums text-[var(--color-on-surface)]">
+                      {f.compact.value}
+                      <span className="mt-0.5 block text-[10px] font-normal leading-tight text-[var(--color-on-surface-variant)]">
+                        {f.compact.note}
+                      </span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <p className="mt-3 text-xs text-[var(--color-on-surface-variant)] lg:hidden">
+                Te respondo yo, en menos de 1 hora.
+              </p>
+
+              <ul className="hidden flex-wrap items-center gap-x-6 gap-y-2 lg:flex">
                 {TRUST_ITEMS.map((item) => (
                   <li
                     key={item}

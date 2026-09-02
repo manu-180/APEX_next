@@ -56,3 +56,7 @@ scripts/meshy/roster-manifest.json
 
 # Screenshots de verificación del muestrario
 muestrario-*.png
+
+# Python bytecode (scripts/google-ads)
+__pycache__/
+*.py[cod]

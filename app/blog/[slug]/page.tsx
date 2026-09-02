@@ -217,6 +217,7 @@ export default async function BlogPostPage({
               className="text-xs text-[var(--color-on-surface-variant)] opacity-60 tabular-nums uppercase tracking-wider"
             >
               {new Date(post.publishedAt).toLocaleDateString('es-AR', {
+                timeZone: 'UTC',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',

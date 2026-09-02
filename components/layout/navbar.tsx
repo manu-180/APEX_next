@@ -36,6 +36,20 @@ const NAV_LINKS = [
   { href: ROUTES.contact, label: 'Contacto', external: false },
 ] as const
 
+/**
+ * En desktop el muestrario vive en el CTA del navbar, que es `hidden
+ * md:inline-flex`: en mobile no existía ninguna entrada a /muestrario, o sea
+ * que la prueba de trabajo real quedaba inalcanzable justo donde llega el
+ * grueso del tráfico. El drawer recibe la lista con Muestrario incluido,
+ * ubicado después de Servicios (es la respuesta natural a "¿y qué hiciste?").
+ */
+const MOBILE_NAV_LINKS = [
+  NAV_LINKS[0],
+  NAV_LINKS[1],
+  { href: ROUTES.muestrario, label: 'Muestrario', external: false },
+  ...NAV_LINKS.slice(2),
+] as const
+
 interface NavbarProps {
   onToggleDarkMode: (e?: React.MouseEvent) => void
   onShowShortcuts: () => void
@@ -422,7 +436,7 @@ export function Navbar({
       <MobileDrawer
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
-        links={NAV_LINKS}
+        links={MOBILE_NAV_LINKS}
         currentPath={pathname}
         whatsappHref={WHATSAPP_NAV_HREF}
         onToggleTheme={onToggleDarkMode}

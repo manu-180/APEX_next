@@ -718,7 +718,11 @@ function UnifiedPricingCard({
               style={{ background: WA_GRADIENT }}
             >
               <WhatsAppIcon className="size-4 transition-transform duration-200 group-hover/wa:scale-110 motion-reduce:transform-none" />
-              {plan.price === null ? 'Consultar por WhatsApp' : 'Empezar proyecto'}
+              {/* "Empezar proyecto" pedía la compra; el ofrecimiento real del
+                  sitio es el boceto gratis. Alinear el label con el del hero, la
+                  home y las verticales deja UNA sola pregunta repetida en todo
+                  el funnel, y es la de menor compromiso. */}
+              {plan.price === null ? 'Consultar por WhatsApp' : 'Quiero mi boceto gratis'}
             </WhatsAppOutboundLink>
 
             <button

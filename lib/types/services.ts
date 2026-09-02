@@ -22,16 +22,6 @@ export interface PricingPlan {
   powerStatement: string
 }
 
-export interface EstimatorModule {
-  id: string
-  label: string
-  description: string
-  price: number
-  originalPrice: number
-  type: 'web' | 'app'
-  isCore?: boolean
-}
-
 export const WEB_PLANS: PricingPlan[] = [
   {
     id: 'web_basic',
@@ -236,33 +226,6 @@ export const APP_PLANS: PricingPlan[] = [
   },
 ]
 
-export const WEB_MODULES: EstimatorModule[] = [
-  { id: 'w1', label: 'Identidad Digital (Landing)', description: 'Tu presencia online base', price: 300000, originalPrice: 400000, type: 'web', isCore: true },
-  { id: 'w2', label: 'Cuentas de Usuario', description: 'Login, registro, perfiles', price: 200000, originalPrice: 300000, type: 'web' },
-  { id: 'w3', label: 'Base de Datos Dinámica', description: 'CRUD + relaciones + filtros', price: 250000, originalPrice: 350000, type: 'web' },
-  { id: 'w4', label: 'Gestión de Contenidos (CMS)', description: 'Panel admin para editar contenido', price: 200000, originalPrice: 300000, type: 'web' },
-  { id: 'w5', label: 'Pasarela de Pagos', description: 'MercadoPago / Stripe integrado', price: 300000, originalPrice: 450000, type: 'web' },
-  { id: 'w6', label: 'Chat o Soporte en Vivo', description: 'Atención al cliente en tiempo real', price: 100000, originalPrice: 150000, type: 'web' },
-  { id: 'w7', label: 'Panel de Administración Full', description: 'Dashboard completo para tu equipo', price: 400000, originalPrice: 600000, type: 'web' },
-]
-
-export const APP_MODULES: EstimatorModule[] = [
-  { id: 'a1', label: 'App Híbrida (iOS + Android)', description: 'Flutter multiplataforma', price: 1200000, originalPrice: 1600000, type: 'app', isCore: true },
-  { id: 'a2', label: 'Autenticación Biométrica', description: 'Face ID, huella digital', price: 350000, originalPrice: 500000, type: 'app' },
-  { id: 'a3', label: 'Sistema de Notificaciones', description: 'Push notifications personalizadas', price: 300000, originalPrice: 450000, type: 'app' },
-  { id: 'a4', label: 'Geolocalización Avanzada', description: 'Mapas, tracking, geofencing', price: 600000, originalPrice: 900000, type: 'app' },
-  { id: 'a5', label: 'Panel Admin Web', description: 'Dashboard web para gestión', price: 700000, originalPrice: 1000000, type: 'app' },
-  { id: 'a6', label: 'Cobros In-App & Wallet', description: 'Pagos dentro de la app', price: 500000, originalPrice: 750000, type: 'app' },
-  { id: 'a7', label: 'Modo Offline (Sync)', description: 'Funciona sin conexión', price: 450000, originalPrice: 650000, type: 'app' },
-]
-
 export function formatARS(amount: number): string {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount)
-}
-
-/** Texto del CTA principal de la card según modalidad de cobro. */
-export function getPlanCtaLabel(plan: PricingPlan): string {
-  if (plan.price === null) return 'Solicitar presupuesto'
-  if (plan.billing === 'month') return 'Consultar retainer mensual'
-  return 'Empezar proyecto'
 }

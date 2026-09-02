@@ -218,6 +218,7 @@ export default function BlogPage() {
                         className="text-[10px] text-[var(--color-on-surface-variant)] opacity-60 uppercase tracking-wider tabular-nums"
                       >
                         {new Date(post.publishedAt).toLocaleDateString('es-AR', {
+                          timeZone: 'UTC',
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',

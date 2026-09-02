@@ -11,7 +11,7 @@ import type { ThemeId } from '@/lib/types/theme'
  * (neutral, botlode, assistify, contact-engine, luma-invita) no se pueden
  * extruir limpio → caen al núcleo icosaédrico por defecto (ver getShapeGeometry).
  */
-export const LOGO_PATHS: Partial<Record<ThemeId, string>> = {
+const LOGO_PATHS: Partial<Record<ThemeId, string>> = {
   flutter:
     'M14.314 0L2.3 12 6 15.7 21.684 0h-7.37zm0 11.066L7.758 17.58l6.556 6.42h7.37L14.758 17.58l6.926-6.514z',
   nextjs:

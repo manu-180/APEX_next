@@ -2,16 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── BotLode Chat Widget ──────────────────────────────────────────────────
-   Fuerza transparencia y corrección táctil en el iframe del player.
-   Se aplica globalmente para sobreescribir estilos inline de Flutter Web.
-   ───────────────────────────────────────────────────────────────────────── */
-#botlode-player {
-  background: none !important;
-  background-color: transparent !important;
-  touch-action: manipulation !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
+/* Nota: el bloque `#botlode-player` vivía acá. Se borró el 2026-09-02: el
+   componente `botlode-chat.tsx` ya se había eliminado del repo en el overhaul
+   de performance (ver docs/PROGRESS.md §-2), así que el selector no matcheaba
+   nada y viajaba en el CSS de las 11 rutas. */
 
 /* Sin arrastre nativo de imágenes/enlaces (complemento al listener dragstart en AppShell). */
 img,
@@ -118,6 +112,9 @@ a {
   --dur-base: 300ms;   /* hover de cards, botones, iconos cinéticos */
   --dur-slow: 600ms;   /* transiciones de superficie */
   --dur-reveal: 800ms; /* entradas de sección */
+  /* Hero: la cascada de entrada corre sobre el elemento LCP, así que se
+     mantiene corta a propósito (ver bloque "Hero v2" al final del archivo). */
+  --dur-hero-reveal: 560ms;
 
   /* ── Double-bezel (spec §3) — radio interior = exterior − padding ────── */
   --radius-shell: 1.25rem;
@@ -1758,29 +1755,32 @@ body::after {
 }
 
 /* ── Hero v2 — coreografía de entrada de la columna izquierda ──────────────
-   Cascada one-shot con blur (spec §2) para eyebrow, párrafo, CTAs y strip.
-   EXCEPCIÓN LCP SAGRADA: el h1 usa la variante transform-only — jamás anima
-   opacity ni blur, se sirve visible en el primer frame.
-   fill-mode `backwards`: oculto solo durante el delay; al terminar NO queda
-   filter residual (blur(0) permanente crearía un backdrop-root y rompería
-   backdrop-filter internos). */
-@keyframes apex-hero-rise-blur {
-  from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0);    filter: blur(0px); }
-}
+   TRANSFORM-ONLY. Ni opacity ni filter. Los dos motivos son medidos, no
+   estéticos:
 
+   1. LCP. El elemento LCP real de la home en móvil NO es el h1 — es el párrafo
+      (`.apex-hero-col-left > p.text-pretty`, 380x78 px). Verificado con
+      Lighthouse móvil el 2026-09-02: mientras ese párrafo arrancaba en
+      `opacity: 0`, Chrome recién lo contabilizaba al terminar el fade →
+      `elementRenderDelay` de 1.139 ms sobre un TTFB de 10 ms. La regla vieja
+      blindaba solo al h1; blindaba al elemento equivocado.
+   2. Compositor. `filter: blur()` sacaba la animación del compositor
+      (Lighthouse "non-composited animations": 4 elementos, "Filter-related
+      property may move pixels") y además viola la regla de diseño de casa:
+      nada de blur animado.
+
+   El reveal se conserva con un slide más largo (22px en vez de 18px) y una
+   duración corta: transform puro, coste de compositor, y el LCP se pinta en
+   el primer frame junto con el FCP.
+   fill-mode `backwards`: durante el delay el elemento ya está pintado, solo
+   desplazado — nunca invisible. */
 @keyframes apex-hero-slide {
-  from { transform: translateY(18px); }
-  to   { transform: translateY(0); }
+  from { transform: translate3d(0, 22px, 0); }
+  to   { transform: translate3d(0, 0, 0); }
 }
 
 .apex-hero-col-left > * {
-  animation: apex-hero-rise-blur var(--dur-reveal) var(--ease-out) backwards;
-}
-
-/* LCP: solo transform */
-.apex-hero-col-left > h1 {
-  animation-name: apex-hero-slide;
+  animation: apex-hero-slide var(--dur-hero-reveal) var(--ease-out) backwards;
 }
 
 .apex-hero-col-left > :nth-child(1) { animation-delay: 0s; }
@@ -1792,9 +1792,7 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .apex-hero-col-left > * {
     animation: none;
-    opacity: 1;
     transform: none;
-    filter: none;
   }
 }
 

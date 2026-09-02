@@ -24,7 +24,7 @@ const EXTRUDE: THREE.ExtrudeGeometryOptions = {
  * (viewBox 24×24, y-abajo, relleno). Centrada en el origen y normalizada a un
  * tamaño consistente con el núcleo. Lanza si el path degenera → fallback al core.
  */
-export function buildLogoGeometry(d: string): THREE.BufferGeometry {
+function buildLogoGeometry(d: string): THREE.BufferGeometry {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${d}"/></svg>`
   const { paths } = new SVGLoader().parse(svg)
 

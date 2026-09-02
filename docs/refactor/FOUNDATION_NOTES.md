@@ -111,7 +111,7 @@ Editorial, asimétrico (`2fr 1fr 1fr`), sin columnas grises. Sigue siendo Server
 - **CTA WhatsApp prominente**: `editorial-label--primary` ("Contacto directo") +
   `heading-display` thin/extrabold + sub con claim real ("te respondo en menos de 1 hora") +
   botón `btn-primary-tech` con mensaje prellenado (`WA_MSG_FOOTER_LINK`).
-- **Contacto visible**: `WHATSAPP_PHONE_DISPLAY` (`+54 9 11 6804 9457`, de `lib/constants`)
+- **Contacto visible**: `WHATSAPP_PHONE_DISPLAY` (`+54 9 11 3427 2488`, de `lib/constants`)
   como link WhatsApp con ícono en verde oficial `#25D366` (única excepción de hex del brief).
 - **Links secundarios discretos**: columnas "Servicios" y "Explorar" con `footer-link`
   (el link "WhatsApp" duplicado se quitó — el canal ya domina la columna izquierda).

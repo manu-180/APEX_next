@@ -328,10 +328,19 @@ export function MobileDrawer({
               <WhatsAppOutboundLink
                 waHref={whatsappHref}
                 onClick={() => onClose()}
-                className="btn-wa w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm text-center"
+                className="btn-wa w-full flex min-h-12 items-center justify-center gap-2 rounded-xl py-3 text-sm text-center"
               >
-                Hablemos
+                Hablemos por WhatsApp
               </WhatsAppOutboundLink>
+
+              {/* La promesa de respuesta va pegada al CTA: es la objeción que
+                  frena el tap ("¿me van a contestar?"), no un dato de adorno. */}
+              <p
+                className="-mt-1 text-center text-[11px]"
+                style={{ color: 'var(--color-on-surface-variant)' }}
+              >
+                Te respondo yo, en menos de 1 hora.
+              </p>
 
               {onlineCount !== undefined && (
                 <div

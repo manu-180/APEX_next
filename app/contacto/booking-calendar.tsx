@@ -123,6 +123,9 @@ export function BookingCalendar() {
   const [contact, setContact] = useState('')
   /** Solo los 8 dígitos después del 11; +54 9 se arma al enviar. */
   const [waLocalDigits, setWaLocalDigits] = useState('')
+  /** Campo trampa. Un humano nunca lo ve ni lo tabula; un bot que autocompleta
+   *  todo lo llena y el endpoint descarta la reserva en silencio. */
+  const [honeypot, setHoneypot] = useState('')
   /** Snapshot para la pantalla de éxito (el hook limpia selectedHour al refrescar slots). */
   const [lastBooking, setLastBooking] = useState<{
     date: Date
@@ -133,6 +136,10 @@ export function BookingCalendar() {
   /* ── Feedback inline de validación — SOLO feedback encima del flujo:
         handleSubmit, confirmBooking y sus guardas quedan intactos. ── */
   const [emailTouched, setEmailTouched] = useState(false)
+  /** Igual que emailTouched: la validación del WhatsApp aparece recién cuando
+   *  el usuario terminó de escribir, nunca mientras tipea (form-CRO: validar
+   *  en blur, no en cada tecla). */
+  const [waTouched, setWaTouched] = useState(false)
   const contactShake = useAnimationControls()
   const hoursShake = useAnimationControls()
 
@@ -237,6 +244,7 @@ export function BookingCalendar() {
       contactInfo,
       contactType: contactMethod,
       name: name.trim() || undefined,
+      honeypot,
     })
   }
 
@@ -248,6 +256,10 @@ export function BookingCalendar() {
     selectedHour !== null &&
     !submitting &&
     (contactMethod === 'email' ? contact.trim().length > 0 : waDigitsOk)
+
+  /** Cuántos dígitos faltan; 0 cuando está completo. Solo feedback. */
+  const waMissing = BOOKING_WA_LOCAL_DIGITS - waLocalDigits.replace(/\D/g, '').length
+  const waInvalid = contactMethod === 'whatsapp' && waTouched && !waDigitsOk
 
   /** Solo feedback visual: no bloquea el envío (guardas intactas). */
   const emailInvalid =
@@ -271,6 +283,7 @@ export function BookingCalendar() {
       return
     }
     if (contactMethod === 'whatsapp' && !waDigitsOk) {
+      setWaTouched(true)
       startShake(contactShake)
       document.getElementById('booking-wa')?.focus()
       return
@@ -356,6 +369,8 @@ export function BookingCalendar() {
               setWaLocalDigits('')
               setLastBooking(null)
               setEmailTouched(false)
+              setWaTouched(false)
+              setHoneypot('')
             }}
             type="button"
           >
@@ -397,8 +412,12 @@ export function BookingCalendar() {
             <strong className="text-[var(--color-on-surface)]">gratis.</strong>
           </span>
         </h2>
+        {/* La zona horaria va explícita en el panel (patrón de Shade y Wellfound
+            en Mobbin): sin ella, cualquiera que no esté en Argentina reserva a
+            ciegas y el turno se cae. */}
         <p className="mb-6 text-xs text-[var(--color-on-surface-variant)]">
-          Lunes a sábado, de 9 a 19. Sin compromiso.
+          Lunes a sábado, de 9 a 19{' '}
+          <span className="opacity-70">(hora de Argentina, GMT-3)</span>. Sin compromiso.
         </p>
 
         {/* supabaseReady es siempre false en SSR (el cliente browser lanza sin
@@ -511,12 +530,24 @@ export function BookingCalendar() {
           >
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <p className={cn(microLabel, 'mb-0')}>Horario</p>
+              {/* Las dos muestras eran casi el mismo gris: la leyenda no
+                  explicaba nada. Ahora "Libre" repite el relleno del slot
+                  disponible y "Ocupado" repite su borde apagado + tachado, así
+                  el mapeo con la grilla es literal (y no depende solo del color). */}
               <div className="flex items-center gap-3 text-xs text-[var(--color-on-surface-variant)]">
-                <span className="inline-flex items-center gap-1">
-                  <span className="size-2 rounded-sm bg-[var(--color-surface-high)]" /> Ocupado
+                <span className="inline-flex items-center gap-1.5">
+                  <span
+                    aria-hidden="true"
+                    className="size-2.5 rounded-sm border border-[rgba(var(--color-primary-rgb),0.5)] bg-[rgba(var(--color-primary-rgb),0.25)]"
+                  />
+                  Libre
                 </span>
-                <span className="inline-flex items-center gap-1">
-                  <span className="size-2 rounded-sm bg-[rgba(var(--color-primary-rgb),0.4)]" /> Libre
+                <span className="inline-flex items-center gap-1.5 opacity-60">
+                  <span
+                    aria-hidden="true"
+                    className="size-2.5 rounded-sm border border-[var(--color-surface-high)] bg-transparent"
+                  />
+                  <span className="line-through">Ocupado</span>
                 </span>
               </div>
             </div>
@@ -583,6 +614,9 @@ export function BookingCalendar() {
               onClick={() => {
                 setContactMethod(m)
                 setSubmitError(null)
+                // Cambiar de canal no debe arrastrar el error del canal anterior.
+                setWaTouched(false)
+                setEmailTouched(false)
               }}
               aria-pressed={contactMethod === m}
               className={cn(
@@ -652,7 +686,9 @@ export function BookingCalendar() {
                     inputBase,
                     'flex items-stretch gap-0 overflow-hidden px-0 py-0',
                     inputIdle,
-                    'focus-within:border-[rgba(var(--color-primary-rgb),0.5)] focus-within:shadow-[0_0_0_3px_rgba(var(--color-primary-rgb),0.15)] dark:focus-within:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)]'
+                    'focus-within:border-[rgba(var(--color-primary-rgb),0.5)] focus-within:shadow-[0_0_0_3px_rgba(var(--color-primary-rgb),0.15)] dark:focus-within:shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.2)]',
+                    waInvalid &&
+                      'border-red-500/60 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus-within:border-red-500/60 focus-within:shadow-[0_0_0_3px_rgba(239,68,68,0.15)]'
                   )}
                 >
                   <span
@@ -668,18 +704,37 @@ export function BookingCalendar() {
                       const x = e.target.value.replace(/\D/g, '').slice(0, BOOKING_WA_LOCAL_DIGITS)
                       setWaLocalDigits(x)
                     }}
-                    placeholder="24842720"
+                    // El placeholder anterior (24842720) era, dígito por dígito,
+                    // el número que el bot de salida tiene en su blocklist.
+                    // Un ejemplo neutro evita que alguien lo copie tal cual.
+                    placeholder="55551234"
                     type="tel"
                     inputMode="numeric"
                     autoComplete="tel-national"
+                    onBlur={() => setWaTouched(true)}
                     className="min-h-[44px] min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-4 text-base text-[var(--color-on-surface)] outline-none placeholder:text-[color-mix(in_srgb,var(--color-on-surface-variant)_50%,transparent)] md:text-sm"
-                    aria-describedby="booking-wa-help"
+                    aria-invalid={waInvalid || undefined}
+                    aria-describedby={waInvalid ? 'booking-wa-error' : 'booking-wa-help'}
                   />
                 </div>
               </FormField>
-              <p id="booking-wa-help" className="mt-1.5 text-[11px] text-[var(--color-on-surface-variant)]">
-                Solo los {BOOKING_WA_LOCAL_DIGITS} dígitos después del 11. Te confirmo al toque.
-              </p>
+              {/* Un solo mensaje a la vez: la ayuda mientras va bien; cuando el
+                  campo quedó corto, el error dice exactamente qué falta. */}
+              {waInvalid ? (
+                <p
+                  id="booking-wa-error"
+                  role="alert"
+                  className="mt-1.5 text-[11px] font-medium text-red-500 dark:text-red-400"
+                >
+                  {waMissing === BOOKING_WA_LOCAL_DIGITS
+                    ? `Necesito tu celular: los ${BOOKING_WA_LOCAL_DIGITS} dígitos que van después del 11.`
+                    : `Te falta${waMissing === 1 ? '' : 'n'} ${waMissing} dígito${waMissing === 1 ? '' : 's'}.`}
+                </p>
+              ) : (
+                <p id="booking-wa-help" className="mt-1.5 text-[11px] text-[var(--color-on-surface-variant)]">
+                  Solo los {BOOKING_WA_LOCAL_DIGITS} dígitos después del 11. Te confirmo al toque.
+                </p>
+              )}
               </m.div>
             </m.div>
           ) : (
@@ -744,6 +799,25 @@ export function BookingCalendar() {
           )}
         </AnimatePresence>
 
+        {/* Honeypot. Fuera del viewport en vez de display:none (algunos bots
+            saltean los campos ocultos por CSS), con aria-hidden + tabIndex -1
+            para que ni el lector de pantalla ni el teclado lo alcancen. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden"
+        >
+          <label htmlFor="booking-company">Empresa</label>
+          <input
+            id="booking-company"
+            name="company"
+            type="text"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
         {/* El Button deshabilitado tiene disabled:pointer-events-none: el click
             cae en este wrapper y dispara el shake del campo incompleto.
             Feedback puro — no altera handleSubmit ni sus guardas. */}
@@ -765,6 +839,13 @@ export function BookingCalendar() {
             Confirmar turno gratis
             <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Button>
+
+          {/* Última objeción antes del tap: qué pasa después y qué NO pasa con
+              el dato que acaban de dejar. Va pegada al botón, no en una FAQ. */}
+          <p className="mt-3 text-center text-[11px] leading-relaxed text-[var(--color-on-surface-variant)]">
+            Te llega la confirmación al instante. Sin compromiso y sin dar tu
+            dato a nadie más.
+          </p>
         </div>
       </div>
       </article>

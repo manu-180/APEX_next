@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
@@ -19,6 +19,15 @@ interface ShortcutHandlers {
 
 export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
   const router = useRouter()
+
+  /**
+   * `handlers` llega como objeto literal nuevo en cada render de AppShell, asi
+   * que tenerlo en las deps del efecto desmontaba y volvia a montar el listener
+   * global de keydown en CADA render. Con la ref, el listener se registra una
+   * sola vez y siempre lee los handlers frescos.
+   */
+  const handlersRef = useRef(handlers)
+  handlersRef.current = handlers
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -57,25 +66,25 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
           break
         case 'Y':
           e.preventDefault()
-          handlers.toggleDarkMode()
+          handlersRef.current.toggleDarkMode()
           break
         case 'R':
           e.preventDefault()
-          handlers.resetTheme()
+          handlersRef.current.resetTheme()
           break
         case 'I':
           e.preventDefault()
-          handlers.toggleInspector()
+          handlersRef.current.toggleInspector()
           break
         case 'K':
         case '?':
           e.preventDefault()
-          handlers.toggleShortcutsDialog()
+          handlersRef.current.toggleShortcutsDialog()
           break
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [router, handlers])
+  }, [router])
 }

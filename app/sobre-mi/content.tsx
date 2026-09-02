@@ -360,9 +360,11 @@ export function SobreMiContent({
   ] as const
 
   /* ── Narrativa scroll-driven (§02): línea vertical de progreso que conecta
-        los beneficios 01→03. GSAP ScrollTrigger con scrub, transform-only,
-        gated por gsap.matchMedia — con reduced-motion la línea queda estática
-        (estado final por CSS). Patrón de referencia: useGsapReveal. ── */
+        los beneficios 01→03. Scroll pasivo + rAF, transform-only, gated por
+        `window.matchMedia('(prefers-reduced-motion: no-preference)')` — con
+        reduced-motion la línea queda estática (estado final por CSS).
+        Patrón de referencia: useGsapReveal (nombre legado: ya no usa GSAP;
+        gsap salió de package.json en el overhaul de performance 2026-08-24). ── */
   const benefitsRef = useRef<HTMLDivElement>(null)
   const progressLineRef = useRef<HTMLDivElement>(null)
 

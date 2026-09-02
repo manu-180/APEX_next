@@ -5,10 +5,13 @@ import { VERTICALS, getVertical, getVerticalSlugs } from '@/lib/data/verticals'
 import { getPostsByKeywords } from '@/lib/data/blog-posts'
 import { Badge } from '@/components/ui/badge'
 import { GridBackground } from '@/components/ui/grid-background'
-import { ArrowRightIcon, CheckIcon } from '@/components/ui/icons'
+import { ArrowRightIcon, CheckIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { BreadcrumbJsonLd } from '@/components/seo/json-ld'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
-import { APP_URL, WHATSAPP_NUMBER } from '@/lib/constants'
+import { APP_URL } from '@/lib/constants'
+import { WA_GRADIENT, WA_SHADOW_CLASS, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
+import { whatsappUrl } from '@/lib/whatsapp'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { formatARS } from '@/lib/types/services'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { STAGGER_BASE } from '@/lib/motion'
@@ -26,6 +29,23 @@ const CARD_HOVER_CLASS = `group border
   focus-visible:outline-none focus-visible:-translate-y-1
   focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
   motion-reduce:transition-none motion-reduce:hover:translate-y-0`
+
+/**
+ * CTA de dinero de las landings verticales.
+ *
+ * Antes eran `<a href="wa.me/…">` planos con el color del tema: no pasaban por
+ * `openWhatsAppWithThankYouPage`, así que NO disparaban la conversión de Google
+ * Ads ni el Lead de Meta y nunca aterrizaban en /gracias — justo en las páginas
+ * a las que apunta la campaña. Ahora usan `WhatsAppOutboundLink` (mismo helper
+ * y mismos labels que el resto del sitio) y el verde sagrado de WhatsApp, que
+ * es el que el visitante reconoce como "esto me abre el chat".
+ */
+const WA_CTA_CLASS = `group inline-flex items-center justify-center gap-2.5 select-none
+  h-12 min-h-12 rounded-xl px-6 text-sm font-bold text-white
+  transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.02] active:scale-[0.97]
+  motion-reduce:hover:scale-100
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]
+  focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]`
 
 /** Focus visible para links de texto (breadcrumbs). */
 const CRUMB_LINK_CLASS =
@@ -88,10 +108,11 @@ export default async function VerticalLandingPage({
   if (!v) notFound()
 
   const url = `${APP_URL.replace(/\/$/, '')}/${v.slug}`
-  const waMessage = encodeURIComponent(
-    `Hola Manuel, vengo de la landing de "${v.nounPlural}" y quiero saber más.`,
+  // Mensaje contextual del rubro: llega a WhatsApp ya diciendo de qué landing
+  // vino el lead, así la primera respuesta no arranca preguntando lo obvio.
+  const waUrl = whatsappUrl(
+    `Hola Manuel, tengo un proyecto de web para ${v.nounPlural} y quiero el boceto gratis. ¿Arrancamos?`,
   )
-  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`
 
   // Internal linking: otras verticals + guías del blog relevantes al rubro.
   const otherVerticals = VERTICALS.filter((x) => x.slug !== v.slug)
@@ -190,17 +211,46 @@ export default async function VerticalLandingPage({
             {v.subheadline}
           </p>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group btn-tech btn-primary-tech inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl min-h-12 active:scale-[0.97]"
+          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+            <WhatsAppOutboundLink
+              waHref={waUrl}
+              className={cn(WA_CTA_CLASS, WA_SHADOW_CLASS, 'w-full sm:w-auto')}
+              style={{ background: WA_GRADIENT }}
             >
-              Hablemos de tu caso
+              <WhatsAppIcon className="size-4 shrink-0" aria-hidden />
+              Quiero mi boceto gratis
               <ArrowRightIcon className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
-            </a>
+            </WhatsAppOutboundLink>
+            <Link
+              href="/contacto"
+              prefetch={false}
+              className={cn(
+                'group btn-tech btn-outline-tech inline-flex h-12 min-h-12 w-full items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold sm:w-auto',
+                'text-[var(--color-primary)] transition-transform duration-300 ease-out active:scale-[0.97]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+              )}
+            >
+              Agendar 15 minutos
+            </Link>
           </div>
+
+          {/* De-riskers junto al CTA: el visitante de Ads llega frío y la
+              objeción real es "cuánto sale y cuánto tarda", no "quién sos". */}
+          <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
+            {[
+              'Boceto gratis en 24-48 h',
+              'Precio cerrado por escrito',
+              'Respuesta en menos de 1 hora',
+            ].map((claim) => (
+              <li
+                key={claim}
+                className="flex items-center gap-2 text-xs text-[var(--color-on-surface-variant)]"
+              >
+                <CheckIcon className="size-3.5 shrink-0 text-[var(--color-primary)]" />
+                {claim}
+              </li>
+            ))}
+          </ul>
         </SectionReveal>
       </section>
 
@@ -378,15 +428,18 @@ export default async function VerticalLandingPage({
             </span>{' '}
             según alcance · Entrega en {v.timeline}
           </p>
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group btn-tech btn-primary-tech inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl min-h-12 active:scale-[0.97]"
+          <WhatsAppOutboundLink
+            waHref={waUrl}
+            className={cn(WA_CTA_CLASS, WA_SHADOW_CLASS_LG, 'w-full sm:h-14 sm:w-auto sm:px-8 sm:text-base')}
+            style={{ background: WA_GRADIENT }}
           >
-            Validar mi caso por WhatsApp
+            <WhatsAppIcon className="size-5 shrink-0" aria-hidden />
+            Pedir mi presupuesto exacto
             <ArrowRightIcon className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
-          </a>
+          </WhatsAppOutboundLink>
+          <p className="mt-3 text-xs text-[var(--color-on-surface-variant)]">
+            Te paso el número cerrado por escrito. Sin compromiso.
+          </p>
         </SectionReveal>
       </section>
 

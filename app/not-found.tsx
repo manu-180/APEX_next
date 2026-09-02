@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { GridBackground } from '@/components/ui/grid-background'
+import { WhatsAppIcon } from '@/components/ui/icons'
+import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { whatsappUrl } from '@/lib/whatsapp'
+import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { ROUTES } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -22,23 +26,6 @@ function HomeIcon() {
       aria-hidden="true"
     >
       <path d="M2 7L8 2l6 5v7h-4V9H6v5H2V7z" />
-    </svg>
-  )
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      className="size-4 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M3.5 8h9M9 4l4 4-4 4" />
     </svg>
   )
 }
@@ -163,26 +150,36 @@ export default function NotFound() {
           className="nf-desc mx-auto max-w-[20rem] text-sm leading-relaxed"
           style={{ color: 'var(--color-on-surface-variant)' }}
         >
-          La página que buscás no existe o fue movida. Volvé al inicio o contactame directamente.
+          La página que buscás no existe o cambió de dirección. Decime qué estabas
+          buscando y te paso el link — o volvé al inicio.
         </p>
 
-        {/* CTAs */}
-        <div className="nf-ctas mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        {/* CTAs — el 404 suele recibir tráfico de un link roto o de un anuncio
+            viejo. La salida más rápida de vuelta al funnel es WhatsApp, así que
+            es la acción dominante (verde sagrado + tracking centralizado vía
+            WhatsAppOutboundLink); volver al inicio queda como acción secundaria. */}
+        <div className="nf-ctas mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+          <WhatsAppOutboundLink
+            waHref={whatsappUrl(
+              'Hola Manuel, entré a un link de tu web que no existe. Estaba buscando…',
+            )}
+            className={`group inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-bold text-white
+              transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.02] active:scale-[0.97]
+              motion-reduce:hover:scale-100
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]
+              ${WA_SHADOW_CLASS}`}
+            style={{ background: WA_GRADIENT }}
+          >
+            <WhatsAppIcon className="size-4 shrink-0" aria-hidden />
+            Preguntame por WhatsApp
+          </WhatsAppOutboundLink>
           <Link
             href={ROUTES.home}
-            className="btn-tech btn-primary-tech inline-flex items-center gap-2.5 px-6 py-3 text-sm font-semibold transition-all duration-300 active:scale-[0.97]"
-            style={{ color: 'var(--color-primary)' }}
+            className="btn-tech btn-outline-tech inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-semibold transition-transform duration-300 active:scale-[0.97]"
+            style={{ color: 'var(--color-on-surface-variant)' }}
           >
             <HomeIcon />
             Volver al inicio
-          </Link>
-          <Link
-            href={ROUTES.contact}
-            className="btn-tech btn-outline-tech inline-flex items-center gap-2.5 px-6 py-3 text-sm font-medium transition-all duration-300 active:scale-[0.97]"
-            style={{ color: 'var(--color-on-surface-variant)' }}
-          >
-            Contactar
-            <ArrowRightIcon />
           </Link>
         </div>
 

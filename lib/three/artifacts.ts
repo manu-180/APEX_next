@@ -130,8 +130,3 @@ export const ARTIFACTS: readonly Artifact[] = [
 export function artifactsOf(cat: CategoryId): Artifact[] {
   return ARTIFACTS.filter((a) => a.category === cat)
 }
-
-/** Índice global (en ARTIFACTS) de la primera pieza de cada categoría. */
-export function firstIndexOf(cat: CategoryId): number {
-  return ARTIFACTS.findIndex((a) => a.category === cat)
-}
