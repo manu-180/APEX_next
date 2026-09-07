@@ -392,7 +392,10 @@ export default function CuantoCuestaUnaPaginaWebPage() {
                     <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[var(--color-on-surface-variant)]">
                       {tier.inheritsFrom ? `Todo lo de ${tier.inheritsFrom}, más:` : 'Incluye:'}
                     </p>
-                    <ul className="space-y-2.5">
+                    {/* flex-1 en la lista, no `mt-auto` en el CTA: así los tres
+                        botones quedan alineados abajo aunque los planes tengan
+                        distinta cantidad de items. */}
+                    <ul className="flex-1 space-y-2.5">
                       {tier.includes.map((f) => (
                         <li key={f} className="flex items-start gap-2.5">
                           <CheckIcon

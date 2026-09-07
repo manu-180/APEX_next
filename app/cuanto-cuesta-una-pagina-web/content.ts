@@ -149,7 +149,7 @@ export const FAQ_ITEMS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Qué incluye el precio?',
-    a: 'Diseño 100% a medida sin plantillas, SEO técnico, botón de WhatsApp y formulario con auto-respuesta, hosting y 3 meses de mantenimiento. No hay costos escondidos: lo que no esté en el presupuesto no se factura después.',
+    a: 'En los tres planes: diseño 100% a medida sin plantillas, SEO técnico, hosting y 3 meses de mantenimiento. Después cada plan suma lo suyo — formularios y WhatsApp en Landing Page, reservas y cobros en Web Interactiva, catálogo y checkout en Tienda Online. No hay costos escondidos: lo que no esté en el presupuesto no se factura después.',
   },
   {
     q: '¿Cuánto tarda una página web?',

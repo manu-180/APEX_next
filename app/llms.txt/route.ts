@@ -51,6 +51,8 @@ ${APP_PLANS.map(planLine).join('\n')}
 
 - [Inicio](${BASE}/): propuesta de valor, proyectos en producción y precios de un vistazo.
 - [Servicios y precios](${BASE}/servicios): los tres planes web y los tres de app en detalle, proceso paso a paso, formas de pago y preguntas frecuentes.
+- [Cuánto cuesta una página web](${BASE}/cuanto-cuesta-una-pagina-web): la respuesta directa al precio — rango, qué incluye cada plan, qué hace subir el número, plazos y formas de pago.
+- [Diseño y desarrollo de páginas web](${BASE}/diseno-de-paginas-web): quién hace el trabajo, sitios reales en producción, cómo es el proceso y para quién no es.
 - [Muestrario](${BASE}/muestrario): galería de sitios reales en producción, todos abribles en vivo, más un laboratorio de diseño que suma un sitio nuevo cada semana.
 - [Tecnologías](${BASE}/tecnologias): Flutter, Next.js, Supabase, Riverpod y TypeScript, y qué gana el negocio con cada una.
 - [Sobre mí](${BASE}/sobre-mi): trayectoria de Manuel Navarro y cómo trabaja.

@@ -19,6 +19,10 @@ export const YEARS_EXP = new Date().getFullYear() - 2021
 export const ROUTES = {
   home:        '/',
   servicios:   '/servicios',
+  /** Landing de la intención "precio" — destino del ad group Presupuesto y Precios. */
+  cuantoCuesta: '/cuanto-cuesta-una-pagina-web',
+  /** Landing de la intención "agencia/diseño" — ad group Web - Diseño y Desarrollo. */
+  disenoWeb:   '/diseno-de-paginas-web',
   muestrario:  '/muestrario',
   lab:         '/lab',
   tecnologias: '/tecnologias',
