@@ -70,11 +70,16 @@ const SPECULATION_RULES = JSON.stringify({
  *    ya con el frame pintado. Con uno solo se pierde el ahorro.
  * 3. El setTimeout es la red de seguridad para cuando rAF esta congelado
  *    (pestana en background): la clase no puede quedarse pegada nunca.
- * 4. Se destapa UNA seccion por frame, no todas juntas. Destapar todas de golpe
- *    concentra el layout diferido en una sola tarea y el TBT sube +300ms
- *    (medido en A/B); de a una, ninguna tarea llega al umbral de 50ms.
+ * 4. El destape va por IntersectionObserver, no por timer. Destapar todo
+ *    despues del paint no ahorra nada: mueve los ~500ms de layout del
+ *    below-the-fold al TBT (medido: +212ms en / y +545ms en /servicios, y
+ *    escalonarlo de a una seccion por frame tampoco lo arregla). Con el
+ *    observer, la seccion que nadie mira nunca se maqueta.
+ * 5. El setTimeout de 5s es la red de a11y: `content-visibility: hidden` saca
+ *    el contenido del arbol de accesibilidad y del buscar-en-pagina, asi que
+ *    pasado ese plazo se destapa todo aunque nadie haya scrolleado.
  */
-const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('cv-boot');var done=false;var f=function(){if(done)return;done=true;var els=[].slice.call(document.querySelectorAll('.cv-auto,.cv-auto-sm'));var i=0;var step=function(){var t=els[i++];if(!t){d.classList.remove('cv-boot');return}t.setAttribute('data-cv-on','');(window.requestAnimationFrame||setTimeout)(step)};step()};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(f)})}else{setTimeout(f,0)}setTimeout(f,2000)})()`
+const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('cv-boot');var start=function(){var els=[].slice.call(document.querySelectorAll('.cv-auto,.cv-auto-sm'));var on=function(e){e.setAttribute('data-cv-on','')};var all=function(){els.forEach(on);d.classList.remove('cv-boot')};if(!els.length||!window.IntersectionObserver){all();return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){on(e.target);io.unobserve(e.target)}})},{rootMargin:'200% 0px'});els.forEach(function(e){io.observe(e)});setTimeout(function(){io.disconnect();all()},5000)};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(start)})}else{setTimeout(start,0)}})()`
 
 export const viewport: Viewport = {
   width: 'device-width',
