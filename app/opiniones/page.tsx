@@ -43,7 +43,7 @@ const REVIEW_CARD_HOVER = `
 
 export default function OpinionesPage() {
   const filledStars = Math.round(Number(AVG_RATING))
-  const waShareMessage = `Hola, te dejo el link para dejar tu opinión sobre APEX en Google (30 segundos): ${PAGE_URL}`
+  const waShareMessage = `Hola, te dejo el link para dejar tu opinión sobre APEX en Google. Son 30 segundos: ${PAGE_URL}`
 
   // La mejor reseña abre la sección como quote hero: mayor rating y, a igual
   // rating, la más sustanciosa. El resto conserva su orden original.

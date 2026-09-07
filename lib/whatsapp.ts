@@ -21,19 +21,19 @@ export function whatsappUrl(message: string): string {
  * CTAs generales (navbar, hero, contacto, pie, atajos). Breve, sin emoji.
  * Los mensajes contextualizados van en waMsgPlan.
  */
-export const WA_MSG_GENERIC = `Hola, quiero potenciarme con tecnología. ¿Charlamos?`
+export const WA_MSG_GENERIC = `Hola Manuel, quiero consultarte por un proyecto. ¿Cómo arrancamos?`
 
 /** Navbar “Hablemos”, hero, contacto, atajo Ctrl+Shift+H */
 export const WA_MSG_NAV = WA_MSG_GENERIC
 
 /** Lab — CTA de los artefactos 3D: el visitante pide su boceto 3D gratis. */
-export const WA_MSG_LAB = `Hola Manuel, vi los objetos 3D de tu laboratorio y quiero algo así para mi marca. ¿Arrancamos con el boceto gratis?`
+export const WA_MSG_LAB = `Hola Manuel, vi los 3D de tu lab y quiero algo así para mi marca. ¿Cómo arrancamos?`
 
 /** Pie — link “WhatsApp” */
 export const WA_MSG_FOOTER_LINK = WA_MSG_GENERIC
 
 export function waMsgPlan(planName: string): string {
-  return `Hola, consulto por el plan «${planName}» desde tu web. ¿Me orientás con los próximos pasos?`
+  return `Hola Manuel, me interesa el plan ${planName}. ¿Cómo seguimos?`
 }
 
 /** Hosts a los que aceptamos mandar a un visitante desde un CTA o desde /gracias. */

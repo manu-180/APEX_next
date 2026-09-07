@@ -54,7 +54,7 @@ function MagneticWhatsAppCta() {
       className="inline-block"
     >
       <WhatsAppOutboundLink
-        waHref={whatsappUrl('Hola Manuel, quiero arrancar mi proyecto. ¿Coordinamos 15 min?')}
+        waHref={whatsappUrl('Hola Manuel, quiero arrancar mi proyecto. ¿Cuándo podemos hablar?')}
         className={cn(
           'group btn-tech inline-flex h-14 items-center justify-center gap-3 rounded-xl px-9 text-base font-semibold text-white select-none',
           'transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.97]',

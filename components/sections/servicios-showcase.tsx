@@ -392,7 +392,7 @@ export function ServiciosShowcase() {
               </div>
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(
-                  'Hola, vi los casos reales en tu web y quiero algo así para mi proyecto. ¿Lo charlamos?',
+                  'Hola Manuel, vi tus casos reales y quiero algo así para mi proyecto. ¿Lo vemos?',
                 )}
                 className={cn(
                   'group btn-tech inline-flex h-12 shrink-0 select-none items-center justify-center gap-2.5 px-6 text-sm font-semibold text-white',

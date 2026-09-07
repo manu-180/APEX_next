@@ -630,7 +630,7 @@ const CUSTOM_SOFTWARE_DERISKERS = [
 
 /** Mensaje de WhatsApp para coordinar la videollamada del proyecto a medida. */
 const WA_MSG_CUSTOM_SOFTWARE =
-  'Hola Manuel, quiero contarte un proyecto de software a medida. ¿Coordinamos una videollamada para verlo?'
+  'Hola Manuel, necesito un software a medida. ¿Coordinamos una llamada?'
 
 function CustomSoftwarePanel() {
   return (

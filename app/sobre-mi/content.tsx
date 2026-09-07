@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils/cn'
 
 /** Mensaje prellenado propio de esta página (el tracking vive en WhatsAppOutboundLink). */
 const WA_MSG_SOBRE_MI =
-  'Hola Manuel, leí tu página y me interesa trabajar con vos. Tengo un proyecto para contarte. ¿Lo charlamos?'
+  'Hola Manuel, quiero trabajar con vos. ¿Te cuento mi proyecto?'
 
 const FICHA_ROWS = [
   { label: 'Disponibilidad', value: '1-2 proyectos por vez' },

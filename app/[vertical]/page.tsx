@@ -111,7 +111,7 @@ export default async function VerticalLandingPage({
   // Mensaje contextual del rubro: llega a WhatsApp ya diciendo de qué landing
   // vino el lead, así la primera respuesta no arranca preguntando lo obvio.
   const waUrl = whatsappUrl(
-    `Hola Manuel, tengo un proyecto de web para ${v.nounPlural} y quiero el boceto gratis. ¿Arrancamos?`,
+    `Hola Manuel, quiero una web para ${v.nounPlural}. ¿Cómo arrancamos?`,
   )
 
   // Internal linking: otras verticals + guías del blog relevantes al rubro.

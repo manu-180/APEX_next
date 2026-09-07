@@ -25,7 +25,7 @@ const ParticleField = dynamic(
  * específico, voseo, 1-2 líneas, sin emojis, termina con pregunta.
  */
 const WA_MSG_HERO =
-  'Hola Manuel, tengo un negocio y quiero una web que venda. ¿Arrancamos con el boceto gratis?'
+  'Hola Manuel, quiero una web para mi negocio. ¿Cómo arrancamos?'
 
 /* ── Micro-icons for feature tags ── */
 function SketchIcon() {

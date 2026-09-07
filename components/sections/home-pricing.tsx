@@ -47,7 +47,7 @@ const INCLUDED_ALWAYS = [
 const HOME_PLANS = WEB_PLANS.filter((p) => p.price !== null).slice(0, 3)
 
 const WA_MSG_PLAN = (planName: string) =>
-  `Hola Manuel, me interesa el plan ${planName}. ¿Arrancamos con el boceto gratis?`
+  `Hola Manuel, me interesa el plan ${planName}. ¿Cómo seguimos?`
 
 function CheckIcon({ className }: { className?: string }) {
   return (

@@ -162,7 +162,7 @@ export default function NotFound() {
         <div className="nf-ctas mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <WhatsAppOutboundLink
             waHref={whatsappUrl(
-              'Hola Manuel, entré a un link de tu web que no existe. Estaba buscando…',
+              'Hola Manuel, entré a un link de tu web que no funciona. Estaba buscando…',
             )}
             className={`group inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 text-sm font-bold text-white
               transition-[transform,box-shadow] duration-300 ease-out hover:scale-[1.02] active:scale-[0.97]
