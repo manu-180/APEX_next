@@ -1231,15 +1231,18 @@ body::after {
    Lighthouse mobile: son 417ms de FCP en / y en /servicios.
 
    `hidden` si la saltea. La clase la pone un script inline del <head> y la
-   saca el primer requestAnimationFrame despues de pintar (ver app/layout.tsx).
+   saca `release()`, que tiene cinco disparadores fail-open (ver el JSDoc de
+   CV_BOOT_SCRIPT en app/layout.tsx antes de tocar nada de esto).
    Que la ponga JS y no el HTML es deliberado y es la parte que lo hace seguro:
    sin JS la clase nunca existe, la regla nunca aplica y el contenido queda
    visible e indexable. No cambiar esto por una clase estatica en el <html>.
 
-   El `:not([data-cv-on])` tampoco es decorativo: destapar las 9 secciones de
-   una hace UNA pasada de layout gigante justo despues del paint y el TBT sube
-   +300ms (medido). El script las destapa de a una por frame, asi ninguna tarea
-   pasa el umbral de 50ms. */
+   El `:not([data-cv-on])` tampoco es decorativo: destapar todas las secciones
+   de una hace UNA pasada de layout gigante justo despues del paint y el TBT
+   sube (medido: +212ms en / y +545ms en /servicios). El atributo lo pone un
+   IntersectionObserver seccion por seccion al acercarse al viewport, asi la
+   que el usuario nunca mira no se maqueta nunca. Escalonar de a una por frame
+   con un timer se probo y NO alcanza. */
 .cv-boot .cv-auto:not([data-cv-on]),
 .cv-boot .cv-auto-sm:not([data-cv-on]) {
   content-visibility: hidden;

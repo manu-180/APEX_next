@@ -62,24 +62,53 @@ const SPECULATION_RULES = JSON.stringify({
  * saltea maquetarlas. Al primer frame pintado se saca la clase y vuelven a
  * `content-visibility: auto`, su comportamiento normal.
  *
- * Tres decisiones que NO hay que revertir sin releer docs/perf/2026-09-07-app-shell-profiling.md:
+ * Seis decisiones que NO hay que revertir sin releer docs/perf/2026-09-07-app-shell-profiling.md:
  * 1. La clase la agrega ESTE script, no el HTML del server. Si el navegador no
  *    corre JS (o el script falla), la clase nunca existe y el contenido queda
  *    visible e indexable. Fail-safe por construccion.
  * 2. Doble rAF: el primero corre ANTES del paint del frame en curso, el segundo
  *    ya con el frame pintado. Con uno solo se pierde el ahorro.
- * 3. El setTimeout es la red de seguridad para cuando rAF esta congelado
- *    (pestana en background): la clase no puede quedarse pegada nunca.
- * 4. El destape va por IntersectionObserver, no por timer. Destapar todo
+ * 3. El destape va por IntersectionObserver, no por timer. Destapar todo
  *    despues del paint no ahorra nada: mueve los ~500ms de layout del
  *    below-the-fold al TBT (medido: +212ms en / y +545ms en /servicios, y
  *    escalonarlo de a una seccion por frame tampoco lo arregla). Con el
  *    observer, la seccion que nadie mira nunca se maqueta.
- * 5. El setTimeout de 5s es la red de a11y: `content-visibility: hidden` saca
- *    el contenido del arbol de accesibilidad y del buscar-en-pagina, asi que
- *    pasado ese plazo se destapa todo aunque nadie haya scrolleado.
+ * 4. `release()` esta armado por CINCO vias y todas son fail-open. El orden
+ *    importa: las tres primeras se registran ANTES de pedir el rAF, porque si
+ *    el rAF esta congelado nada que dependa de el llega a correr.
+ *    - `visibilityState !== 'visible'` al arrancar: ni se aplica la clase.
+ *      Cubre la pestana abierta en background y el prerender de speculation
+ *      rules, donde el rAF nunca corre y la clase quedaba pegada para siempre.
+ *    - `setTimeout(5000)` FUERA del rAF: la red que antes vivia adentro de
+ *      `start` y por eso no cubria nada.
+ *    - `visibilitychange` a hidden: preferimos pagar layout en background
+ *      antes que dejar contenido inaccesible.
+ *    - `pageshow` con `persisted`: BFCache puede restaurar el DOM con el boot
+ *      a medio camino y sin re-ejecutar el script.
+ *    - Navegacion client-side, y SOLO si cambia el pathname. La comparacion no
+ *      es paranoia: Next llama `history.replaceState` al hidratar para
+ *      normalizar la URL, asi que liberar en cualquier replaceState apagaba
+ *      el boot apenas hidrataba y devolvia el destape masivo post-paint que
+ *      el punto 3 evita. Verificado con `chrome --headless --dump-dom`: el
+ *      `<html>` salia sin la clase incluso a 200ms de virtual-time-budget.
+ * 5. Por que la navegacion libera en vez de re-observar: el script corre una
+ *    sola vez y las `.cv-auto` viven en el contenido de cada ruta, no en este
+ *    layout. Sin esto, navegar dentro de la ventana de boot dejaba las
+ *    secciones de la ruta nueva en `hidden` (medido: 7 de 8 en /servicios,
+ *    5040px en blanco). Se libera y no se re-observa porque el ahorro ya se
+ *    cobro en el primer paint: en la ruta nueva React monta ya hidratado, no
+ *    hay un primer layout que proteger, y `content-visibility: auto` solo
+ *    alcanza. Re-observar exigia MutationObserver o un componente cliente en
+ *    el shell — mas superficie y mas JS en el shell, a cambio de nada.
+ * 6. `release()` saca la clase del `<html>`, NO recorre la lista inicial. Un
+ *    nodo insertado justo antes de liberar vuelve a `auto` igual que el resto.
+ *
+ * Trade-off asumido, no resuelto: mientras dura el boot el below-the-fold esta
+ * fuera del arbol de accesibilidad y del buscar-en-pagina. Es inherente a
+ * `content-visibility: hidden`; la unica alternativa es no usarlo y perder los
+ * 417ms. Por eso la ventana es corta y tiene cinco formas de cerrarse.
  */
-const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('cv-boot');var start=function(){var els=[].slice.call(document.querySelectorAll('.cv-auto,.cv-auto-sm'));var on=function(e){e.setAttribute('data-cv-on','')};var all=function(){els.forEach(on);d.classList.remove('cv-boot')};if(!els.length||!window.IntersectionObserver){all();return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){on(e.target);io.unobserve(e.target)}})},{rootMargin:'200% 0px'});els.forEach(function(e){io.observe(e)});setTimeout(function(){io.disconnect();all()},5000)};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(start)})}else{setTimeout(start,0)}})()`
+const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;if(document.visibilityState!=='visible')return;d.classList.add('cv-boot');var io=null,done=false;var release=function(){if(done)return;done=true;if(io){io.disconnect();io=null}d.classList.remove('cv-boot')};setTimeout(release,5000);document.addEventListener('visibilitychange',function(){if(document.visibilityState!=='visible')release()});window.addEventListener('pageshow',function(e){if(e.persisted)release()});var path=location.pathname,check=function(){if(location.pathname!==path)release()};window.addEventListener('popstate',check);var h=window.history,wrap=function(n){var f=h[n];if(typeof f==='function'){h[n]=function(){var r=f.apply(this,arguments);check();return r}}};wrap('pushState');wrap('replaceState');var start=function(){if(done)return;var els=[].slice.call(document.querySelectorAll('.cv-auto,.cv-auto-sm'));if(!els.length||!window.IntersectionObserver){release();return}io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.setAttribute('data-cv-on','');io.unobserve(e.target)}})},{rootMargin:'200% 0px'});els.forEach(function(e){io.observe(e)})};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(start)})}else{setTimeout(start,0)}})()`
 
 export const viewport: Viewport = {
   width: 'device-width',
