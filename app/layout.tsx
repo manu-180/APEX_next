@@ -56,6 +56,23 @@ const SPECULATION_RULES = JSON.stringify({
   ],
 })
 
+/**
+ * cv-boot: durante el primer layout, las secciones below-the-fold quedan en
+ * `content-visibility: hidden` (ver la regla en globals.css) y el navegador se
+ * saltea maquetarlas. Al primer frame pintado se saca la clase y vuelven a
+ * `content-visibility: auto`, su comportamiento normal.
+ *
+ * Tres decisiones que NO hay que revertir sin releer docs/perf/2026-09-07-app-shell-profiling.md:
+ * 1. La clase la agrega ESTE script, no el HTML del server. Si el navegador no
+ *    corre JS (o el script falla), la clase nunca existe y el contenido queda
+ *    visible e indexable. Fail-safe por construccion.
+ * 2. Doble rAF: el primero corre ANTES del paint del frame en curso, el segundo
+ *    ya con el frame pintado. Con uno solo se pierde el ahorro.
+ * 3. El setTimeout es la red de seguridad para cuando rAF esta congelado
+ *    (pestana en background): la clase no puede quedarse pegada nunca.
+ */
+const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('cv-boot');var f=function(){d.classList.remove('cv-boot')};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(f)})}else{f()}setTimeout(f,2000)})()`
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -118,6 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           preconnect solo gastaba un socket y un handshake TLS de más
           (PageSpeed lo reportaba como "preconexión no utilizada").
         */}
+        <script dangerouslySetInnerHTML={{ __html: CV_BOOT_SCRIPT }} />
         {gaMeasurementId ? <link rel="dns-prefetch" href="https://www.googletagmanager.com" /> : null}
         <PersonJsonLd />
         <WebSiteJsonLd />
