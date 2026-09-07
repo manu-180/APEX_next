@@ -70,8 +70,11 @@ const SPECULATION_RULES = JSON.stringify({
  *    ya con el frame pintado. Con uno solo se pierde el ahorro.
  * 3. El setTimeout es la red de seguridad para cuando rAF esta congelado
  *    (pestana en background): la clase no puede quedarse pegada nunca.
+ * 4. Se destapa UNA seccion por frame, no todas juntas. Destapar todas de golpe
+ *    concentra el layout diferido en una sola tarea y el TBT sube +300ms
+ *    (medido en A/B); de a una, ninguna tarea llega al umbral de 50ms.
  */
-const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('cv-boot');var f=function(){d.classList.remove('cv-boot')};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(f)})}else{f()}setTimeout(f,2000)})()`
+const CV_BOOT_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('cv-boot');var done=false;var f=function(){if(done)return;done=true;var els=[].slice.call(document.querySelectorAll('.cv-auto,.cv-auto-sm'));var i=0;var step=function(){var t=els[i++];if(!t){d.classList.remove('cv-boot');return}t.setAttribute('data-cv-on','');(window.requestAnimationFrame||setTimeout)(step)};step()};if(window.requestAnimationFrame){requestAnimationFrame(function(){requestAnimationFrame(f)})}else{setTimeout(f,0)}setTimeout(f,2000)})()`
 
 export const viewport: Viewport = {
   width: 'device-width',
