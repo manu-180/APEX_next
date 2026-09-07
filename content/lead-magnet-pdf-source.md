@@ -251,7 +251,7 @@ Si tu candidato cumple 7+ de 10, vas bien.
 Soy Manuel. Diseño y programo web + apps móviles desde Argentina, full-stack.
 Stack opinado: Flutter, Next.js, Supabase, Riverpod, TypeScript.
 
-- WhatsApp directo: [+54 9 11 3427 2488](https://wa.me/5491134272488)
+- WhatsApp directo: [+54 9 11 5632 7091](https://wa.me/5491156327091)
 - Sitio: [theapexweb.com](https://www.theapexweb.com)
 - Casos completos: [theapexweb.com/proyectos](https://www.theapexweb.com/muestrario)
 

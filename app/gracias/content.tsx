@@ -10,7 +10,7 @@ import { WA_GRADIENT, WA_GREEN, WA_SHADOW_CLASS_LG } from '@/lib/constants/whats
 import { DELAY_AFTER_PANEL, DUR_REVEAL, DUR_SLOW, EASE_OUT } from '@/lib/motion'
 
 const FALLBACK_WA = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  'Hola Manuel, quiero arrancar mi proyecto. ¿Lo charlamos?'
+  'Hola Manuel, quiero arrancar mi proyecto. ¿Cómo seguimos?'
 )}`
 
 declare global {

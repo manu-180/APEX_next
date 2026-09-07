@@ -77,7 +77,7 @@ const CRUMB_LINK_CLASS =
 const EYEBROW_CLASS = 'inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase mb-4'
 
 const WA_MSG =
-  'Hola Manuel, quiero el diseño de la página web de mi empresa y me interesa el boceto gratis. ¿Arrancamos?'
+  'Hola Manuel, quiero el diseño de la web de mi empresa. ¿Cómo arrancamos?'
 
 /* Ficha del estudio: datos duros y verificables, no adjetivos. */
 const STUDIO_FACTS = [

@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils/cn'
  */
 
 const WA_MSG_PROOF =
-  'Hola Manuel, vi los proyectos en producción que mostrás en tu web. ¿Podés hacer algo así para mi negocio?'
+  'Hola Manuel, vi tus proyectos y quiero algo así para mi negocio. ¿Cómo arrancamos?'
 
 const FEATURED_CLIENT = {
   name: 'Mi Lugar en el Mundo',

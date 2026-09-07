@@ -288,7 +288,7 @@ Ejemplos reales de texto a 11 px: `Esencial`, `Más elegido`, `E-commerce`, `Cal
 | `<a>` | 174×**16** | `Ver el muestrario completo` |
 | `<a>` | 142×**16** | `Verlos flotando en 3D` |
 | `<a>` | 262×**32** | `¿Otra duda? Escribime directo` |
-| `<a>` | 159×**20** | `+54 9 11 3427 2488` |
+| `<a>` | 159×**20** | `+54 9 11 5632 7091` |
 
 Los CTAs principales sí están bien (48 px de alto) y las filas del panel de decisión también (65 px). El problema son los links secundarios de 16 px de alto — incluido **el número de teléfono**, que es exactamente el elemento de transparencia que Google mira.
 
@@ -441,7 +441,7 @@ Opciones, en orden de preferencia: mover esas secciones a páginas propias enlaz
 **Impacto: bajo-medio · Esfuerzo: bajo (4–8 h)**
 
 - Subir a ≥12 px los **81 elementos** con texto menor (hay uno a 7 px, cinco a 8 px, siete a 9 px, 34 a 10 px, 34 a 11 px). Prioridad: los badges de plan (`Esencial`, `Más elegido`, `E-commerce`) y los claims comerciales (`3 cuotas sin interés`, `Entrega en 15 días`).
-- Llevar a ≥44 px de alto los **19 clickeables** que no llegan. Prioridad absoluta: el link del teléfono `+54 9 11 3427 2488` (hoy 159×**20 px**) — es el elemento de transparencia que Google mira.
+- Llevar a ≥44 px de alto los **19 clickeables** que no llegan. Prioridad absoluta: el link del teléfono `+54 9 11 5632 7091` (hoy 159×**20 px**) — es el elemento de transparencia que Google mira.
 - Arreglar los **6 fallos de contraste** (mínimo medido 2,53:1, requerido 4,5:1). El culpable recurrente es `#64748b` y `#505052` sobre fondos oscuros.
 - Tabla comparativa: 640 px dentro de 275 px. Convertir a tarjetas apiladas en mobile en vez de scroll horizontal anidado.
 

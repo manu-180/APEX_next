@@ -9,7 +9,7 @@
 /** Mensaje prellenado contextual de /contacto (decisión: arrancar ahora).
  *  Usado en el CTA primario (WhatsAppNowPanel) y en el estado vacío de reviews. */
 export const WA_MSG_CONTACT_NOW =
-  'Hola Manuel, tengo un proyecto y quiero arrancar. ¿Lo charlamos?'
+  'Hola Manuel, tengo un proyecto y quiero arrancar. ¿Cómo seguimos?'
 
 /** Anillo de foco estándar — compartido por CTAs y controles en los 3 archivos. */
 export const focusRing =

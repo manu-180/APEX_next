@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils/cn'
  */
 
 const WA_MSG_FOUNDER =
-  'Hola Manuel, leí quién está detrás de APEX y quiero contarte mi proyecto. ¿Lo charlamos?'
+  'Hola Manuel, quiero contarte mi proyecto. ¿Cuándo podemos hablar?'
 
 /** Verdades canónicas (AUDIT_ADDENDUM) — nada inflado. */
 const FOUNDER_STATS = [

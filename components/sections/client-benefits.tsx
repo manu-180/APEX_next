@@ -24,9 +24,9 @@ const LIST_ITEM: Variants = {
 
 /* Mensajes WA contextuales (brief §1.2/§5): 1-2 líneas, voseo, terminan con pregunta. */
 const WA_MSG_PROBLEMA =
-  'Hola Manuel, mi negocio necesita vender más online. ¿Qué me recomendás como primer paso?'
+  'Hola Manuel, quiero vender más online. ¿Por dónde empiezo?'
 const WA_MSG_PROCESO =
-  'Hola Manuel, quiero el boceto gratis de mi web. ¿Qué necesitás de mi parte para arrancar?'
+  'Hola Manuel, quiero el boceto gratis de mi web. ¿Qué necesitás de mí?'
 
 /* ════════════════════════════════════════════════════════════════════════
    Sección 02 — Problema → Solución (PAS comprimido, 2 columnas asimétricas)

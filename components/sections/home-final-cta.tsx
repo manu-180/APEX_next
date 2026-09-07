@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils/cn'
  */
 
 const WA_MSG_FINAL =
-  'Hola Manuel, recorrí tu web y quiero arrancar mi proyecto. ¿Coordinamos 15 minutos?'
+  'Hola Manuel, quiero arrancar mi proyecto. ¿Cuándo podemos hablar?'
 
 /** De-riskers — verdades canónicas del AUDIT_ADDENDUM. */
 const DE_RISKERS = [

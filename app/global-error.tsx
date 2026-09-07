@@ -30,7 +30,7 @@ export default function GlobalError({
   }, [error])
 
   const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    'Hola Manuel, la web me tiró un error y no pude seguir. ¿Me escribís por acá?',
+    'Hola Manuel, tu web me dio un error y no pude seguir. ¿Me ayudás por acá?',
   )}`
 
   return (

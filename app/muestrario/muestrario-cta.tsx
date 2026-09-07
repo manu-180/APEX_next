@@ -37,7 +37,7 @@ export function MuestrarioCta() {
               </div>
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(
-                  'Hola, vi el muestrario y quiero algo con ese nivel de diseño para mi proyecto. ¿Lo charlamos?',
+                  'Hola Manuel, vi el muestrario y quiero ese nivel de diseño para mi proyecto. ¿Lo vemos?',
                 )}
                 className={cn(
                   'group btn-tech inline-flex h-12 shrink-0 select-none items-center justify-center gap-2.5 px-6 text-sm font-semibold text-white',

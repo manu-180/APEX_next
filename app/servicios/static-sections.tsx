@@ -80,7 +80,7 @@ export function ServiciosHero() {
             <div className="flex flex-wrap items-center gap-3 mb-8">
               <WhatsAppOutboundLink
                 waHref={whatsappUrl(
-                  'Hola, estoy viendo los planes en tu web pero no sé cuál me conviene. ¿Me orientás?',
+                  'Hola Manuel, no sé qué plan me conviene. ¿Me ayudás a elegir?',
                 )}
                 className={cn(
                   'group btn-tech inline-flex items-center justify-center gap-2.5 font-semibold select-none',
@@ -741,7 +741,7 @@ export function ServiciosStaticFaq() {
             </p>
             <WhatsAppOutboundLink
               waHref={whatsappUrl(
-                'Hola, tengo una duda que no encontré en el FAQ de tu web. ¿Me la respondés?',
+                'Hola Manuel, tengo una duda que no vi en las preguntas frecuentes. ¿Te consulto?',
               )}
               className="group relative tap-44 inline-flex items-center gap-2.5 rounded-xl text-sm font-semibold text-[var(--color-on-surface)] transition-colors hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
             >

@@ -79,7 +79,7 @@ Mobile: App Producto $580K/mes | App + Operaciones $1.15M/mes | Plataforma multi
 ## Admin
 
 ADMIN_UUID = `37dad3e9-531c-4657-8db6-ddebbdcfa878`
-WhatsApp: `5491134272488`
+WhatsApp: `5491156327091`
 
 ## Google Ads — este sitio es la landing de una campaña activa
 

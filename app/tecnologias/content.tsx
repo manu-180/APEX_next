@@ -19,7 +19,7 @@ import { TechCardsSection } from './tech-cards-section'
 
 /** Mensaje prellenado propio de esta página (tracking centralizado en WhatsAppOutboundLink). */
 const WA_MSG_TECNOLOGIAS =
-  'Hola Manuel, vi el stack que usás en tu web y quiero saber si encaja con mi proyecto. ¿Lo charlamos?'
+  'Hola Manuel, quiero saber si tu stack sirve para mi proyecto. ¿Lo vemos?'
 
 const HERO_STATS = [
   { value: '5', label: 'piezas — cero relleno' },

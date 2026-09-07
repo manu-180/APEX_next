@@ -84,7 +84,7 @@ const CRUMB_LINK_CLASS =
 const LABEL_CLASS = 'inline-block font-mono text-[10px] font-bold tracking-[0.3em] uppercase'
 
 const WA_MSG =
-  'Hola Manuel, vi los precios de páginas web en tu sitio y quiero el número exacto para mi caso. ¿Arrancamos?'
+  'Hola Manuel, quiero saber cuánto me sale mi página web. ¿Me pasás el precio?'
 
 /** Reseñas de proyectos web (las de apps viven en /servicios). */
 const WEB_REVIEWS = REVIEWS.filter((r) => r.project === 'mnltecno' || r.project === 'tallerceramica')
@@ -411,7 +411,7 @@ export default function CuantoCuestaUnaPaginaWebPage() {
 
                     <WhatsAppOutboundLink
                       waHref={whatsappUrl(
-                        `Hola Manuel, quiero el plan ${tier.name} (${formatARS(tier.price)}). ¿Qué necesitás de mí para arrancar?`,
+                        `Hola Manuel, quiero el plan ${tier.name} (${formatARS(tier.price)}). ¿Cómo arrancamos?`,
                       )}
                       className={cn(WA_CTA_CLASS, WA_SHADOW_CLASS, 'mt-6 w-full')}
                       style={{ background: WA_GRADIENT }}
