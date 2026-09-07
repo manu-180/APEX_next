@@ -1,16 +1,8 @@
 import type { Metadata } from 'next'
-import { ServiciosContent } from './content'
-import {
-  ServiciosHero,
-  ServiciosProcess,
-  ServiciosWhyApex,
-  ServiciosStaticFaq,
-  ServiciosComparisonTable,
-} from './static-sections'
+import { ServiciosHero } from './static-sections'
+import { ServiciosBelowFold } from './servicios-below-fold'
 import { SERVICIOS_FAQ_ITEMS } from './faq-data'
-import { ServiciosFinalCta } from './servicios-final-cta'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
-import { ServiciosShowcase } from '@/components/sections/servicios-showcase'
 
 export const metadata: Metadata = {
   title: 'Páginas web a medida en Argentina | Precios desde $300.000',
@@ -50,13 +42,7 @@ export default function ServiciosPage() {
       {/* Orden DESIGN_BRIEF §3: hero corto → pricing → casos reales (prueba) →
           proceso → diferenciador → comparativa única → FAQ → CTA final */}
       <ServiciosHero />
-      <ServiciosContent />
-      <ServiciosShowcase />
-      <ServiciosProcess />
-      <ServiciosWhyApex />
-      <ServiciosComparisonTable />
-      <ServiciosStaticFaq />
-      <ServiciosFinalCta />
+      <ServiciosBelowFold />
     </>
   )
 }

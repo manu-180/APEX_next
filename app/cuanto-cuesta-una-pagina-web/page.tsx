@@ -212,10 +212,13 @@ export default function CuantoCuestaUnaPaginaWebPage() {
                 <p className={cn(LABEL_CLASS, 'mb-2')} style={{ color: 'var(--color-primary)' }}>
                   La respuesta corta
                 </p>
-                <p className="font-heading text-[2rem] font-extrabold leading-none tabular-nums text-[var(--color-on-surface)] sm:text-4xl">
-                  {formatARS(PRICE_MIN)}
-                  <span className="mx-2 font-extralight text-[var(--color-on-surface-variant)]">a</span>
-                  {formatARS(PRICE_MAX)}
+                {/* flex-wrap y no una línea sola: a 375 px el rango completo
+                    no entra y con `white-space` normal se cortaba contra el
+                    borde de la tarjeta. Envuelve a dos líneas en vez de recortar. */}
+                <p className="font-heading flex flex-wrap items-baseline gap-x-2 text-[1.65rem] font-extrabold leading-[1.05] tracking-tight tabular-nums text-[var(--color-on-surface)] sm:text-4xl">
+                  <span>{formatARS(PRICE_MIN)}</span>
+                  <span className="font-extralight text-[var(--color-on-surface-variant)]">a</span>
+                  <span>{formatARS(PRICE_MAX)}</span>
                 </p>
                 <p className="mt-2 text-sm text-[var(--color-on-surface-variant)]">
                   Según lo que la página tenga que hacer. Precio cerrado por escrito, en pesos.

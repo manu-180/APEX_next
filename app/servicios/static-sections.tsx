@@ -56,9 +56,13 @@ export function ServiciosHero() {
 
   return (
     <ServiciosHeroShell>
-      <SectionReveal>
-        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
-          {/* Columna izquierda — decisión + CTA */}
+      {/* Sin SectionReveal: el H1/P de arriba son el elemento LCP de /servicios.
+          Un reveal que arranca en opacity:0 hace que Chrome no lo cuente como
+          pintado hasta que termina la animación (mismo gotcha ya resuelto en
+          el hero de home) — acá lo medimos: 3172ms de elementRenderDelay sobre
+          3195ms de LCP total. Contenido estático, igual que HeroSection. */}
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+        {/* Columna izquierda — decisión + CTA */}
           <div className="max-w-2xl">
             <p className="editorial-label editorial-label--primary mb-6">Servicios y precios</p>
 
@@ -160,7 +164,6 @@ export function ServiciosHero() {
             </ul>
           </div>
         </div>
-      </SectionReveal>
     </ServiciosHeroShell>
   )
 }
