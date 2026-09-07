@@ -1,6 +1,10 @@
-'use client'
-
-import { useEffect, useRef, type CSSProperties } from 'react'
+/**
+ * Server component a proposito. El footer es markup estatico salvo el
+ * watermark con parallax (extraido a `FooterWatermark`) y los CTAs de
+ * WhatsApp (`WhatsAppOutboundLink`, cliente). Como el shell lo recibe como
+ * slot desde `app/layout.tsx`, su arbol no viaja en el bundle de cliente ni
+ * se hidrata: es costo que se pagaba en TODAS las rutas.
+ */
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
@@ -8,6 +12,7 @@ import { whatsappUrl, WA_MSG_FOOTER_LINK } from '@/lib/whatsapp'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 import { WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
+import { FooterWatermark } from '@/components/layout/footer-watermark'
 
 const WHATSAPP_FOOTER_HREF = whatsappUrl(WA_MSG_FOOTER_LINK)
 
@@ -39,85 +44,6 @@ const EXPLORAR_LINKS = [
 ]
 
 export function Footer() {
-  const watermarkRef = useRef<HTMLDivElement>(null)
-
-  // Parallax de marca (spec §1/§11): el watermark APEX se desplaza -30→30px
-  // y su stroke se intensifica 0.05→0.10 scrubbed al scroll. Vanilla (scroll
-  // pasivo + rAF, antes GSAP): solo corre con el footer en viewport, lg+ y
-  // sin reduced-motion.
-  useEffect(() => {
-    const el = watermarkRef.current
-    if (!el) return
-
-    const mql = window.matchMedia(
-      '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
-    )
-    const footerEl = (el.closest('footer') as HTMLElement) ?? el
-
-    let rafId = 0
-    let listening = false
-
-    const update = () => {
-      rafId = 0
-      const rect = footerEl.getBoundingClientRect()
-      const vh = window.innerHeight
-      // 0 cuando el top del footer toca el borde inferior del viewport;
-      // 1 cuando el bottom del footer llega al borde inferior.
-      const p = Math.min(1, Math.max(0, (vh - rect.top) / Math.max(1, rect.height)))
-      el.style.transform = `translate3d(0, ${(-30 + 60 * p).toFixed(1)}px, 0)`
-      el.style.setProperty('--sn-stroke-alpha', (0.05 + 0.05 * p).toFixed(3))
-    }
-
-    const onScroll = () => {
-      if (!rafId) rafId = requestAnimationFrame(update)
-    }
-
-    const stop = () => {
-      if (!listening) return
-      listening = false
-      window.removeEventListener('scroll', onScroll)
-      if (rafId) {
-        cancelAnimationFrame(rafId)
-        rafId = 0
-      }
-    }
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && mql.matches) {
-          if (!listening) {
-            listening = true
-            window.addEventListener('scroll', onScroll, { passive: true })
-            update()
-          }
-        } else {
-          stop()
-        }
-      },
-      { rootMargin: '80px' },
-    )
-
-    const applyGate = () => {
-      if (mql.matches) {
-        io.observe(footerEl)
-      } else {
-        io.disconnect()
-        stop()
-        el.style.transform = ''
-        el.style.removeProperty('--sn-stroke-alpha')
-      }
-    }
-
-    applyGate()
-    mql.addEventListener('change', applyGate)
-
-    return () => {
-      mql.removeEventListener('change', applyGate)
-      io.disconnect()
-      stop()
-    }
-  }, [])
-
   return (
     <footer
       id="site-footer"
@@ -131,19 +57,7 @@ export function Footer() {
       <span aria-hidden className="noise-overlay pointer-events-none absolute inset-0 z-0" />
 
       {/* Watermark de marca: outline gigante del tema, puramente decorativo */}
-      <div
-        ref={watermarkRef}
-        aria-hidden="true"
-        className="section-number absolute -bottom-8 right-0 z-0 hidden select-none lg:block"
-        style={
-          {
-            '--sn-stroke-alpha': '0.07',
-            fontSize: 'clamp(9rem, 16vw, 14rem)',
-          } as CSSProperties
-        }
-      >
-        APEX
-      </div>
+      <FooterWatermark />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 pt-20 pb-10">
         {/* Main — asimétrico: bloque editorial ancho + 2 columnas discretas */}

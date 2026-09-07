@@ -30,8 +30,27 @@ import { WA_MSG_CONTACT_NOW, focusRing } from './shared'
    imports en la entrega de esta tarea.
    ──────────────────────────────────────────────────────────────────────── */
 
-const BookingCalendar = dynamic(
-  () => import('./booking-calendar').then((m) => m.BookingCalendar),
+/**
+ * `ToastProvider` viaja junto al calendario y no en el shell: es su unico
+ * consumidor en todo el sitio. Montandolo aca, AnimatePresence + el Toaster
+ * dejan de cargarse (y de hidratarse) en las otras 30+ rutas.
+ */
+const BookingCalendarWithToasts = dynamic(
+  () =>
+    Promise.all([
+      import('./booking-calendar'),
+      import('@/components/ui/toast'),
+    ]).then(([booking, toast]) => {
+      const Calendar = booking.BookingCalendar
+      const Provider = toast.ToastProvider
+      return function CalendarWithToasts() {
+        return (
+          <Provider>
+            <Calendar />
+          </Provider>
+        )
+      }
+    }),
   { ssr: true, loading: () => <BookingCalendarSkeleton /> },
 )
 
@@ -191,7 +210,7 @@ export function ContactoContent() {
               <div className="divider-theme flex-1" />
             </div>
 
-            <BookingCalendar />
+            <BookingCalendarWithToasts />
           </div>
         </div>
       </section>
