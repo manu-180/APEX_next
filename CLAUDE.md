@@ -7,7 +7,7 @@ Always work directly on main branch. Never create worktrees or feature branches.
 - Next.js 14 (App Router, TypeScript)
 - Tailwind CSS 3
 - Framer Motion 11
-- next-themes (light/dark)
+- Provider propio de light/dark (`components/providers/theme-mode-provider.tsx`) — next-themes fue removido
 - Supabase (auth, DB, realtime)
 
 ## Project Structure
@@ -20,15 +20,18 @@ app/              # Next.js App Router pages
   sobre-mi/       # About page
   servicios/      # Services + estimator
   contacto/       # Contact + booking + reviews
-  api/            # Route handlers (chat, contact, bookings)
+  api/            # Route handlers (booking/whatsapp, csp-report)
 
 components/
-  ui/             # Primitive UI components (button, card, badge, etc.)
-  layout/         # Navbar, Footer, MainLayout
+  ui/             # Primitive UI components (button, card, toast, icons, etc.)
+  layout/         # AppShell, Navbar, Footer, MobileDrawer, ShortcutsModal
   sections/       # Full page sections (Hero, Projects, Pricing, etc.)
-  theme/          # ThemeCard, ThemeToast, ThemeSwitcher
-  floating/       # WhatsAppButton, APEXbot, PresenceBadge
-  inspector/      # InspectorGadget wrapper
+  providers/      # ThemeModeProvider (light/dark), ApexThemeProvider (7 temas)
+  floating/       # WhatsAppFloatingButton (unico flotante)
+  analytics/      # GoogleAnalyticsRoot (INTOCABLE, cola de eventos), MetaPixel
+  whatsapp/       # WhatsAppOutboundLink + bridge de /gracias
+  seo/            # JSON-LD, sitemap helpers, legacy hash redirect
+  three/          # Escenas WebGL (solo /lab)
 
 hooks/
   useTheme.ts           # 7-theme dynamic system (data-theme on <html>)
@@ -46,7 +49,9 @@ lib/
 
 7 dynamic themes, applied via `data-theme="<id>"` on `<html>`.
 CSS variables `--color-primary` and `--color-primary-rgb` change per theme.
-Light/dark handled separately by next-themes (`class="dark"` on `<html>`).
+Light/dark lo maneja `components/providers/theme-mode-provider.tsx` (`class="dark"`
+en `<html>`). Reemplazo de next-themes, que inyectaba un script bloqueante en el
+`<head>`; la dependencia ya no esta instalada.
 
 Theme IDs: `neutral` | `flutter` | `supabase` | `riverpod` | `botlode` | `assistify` | `contact-engine`
 
@@ -54,14 +59,16 @@ Theme IDs: `neutral` | `flutter` | `supabase` | `riverpod` | `botlode` | `assist
 
 - Dynamic themes: hover preview + click to apply (persisted localStorage)
 - Light/dark toggle: Ctrl+Y
-- Inspector mode (X-Ray): Ctrl+I
+- Inspector mode (X-Ray): Ctrl+I — `hooks/useInspector.ts` + `components/ui/inspector-overlay.tsx`
 - Keyboard shortcuts: Ctrl+H/A/S/M/Y/R/I/K (+ Ctrl+Shift+H abre WhatsApp)
-- Real-time presence badge (Supabase Realtime)
-- Google login (Supabase OAuth)
-- APEXbot floating chatbot
-- WhatsApp floating button
+- WhatsApp floating button (`components/floating/`, diferido a `requestIdleCallback`)
 - Booking/calendar system (no Sundays, anti-double-booking)
 - Reviews with star rating + nested replies
+
+(Verificado contra el codigo el 2026-09-07. Lo que este doc listaba y NO existe:
+`APEXbot`, `PresenceBadge`, `InspectorGadget`, `components/theme/`,
+`components/inspector/`, el badge de presencia realtime y el login con Google.
+No reponerlos sin implementarlos primero.)
 
 ## Prices (ARS) — do not modify without checking with Manuel
 
