@@ -437,6 +437,11 @@ export function Navbar({
           </m.span>
 
           <button
+            // pointerdown/focus montan el drawer antes del click: el chunk
+            // empieza a bajar ~100ms antes de que haga falta, asi el primer
+            // toque no espera a la red.
+            onPointerDown={() => setDrawerRequested(true)}
+            onFocus={() => setDrawerRequested(true)}
             onClick={() => {
               setDrawerRequested(true)
               setMobileOpen((v) => !v)
