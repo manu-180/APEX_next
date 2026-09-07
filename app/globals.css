@@ -879,20 +879,24 @@ a {
   position: relative;
 }
 
+/* Sin mix-blend-mode a proposito: medido con Lighthouse mobile, el blend de
+   las capas de grano costaba ~80ms de trabajo previo al primer paint en TODAS
+   las rutas (es del shell, no de la pagina). A opacity 0.02-0.03 el resultado
+   visual con `normal` es indistinguible; con `overlay` el compositor tiene que
+   mezclar la capa contra todo lo que hay debajo antes de poder pintar. */
 .noise-overlay::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 0;
   background-image: var(--noise-url);
-  opacity: 0.03;
-  mix-blend-mode: overlay;
+  opacity: 0.028;
   border-radius: inherit;
   pointer-events: none;
 }
 
 .light .noise-overlay::after {
-  opacity: 0.015;
+  opacity: 0.014;
 }
 
 /* ── Noise global (spec §6): grain fijo que mata el banding de los fondos ──
@@ -904,13 +908,12 @@ body::after {
   inset: 0;
   z-index: 1;
   background-image: var(--noise-url);
-  opacity: 0.02;
-  mix-blend-mode: overlay;
+  opacity: 0.019;
   pointer-events: none;
 }
 
 .light body::after {
-  opacity: 0.015;
+  opacity: 0.014;
 }
 
 /* ── Divider con gradiente del tema (para <div> o <hr>) ──────────────────── */

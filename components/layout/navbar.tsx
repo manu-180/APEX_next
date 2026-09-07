@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { m, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
@@ -11,8 +12,18 @@ import { whatsappUrl, WA_MSG_NAV } from '@/lib/whatsapp'
 import { SPRING_SNAP } from '@/lib/motion'
 import { SunIcon, MoonIcon, KeyboardIcon, InspectorIcon, GalleryIcon, ArrowRightIcon } from '@/components/ui/icons'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
-import { MobileDrawer } from '@/components/layout/mobile-drawer'
 const WHATSAPP_NAV_HREF = whatsappUrl(WA_MSG_NAV)
+
+/**
+ * El drawer (~9 kB con el drag de framer-motion) solo existe despues del
+ * primer toque en el hamburguesa. Antes viajaba en el chunk del layout, o sea
+ * en TODAS las rutas, para una UI que la mayoria de las visitas nunca abre.
+ * `ssr: false` es correcto aca: cerrado no renderiza nada indexable.
+ */
+const MobileDrawer = dynamic(
+  () => import('@/components/layout/mobile-drawer').then((m) => m.MobileDrawer),
+  { ssr: false },
+)
 
 // Estilo base compartido de los controles-icono del navbar: superficie táctil,
 // press feedback (active:scale) y focus-visible siempre visible. El tamaño
@@ -25,6 +36,17 @@ const ICON_BTN = cn(
   'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]',
   'transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.92]',
   'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]',
+)
+
+/**
+ * Morph del hamburguesa en CSS puro. Eran dos componentes de framer-motion
+ * montados en cada ruta solo para animar 2 rayas; el overshoot del cubic-bezier
+ * imita el spring 380/26 sin traer el runtime de animacion al viewport mobile.
+ */
+const BURGER_LINE = cn(
+  'absolute left-0 top-1/2 -mt-px block h-0.5 w-5 origin-center rounded-full bg-current',
+  'transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
+  'motion-reduce:duration-100 motion-reduce:ease-out',
 )
 
 const NAV_LINKS = [
@@ -71,8 +93,18 @@ export function Navbar({
   const { resolvedTheme } = useTheme()
   const shouldReduceMotion = useReducedMotion()
   const [mobileOpen, setMobileOpen] = useState(false)
+  // Una vez abierto, el drawer queda montado: cerrarlo no debe descargar el
+  // chunk ni perder la animacion de salida de AnimatePresence.
+  const [drawerRequested, setDrawerRequested] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  /**
+   * La barra de links (y con ella el underline, el ResizeObserver y el
+   * reflow forzado por getBoundingClientRect) es `hidden md:flex`. En mobile
+   * medir esas cajas es trabajo de layout sincronico durante la hidratacion
+   * sobre elementos con display:none — puro costo, cero pixeles.
+   */
+  const [isDesktop, setIsDesktop] = useState(false)
 
   // Magnetic hover del CTA Muestrario (spec §8.6): pull sutil ±3px vía
   // useMotionValue + useSpring — cero re-renders, desktop only (pointerType
@@ -108,6 +140,7 @@ export function Navbar({
   const [hoveredHref, setHoveredHref] = useState<string | null>(null)
 
   const updateUnderline = useCallback(() => {
+    if (!isDesktop) return
     const container = navLinksRef.current
     if (!container) return
     const targetHref =
@@ -129,7 +162,7 @@ export function Navbar({
       width: Math.max(0, lr.width - insetX * 2),
       top: lr.bottom - cr.top + 2,
     })
-  }, [pathname, hoveredHref])
+  }, [pathname, hoveredHref, isDesktop])
 
   useLayoutEffect(() => {
     updateUnderline()
@@ -137,6 +170,11 @@ export function Navbar({
 
   useEffect(() => {
     setMounted(true)
+    const mql = window.matchMedia('(min-width: 768px)')
+    const sync = () => setIsDesktop(mql.matches)
+    sync()
+    mql.addEventListener('change', sync)
+    return () => mql.removeEventListener('change', sync)
   }, [])
 
   // Glass reactivo al scroll: una vez desplazado, el nav gana sombra/elevación.
@@ -157,6 +195,7 @@ export function Navbar({
   }, [])
 
   useEffect(() => {
+    if (!isDesktop) return
     const el = navLinksRef.current
     if (!el) return
     const ro = new ResizeObserver(() => updateUnderline())
@@ -166,12 +205,13 @@ export function Navbar({
       ro.disconnect()
       window.removeEventListener('resize', updateUnderline)
     }
-  }, [updateUnderline])
+  }, [updateUnderline, isDesktop])
 
   useEffect(() => {
+    if (!isDesktop) return
     if (typeof document === 'undefined' || !document.fonts?.ready) return
     void document.fonts.ready.then(() => updateUnderline())
-  }, [updateUnderline])
+  }, [updateUnderline, isDesktop])
 
   return (
     <nav
@@ -397,7 +437,15 @@ export function Navbar({
           </m.span>
 
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
+            // pointerdown/focus montan el drawer antes del click: el chunk
+            // empieza a bajar ~100ms antes de que haga falta, asi el primer
+            // toque no espera a la red.
+            onPointerDown={() => setDrawerRequested(true)}
+            onFocus={() => setDrawerRequested(true)}
+            onClick={() => {
+              setDrawerRequested(true)
+              setMobileOpen((v) => !v)
+            }}
             className={cn(ICON_BTN, 'flex md:hidden size-11')}
             aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={mobileOpen}
@@ -406,25 +454,11 @@ export function Navbar({
             {/* Hamburger morph: 2 líneas que colapsan al centro y rotan ±45°
                 (transform-only, spring 380/26). Reduced-motion → cross corto. */}
             <span aria-hidden className="relative block size-5">
-              <m.span
-                className="absolute left-0 top-1/2 -mt-px block h-0.5 w-5 rounded-full bg-current"
-                initial={false}
-                animate={mobileOpen ? { y: 0, rotate: 45 } : { y: -3.5, rotate: 0 }}
-                transition={
-                  shouldReduceMotion
-                    ? { duration: 0.12 }
-                    : { type: 'spring' as const, stiffness: 380, damping: 26 }
-                }
+              <span
+                className={cn(BURGER_LINE, mobileOpen ? 'translate-y-0 rotate-45' : '-translate-y-[3.5px] rotate-0')}
               />
-              <m.span
-                className="absolute left-0 top-1/2 -mt-px block h-0.5 w-5 rounded-full bg-current"
-                initial={false}
-                animate={mobileOpen ? { y: 0, rotate: -45 } : { y: 3.5, rotate: 0 }}
-                transition={
-                  shouldReduceMotion
-                    ? { duration: 0.12 }
-                    : { type: 'spring' as const, stiffness: 380, damping: 26 }
-                }
+              <span
+                className={cn(BURGER_LINE, mobileOpen ? 'translate-y-0 -rotate-45' : 'translate-y-[3.5px] rotate-0')}
               />
             </span>
           </button>
@@ -433,6 +467,7 @@ export function Navbar({
         </div>
       </div>
 
+      {drawerRequested && (
       <MobileDrawer
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
@@ -444,6 +479,7 @@ export function Navbar({
         resolvedTheme={resolvedTheme === 'dark' ? 'dark' : 'light'}
         onlineCount={onlineCount}
       />
+      )}
     </nav>
   )
 }

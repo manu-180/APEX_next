@@ -8,8 +8,6 @@ import { useApexThemeActions } from '@/hooks/useTheme'
 import { useInspector } from '@/hooks/useInspector'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { Navbar } from './navbar'
-import { Footer } from './footer'
-import { ToastProvider } from '@/components/ui/toast'
 
 const ShortcutsModal = dynamic(
   () => import('./shortcuts-modal').then((m) => m.ShortcutsModal),
@@ -50,7 +48,14 @@ export { useInspector } from '@/hooks/useInspector'
 const loadMotionFeatures = () =>
   import('@/lib/motion-features').then((mod) => mod.default)
 
-export function AppShell({ children }: { children: ReactNode }) {
+/**
+ * `footer` llega como slot desde `app/layout.tsx` (server): asi el arbol del
+ * footer se renderiza en el servidor y NO entra al bundle de cliente ni se
+ * hidrata. Mismo motivo por el que `ToastProvider` ya no vive aca — su unico
+ * consumidor es el calendario de /contacto, y montarlo en el shell cargaba
+ * AnimatePresence + el Toaster en todas las rutas.
+ */
+export function AppShell({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme()
   const { resetTheme } = useApexThemeActions()
   const inspector = useInspector()
@@ -114,7 +119,6 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <LazyMotion features={loadMotionFeatures} strict>
-    <ToastProvider>
     <div className={inspector.isActive ? 'inspector-mode' : ''}>
       <Navbar
         onToggleDarkMode={toggleDarkMode}
@@ -135,7 +139,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         {children}
       </main>
-      <Footer />
+      {footer}
       {inspector.isActive && <InspectorOverlay onDisable={inspector.disable} />}
       {showShortcuts && <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />}
       {enhancementsReady && (
@@ -146,7 +150,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </>
       )}
     </div>
-    </ToastProvider>
     </LazyMotion>
   )
 }
