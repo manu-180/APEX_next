@@ -5,6 +5,75 @@
 
 ---
 
+## -4. ORQUESTADOR — una landing por intención de búsqueda (2026-09-06)
+
+Disparador: la campaña **Apex search** pierde **79 % de las subastas por Ad Rank**
+(vs 14 % por presupuesto) con Quality Score promedio **3,4**. Subir presupuesto no
+compra impresiones: la palanca es la landing.
+
+**El diagnóstico, leído de la API el 2026-09-06.** Sólo 2 de los 6 ad groups están
+activos y **los dos aterrizan en la misma página**:
+
+| Ad group (ENABLED) | Landing | Keywords con `post_click_quality_score = BELOW_AVERAGE` |
+|---|---|---|
+| Presupuesto y Precios | `/servicios#pricing` | 11 de 11 |
+| Web - Diseño y Desarrollo | `/servicios` | 13 de 15 |
+
+`/servicios` tenía que servir dos intenciones distintas (cuánto cuesta vs. con
+quién lo hago) y Google la castigaba para las dos. De ahí las dos landings nuevas.
+
+**Hecho y verificado:**
+- `app/cuanto-cuesta-una-pagina-web/` — intención transaccional de precio. H1 con
+  la búsqueda literal; verificado a 375×812 que el rango y los precios reales
+  entran **sin scrollear** (`h1Bottom` 342 px, `$ 300.000` y `$ 900.000` en el
+  primer viewport). `PRICE_TIERS` se deriva de `WEB_PLANS` y rompe el build si un
+  plan pierde el precio — los precios no pueden desfasarse.
+- `app/diseno-de-paginas-web/` — intención "agencia/diseño". 1 solo `<h1>`, 7 `<h2>`,
+  4 CTAs por `WhatsAppOutboundLink`, link contextual a la landing de precio.
+- **CWV de `/servicios`**: se sacó el `SectionReveal` del hero (mismo gotcha del
+  hero de home: un reveal que arranca en `opacity:0` retrasa el LCP — medido acá,
+  3172 ms de `elementRenderDelay` sobre 3195 ms de LCP) y las 7 secciones
+  below-the-fold pasaron a `next/dynamic` **con SSR**, patrón de `home-below-fold`.
+  Medido con dos builds: First Load JS **175 kB → 152 kB (−23 kB, −13 %)**.
+- **Verificado que el SSR sobrevivió** — es el riesgo real de ese cambio. En el
+  HTML prerenderizado de `/servicios` están las 31 `<h2>/<h3>`: pricing, showcase,
+  proceso, comparativa y las 7 preguntas de la FAQ. Si eso se hubiera ido al
+  cliente, el Quality Score empeoraba en vez de mejorar.
+- Rutas sumadas a `sitemap.ts`, `ROUTES` y `llms.txt`; link interno desde el hero
+  de `/servicios` a las dos (antes no recibían autoridad interna de ningún lado).
+- `docs/google-ads/auditoria-negativas-2026-09-06.md` — auditoría de las 450
+  negativas de la campaña (0 a nivel ad group, 0 listas compartidas).
+
+**El hallazgo de la auditoría:** `como` y `cómo` estaban como negativas **de una
+sola palabra en amplia** (criterion 11413781 y 14976776), o sea bloqueando toda
+búsqueda que contenga la palabra interrogativa más común del español. Evidencia:
+en 718 términos de búsqueda de 30 días no aparece ni uno con esa palabra.
+
+**Verificación:** `npx tsc --noEmit` exit 0 · `npm run build` exit 0, las 3 rutas
+estáticas · sin scroll horizontal a 375 y 1280 px · CLS 0 medido con
+`PerformanceObserver`.
+
+**Lo que NO se pudo medir en este entorno:** LCP e INP. El Browser pane corre
+oculto y su renderer no emite entradas de `paint` ni de `largest-contentful-paint`
+(sí emite `layout-shift`), y no hay Lighthouse instalado. El número de LCP hay que
+tomarlo en producción con PageSpeed después del deploy.
+
+**Pendiente de decisión de Manuel (mueve plata, no se aplicó solo):**
+1. Repuntar los final URLs: ad `806775371905` → `/cuanto-cuesta-una-pagina-web`,
+   ad `806775371899` → `/diseno-de-paginas-web`. Sin esto las landings no rinden.
+2. Eliminar las negativas `como` y `cómo`; pasar `como hacer`, `cómo hacer`,
+   `como crear`, `cómo crear` de amplia a **exacto** (están en los tokens
+   irrelevantes configurados: filtrar DIY es decisión deliberada, el bug es la
+   concordancia).
+3. Canibalización sin medir: `/servicios` y el post
+   `/blog/cuanto-cuesta-pagina-web-argentina-2026` tienen titles casi calcados al
+   de la landing de precio. **No se tocaron a propósito** — son activos orgánicos y
+   no hay datos de Search Console para saber qué se pierde al retitularlos.
+
+El Quality Score tarda **2 a 4 semanas** en recalcularse: no evaluar antes.
+
+---
+
 ## -3. ORQUESTADOR — blindaje, CWV, conversión y limpieza (2026-09-02)
 
 Disparador: PageSpeed móvil (LCP 2,8 s, CSS bloqueante 340 ms, 82 % CSS sin uso,
