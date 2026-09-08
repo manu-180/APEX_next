@@ -14,7 +14,7 @@ export const dynamic = 'force-static'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Blog APEX — Precios, stack, casos y estrategia para PyMEs argentinas',
+  title: 'Blog — precios y guías de desarrollo web',
   description:
     'Artículos honestos sobre precios reales de desarrollo web y apps en Argentina 2026, comparativas de tecnología, casos de estudio y cómo elegir bien tu proveedor.',
   alternates: { canonical: `${APP_URL.replace(/\/$/, '')}/blog` },

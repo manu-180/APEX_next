@@ -16,9 +16,11 @@ import {
   ReadingProgress,
   type TocHeading,
 } from '@/components/blog/blog-block-renderer'
-import { BreadcrumbJsonLd } from '@/components/seo/json-ld'
+import { BreadcrumbJsonLd, ORG_ID, PERSON_ID, WEBSITE_ID } from '@/components/seo/json-ld'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
 import { APP_URL } from '@/lib/constants'
+
+const BASE = APP_URL.replace(/\/$/, '')
 
 export const dynamic = 'force-static'
 export const dynamicParams = false
@@ -40,7 +42,10 @@ export async function generateMetadata({
   const url = `${APP_URL.replace(/\/$/, '')}/blog/${post.slug}`
 
   return {
-    title: post.title,
+    // `absolute`: sin sufijo de marca. Los títulos del blog ya usan todo el
+    // presupuesto del SERP con la keyword — `seoTitle` es la versión recortada
+    // cuando el H1 largo no entra.
+    title: { absolute: post.seoTitle ?? post.title },
     description: post.description,
     keywords: post.tags,
     alternates: { canonical: url },
@@ -100,8 +105,23 @@ export default async function BlogPostPage({
   const post = getBlogPost(slug)
   if (!post) notFound()
 
-  const url = `${APP_URL.replace(/\/$/, '')}/blog/${post.slug}`
+  const url = `${BASE}/blog/${post.slug}`
   const related = getRelatedPosts(slug, 3)
+
+  // `wordCount` sale del contenido real, no de una estimación a mano: un
+  // número inflado en el schema es una señal de calidad que Google puede
+  // contrastar contra el HTML servido.
+  const wordCount = post.blocks.reduce((n, b) => {
+    const text =
+      b.type === 'list'
+        ? b.items.join(' ')
+        : b.type === 'table'
+          ? [...b.headers, ...b.rows.flat()].join(' ')
+          : 'text' in b
+            ? b.text
+            : ''
+    return n + text.trim().split(/\s+/).filter(Boolean).length
+  }, 0)
 
   // Anchors por heading (server-side, sin colisiones) + datos del TOC.
   // La misma lista alimenta los ids del renderer y los links del índice.
@@ -140,24 +160,26 @@ export default async function BlogPostPage({
   const blogPostingSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
+    '@id': `${url}#article`,
     headline: post.title,
     description: post.description,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
-    author: {
-      '@type': 'Person',
-      name: 'Manuel Navarro',
-      url: APP_URL,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'APEX Portfolio',
-      url: APP_URL,
-    },
-    mainEntityOfPage: url,
+    // Referencias a los nodos del layout, no copias inline: `author` y
+    // `publisher` estaban redeclarados acá y Google los leía como una Person
+    // y una Organization DISTINTAS de las del resto del sitio.
+    author: { '@id': PERSON_ID },
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    // `image` es requisito de Google para el rich result de artículo; sin él
+    // el post queda como resultado azul común.
+    image: [`${BASE}/opengraph-image`],
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     keywords: post.tags.join(', '),
     inLanguage: 'es-AR',
     articleSection: CATEGORY_LABELS[post.category],
+    wordCount,
+    timeRequired: `PT${post.readingMinutes}M`,
   }
 
   return (

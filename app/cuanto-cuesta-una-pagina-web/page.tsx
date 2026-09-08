@@ -32,8 +32,13 @@ const BASE = APP_URL.replace(/\/$/, '')
 const PAGE_URL = `${BASE}${PATH}`
 
 export const metadata: Metadata = {
-  title: `Cuánto cuesta una página web en Argentina | ${arsInline(PRICE_MIN)} a ${arsInline(PRICE_MAX)} | APEX`,
-  description: `Precio de una página web en Argentina: Landing ${arsInline(PRICE_TIERS[0].price)}, Web Interactiva ${arsInline(PRICE_TIERS[1].price)} y Tienda Online ${arsInline(PRICE_TIERS[2].price)}. Presupuesto cerrado por escrito, 3 cuotas sin interés y entrega en 15 días.`,
+  // `absolute`: el título ya gasta el presupuesto entero del SERP con la
+  // query literal + la respuesta. Un sufijo de marca acá solo empuja el
+  // rango de precio fuera de la línea visible.
+  title: {
+    absolute: `Cuánto cuesta una página web en Argentina: ${arsInline(PRICE_MIN)} a ${arsInline(PRICE_MAX)}`,
+  },
+  description: `Precio de una página web en Argentina: Landing ${arsInline(PRICE_TIERS[0].price)}, Interactiva ${arsInline(PRICE_TIERS[1].price)} y Tienda Online ${arsInline(PRICE_TIERS[2].price)}. Presupuesto cerrado y entrega en 15 días.`,
   keywords: [
     'cuanto cuesta una pagina web',
     'cuanto cuesta una pagina web en argentina',

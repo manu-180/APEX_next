@@ -28,7 +28,7 @@ const LANDING_PRICE = WEB_PLANS.find((p) => p.id === 'web_basic')?.price ?? 3000
 export const metadata: Metadata = {
   title: 'Diseño y desarrollo de páginas web para empresas',
   description:
-    'Estudio de diseño y desarrollo web en Buenos Aires. Páginas web profesionales a medida para empresas y PyMEs de toda la Argentina: diseño propio, código propio y entrega en 15 días.',
+    'Estudio de diseño y desarrollo web en Buenos Aires. Páginas a medida para empresas y PyMEs de toda la Argentina: diseño propio, código propio y entrega en 15 días.',
   keywords: [
     'diseño de paginas web',
     'diseño y desarrollo web',

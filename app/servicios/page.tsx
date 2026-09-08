@@ -3,9 +3,10 @@ import { ServiciosHero } from './static-sections'
 import { ServiciosBelowFold } from './servicios-below-fold'
 import { SERVICIOS_FAQ_ITEMS } from './faq-data'
 import { SafeJsonLd } from '@/components/seo/safe-json-ld'
+import { TopLevelBreadcrumbJsonLd } from '@/components/seo/json-ld'
 
 export const metadata: Metadata = {
-  title: 'Páginas web a medida en Argentina | Precios desde $300.000',
+  title: 'Páginas web a medida en Argentina desde $300.000',
   description:
     'Páginas web a medida desde ARS 300.000, con precio fijo y entrega garantizada en 15 días. Webs, e-commerce y apps móviles para empresas y emprendedores en Argentina.',
   keywords: [
@@ -38,6 +39,7 @@ const faqSchema = {
 export default function ServiciosPage() {
   return (
     <>
+      <TopLevelBreadcrumbJsonLd name="Servicios" path="/servicios" />
       <SafeJsonLd data={faqSchema} />
       {/* Orden DESIGN_BRIEF §3: hero corto → pricing → casos reales (prueba) →
           proceso → diferenciador → comparativa única → FAQ → CTA final */}

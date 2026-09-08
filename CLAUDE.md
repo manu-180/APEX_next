@@ -107,6 +107,31 @@ Lo que hay que tener presente al programar en este repo:
 Hay automatismos que escriben en la cuenta sin pasar por este repo, en
 `C:\Users\Manuel\apex-ads-ops\`. Si algo cambió solo en la campaña, mirar ahí.
 
+## SEO — invariantes (auditado y reconstruido 2026-09-07)
+
+Registro completo: `docs/seo/2026-09-07-posicionamiento.md`. Lo que no hay que
+romper sin leerlo primero:
+
+- **Una URL por intención.** `/servicios` es el catálogo; cada producto con
+  demanda medida tiene página propia (`/tienda-online`, `/landing-page`,
+  `/cuanto-cuesta-una-pagina-web`, `/diseno-de-paginas-web`). Un `?tab=` **no**
+  crea una URL para Google. Landing nueva sin 1.000 palabras que no estén en
+  otra página = canibalización, no cobertura.
+- **El footer reparte autoridad.** Es el único bloque en todas las páginas.
+  Cada entrada apunta a una URL distinta y real; al sumar una landing, sumarla
+  ahí y en `INTENT_LANDINGS` de `app/servicios/static-sections.tsx`.
+- **Presupuesto del `<title>`: 60 caracteres.** El sufijo es `| APEX` (7), no
+  el nombre propio. Si el título ya los usa, va `title.absolute`. Los posts del
+  blog llevan `seoTitle` para el SERP y conservan el H1 largo.
+- **Los precios del schema salen de `WEB_PLANS`**, nunca escritos a mano en
+  `json-ld.tsx`: un desfasaje ahí no se ve en pantalla y Google sí lo lee.
+- **Un solo nodo por entidad.** `PERSON_ID` / `ORG_ID` / `WEBSITE_ID` se
+  exportan desde `components/seo/json-ld.tsx` y se **referencian**. Redeclarar
+  un `author` o `publisher` inline crea una entidad paralela y parte la
+  autoridad en dos.
+- **Antes de dar por buena una tanda de cambios SEO**, correr los cuatro
+  chequeos del final de ese doc contra el build de producción.
+
 ## Diseño Visual — Reglas de Estética (NO IGNORAR)
 
 ### Tipografía

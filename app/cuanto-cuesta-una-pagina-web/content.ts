@@ -1,4 +1,4 @@
-import { WEB_PLANS } from '@/lib/types/services'
+import { arsInline, WEB_PLANS } from '@/lib/types/services'
 
 export interface PriceTier {
   id: string
@@ -126,9 +126,7 @@ export const PROCESS_STEPS: Array<{ num: string; title: string; body: string }> 
  * Los montos salen igual de `lib/types/services.ts`, así que no pueden
  * desincronizarse del pricing.
  */
-export function arsInline(amount: number): string {
-  return `$${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(amount)}`
-}
+export { arsInline }
 
 const P_LANDING = arsInline(PRICE_TIERS[0].price)
 const P_INTERACTIVA = arsInline(PRICE_TIERS[1].price)

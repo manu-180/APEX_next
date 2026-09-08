@@ -52,6 +52,11 @@ const BURGER_LINE = cn(
 const NAV_LINKS = [
   { href: ROUTES.home, label: 'Inicio', external: false },
   { href: ROUTES.servicios, label: 'Servicios', external: false },
+  // El blog son 8 guías de ~5.000 palabras cada una y hasta 2026-09-07 no tenía
+  // un solo enlace sitewide: los únicos que lo apuntaban eran las verticales y
+  // una landing. Entra antes que Tecnologías porque responde a la intención
+  // "todavía estoy averiguando", que es donde llega el grueso del tráfico frío.
+  { href: ROUTES.blog, label: 'Blog', external: false },
   { href: ROUTES.tecnologias, label: 'Tecnologías', external: false },
   { href: ROUTES.lab, label: 'Lab', external: false },
   { href: ROUTES.about, label: 'Sobre Mí', external: false },

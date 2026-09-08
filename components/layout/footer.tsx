@@ -8,6 +8,7 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
+import { VERTICALS } from '@/lib/data/verticals'
 import { whatsappUrl, WA_MSG_FOOTER_LINK } from '@/lib/whatsapp'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
 import { WhatsAppIcon } from '@/components/ui/icons'
@@ -28,15 +29,31 @@ const FOOTER_LINK = cn(
   'focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)] focus-visible:text-[var(--color-primary)]',
 )
 
+/**
+ * El footer es el único bloque que aparece en TODAS las páginas: es la palanca
+ * de enlazado interno más fuerte del sitio, y hasta 2026-09-07 la estaba
+ * desperdiciando. Tres de sus cinco links de "Servicios" apuntaban a la MISMA
+ * URL (`/servicios?tab=web`, que es `/servicios` para un crawler), mientras las
+ * dos landings de intención comercial más largas del sitio quedaban casi
+ * huérfanas: `/cuanto-cuesta-una-pagina-web` con 2 enlaces entrantes en todo el
+ * sitio y `/diseno-de-paginas-web` con 1 — contra 45 de `/sobre-mi`, que no
+ * tiene ninguna keyword comercial detrás.
+ *
+ * Regla al editar: cada entrada apunta a una URL DISTINTA y real. Un `?tab=`
+ * no crea una URL nueva a ojos de Google — si un servicio merece su propio
+ * link acá, merece su propia página.
+ */
 const SERVICIOS_LINKS = [
-  { label: 'Landing Page',     href: `${ROUTES.servicios}?tab=web` },
-  { label: 'Web Interactiva',  href: `${ROUTES.servicios}?tab=web` },
-  { label: 'E-commerce',       href: `${ROUTES.servicios}?tab=web` },
-  { label: 'App Mobile',       href: `${ROUTES.servicios}?tab=mobile` },
-  { label: 'Automatizaciones', href: `${ROUTES.servicios}?tab=mobile` },
+  { label: 'Páginas web a medida', href: ROUTES.disenoWeb },
+  { label: 'Tienda online',        href: ROUTES.tiendaOnline },
+  { label: 'Landing page',         href: ROUTES.landingPage },
+  { label: 'Apps móviles',         href: `${ROUTES.servicios}?tab=mobile` },
+  { label: 'Precios y planes',     href: ROUTES.cuantoCuesta },
 ]
 
 const EXPLORAR_LINKS = [
+  { label: 'Blog y guías',    href: ROUTES.blog,         external: false },
+  { label: 'Muestrario',      href: ROUTES.muestrario,   external: false },
   { label: 'Agendar reunión', href: ROUTES.contact,      external: false },
   { label: 'Tecnologías',     href: ROUTES.tecnologias,  external: false },
   { label: 'Sobre mí',        href: ROUTES.about,        external: false },
@@ -135,9 +152,9 @@ export function Footer() {
                       href={l.href}
                       className={FOOTER_LINK}
                       data-hover
-                      data-inspector-title="Navegación a Servicios"
-                      data-inspector-desc="Client-side navigation con Next.js — activa el tab correcto vía query param ?tab=web o ?tab=mobile."
-                      data-inspector-cat="Performance"
+                      data-inspector-title="Una página por intención"
+                      data-inspector-desc="Cada servicio tiene su propia URL con su propio contenido, no un tab de la misma página: es lo que le permite a Google rankearlas por separado."
+                      data-inspector-cat="SEO"
                     >
                       {l.label}
                     </Link>
@@ -186,8 +203,34 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar: marca + año + stack */}
+        {/* ── Webs por profesión ────────────────────────────────────────
+            Fila editorial en línea, no una cuarta columna de links (el brief
+            veta el footer de 4 columnas). Es lo que le da a las landings por
+            vertical un enlace entrante desde TODAS las páginas: antes solo las
+            linkeaban los posts del blog. */}
         <div className="divider-theme mt-14" aria-hidden="true" />
+        <nav aria-label="Webs por profesión" className="pt-6">
+          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-2 text-sm">
+            <span className="editorial-label editorial-label--primary">
+              Webs por profesión
+            </span>
+            {VERTICALS.map((v, i) => (
+              <span key={v.slug} className="flex items-baseline gap-3">
+                {i > 0 && (
+                  <span aria-hidden className="text-[var(--color-on-surface-variant)] opacity-30">
+                    /
+                  </span>
+                )}
+                <Link href={`/${v.slug}`} className={FOOTER_LINK} data-hover>
+                  {v.nounPlural.charAt(0).toUpperCase() + v.nounPlural.slice(1)}
+                </Link>
+              </span>
+            ))}
+          </p>
+        </nav>
+
+        {/* Bottom bar: marca + año + stack */}
+        <div className="divider-theme mt-10" aria-hidden="true" />
         <div className="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
           <div className="flex items-center gap-2.5">
             <ApexLogoMark />

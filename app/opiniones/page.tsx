@@ -14,7 +14,7 @@ export const revalidate = 86400
 const PAGE_URL = `${APP_URL.replace(/\/$/, '')}/opiniones`
 
 export const metadata: Metadata = {
-  title: 'Dejá tu opinión sobre APEX',
+  title: { absolute: 'Dejá tu opinión sobre APEX' },
   description:
     'Si trabajamos juntos en tu web o app, tu reseña en Google ayuda al próximo emprendedor a confiar. Dejá tu opinión en 30 segundos, sin registrarte en nada.',
   alternates: { canonical: '/opiniones' },

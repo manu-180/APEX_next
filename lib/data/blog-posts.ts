@@ -23,6 +23,13 @@ export type BlogBlock =
 export interface BlogPost {
   slug: string
   title: string
+  /**
+   * Título del <title> cuando `title` no entra en el SERP (~60 caracteres:
+   * Google trunca por ancho en píxeles). El H1 se queda con el título largo
+   * —que es el que gana la long tail—; el SERP recibe la versión corta.
+   * Omitirlo significa "el título ya entra".
+   */
+  seoTitle?: string
   description: string
   publishedAt: string
   updatedAt?: string
@@ -40,6 +47,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'cuanto-cuesta-pagina-web-argentina-2026',
     title: 'Cuánto cuesta una página web en Argentina en 2026 (precios reales por tipo)',
+    seoTitle: 'Cuánto cuesta una página web en Argentina en 2026',
     description:
       'Tabla actualizada con los precios reales del mercado argentino 2026 para landing, sitio corporativo, e-commerce y apps móviles. Sin "depende".',
     publishedAt: '2026-05-15',
@@ -97,7 +105,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Heurística sencilla por volumen de ventas mensuales: hasta $500k facturás cada mes, Tiendanube te alcanza ($35/mes). Entre $500k y $3M, conviene Tiendanube + custom skin. Arriba de $3M/mes, el e-commerce custom paga su diferencia en 6-12 meses por: velocidad real, sin comisión por venta, propiedad del código. Lo comparo a fondo en [Tiendanube vs Shopify vs e-commerce custom](/blog/tiendanube-vs-shopify-vs-ecommerce-custom-argentina).',
+        text: 'Heurística sencilla por volumen de ventas mensuales: hasta $500k facturás cada mes, Tiendanube te alcanza ($35/mes). Entre $500k y $3M, conviene Tiendanube + custom skin. Arriba de $3M/mes, la [tienda online a medida](/tienda-online) paga su diferencia en 6-12 meses por: velocidad real, sin comisión por venta, propiedad del código. Lo comparo a fondo en [Tiendanube vs Shopify vs e-commerce custom](/blog/tiendanube-vs-shopify-vs-ecommerce-custom-argentina).',
       },
       {
         type: 'callout',
@@ -111,7 +119,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting profesional el primer año, integración formulario de contacto con email, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días. Es lo que ofrezco como [plan Landing](/servicios).',
+        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting profesional el primer año, integración formulario de contacto con email, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días. Es lo que ofrezco como [plan Landing Page](/landing-page).',
       },
       {
         type: 'paragraph',
@@ -171,7 +179,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Tenés la comparación completa, fila por fila —APEX vs WordPress vs Wix vs Tiendanube vs agencia—, en la página de [servicios y precios](/servicios), con qué recibís exactamente a cada precio.',
+        text: 'Tenés la comparación completa, fila por fila —APEX vs WordPress vs Wix vs Tiendanube vs agencia—, en la página de [servicios y precios](/servicios), con qué recibís exactamente a cada precio. Y si lo único que querés es el número, está en [cuánto cuesta una página web](/cuanto-cuesta-una-pagina-web).',
       },
       {
         type: 'heading',
@@ -238,6 +246,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'nextjs-vs-wordpress-pyme-argentina',
     title: 'Next.js vs WordPress vs Wix para PyMEs argentinas: comparativa real 2026',
+    seoTitle: 'Next.js vs WordPress vs Wix para PyMEs argentinas',
     description:
       'Comparativa honesta entre Next.js, WordPress y Wix para sitios de PyMEs en Argentina. Velocidad real, costos, lock-in, SEO y cuándo conviene cada uno.',
     publishedAt: '2026-05-12',
@@ -394,6 +403,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'cuanto-cuesta-app-movil-argentina-flutter-react-native',
     title: 'Cuánto cuesta hacer una app móvil en Argentina (Flutter vs React Native vs nativo)',
+    seoTitle: 'Cuánto cuesta hacer una app móvil en Argentina 2026',
     description:
       'Precios reales y comparativa técnica para apps iOS + Android en Argentina 2026. Cuándo conviene Flutter, React Native o nativo según tu caso.',
     publishedAt: '2026-05-10',
@@ -708,6 +718,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'tiendanube-vs-shopify-vs-ecommerce-custom-argentina',
     title: 'Tiendanube vs Shopify vs e-commerce custom: cuál te conviene según tu facturación',
+    seoTitle: 'Tiendanube vs Shopify vs e-commerce a medida (2026)',
     description:
       'Comparativa honesta de e-commerce en Argentina 2026. Desde Tiendanube básico hasta custom con Next.js. Tabla con cuándo conviene cada uno según tu volumen mensual.',
     publishedAt: '2026-05-05',
@@ -800,7 +811,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'El precio de entrada engaña. Lo que importa es el costo total acumulado, porque la plataforma se paga todos los meses para siempre y el custom se paga una vez. A volumen medio:',
+        text: 'El precio de entrada engaña. Lo que importa es el costo total acumulado, porque la plataforma se paga todos los meses para siempre y una [tienda a medida](/tienda-online) se paga una vez. A volumen medio:',
       },
       {
         type: 'table',
@@ -827,7 +838,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Sí, y bastante. En custom controlás la velocidad (Core Web Vitals), las URLs, el schema de producto (precio, stock y reseñas en los resultados de Google) y el contenido de cada categoría. En las plataformas estás limitado a lo que te dejan tocar. Si una parte importante de tus ventas viene (o podría venir) de búsquedas en Google, el custom te da techo más alto.',
+        text: 'Sí, y bastante. En custom controlás la velocidad (Core Web Vitals), las URLs, el schema de producto (precio, stock y reseñas en los resultados de Google) y el contenido de cada categoría. En las plataformas estás limitado a lo que te dejan tocar. Si una parte importante de tus ventas viene (o podría venir) de búsquedas en Google, el custom te da techo más alto. Qué incluye una [tienda online a medida](/tienda-online) y cuánto sale, en detalle.',
       },
     ],
     faq: [
@@ -861,6 +872,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'elegir-freelance-web-argentina-checklist',
     title: 'Cómo elegir un freelance web en Argentina sin perder plata: checklist de 12 puntos',
+    seoTitle: 'Cómo elegir un freelance web en Argentina: 12 puntos',
     description:
       'Checklist verificable de 12 puntos para evaluar a un freelance o agencia antes de firmar. Si cumple 9+, vas bien.',
     publishedAt: '2026-05-02',
@@ -999,6 +1011,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'integrar-mercadopago-afip-web-argentina',
     title: 'Integrar MercadoPago + AFIP en tu web: guía técnica + costos 2026',
+    seoTitle: 'Integrar MercadoPago y AFIP en tu web: guía 2026',
     description:
       'Cómo integrar pasarela de pagos MercadoPago + facturación electrónica AFIP en un sitio web argentino. Costos reales, plazos y aspectos técnicos para 2026.',
     publishedAt: '2026-04-28',
@@ -1172,6 +1185,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'por-que-pyme-pwa-2026',
     title: 'Por qué tu PyME necesita una PWA (y no una app nativa) en 2026',
+    seoTitle: 'PWA o app nativa para tu PyME: cuál conviene en 2026',
     description:
       'PWA vs app nativa para PyMEs argentinas en 2026. Cuándo conviene cada una, costos comparados, y los 3 escenarios donde la PWA gana 9 de 10 veces.',
     publishedAt: '2026-04-25',

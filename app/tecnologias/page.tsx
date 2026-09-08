@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { TecnologiasContent } from './content'
+import { TopLevelBreadcrumbJsonLd } from '@/components/seo/json-ld'
 
 export const metadata: Metadata = {
-  title: 'Stack tecnológico | Flutter, Next.js y Supabase',
+  title: 'Stack tecnológico: Flutter, Next.js y Supabase',
   description:
     'Flutter, Next.js, Supabase, Riverpod y TypeScript: el stack que elijo para apps móviles y webs rápidas en Argentina. Cada tecnología tiene una razón de ser.',
   keywords: [
@@ -19,5 +20,10 @@ export const metadata: Metadata = {
 }
 
 export default function TecnologiasPage() {
-  return <TecnologiasContent />
+  return (
+    <>
+      <TopLevelBreadcrumbJsonLd name="Tecnologías" path="/tecnologias" />
+      <TecnologiasContent />
+    </>
+  )
 }

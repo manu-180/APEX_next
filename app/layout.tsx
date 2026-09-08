@@ -74,7 +74,13 @@ export const metadata: Metadata = {
     // (no con el nombre propio, que nadie busca). Marca "APEX" al final = el término
     // branded que sí es ownable ("apex web"); "Manuel Navarro" queda para el resto vía template.
     default: 'Desarrollo web y apps para PyMEs en Argentina | APEX',
-    template: '%s | Manuel Navarro',
+    // El sufijo de marca cuesta caracteres en CADA título del sitio, y el
+    // presupuesto real del SERP es ~60 (Google trunca por ancho en píxeles).
+    // "Manuel Navarro" gastaba 17 de esos 60 en un término que nadie busca:
+    // la marca ownable es "APEX" ("apex web", "apex argentina"). Con `| APEX`
+    // el sufijo cuesta 7. Las páginas cuyo título ya supera el presupuesto
+    // usan `title.absolute` para no recibir sufijo alguno.
+    template: '%s | APEX',
   },
   description:
     'Diseño y desarrollo de páginas web y apps a medida para PyMEs y emprendedores en Argentina. Precio fijo, boceto gratis en 48 h y entrega en 15 días.',

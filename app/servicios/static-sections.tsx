@@ -32,6 +32,22 @@ const SERVICIOS_FAQ_GROUPS = [
    Izquierda: claim + CTA WhatsApp contextual. Derecha: panel de decisión con
    los planes y precios reales (desde WEB_PLANS — nunca hardcodeados).
    ──────────────────────────────────────────────────────────────────────────── */
+/**
+ * Puente a las landings por intención. `/servicios` es el catálogo; quien
+ * llega buscando "cuánto cuesta", "tienda online" o "landing page" tiene una
+ * página dedicada que responde eso literalmente, y es a donde apunta el
+ * tráfico pago (ver docs/google-ads/).
+ *
+ * Al agregar una landing nueva, sumarla acá: `/servicios` es la página con más
+ * autoridad después de la home, y este párrafo es el que se la pasa.
+ */
+const INTENT_LANDINGS = [
+  { href: ROUTES.cuantoCuesta, label: 'Cuánto cuesta una página web' },
+  { href: ROUTES.disenoWeb,    label: 'Diseño y desarrollo web' },
+  { href: ROUTES.tiendaOnline, label: 'Tienda online' },
+  { href: ROUTES.landingPage,  label: 'Landing page' },
+]
+
 export function ServiciosHero() {
   const decisionRows: Array<{ name: string; meta: string; price: string; href: string }> = [
     ...WEB_PLANS.map((plan) => ({
@@ -110,27 +126,20 @@ export function ServiciosHero() {
               </a>
             </div>
 
-            {/* Puente a las landings por intención. /servicios es el catálogo;
-                quien llega buscando "cuánto cuesta" o "diseño de páginas web"
-                tiene una página dedicada que responde eso literalmente, y es a
-                donde apunta el tráfico pago (ver docs/google-ads/). Además es
-                el único link interno que reciben: sin esto no les llega
-                autoridad desde el resto del sitio. */}
-            <p className="mb-8 text-sm text-[var(--color-on-surface-variant)]">
+            {/* Ver INTENT_LANDINGS arriba. */}
+            <p className="mb-8 text-sm leading-loose text-[var(--color-on-surface-variant)]">
               ¿Viniste por algo puntual?{' '}
-              <Link
-                href={ROUTES.cuantoCuesta}
-                className="rounded font-semibold text-[var(--color-primary)] underline decoration-[rgba(var(--color-primary-rgb),0.4)] underline-offset-4 transition-colors hover:decoration-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
-              >
-                Cuánto cuesta una página web
-              </Link>{' '}
-              ·{' '}
-              <Link
-                href={ROUTES.disenoWeb}
-                className="rounded font-semibold text-[var(--color-primary)] underline decoration-[rgba(var(--color-primary-rgb),0.4)] underline-offset-4 transition-colors hover:decoration-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
-              >
-                Diseño y desarrollo de páginas web
-              </Link>
+              {INTENT_LANDINGS.map((l, i) => (
+                <span key={l.href}>
+                  {i > 0 && <span aria-hidden className="opacity-40"> · </span>}
+                  <Link
+                    href={l.href}
+                    className="rounded font-semibold text-[var(--color-primary)] underline decoration-[rgba(var(--color-primary-rgb),0.4)] underline-offset-4 transition-colors hover:decoration-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+                  >
+                    {l.label}
+                  </Link>
+                </span>
+              ))}
             </p>
 
             {/* Strip de confianza — claims reales */}

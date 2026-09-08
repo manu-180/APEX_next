@@ -23,7 +23,17 @@ export const ROUTES = {
   cuantoCuesta: '/cuanto-cuesta-una-pagina-web',
   /** Landing de la intención "agencia/diseño" — ad group Web - Diseño y Desarrollo. */
   disenoWeb:   '/diseno-de-paginas-web',
+  /**
+   * Landings por PRODUCTO. Salieron de los términos de búsqueda reales de la
+   * campaña (junio-septiembre 2026): "tienda online" + "ecommerce" +
+   * "comercio electrónico" sumaban 134 impresiones y "landing page" 235, todas
+   * cayendo en `/servicios`, que responde a las dos con la misma página.
+   */
+  tiendaOnline: '/tienda-online',
+  landingPage:  '/landing-page',
   muestrario:  '/muestrario',
+  blog:        '/blog',
+  opiniones:   '/opiniones',
   lab:         '/lab',
   tecnologias: '/tecnologias',
   about:       '/sobre-mi',
@@ -39,8 +49,14 @@ export const PROJECTS = {
   assistify:     'https://assistify.lat',
 } as const
 
-/** Link directo al diálogo de reseña del Perfil de Negocio (Google). Compartible. */
-export const GOOGLE_REVIEW_URL = 'https://g.page/r/Cf6x-buXP4ugEBM/review' as const
+/**
+ * Perfil de Negocio de Google (verificado 2026-09-07: resuelve al perfil de
+ * APEX en Maps). Va en el `sameAs` del schema: es el perfil que más pesa para
+ * unir la entidad en búsquedas locales.
+ */
+export const GOOGLE_BUSINESS_PROFILE_URL = 'https://g.page/r/Cf6x-buXP4ugEBM' as const
+/** Link directo al diálogo de reseña del mismo perfil. Compartible. */
+export const GOOGLE_REVIEW_URL = `${GOOGLE_BUSINESS_PROFILE_URL}/review` as const
 
 // ─── Keyboard Shortcuts ───────────────────────────────────────────────────────
 export const SHORTCUTS = [

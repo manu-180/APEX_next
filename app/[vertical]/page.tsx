@@ -12,7 +12,7 @@ import { APP_URL } from '@/lib/constants'
 import { WA_GRADIENT, WA_SHADOW_CLASS, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
-import { formatARS } from '@/lib/types/services'
+import { arsInline, formatARS } from '@/lib/types/services'
 import { SectionReveal } from '@/components/ui/section-reveal'
 import { STAGGER_BASE } from '@/lib/motion'
 import { cn } from '@/lib/utils/cn'
@@ -76,11 +76,13 @@ export async function generateMetadata({
   const v = getVertical(slug)
   if (!v) return { title: 'Página no encontrada' }
 
-  const title = `Página web para ${v.nounPlural} en Argentina | Desde ${formatARS(v.priceFrom)} | APEX`
+  // Sin sufijo de marca: `Página web para contadores en Argentina desde
+  // $900.000` ya son ~57 caracteres, el techo del SERP.
+  const title = `Página web para ${v.nounPlural} en Argentina desde ${arsInline(v.priceFrom)}`
   const description = v.subheadline
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: v.keywords,
     alternates: {

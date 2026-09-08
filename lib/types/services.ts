@@ -226,6 +226,15 @@ export const APP_PLANS: PricingPlan[] = [
   },
 ]
 
+/**
+ * `$600.000` — sin el espacio duro que `formatARS` hereda del locale es-AR.
+ * Para títulos, meta descriptions y prosa, donde ese espacio se lee como
+ * un error de tipeo y encima gasta ancho en el SERP.
+ */
+export function arsInline(amount: number): string {
+  return `$${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(amount)}`
+}
+
 export function formatARS(amount: number): string {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount)
 }

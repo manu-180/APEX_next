@@ -4,12 +4,13 @@ import { MuestrarioGallery } from './muestrario-gallery'
 import { MuestrarioCta } from './muestrario-cta'
 import { getLabDemos, LAB_REVALIDATE_SECONDS } from '@/lib/data/lab-demos'
 import { SHOWCASE_TIERS } from '@/lib/data/showcase'
+import { TopLevelBreadcrumbJsonLd } from '@/components/seo/json-ld'
 
 export const metadata: Metadata = {
-  // El template global ya agrega "| Manuel Navarro" — no repetir marca acá.
+  // El template global ya agrega " | APEX" — no repetir marca acá.
   title: 'Portfolio de páginas web — ejemplos reales en vivo',
   description:
-    'Galería de sitios web hechos por APEX: productos propios y clientes reales en producción, más un laboratorio de diseño que suma un sitio premium nuevo cada semana. Abrí cualquiera en vivo.',
+    'Sitios web hechos por APEX que están online ahora mismo: productos propios y clientes reales, más un laboratorio que suma un diseño nuevo cada semana. Abrilos en vivo.',
   keywords: [
     'muestrario diseño web',
     'portfolio desarrollo web argentina',
@@ -41,6 +42,7 @@ export default async function MuestrarioPage() {
 
   return (
     <>
+      <TopLevelBreadcrumbJsonLd name="Muestrario" path="/muestrario" />
       <MuestrarioHero totalCount={produccionCount + demos.length} labCount={demos.length} />
       <MuestrarioGallery demos={demos} />
       <MuestrarioCta />

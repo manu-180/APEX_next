@@ -20,6 +20,8 @@ const PAGE_LAST_MODIFIED = {
   servicios:   '2026-08-30',
   cuantoCuesta: '2026-09-06',
   disenoWeb:   '2026-09-06',
+  tiendaOnline: '2026-09-07',
+  landingPage:  '2026-09-07',
   muestrario:  '2026-08-24',
   tecnologias: '2026-08-30',
   sobreMi:     '2026-08-30',
@@ -51,6 +53,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Ads (ver docs/google-ads/). Prioridad a la par de /servicios a propósito.
     { url: `${BASE}${ROUTES.cuantoCuesta}`, lastModified: day(PAGE_LAST_MODIFIED.cuantoCuesta), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}${ROUTES.disenoWeb}`,   lastModified: day(PAGE_LAST_MODIFIED.disenoWeb),   changeFrequency: 'weekly',  priority: 0.9  },
+    // Landings por producto: una URL por cosa que se vende.
+    { url: `${BASE}${ROUTES.tiendaOnline}`, lastModified: day(PAGE_LAST_MODIFIED.tiendaOnline), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE}${ROUTES.landingPage}`,  lastModified: day(PAGE_LAST_MODIFIED.landingPage),  changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}${ROUTES.muestrario}`,  lastModified: day(PAGE_LAST_MODIFIED.muestrario),  changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${BASE}/blog`,             lastModified: newestPost ?? day(PAGE_LAST_MODIFIED.home), changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE}${ROUTES.tecnologias}`, lastModified: day(PAGE_LAST_MODIFIED.tecnologias), changeFrequency: 'monthly', priority: 0.7  },

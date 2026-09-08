@@ -3,11 +3,12 @@ import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { YEARS_EXP } from '@/lib/constants'
 import { SobreMiContent } from './content'
+import { TopLevelBreadcrumbJsonLd } from '@/components/seo/json-ld'
 
 export const metadata: Metadata = {
-  title: 'Sobre mí | Dev Full-Stack en Buenos Aires',
+  title: 'Manuel Navarro — dev full-stack en Buenos Aires',
   description:
-    'El mismo que diseña, programa y entrega tu proyecto de principio a fin. Sin agencias, sin intermediarios. Web y apps para PyMEs argentinas que quieren vender. 1-2 clientes por vez.',
+    'El mismo que diseña, programa y entrega tu proyecto de principio a fin. Sin agencias ni intermediarios: web y apps para PyMEs argentinas, 1 o 2 clientes por vez.',
   keywords: [
     'desarrollador web Buenos Aires',
     'programador freelance Argentina',
@@ -26,5 +27,10 @@ export const metadata: Metadata = {
 const HAS_FOUNDER_PHOTO = existsSync(join(process.cwd(), 'public', 'manuel.jpg'))
 
 export default function SobreMiPage() {
-  return <SobreMiContent hasFounderPhoto={HAS_FOUNDER_PHOTO} yearsExp={YEARS_EXP} />
+  return (
+    <>
+      <TopLevelBreadcrumbJsonLd name="Sobre mí" path="/sobre-mi" />
+      <SobreMiContent hasFounderPhoto={HAS_FOUNDER_PHOTO} yearsExp={YEARS_EXP} />
+    </>
+  )
 }
