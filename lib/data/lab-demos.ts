@@ -32,6 +32,14 @@ const LIBRE_ALBEDRIO_SUPABASE_ANON_KEY =
 /** Cada cuánto se re-consulta la tabla (segundos). Un demo por semana → 30 min sobra. */
 export const LAB_REVALIDATE_SECONDS = 1800
 
+/**
+ * Slugs bloqueados: Manuel pidió sacarlos del muestrario (2026-09-09). Siguen
+ * vivos en la tabla `demos` de libre-albedrio, pero este MCP es solo lectura
+ * acá (execute_sql/list_tables devuelven "permission"), así que se filtran acá
+ * en vez de borrarlos de la fila.
+ */
+const BLOCKED_SLUGS = new Set(['temblor', 'developer_web'])
+
 /** Forma cruda de una fila de `demos` (solo lo que pedimos). */
 interface DemoRow {
   slug: string
@@ -85,7 +93,6 @@ const LOCAL_SHOT: Record<string, string> = {
   brasa: '/projects/muestrario/brasa.jpg',
   forge_fitness: '/projects/muestrario/forge_fitness.jpg',
   'e-commerce_mujer': '/projects/muestrario/e-commerce_mujer.jpg',
-  developer_web: '/projects/muestrario/developer_web.jpg',
 }
 
 /** Captura en vivo del sitio vía microlink (sin API key; cae al póster si falla). */
@@ -211,22 +218,6 @@ const FALLBACK_RAW: DemoRow[] = [
     built_at: '2026-06-16T04:43:56Z',
     created_at: '2026-06-14T05:23:29Z',
   },
-  {
-    slug: 'developer_web',
-    titulo: 'Developer',
-    pitch: 'Portfolio de desarrollador con 3D y profundidad.',
-    tipo_producto: 'portfolio',
-    industria: 'tech',
-    estilo_visual: null,
-    tecnica_movimiento: '3D (three / r3f)',
-    complejidad: 'alta',
-    paleta: null,
-    status: 'deployado',
-    screenshot_url: null,
-    url_deploy: 'https://demo-developer-web.vercel.app',
-    built_at: '2026-06-16T04:32:41Z',
-    created_at: '2026-06-14T05:23:29Z',
-  },
 ]
 
 const FALLBACK_DEMOS: LabDemo[] = FALLBACK_RAW.map(toLabDemo)
@@ -252,7 +243,9 @@ export async function getLabDemos(): Promise<LabDemo[]> {
     })
     if (!res.ok) throw new Error(`Supabase REST ${res.status}`)
     const rows = (await res.json()) as DemoRow[]
-    const demos = rows.map(toLabDemo).filter((d) => d.url)
+    const demos = rows
+      .map(toLabDemo)
+      .filter((d) => d.url && !BLOCKED_SLUGS.has(d.slug))
     return demos.length > 0 ? demos : FALLBACK_DEMOS
   } catch {
     return FALLBACK_DEMOS
