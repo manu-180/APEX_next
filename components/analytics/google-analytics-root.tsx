@@ -3,6 +3,7 @@
 import Script from 'next/script'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { captureAdClickId } from '@/lib/analytics/ad-click-id'
 
 declare global {
   interface Window {
@@ -69,6 +70,11 @@ export function GoogleAnalyticsRoot({ gaId }: { gaId: string }) {
    */
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    // Captura del gclid: corre siempre, sin esperar interacción ni gtag.js.
+    // Es lectura de location.search, cero red — no compite con el LCP.
+    captureAdClickId()
+
     if (typeof window.gtag === 'function') return
 
     window.dataLayer = window.dataLayer || []

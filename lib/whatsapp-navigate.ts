@@ -2,6 +2,7 @@
 
 import { ROUTES } from '@/lib/constants'
 import { trackGoogleAdsWhatsAppClick } from '@/lib/analytics/google-ads'
+import { logAdWhatsAppClick } from '@/lib/analytics/ad-clicks'
 import { trackMetaLead } from '@/components/analytics/meta-pixel'
 import { isTrustedWhatsAppUrl } from '@/lib/whatsapp'
 
@@ -142,6 +143,7 @@ export function openWhatsAppWithThankYouPage(
 
   trackGoogleAdsWhatsAppClick()
   trackMetaLead()
+  logAdWhatsAppClick(window.location.pathname)
 
   let popup: Window | null = null
   try {
