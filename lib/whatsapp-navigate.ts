@@ -29,6 +29,27 @@ function warn(message: string, detail?: unknown): void {
 }
 
 /**
+ * Le agrega el `ref_code` al final del texto prellenado del `wa.me` link.
+ *
+ * Es el único lugar del sitio donde se hace: todos los CTAs pasan por acá
+ * (ver el comment de `openWhatsAppWithThankYouPage`), así que no hace falta
+ * tocar los ~150 call-sites que arman el mensaje. Si `waHref` no parsea como
+ * URL o no tiene `text`, se devuelve tal cual — nunca por eso se cancela la
+ * apertura de WhatsApp.
+ */
+function appendRefCode(waHref: string, refCode: string): string {
+  try {
+    const url = new URL(waHref)
+    const texto = url.searchParams.get('text') ?? ''
+    url.searchParams.set('text', `${texto} (ref: ${refCode})`)
+    return url.toString()
+  } catch (error) {
+    warn('no se pudo agregar el ref_code al mensaje', error)
+    return waHref
+  }
+}
+
+/**
  * Navegación top-level en la pestaña actual: el único camino a WhatsApp que
  * ningún navegador bloquea. Es el piso de garantía de todo este módulo.
  */
@@ -143,7 +164,8 @@ export function openWhatsAppWithThankYouPage(
 
   trackGoogleAdsWhatsAppClick()
   trackMetaLead()
-  logAdWhatsAppClick(window.location.pathname)
+  const refCode = logAdWhatsAppClick(window.location.pathname)
+  const finalHref = refCode ? appendRefCode(waHref, refCode) : waHref
 
   let popup: Window | null = null
   try {
@@ -151,16 +173,16 @@ export function openWhatsAppWithThankYouPage(
     // null y perderíamos la señal temprana de bloqueo. Tampoco anulamos
     // `popup.opener` — wa.me es dominio de Meta y necesitamos conservar el
     // handle para detectar la pestaña fantasma.
-    popup = window.open(waHref, '_blank')
+    popup = window.open(finalHref, '_blank')
   } catch (error) {
     warn('window.open lanzó una excepción', error)
     popup = null
   }
 
   if (!isPopupHandleUsable(popup)) {
-    navigateThisTab(waHref, 'popup bloqueado')
+    navigateThisTab(finalHref, 'popup bloqueado')
     return
   }
 
-  confirmHandoff(waHref, popup, router)
+  confirmHandoff(finalHref, popup, router)
 }
