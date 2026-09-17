@@ -212,7 +212,14 @@ export default function DisenoDePaginasWebPage() {
               </div>
 
               <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
-                {['Boceto gratis en 24-48 h', 'Diseño a medida, sin plantillas', 'Precio cerrado por escrito'].map(
+                {/* Precio y cuotas arriba: los anuncios de este ad group los prometen,
+                    y Google mide si la landing cumple lo que dice el anuncio. */}
+                {[
+                  'Boceto gratis en 24-48 h',
+                  `Desde ${formatARS(LANDING_PRICE)} en 3 cuotas sin interés`,
+                  'Diseño a medida, sin plantillas',
+                  'Precio cerrado por escrito',
+                ].map(
                   (claim) => (
                     <li
                       key={claim}

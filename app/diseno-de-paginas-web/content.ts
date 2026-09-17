@@ -101,6 +101,10 @@ export const FAQ = [
     a: 'El diseño a medida de cada pantalla (no una plantilla), el desarrollo del sitio en código propio, la carga de tus textos e imágenes, el SEO técnico para que Google te encuentre, el dominio y el hosting configurados, y tres meses de soporte después del lanzamiento. Entrás con una idea y salís con el sitio funcionando.',
   },
   {
+    q: '¿Qué necesito para hacer la página web de mi empresa?',
+    a: 'Nada técnico. Me contás qué hace tu empresa y qué querés que la página consiga, y con eso armo el boceto. Si ya tenés textos, fotos y logo, arrancamos el primer día; si hay que producirlos, lo acordamos antes de empezar. El dominio y el hosting los configuro yo.',
+  },
+  {
     q: '¿Trabajás con empresas de Buenos Aires y del interior del país?',
     a: 'Sí. Estoy en Buenos Aires y trabajo con empresas de toda la Argentina. Todo el proceso es por WhatsApp y videollamada, así que la distancia no cambia nada. Si estás en CABA o Gran Buenos Aires y preferís que nos veamos en persona, también se puede.',
   },
