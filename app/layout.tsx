@@ -105,6 +105,7 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   alternates: { canonical: APP_URL },
+  verification: { other: { 'msvalidate.01': '87A140CB2FE20CA899AF6A5D30470CB4' } },
   // Sin `icons`: declararlo acá pisa la convención de archivos de Next. Los
   // íconos salen de app/favicon.ico + app/icon.png + app/apple-icon.png, que
   // Next linkea con el tamaño real de cada archivo. Antes los tres apuntaban a
