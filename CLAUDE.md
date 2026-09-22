@@ -79,7 +79,7 @@ Mobile: App Producto $580K/mes | App + Operaciones $1.15M/mes | Plataforma multi
 ## Admin
 
 ADMIN_UUID = `37dad3e9-531c-4657-8db6-ddebbdcfa878`
-WhatsApp: `5491156327091`
+WhatsApp: `14244475253` (línea oficial de Twilio desde el 2026-09-22; el viejo `5491156327091` ya no está conectado al bot)
 
 ## Google Ads — este sitio es la landing de una campaña activa
 
