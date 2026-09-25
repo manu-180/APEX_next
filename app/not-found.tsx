@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   title: 'Página no encontrada — 404',
   description: 'La ruta solicitada no existe. Navegá al inicio o contactame directamente.',
   robots: { index: false, follow: false },
+  // Sin esto hereda el canonical del layout raíz y cada 404 le dice a Google que es la home.
+  alternates: { canonical: null },
 }
 
 function HomeIcon() {
