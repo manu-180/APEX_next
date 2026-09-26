@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { APP_URL, WHATSAPP_NUMBER } from '@/lib/constants'
-import { WEB_PLANS, APP_PLANS } from '@/lib/types/services'
+import { WEB_PLANS, APP_PLANS, FREE_CHANGES_DAYS, GOOGLE_MARKETING, MAINTENANCE_PLANS } from '@/lib/types/services'
 import { BLOG_POSTS } from '@/lib/data/blog-posts'
 import { VERTICALS } from '@/lib/data/verticals'
 import { SHOWCASE_TIERS } from '@/lib/data/showcase'
@@ -38,7 +38,7 @@ function buildLlmsTxt(): string {
 
 APEX es el estudio de Manuel Navarro, desarrollador full-stack y mobile con base en Buenos Aires. Trabaja 100% remoto con clientes de todo el país y atiende 1 o 2 proyectos por vez: el que diseña, programa y entrega es siempre la misma persona, sin agencia ni vendedores de por medio.
 
-Cómo funciona la contratación: charla de 15 minutos por WhatsApp, boceto gratis de la página en 24-48 h y recién ahí la primera de 3 cuotas sin interés. La entrega es a 15 días desde que se aprueba el boceto, con la fecha pactada por escrito — si no se cumple, se devuelve el depósito. El código vive desde el primer día en un repositorio a nombre del cliente. Después del lanzamiento hay 3 meses de soporte incluido, y mantenimiento mensual opcional desde ARS 50.000.
+Cómo funciona la contratación: charla de 15 minutos por WhatsApp, boceto gratis de la página en 24-48 h y recién ahí la primera de 3 cuotas sin interés. La entrega es a 15 días desde que se aprueba el boceto, con la fecha pactada por escrito — si no se cumple, se devuelve el depósito. El código vive desde el primer día en un repositorio a nombre del cliente. El hosting va incluido, sin abono obligatorio, y durante ${FREE_CHANGES_DAYS} días desde que la página queda online los cambios no tienen límite. Después, mantenimiento opcional desde ARS ${ars(MAINTENANCE_PLANS[0].price)} por mes. Para quien ya tiene su página, marketing en Google por ARS ${ars(GOOGLE_MARKETING.price)} por mes, más la inversión en anuncios que el cliente le paga directo a Google.
 
 ## Servicios y precios
 
@@ -60,6 +60,7 @@ ${APP_PLANS.map(planLine).join('\n')}
 - [Sobre mí](${BASE}/sobre-mi): trayectoria de Manuel Navarro y cómo trabaja.
 - [Contacto](${BASE}/contacto): reserva de una reunión gratuita, reseñas de clientes y contacto directo por WhatsApp.
 - [Opiniones](${BASE}/opiniones): dónde dejan su reseña los clientes que ya trabajaron con APEX.
+- [Términos y condiciones](${BASE}/terminos): las condiciones de contratación vigentes, el derecho de arrepentimiento y la baja de servicios.
 
 ## Páginas por profesión
 

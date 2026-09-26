@@ -1,4 +1,4 @@
-import { arsInline, WEB_PLANS } from '@/lib/types/services'
+import { arsInline, GOOGLE_MARKETING, MAINTENANCE_PLANS, WEB_PLANS } from '@/lib/types/services'
 
 export interface PriceTier {
   id: string
@@ -96,7 +96,7 @@ export const PRICE_FACTORS: Array<{ title: string; body: string; moves: 'sube' |
 export const ALWAYS_INCLUDED: string[] = [
   'Diseño 100% a medida, sin plantillas',
   'SEO técnico para que Google te encuentre',
-  'Hosting + 3 meses de mantenimiento',
+  'Hosting incluido y 60 días de cambios sin límite',
   'Boceto gratis antes de que pagues nada',
   '3 cuotas sin interés',
   'Entrega en 15 días, por escrito',
@@ -116,7 +116,7 @@ export const PROCESS_STEPS: Array<{ num: string; title: string; body: string }> 
   {
     num: '03',
     title: 'Online en 15 días',
-    body: 'Fecha pactada por escrito antes de arrancar. Se paga en 3 cuotas sin interés y quedan 3 meses de soporte incluidos.',
+    body: 'Fecha pactada por escrito antes de arrancar. Se paga en 3 cuotas sin interés y, desde que sale online, tenés 60 días de cambios sin límite.',
   },
 ]
 
@@ -131,6 +131,8 @@ export { arsInline }
 const P_LANDING = arsInline(PRICE_TIERS[0].price)
 const P_INTERACTIVA = arsInline(PRICE_TIERS[1].price)
 const P_TIENDA = arsInline(PRICE_TIERS[2].price)
+const P_MANTENIMIENTO = arsInline(MAINTENANCE_PLANS[0].price)
+const P_MARKETING = arsInline(GOOGLE_MARKETING.price)
 
 export const FAQ_ITEMS: Array<{ q: string; a: string }> = [
   {
@@ -139,15 +141,15 @@ export const FAQ_ITEMS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Cuánto sale una página web simple?',
-    a: `Una página simple —tus servicios, tu presentación y un botón de WhatsApp que funciona— sale ${P_LANDING} pesos, con diseño a medida, SEO técnico, hosting y 3 meses de mantenimiento incluidos.`,
+    a: `Una página simple —tus servicios, tu presentación y un botón de WhatsApp que funciona— sale ${P_LANDING} pesos, con diseño a medida, SEO técnico, hosting incluido y 60 días de cambios sin límite.`,
   },
   {
     q: '¿Cuánto cuesta una tienda online?',
-    a: `Una tienda online propia cuesta ${P_TIENDA} pesos e incluye catálogo con filtros, carrito, checkout con MercadoPago o Stripe, panel de gestión de pedidos y stock, y cuentas de cliente con historial de compras. Es tuya: no pagás comisión por venta a ninguna plataforma.`,
+    a: `Una tienda online propia cuesta ${P_TIENDA} pesos e incluye catálogo con filtros, carrito, checkout con MercadoPago, panel de gestión de pedidos y stock, y «Mis pedidos», donde tus clientes ven sus compras entrando con un código, sin crear cuenta. Es tuya: no pagás comisión por venta a ninguna plataforma.`,
   },
   {
     q: '¿Qué incluye el precio?',
-    a: 'En los tres planes: diseño 100% a medida sin plantillas, SEO técnico, hosting y 3 meses de mantenimiento. Después cada plan suma lo suyo — formularios y WhatsApp en Landing Page, reservas y cobros en Web Interactiva, catálogo y checkout en Tienda Online. No hay costos escondidos: lo que no esté en el presupuesto no se factura después.',
+    a: 'En los tres planes: diseño 100% a medida sin plantillas, SEO técnico, hosting incluido y 60 días de cambios sin límite desde que la página sale online. Después cada plan suma lo suyo — formularios y WhatsApp en Landing Page, reservas y cobros en Web Interactiva, catálogo y checkout en Tienda Online. No hay costos escondidos: lo que no esté en el presupuesto no se factura después.',
   },
   {
     q: '¿Cuánto tarda una página web?',
@@ -167,7 +169,7 @@ export const FAQ_ITEMS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Hay costos mensuales después?',
-    a: 'El hosting y el mantenimiento van incluidos los primeros 3 meses. Lo que siga después se acuerda por escrito antes de arrancar, así sabés desde el día uno con qué números contar.',
+    a: `No hay abono obligatorio: el hosting va incluido y tu página sigue online aunque no contrates nada más. Durante los 60 días desde que sale online, los cambios no tienen límite. Después, si querés seguir pidiendo cambios, hay mantenimiento opcional desde ${P_MANTENIMIENTO} por mes, con débito automático y baja cuando quieras. Y si querés sumar anuncios en Google, el marketing cuesta ${P_MARKETING} por mes más la inversión en anuncios, que le pagás directo a Google.`,
   },
   {
     q: '¿Por qué una agencia cobra más por lo mismo?',

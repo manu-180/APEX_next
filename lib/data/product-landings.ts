@@ -1,6 +1,6 @@
 import { ROUTES } from '@/lib/constants'
 import { SHOWCASE_TIERS, type ShowcaseSite } from '@/lib/data/showcase'
-import { arsInline, WEB_PLANS } from '@/lib/types/services'
+import { arsInline, MAINTENANCE_PLANS, WEB_PLANS } from '@/lib/types/services'
 
 /**
  * Landings por PRODUCTO — una URL por cosa que se vende.
@@ -103,7 +103,7 @@ export const TIENDA_ONLINE: ProductLanding = {
   h1Bold: 'sin comisión por venta.',
   subhead:
     'Catálogo, carrito, checkout con MercadoPago y un panel para manejar todo desde el celular. Tuya, con tu marca, sin abono mensual ni un porcentaje de cada venta yéndose a una plataforma.',
-  answer: `Una tienda online a medida en Argentina arranca en ${arsInline(TIENDA_PRICE)} ARS, con precio cerrado por escrito y entrega en 15 días. Incluye catálogo con filtros y búsqueda, carrito, checkout con MercadoPago, cálculo de envíos, cuentas de cliente con historial y un panel propio para cargar productos, controlar stock y ver pedidos. Se paga una vez: no hay abono mensual ni comisión por venta, así que el margen de cada venta queda entero en tu cuenta.`,
+  answer: `Una tienda online a medida en Argentina arranca en ${arsInline(TIENDA_PRICE)} ARS, con precio cerrado por escrito y entrega en 15 días. Incluye catálogo con filtros y búsqueda, carrito, checkout con MercadoPago, cálculo de envíos, «Mis pedidos» para que tus clientes vean sus compras con un código, sin crear cuenta, y un panel propio para cargar productos, controlar stock y ver pedidos. Se paga una vez: no hay abono mensual ni comisión por venta, así que el margen de cada venta queda entero en tu cuenta.`,
   waMessage: 'Hola Manuel, quiero una tienda online. ¿Cómo arrancamos?',
   pains: [
     {
@@ -126,7 +126,7 @@ export const TIENDA_ONLINE: ProductLanding = {
     },
     {
       title: 'Checkout con MercadoPago',
-      body: 'Carrito, checkout y cobro con MercadoPago (tarjeta, débito, transferencia y cuotas). Otras pasarelas —Stripe, PayPal— si vendés al exterior. La plata entra a tu cuenta, no a la mía.',
+      body: 'Carrito, checkout y cobro con MercadoPago (tarjeta, débito, transferencia y cuotas). La plata entra directo a tu cuenta de MercadoPago, no a la mía.',
     },
     {
       title: 'Envíos calculados en el carrito',
@@ -137,8 +137,8 @@ export const TIENDA_ONLINE: ProductLanding = {
       body: 'Pedidos, stock, productos y clientes en un solo lugar, pensado para usarlo desde el celular. Cuando entra una venta te llega la notificación y el pedido ya está cargado.',
     },
     {
-      title: 'Cuentas de cliente e historial',
-      body: 'Tus compradores se crean una cuenta, ven sus pedidos anteriores y vuelven a comprar en dos toques. Es la diferencia entre un cliente y una venta suelta.',
+      title: 'Mis pedidos, sin crear cuenta',
+      body: 'Tus compradores ven sus compras entrando con un código que les llega por mail o WhatsApp. Sin contraseñas que olvidar ni formularios de registro en el medio de la compra.',
     },
     {
       title: 'SEO técnico de e-commerce',
@@ -152,7 +152,7 @@ export const TIENDA_ONLINE: ProductLanding = {
     headers: ['', 'Plataforma con abono', 'Tienda a medida'],
     rows: [
       ['Costo inicial', 'Casi cero', `${arsInline(TIENDA_PRICE)}, una vez`],
-      ['Costo mensual', 'Abono fijo, sube con el plan', 'Solo hosting'],
+      ['Costo mensual', 'Abono fijo, sube con el plan', 'Ninguno: hosting incluido'],
       ['Comisión por venta', 'Según plan y medio de pago', 'Ninguna de mi lado'],
       ['Diseño', 'Plantilla, compartida con miles', 'A medida, solo tuyo'],
       ['Funciones raras del rubro', 'Lo que tenga el plugin', 'Se programa'],
@@ -198,19 +198,19 @@ export const TIENDA_ONLINE: ProductLanding = {
     {
       step: '04',
       title: 'Primera venta y soporte',
-      body: 'Salimos al aire con los pagos probados de punta a punta. Los tres meses siguientes, los ajustes van por mi cuenta.',
-      meta: '+3 meses',
+      body: 'Salimos al aire con los pagos probados de punta a punta. Durante 60 días, los cambios que pidas no tienen límite.',
+      meta: '+60 días',
     },
   ],
   fitNo: [
     'Si todavía no vendiste una unidad. Validá primero por Instagram o con una plataforma barata; la tienda a medida es para cuando ya sabés que el producto se mueve.',
     'Si necesitás publicar mañana. El boceto tarda 48 h y la tienda, 15 días desde que aprobás el diseño.',
-    'Si además querés que te lleve las campañas o el contenido. Diseño y programo: eso es lo que hago.',
+    'Si necesitás que te produzcan las fotos y las descripciones de cada producto. La tienda la diseño y la programo; el contenido lo aportás vos.',
   ],
   faq: [
     {
       q: '¿Cuánto cuesta una tienda online en Argentina?',
-      a: `Una tienda online a medida arranca en ${arsInline(TIENDA_PRICE)} ARS, con el precio cerrado por escrito antes de empezar y en 3 cuotas sin interés. Ese número incluye el diseño, el desarrollo, el checkout con MercadoPago, el panel de gestión, el hosting y tres meses de soporte. No hay costos ocultos ni "extras" que aparecen a mitad del proyecto.`,
+      a: `Una tienda online a medida arranca en ${arsInline(TIENDA_PRICE)} ARS, con el precio cerrado por escrito antes de empezar y en 3 cuotas sin interés. Ese número incluye el diseño, el desarrollo, el checkout con MercadoPago, el panel de gestión, el hosting incluido y 60 días de cambios sin límite. No hay costos ocultos ni "extras" que aparecen a mitad del proyecto.`,
     },
     {
       q: '¿Me cobrás comisión por cada venta?',
@@ -226,7 +226,7 @@ export const TIENDA_ONLINE: ProductLanding = {
     },
     {
       q: '¿Qué medios de pago acepta?',
-      a: 'MercadoPago cubre tarjeta de crédito y débito, transferencia, dinero en cuenta y cuotas — es lo estándar para vender en Argentina. Si vendés al exterior sumamos Stripe o PayPal. Y si querés dejar transferencia directa o efectivo contra entrega, también.',
+      a: 'MercadoPago cubre tarjeta de crédito y débito, transferencia, dinero en cuenta y cuotas — es lo estándar para vender en Argentina, y la plata entra directo a tu cuenta. Y si querés dejar transferencia directa o efectivo contra entrega, también.',
     },
     {
       q: '¿Cuánto tarda en estar online?',
@@ -280,7 +280,7 @@ export const LANDING_PAGE: ProductLanding = {
   h1Bold: 'que trae clientes.',
   subhead:
     'Una sola página, diseñada a medida y escrita para que el visitante haga una cosa: escribirte. Carga en menos de dos segundos, se ve impecable en el celular y sale en 15 días.',
-  answer: `Una landing page profesional en Argentina cuesta ${arsInline(LANDING_PRICE)} ARS, con precio cerrado y entrega en 15 días desde que se aprueba el diseño. Incluye diseño 100% a medida (sin plantillas), redacción orientada a conversión, botón de WhatsApp y formulario con respuesta automática, SEO técnico, medición con Google Analytics, dominio y hosting configurados y tres meses de soporte. Antes de pagar nada se ve un boceto gratis del diseño, en 24 a 48 horas.`,
+  answer: `Una landing page profesional en Argentina cuesta ${arsInline(LANDING_PRICE)} ARS, con precio cerrado y entrega en 15 días desde que se aprueba el diseño. Incluye diseño 100% a medida (sin plantillas), redacción orientada a conversión, botón de WhatsApp y formulario que abre el chat con la consulta ya escrita, SEO técnico, medición con Google Analytics, dominio configurado, hosting incluido y 60 días de cambios sin límite. Antes de pagar nada se ve un boceto gratis del diseño, en 24 a 48 horas.`,
   waMessage: 'Hola Manuel, quiero una landing page. ¿Cómo arrancamos?',
   pains: [
     {
@@ -306,8 +306,8 @@ export const LANDING_PAGE: ProductLanding = {
       body: 'No te mando un documento para que "completes el contenido". Charlamos, escribo la página y vos corregís lo que no suene a vos.',
     },
     {
-      title: 'WhatsApp y formulario que avisa',
-      body: 'Botón de WhatsApp con el mensaje ya escrito y formulario que te llega por mail con auto-respuesta al que consultó, para que no quede en silencio.',
+      title: 'WhatsApp y formulario de consulta',
+      body: 'Botón de WhatsApp con el mensaje ya escrito y un formulario que abre la charla con la consulta completa. Te llega a tu WhatsApp, no a una bandeja que nadie mira.',
     },
     {
       title: 'Menos de 2 segundos en el celular',
@@ -318,8 +318,8 @@ export const LANDING_PAGE: ProductLanding = {
       body: 'Google Analytics y el evento de conversión configurados. Vas a saber cuánta gente entró y cuántos escribieron, no adivinarlo.',
     },
     {
-      title: 'Dominio, hosting y 3 meses de soporte',
-      body: 'Todo configurado y a tu nombre. Los primeros tres meses de ajustes y correcciones van incluidos.',
+      title: 'Hosting incluido y 60 días de cambios',
+      body: 'Dominio y hosting configurados, sin abono mensual. Durante 60 días desde que la página sale online, pedís cambios sin límite.',
     },
   ],
   comparison: {
@@ -328,7 +328,7 @@ export const LANDING_PAGE: ProductLanding = {
     headers: ['', 'Plantilla (Wix, etc.)', 'Landing a medida'],
     rows: [
       ['Costo inicial', 'Bajo', `${arsInline(LANDING_PRICE)}, una vez`],
-      ['Costo mensual', 'Suscripción, para siempre', 'Solo hosting'],
+      ['Costo mensual', 'Suscripción, para siempre', 'Ninguno: hosting incluido'],
       ['Diseño', 'El mismo de otros miles', 'Solo tuyo'],
       ['Velocidad', 'Pesada por lo que no usás', 'Menos de 2 s en móvil'],
       ['Textos', 'Los escribís vos', 'Los escribo yo'],
@@ -374,8 +374,8 @@ export const LANDING_PAGE: ProductLanding = {
     {
       step: '04',
       title: 'Online y midiendo',
-      body: 'Dominio, hosting y medición configurados. Tres meses de correcciones incluidos.',
-      meta: '+3 meses',
+      body: 'Dominio, hosting y medición configurados. Durante 60 días, los cambios no tienen límite.',
+      meta: '+60 días',
     },
   ],
   fitNo: [
@@ -386,7 +386,7 @@ export const LANDING_PAGE: ProductLanding = {
   faq: [
     {
       q: '¿Cuánto sale una landing page en Argentina?',
-      a: `${arsInline(LANDING_PRICE)} ARS, precio cerrado por escrito y en 3 cuotas sin interés. Incluye diseño a medida, redacción, desarrollo, SEO técnico, medición, dominio y hosting configurados y tres meses de soporte. No hay extras que aparecen después.`,
+      a: `${arsInline(LANDING_PRICE)} ARS, precio cerrado por escrito y en 3 cuotas sin interés. Incluye diseño a medida, redacción, desarrollo, SEO técnico, medición, dominio configurado, hosting incluido y 60 días de cambios sin límite. No hay extras que aparecen después.`,
     },
     {
       q: '¿Qué diferencia hay entre una landing page y una página web?',
@@ -406,7 +406,7 @@ export const LANDING_PAGE: ProductLanding = {
     },
     {
       q: '¿Puedo cambiarle cosas después?',
-      a: 'Los ajustes de texto, precios o fotos entran en los tres meses de soporte. Después, si es algo puntual, se cotiza aparte; si querés cambiarla seguido, hay mantenimiento mensual desde $50.000.',
+      a: `Sí. Durante 60 días desde que sale online, pedís cambios sin límite: textos, precios, fotos. Después, si es algo puntual, se cotiza aparte; si querés cambiarla seguido, hay mantenimiento opcional desde ${arsInline(MAINTENANCE_PLANS[0].price)} por mes, con baja cuando quieras.`,
     },
     {
       q: '¿Y si más adelante necesito más páginas?',

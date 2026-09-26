@@ -6,6 +6,8 @@
  * Vive en un módulo sin 'use client' porque page.tsx (Server Component) lo
  * consume para el schema; static-sections.tsx es client (usa framer-motion).
  */
+import { arsTexto, MAINTENANCE_PLANS } from '@/lib/types/services'
+
 export const SERVICIOS_FAQ_ITEMS = [
   {
     q: '¿Cuánto cuesta una página web en Argentina?',
@@ -21,7 +23,7 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Cómo es el proceso de trabajo?',
-    a: 'Cuatro pasos: (1) me escribís por WhatsApp y charlamos 15 minutos sobre tu negocio; (2) en 24-48 h te mando un boceto gratis de tu página; (3) si te gusta, pagás la primera de 3 cuotas y en 15 días tenés tu web online, viendo avances en el camino; (4) lanzamos y tenés 3 meses de soporte incluido. Todo por WhatsApp o Zoom, desde cualquier punto del país.',
+    a: 'Cuatro pasos: (1) me escribís por WhatsApp y charlamos 15 minutos sobre tu negocio; (2) en 24-48 h te mando un boceto gratis de tu página; (3) si te gusta, pagás la primera de 3 cuotas y en 15 días tenés tu web online, viendo avances en el camino; (4) lanzamos y tenés 60 días de cambios sin límite. Todo por WhatsApp o Zoom, desde cualquier punto del país.',
   },
   {
     q: '¿Qué gano con una web a medida en vez de Wix o una plantilla?',
@@ -53,7 +55,7 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Qué pasa después de la entrega?',
-    a: 'Tenés 3 meses de soporte incluido: bugs, ajustes menores y dudas de uso, sin costo. Después podés seguir por tu cuenta (la web queda andando sola) o contratar mantenimiento mensual desde $50.000, que cubre actualizaciones de seguridad, monitoreo de errores y cambios menores.',
+    a: `Durante 60 días desde que tu página sale online, pedís cambios sin límite. Después sigue online igual, con el hosting incluido y sin abono obligatorio. Si querés seguir pidiendo cambios, hay mantenimiento opcional desde ${arsTexto(MAINTENANCE_PLANS[0].price)} por mes (actualizaciones de seguridad, monitoreo y rondas de cambios), con débito automático y baja cuando quieras. Y si algo que hicimos no funciona como acordamos, lo arreglamos sin costo, tengas plan o no.`,
   },
   {
     q: '¿Trabajás solo en Buenos Aires?',

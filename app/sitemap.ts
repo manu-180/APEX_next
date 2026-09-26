@@ -16,20 +16,21 @@ const BASE = APP_URL.replace(/\/$/, '')
  * Las que SÍ se derivan solas (blog y verticales) no están en esta tabla.
  */
 const PAGE_LAST_MODIFIED = {
-  home:        '2026-08-30',
-  servicios:   '2026-08-30',
-  cuantoCuesta: '2026-09-06',
-  disenoWeb:   '2026-09-06',
-  tiendaOnline: '2026-09-07',
-  landingPage:  '2026-09-07',
+  home:        '2026-09-26',
+  servicios:   '2026-09-26',
+  cuantoCuesta: '2026-09-26',
+  disenoWeb:   '2026-09-26',
+  tiendaOnline: '2026-09-26',
+  landingPage:  '2026-09-26',
   muestrario:  '2026-08-24',
   tecnologias: '2026-08-30',
   sobreMi:     '2026-08-30',
   contacto:    '2026-08-24',
   opiniones:   '2026-08-24',
   lab:         '2026-07-06',
+  terminos:    '2026-09-26',
   /** Los verticales comparten plantilla y data (`lib/data/verticals.ts`). */
-  verticales:  '2026-07-02',
+  verticales:  '2026-09-26',
 } as const
 
 /** 'YYYY-MM-DD' → Date al mediodía UTC: nunca corre de día al serializarse. */
@@ -63,6 +64,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}${ROUTES.contact}`,     lastModified: day(PAGE_LAST_MODIFIED.contacto),    changeFrequency: 'monthly', priority: 0.8  },
     { url: `${BASE}/opiniones`,        lastModified: day(PAGE_LAST_MODIFIED.opiniones),   changeFrequency: 'monthly', priority: 0.6  },
     { url: `${BASE}${ROUTES.lab}`,         lastModified: day(PAGE_LAST_MODIFIED.lab),         changeFrequency: 'monthly', priority: 0.5  },
+    { url: `${BASE}${ROUTES.terminos}`,    lastModified: day(PAGE_LAST_MODIFIED.terminos),    changeFrequency: 'monthly', priority: 0.3  },
   ]
 
   const blogUrls: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({

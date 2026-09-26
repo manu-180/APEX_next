@@ -51,7 +51,7 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Tabla actualizada con los precios reales del mercado argentino 2026 para landing, sitio corporativo, e-commerce y apps móviles. Sin "depende".',
     publishedAt: '2026-05-15',
-    updatedAt: '2026-06-19',
+    updatedAt: '2026-09-26',
     readingMinutes: 11,
     category: 'pricing',
     tags: ['precios', 'argentina', 'desarrollo web', 'presupuesto'],
@@ -119,11 +119,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting profesional el primer año, integración formulario de contacto con email, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días. Es lo que ofrezco como [plan Landing Page](/landing-page).',
+        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting incluido, formulario de contacto que abre WhatsApp con la consulta escrita, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días. Es lo que ofrezco como [plan Landing Page](/landing-page).',
       },
       {
         type: 'paragraph',
-        text: 'Un proyecto de $600k agrega: hasta 5-7 páginas adicionales, panel admin para que cambies textos/imágenes vos, integración WhatsApp + email automático, booking/calendario online, analytics avanzado, y soporte 3 meses post-entrega. Es el [plan Web Interactiva](/servicios).',
+        text: 'Un proyecto de $600k agrega: hasta 5-7 páginas adicionales, panel admin para que cambies textos/imágenes vos, integración con WhatsApp, booking/calendario online, analytics avanzado, y 60 días de cambios sin límite desde que sale online. Es el [plan Web Interactiva](/servicios).',
       },
       {
         type: 'heading',

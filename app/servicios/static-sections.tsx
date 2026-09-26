@@ -226,7 +226,7 @@ const PROCESS_STEPS = [
   {
     step: '04',
     title: 'Lanzamiento + soporte',
-    sub: '3 meses de soporte incluido post-entrega',
+    sub: '60 días de cambios sin límite',
     highlight: false,
   },
 ] as const
@@ -411,7 +411,7 @@ const WHY_APEX_POINTS = [
   },
   {
     title: 'Entrega en 15 días — o devuelvo el depósito',
-    sub: 'Fecha pactada antes de arrancar, con 3 meses de soporte incluido después.',
+    sub: 'Fecha pactada antes de arrancar, y 60 días de cambios sin límite después.',
   },
 ] as const
 
@@ -505,7 +505,7 @@ const COMPARISON_ROWS: Array<{
   },
   {
     feature: 'Costo mensual recurrente',
-    apex: 'Hosting incluido año 1',
+    apex: 'Hosting incluido, sin abono',
     wordpress: 'USD 5–25/mes',
     wix: 'USD 16–45/mes',
     tiendanube: 'USD 35–250/mes',

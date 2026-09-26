@@ -20,7 +20,16 @@ import { cn } from '@/lib/utils/cn'
 import { ROUTES } from '@/lib/constants'
 import { whatsappUrl, waMsgPlan } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
-import { WEB_PLANS, APP_PLANS, formatARS, type PricingPlan } from '@/lib/types/services'
+import {
+  WEB_PLANS,
+  APP_PLANS,
+  FREE_CHANGES_DAYS,
+  GOOGLE_MARKETING,
+  MAINTENANCE_PLANS,
+  arsTexto,
+  formatARS,
+  type PricingPlan,
+} from '@/lib/types/services'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { DUR_FAST, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
 
@@ -289,29 +298,32 @@ export function ServiciosContent() {
               transition={{ duration: prefersReducedMotion ? 0 : DUR_FAST, ease: EASE_OUT }}
             >
               {tab === 'web' ? (
-                <m.div
-                  variants={prefersReducedMotion ? undefined : TAB_GRID_VARIANTS}
-                  initial={prefersReducedMotion ? false : 'hidden'}
-                  whileInView={prefersReducedMotion ? undefined : 'visible'}
-                  viewport={{ once: true, amount: 0.1 }}
-                  animate={prefersReducedMotion ? { opacity: 1 } : undefined}
-                  className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
-                >
-                  {plans.map((plan) => (
-                    <m.div
-                      key={plan.id}
-                      variants={prefersReducedMotion ? undefined : TAB_CARD_VARIANTS}
-                      className={cn('h-full', ANCHOR_PLAN_IDS.has(plan.id) && 'md:-mt-4 md:mb-4')}
-                    >
-                      <UnifiedPricingCard
-                        plan={plan}
-                        onOpenDrawer={() => setOpenPlanDrawerId(plan.id)}
-                        isDrawerOpen={openPlanDrawerId === plan.id}
-                        deriskers={PLAN_DERISKERS[plan.id]}
-                      />
-                    </m.div>
-                  ))}
-                </m.div>
+                <>
+                  <m.div
+                    variants={prefersReducedMotion ? undefined : TAB_GRID_VARIANTS}
+                    initial={prefersReducedMotion ? false : 'hidden'}
+                    whileInView={prefersReducedMotion ? undefined : 'visible'}
+                    viewport={{ once: true, amount: 0.1 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : undefined}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
+                  >
+                    {plans.map((plan) => (
+                      <m.div
+                        key={plan.id}
+                        variants={prefersReducedMotion ? undefined : TAB_CARD_VARIANTS}
+                        className={cn('h-full', ANCHOR_PLAN_IDS.has(plan.id) && 'md:-mt-4 md:mb-4')}
+                      >
+                        <UnifiedPricingCard
+                          plan={plan}
+                          onOpenDrawer={() => setOpenPlanDrawerId(plan.id)}
+                          isDrawerOpen={openPlanDrawerId === plan.id}
+                          deriskers={PLAN_DERISKERS[plan.id]}
+                        />
+                      </m.div>
+                    ))}
+                  </m.div>
+                  <AfterLaunchPanel />
+                </>
               ) : (
                 <CustomSoftwarePanel />
               )}
@@ -601,6 +613,78 @@ function UnifiedPricingCard({
         </div>
       </div>
     </>
+  )
+}
+
+const SUBTITULO_PANEL = 'font-heading text-base font-bold text-[var(--color-on-surface)]'
+
+// Montos desde services.ts, como los planes: tienen que coincidir con los términos.
+function AfterLaunchPanel() {
+  return (
+    <SectionReveal className="mt-12">
+      <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--color-surface-low)] p-6 shadow-[0_18px_40px_-28px_rgba(0,0,0,0.16)] sm:p-8 md:p-10">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
+          <div>
+            <p className="editorial-label editorial-label--primary mb-5">Después de publicar</p>
+            <h3 className="heading-display text-balance text-2xl sm:text-3xl">
+              <span className="block text-[var(--color-on-surface-variant)]">Sin abono obligatorio.</span>
+              <strong className="block text-[var(--color-on-surface)]">Lo demás lo elegís vos.</strong>
+            </h3>
+            <p className="mt-5 max-w-sm text-pretty text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+              El hosting va incluido y tu página sigue online aunque no contrates nada más. Durante{' '}
+              {FREE_CHANGES_DAYS} días desde que sale online, pedís cambios sin límite.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-8">
+            <div>
+              <h4 className={SUBTITULO_PANEL}>Mantenimiento</h4>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+                Opcional, para seguir pidiendo cambios. Débito automático por MercadoPago y baja cuando quieras.
+              </p>
+              <ul className="mt-5 space-y-4">
+                {MAINTENANCE_PLANS.map((plan) => (
+                  <li key={plan.id} className="border-t border-[var(--glass-border)] pt-4">
+                    <p className="flex items-baseline justify-between gap-3">
+                      <span className="text-sm font-semibold text-[var(--color-on-surface)]">{plan.name}</span>
+                      <span className="whitespace-nowrap text-sm font-semibold tabular-nums text-[var(--color-on-surface)]">
+                        {arsTexto(plan.price)}
+                        <span className="font-normal text-[var(--color-on-surface-variant)]"> /mes</span>
+                      </span>
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-[var(--color-on-surface-variant)]">{plan.summary}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className={SUBTITULO_PANEL}>{GOOGLE_MARKETING.name}</h4>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+                Para que te encuentren quienes ya buscan lo que hacés.{' '}
+                <span className="whitespace-nowrap font-semibold tabular-nums text-[var(--color-on-surface)]">
+                  {arsTexto(GOOGLE_MARKETING.price)} por mes
+                </span>
+                .
+              </p>
+              <ul className="mt-5 space-y-2.5">
+                {GOOGLE_MARKETING.includes.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-[var(--color-on-surface-variant)]">
+                    <CheckIcon className="mt-1 size-3 shrink-0 text-[var(--color-primary)]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 border-t border-[var(--glass-border)] pt-4 text-xs leading-relaxed text-[var(--color-on-surface-variant)]">
+                Aparte va la inversión en anuncios: la pagás vos directo a Google, con tu tarjeta. Recomendamos
+                arrancar con {arsTexto(GOOGLE_MARKETING.recommendedAdSpend)} por mes. Los resultados no son
+                inmediatos y no prometemos posiciones en Google.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SectionReveal>
   )
 }
 

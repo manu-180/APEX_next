@@ -36,10 +36,10 @@ export const WEB_PLANS: PricingPlan[] = [
     features: [
       'Diseño premium 100% a medida (sin plantillas genéricas)',
       'Secciones de servicios, bio, testimonios y contacto',
-      'Botón WhatsApp + formulario con auto-respuesta por email',
+      'Botón de WhatsApp y formulario que abre el chat con la consulta ya escrita',
       'Velocidad real: carga en menos de 2 segundos (Google te premia con mejor posicionamiento)',
       'SEO técnico para aparecer en Google',
-      'Hosting + 3 meses de mantenimiento incluidos',
+      'Hosting incluido y 60 días de cambios sin límite',
     ],
     caseStudies: ['Simon Mindset', 'Pérez Yeregui', 'Metal Wailers', 'Poncho Spanish'],
     // Back face
@@ -51,7 +51,7 @@ export const WEB_PLANS: PricingPlan[] = [
       { num: '01', title: 'Más clientes sin esfuerzo', desc: 'Tu web convierte visitas en consultas mientras vos dormís' },
       { num: '02', title: 'Primera impresión premium', desc: 'Diseño que no parece el de todos: genera confianza desde la primera pantalla' },
       { num: '03', title: 'Aparecer en Google', desc: 'SEO técnico para que te encuentren antes que a la competencia' },
-      { num: '04', title: 'Contacto directo', desc: 'WhatsApp + formulario con respuesta automática inmediata' },
+      { num: '04', title: 'Contacto directo', desc: 'WhatsApp y un formulario que abre la charla con la consulta ya escrita' },
     ],
     powerStatement: 'Cada día sin presencia online es un cliente que va con tu competencia.',
   },
@@ -70,7 +70,7 @@ export const WEB_PLANS: PricingPlan[] = [
       'Base de datos conectada (Supabase)',
       'Reservas online, cotizadores automáticos y formularios con lógica y flujos propios',
       'Integraciones: WhatsApp, MercadoPago, Google Calendar',
-      'Hosting + 3 meses de mantenimiento incluidos',
+      'Hosting incluido y 60 días de cambios sin límite',
     ],
     caseStudies: ['Assistify', 'Botrive', 'BotLode'],
     // Back face
@@ -99,11 +99,11 @@ export const WEB_PLANS: PricingPlan[] = [
     targetAudience: 'Comercios y emprendimientos con productos propios',
     features: [
       'Catálogo de productos con filtros y búsqueda',
-      'Carrito + checkout con MercadoPago / Stripe',
+      'Carrito + checkout con MercadoPago',
       'Panel de gestión propio: pedidos, stock, clientes y catálogo en un solo lugar',
-      'Sistema de cuentas con historial de compras',
+      'Mis pedidos: tus clientes ven sus compras entrando con un código, sin crear cuenta',
       'SEO técnico avanzado para tráfico orgánico',
-      'Hosting + 3 meses de mantenimiento incluidos',
+      'Hosting incluido y 60 días de cambios sin límite',
     ],
     caseStudies: ['Pulpiprint', 'MNL Tecno'],
     // Back face
@@ -226,6 +226,53 @@ export const APP_PLANS: PricingPlan[] = [
   },
 ]
 
+/** Cambios sin tope desde que la página queda online (términos, sección 8). */
+export const FREE_CHANGES_DAYS = 60
+
+export interface MonthlyPlan {
+  id: string
+  name: string
+  price: number
+  summary: string
+}
+
+/** Mantenimiento opcional, por débito automático de MercadoPago (términos, sección 10). */
+export const MAINTENANCE_PLANS: MonthlyPlan[] = [
+  {
+    id: 'mant_esencial',
+    name: 'Esencial',
+    price: 40000,
+    summary: 'Hosting y dominio gestionados, monitoreo, actualizaciones de seguridad y 1 ronda de cambios chicos por mes.',
+  },
+  {
+    id: 'mant_crecimiento',
+    name: 'Crecimiento',
+    price: 80000,
+    summary: 'Todo lo del Esencial, hasta 3 rondas de cambios por mes e informe mensual de visitas.',
+  },
+  {
+    id: 'mant_pro',
+    name: 'Pro',
+    price: 150000,
+    summary: 'Todo lo del Crecimiento, rondas de cambios sin tope y funciones nuevas chicas.',
+  },
+]
+
+/** Servicio adicional para quien ya tiene su página (términos, sección 11). */
+export const GOOGLE_MARKETING = {
+  id: 'marketing_google',
+  name: 'Marketing en Google',
+  price: 150000,
+  /** Inversión en anuncios: la paga el cliente directo a Google con su tarjeta. */
+  recommendedAdSpend: 150000,
+  includes: [
+    'Creamos tu cuenta de Google Ads',
+    'Armamos la campaña',
+    'Medimos las consultas que llegan',
+    'La ajustamos todos los meses',
+  ],
+} as const
+
 /**
  * `$600.000` — sin el espacio duro que `formatARS` hereda del locale es-AR.
  * Para títulos, meta descriptions y prosa, donde ese espacio se lee como
@@ -233,6 +280,14 @@ export const APP_PLANS: PricingPlan[] = [
  */
 export function arsInline(amount: number): string {
   return `$${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(amount)}`
+}
+
+/**
+ * `$40.000` sin Intl, para texto que también se renderiza en el cliente: el ICU
+ * de Node y el del navegador no siempre agrupan igual y eso rompe la hidratación.
+ */
+export function arsTexto(amount: number): string {
+  return `$${String(Math.round(amount)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
 }
 
 export function formatARS(amount: number): string {

@@ -7,7 +7,7 @@ import { GridBackground } from '@/components/ui/grid-background'
 import { WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
-import { WEB_PLANS } from '@/lib/types/services'
+import { arsTexto, MAINTENANCE_PLANS, WEB_PLANS } from '@/lib/types/services'
 import { EASE_OUT } from '@/lib/motion'
 import { useParallaxNumber } from '@/hooks/use-parallax-number'
 import { cn } from '@/lib/utils/cn'
@@ -39,7 +39,7 @@ const INCLUDED_ALWAYS = [
   '3 cuotas sin interés',
   'Diseño 100% a medida, sin plantillas genéricas',
   'Carga en menos de 2 segundos + SEO técnico',
-  'Hosting y 3 meses de mantenimiento incluidos',
+  'Hosting incluido y 60 días de cambios sin límite',
   'El código queda a tu nombre',
 ]
 
@@ -214,8 +214,8 @@ export function HomePricingSection() {
               ))}
             </ul>
             <p className="mt-6 border-t border-[var(--glass-border)] pt-4 text-xs leading-relaxed text-[var(--color-on-surface-variant)] opacity-80">
-              Sin costos ocultos ni mensualidades sorpresa. Lo que ves acá está en
-              el presupuesto por escrito.
+              Sin costos ocultos ni abono obligatorio. Después de los 60 días, el
+              mantenimiento es opcional: desde {arsTexto(MAINTENANCE_PLANS[0].price)} por mes.
             </p>
           </m.div>
 

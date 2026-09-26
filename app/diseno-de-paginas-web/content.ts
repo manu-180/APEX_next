@@ -50,8 +50,8 @@ export const INCLUDED = [
     body: 'Estructura, metadatos, datos estructurados y sitemap. Para que te encuentren en Google sin pagar por cada clic.',
   },
   {
-    title: 'Hosting y 3 meses de soporte',
-    body: 'Dominio y hosting configurados, y los primeros tres meses de ajustes y correcciones incluidos después de lanzar.',
+    title: 'Hosting incluido y 60 días de cambios',
+    body: 'Dominio y hosting configurados, sin abono mensual. Durante 60 días desde que el sitio sale online, pedís cambios sin límite.',
   },
 ] as const
 
@@ -77,8 +77,8 @@ export const PROCESS = [
   {
     step: '04',
     title: 'Lanzamiento y soporte',
-    body: 'Dominio, hosting y medición configurados. Los tres meses siguientes, las correcciones corren por mi cuenta.',
-    meta: '+3 meses',
+    body: 'Dominio, hosting y medición configurados. Durante 60 días, los cambios que pidas no tienen límite.',
+    meta: '+60 días',
   },
 ] as const
 
@@ -92,13 +92,13 @@ export const FIT_YES = [
 export const FIT_NO = [
   'Si lo necesitás para pasado mañana. El boceto tarda 48 h y el sitio, 15 días.',
   'Si buscás lo más barato del mercado. Hay quien te arma una página por monedas; no compito ahí.',
-  'Si querés que además te lleve las redes o las campañas. Diseño y programo sitios: eso es lo que hago.',
+  'Si buscás que te lleven las redes sociales. Diseño y programo sitios, y si querés te llevo los anuncios en Google; las redes, no.',
 ] as const
 
 export const FAQ = [
   {
     q: '¿Qué incluye el diseño de una página web?',
-    a: 'El diseño a medida de cada pantalla (no una plantilla), el desarrollo del sitio en código propio, la carga de tus textos e imágenes, el SEO técnico para que Google te encuentre, el dominio y el hosting configurados, y tres meses de soporte después del lanzamiento. Entrás con una idea y salís con el sitio funcionando.',
+    a: 'El diseño a medida de cada pantalla (no una plantilla), el desarrollo del sitio en código propio, la carga de tus textos e imágenes, el SEO técnico para que Google te encuentre, el dominio y el hosting configurados, y 60 días de cambios sin límite desde que el sitio sale online. Entrás con una idea y salís con el sitio funcionando.',
   },
   {
     q: '¿Qué necesito para hacer la página web de mi empresa?',
@@ -118,7 +118,7 @@ export const FAQ = [
   },
   {
     q: '¿Puedo actualizar la página yo después?',
-    a: 'Sí. Los sitios con contenido que cambia seguido —productos, turnos, precios— salen con un panel propio para que lo edites vos, sin tocar código. Si es un sitio institucional que casi no cambia, los ajustes puntuales entran en los tres meses de soporte.',
+    a: 'Sí. Los sitios con contenido que cambia seguido —productos, turnos, precios— salen con un panel propio para que lo edites vos, sin tocar código. Si es un sitio institucional que casi no cambia, los ajustes entran en los 60 días de cambios sin límite y, después, en el mantenimiento opcional.',
   },
   {
     q: '¿Cuánto cuesta el diseño de una página web?',

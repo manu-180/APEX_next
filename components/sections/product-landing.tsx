@@ -157,7 +157,7 @@ export function ProductLandingPage({ data }: { data: ProductLanding }) {
                 ARS · precio cerrado · 3 cuotas sin interés
               </p>
               <ul className="mt-5 space-y-2.5">
-                {['Diseño 100% a medida', 'Dominio y hosting configurados', '3 meses de soporte incluidos'].map(
+                {['Diseño 100% a medida', 'Hosting incluido, sin abono mensual', '60 días de cambios sin límite'].map(
                   (f) => (
                     <li
                       key={f}
