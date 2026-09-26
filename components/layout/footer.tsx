@@ -7,11 +7,12 @@
  */
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
-import { ROUTES, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
+import { HORARIO_ATENCION, ROUTES, VENTANILLA_CONSUMIDOR, WHATSAPP_PHONE_DISPLAY } from '@/lib/constants'
 import { VERTICALS } from '@/lib/data/verticals'
+import { datosFiscales } from '@/lib/legal/vendedor'
 import { whatsappUrl, WA_MSG_FOOTER_LINK } from '@/lib/whatsapp'
 import { ApexLogoMark } from '@/components/ui/apex-logo-mark'
-import { WhatsAppIcon } from '@/components/ui/icons'
+import { ExternalLinkIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { FooterWatermark } from '@/components/layout/footer-watermark'
 
@@ -51,6 +52,12 @@ const SERVICIOS_LINKS = [
   { label: 'Precios y planes',     href: ROUTES.cuantoCuesta },
 ]
 
+const LEGALES_LINKS = [
+  { label: 'Términos y condiciones',     href: ROUTES.terminos },
+  { label: 'Botón de arrepentimiento',   href: ROUTES.arrepentimiento },
+  { label: 'Botón de baja de servicio',  href: ROUTES.baja },
+]
+
 const EXPLORAR_LINKS = [
   { label: 'Blog y guías',    href: ROUTES.blog,         external: false },
   { label: 'Muestrario',      href: ROUTES.muestrario,   external: false },
@@ -61,10 +68,12 @@ const EXPLORAR_LINKS = [
 ]
 
 export function Footer() {
+  const fiscales = datosFiscales()
+
   return (
     <footer
       id="site-footer"
-      className="cv-auto relative overflow-hidden"
+      className="cv-auto relative overflow-hidden print:hidden"
       style={{ backgroundColor: 'var(--footer-bg)' }}
     >
       {/* Separador superior con gradiente del tema */}
@@ -228,6 +237,56 @@ export function Footer() {
             ))}
           </p>
         </nav>
+
+        {/* Atención al cliente y legales: Disposición 954/2025 (art. 6) pide
+            teléfono y horario; la Res. 274/2021, el link a la Ventanilla
+            Única Federal con su texto exacto, en todas las páginas. */}
+        <div className="divider-theme mt-10" aria-hidden="true" />
+        <div className="grid grid-cols-1 gap-8 pt-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+          <div>
+            <p className="editorial-label mb-4">Atención al cliente</p>
+            <p className="max-w-xl text-sm leading-relaxed text-[var(--color-on-surface-variant)]">
+              WhatsApp{' '}
+              <span className="font-heading font-semibold tabular-nums text-[var(--color-on-surface)]">
+                {WHATSAPP_PHONE_DISPLAY}
+              </span>
+              . Te atendemos de {HORARIO_ATENCION}.
+            </p>
+            {fiscales && (
+              <p className="mt-3 max-w-xl text-xs leading-relaxed text-[var(--color-on-surface-variant)]">
+                APEX es el nombre comercial de {fiscales.titular} · CUIT {fiscales.cuit} ·{' '}
+                {fiscales.condicionIva} · {fiscales.domicilio} ·{' '}
+                <a
+                  href={`mailto:${fiscales.mail}`}
+                  className="rounded underline decoration-[rgba(var(--color-primary-rgb),0.45)] underline-offset-4 hover:text-[var(--color-on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)]"
+                >
+                  {fiscales.mail}
+                </a>
+              </p>
+            )}
+          </div>
+
+          <nav aria-label="Legales" className="min-w-0">
+            <ul className="flex flex-wrap gap-x-5">
+              {LEGALES_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} prefetch={false} className={FOOTER_LINK}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <a
+              href={VENTANILLA_CONSUMIDOR.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-11 items-start gap-2 rounded-lg border border-[var(--color-outline)] px-3.5 py-2.5 text-sm font-medium leading-snug text-[var(--color-on-surface)] transition-colors duration-150 hover:border-[rgba(var(--color-on-surface-variant-rgb),0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--color-primary-rgb),0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-base)]"
+            >
+              <span>{VENTANILLA_CONSUMIDOR.texto}</span>
+              <ExternalLinkIcon className="mt-0.5 size-3.5 shrink-0 opacity-60" />
+            </a>
+          </nav>
+        </div>
 
         {/* Bottom bar: marca + año + stack */}
         <div className="divider-theme mt-10" aria-hidden="true" />
