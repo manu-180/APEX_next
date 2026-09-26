@@ -72,12 +72,12 @@ export const VERTICALS: Vertical[] = [
         body: 'No es una plantilla genérica de doctor. Diseño a medida que comunica tu seriedad y especialización, con foto profesional, biografía y consultorio.',
       },
       {
-        title: 'Cumple normativa argentina',
-        body: 'Política de privacidad acorde a Ley 25.326 (datos personales), términos de servicio para profesionales de la salud, y nota legal sobre que no reemplaza consulta médica.',
+        title: 'Datos de pacientes, con cuidado',
+        body: 'Lo que dejan tus pacientes en la página queda guardado con acceso restringido y viaja por conexión segura. Si además vas a pedir datos de salud, lo definimos antes: la Ley 25.326 les exige cuidados especiales.',
       },
       {
         title: 'SEO local',
-        body: 'Optimizado para que aparezcas cuando alguien busca "cardiólogo Palermo" o "obstetra zona norte". Google Business Profile configurado y posicionado.',
+        body: 'Optimizado para que aparezcas cuando alguien busca "cardiólogo Palermo" o "obstetra zona norte". Google Business Profile configurado.',
       },
     ],
     faq: [
@@ -91,7 +91,7 @@ export const VERTICALS: Vertical[] = [
       },
       {
         q: '¿Cumple con la ley de datos personales?',
-        a: 'Sí. Incluimos políticas de privacidad acordes a la Ley 25.326, formularios de consentimiento, y almacenamiento seguro de datos sensibles. El hosting se elige en infraestructura compatible.',
+        a: 'Te damos la base técnica para cumplirla: lo que dejan tus pacientes queda guardado con acceso restringido y viaja por conexión segura. La política de privacidad la publicás vos, porque ante la Ley 25.326 el responsable de esos datos sos vos, y te ayudamos a hacerlo. Si la página va a pedir datos de salud, lo definimos antes: la ley les exige cuidados especiales.',
       },
       {
         q: '¿Mis pacientes pueden pagar por tarjeta?',
@@ -147,8 +147,8 @@ export const VERTICALS: Vertical[] = [
         body: 'Estructura de blog para que escribas (o te ayudemos a escribir) artículos sobre tu especialidad. Cada artículo bien escrito posiciona en Google para keywords legales específicas.',
       },
       {
-        title: 'Política de confidencialidad robusta',
-        body: 'Términos de servicio adaptados al ejercicio profesional argentino, secreto profesional protegido, y formularios con criptografía adecuada para datos sensibles.',
+        title: 'Consultas confidenciales',
+        body: 'Lo que te escriben por la página queda guardado con acceso restringido y viaja por conexión segura. Los textos legales de tu estudio los definís vos, que conocés las reglas de tu colegio, y nosotros los publicamos.',
       },
       {
         title: 'Diferenciación visual',
@@ -170,7 +170,7 @@ export const VERTICALS: Vertical[] = [
       },
       {
         q: '¿El sitio cumple con normativas profesionales argentinas?',
-        a: 'Sí. Cumplimos con regulaciones de Colegio Público de Abogados (CPACF, CPAU según jurisdicción) en términos de comunicación profesional, advertising y captación.',
+        a: 'Las reglas de publicidad profesional las fija tu colegio y cambian según la jurisdicción. Por eso revisás y aprobás cada texto antes de publicarlo, y lo ajustamos a lo que pida tu colegio. Esa revisión queda de tu lado: no damos asesoramiento legal.',
       },
       {
         q: '¿Puedo recibir consultas internacionales?',
@@ -219,7 +219,7 @@ export const VERTICALS: Vertical[] = [
       },
       {
         title: 'Portal del cliente',
-        body: 'Cada cliente accede a su panel con: documentos compartidos, comprobantes emitidos, balance, estado de cuenta corriente, y mensajes directos con vos. Reduce 70% las consultas por WhatsApp.',
+        body: 'Cada cliente accede a su panel con: documentos compartidos, comprobantes emitidos, balance, estado de cuenta corriente, y mensajes directos con vos.',
       },
       {
         title: 'Integración AFIP completa',
@@ -249,7 +249,7 @@ export const VERTICALS: Vertical[] = [
       },
       {
         q: '¿Cumple con normas de secreto profesional contable?',
-        a: 'Sí. El portal está protegido con autenticación robusta, los datos sensibles van encriptados, y los accesos quedan auditados. Cumplimos con Ley 25.326 y normativas FACPCE.',
+        a: 'El secreto profesional lo cuidás vos, y la página te da la base técnica: lo que se carga queda con acceso restringido y viaja por conexión segura. Ante la Ley 25.326, el responsable de los datos de tus clientes sos vos; te ayudamos a publicar tu política de privacidad y a responder cuando alguien pida ver o borrar sus datos.',
       },
     ],
     priceFrom: 900_000,
