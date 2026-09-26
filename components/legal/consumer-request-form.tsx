@@ -6,6 +6,7 @@ import { whatsappUrl } from '@/lib/whatsapp'
 import type { TipoSolicitud } from '@/lib/legal/config'
 import {
   LIMITES,
+  MENSAJES,
   enviarSolicitud,
   validarSolicitud,
   type Campo,
@@ -36,10 +37,10 @@ const TEXTOS: Record<
   },
 }
 
-const ERROR_SISTEMA: Record<'red' | 'no_disponible' | 'rechazada', string> = {
+const ERROR_SISTEMA: Record<'red' | 'no_disponible' | 'demasiados', string> = {
   red: 'No pudimos enviar tu pedido porque se cortó la conexión. Probá de nuevo en un momento.',
   no_disponible: 'No pudimos registrar tu pedido desde la web en este momento.',
-  rechazada: 'No pudimos registrar tu pedido con estos datos. Revisalos y probá de nuevo.',
+  demasiados: 'Ya recibimos varios pedidos desde esta conexión. Probá de nuevo en un rato.',
 }
 
 const ORDEN_CAMPOS: Campo[] = ['nombre', 'contacto', 'referencia', 'detalle']
@@ -106,6 +107,9 @@ export function ConsumerRequestForm({ tipo }: { tipo: TipoSolicitud }) {
     if (resultado.ok) {
       setCanalConfirmado(datos.canal)
       setCodigo(resultado.codigo)
+    } else if (resultado.motivo === 'campo') {
+      setErrores({ [resultado.campo]: MENSAJES[resultado.campo] })
+      refs[resultado.campo].current?.focus()
     } else {
       setFallo(resultado.motivo)
     }

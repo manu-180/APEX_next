@@ -6,15 +6,11 @@ export interface VersionTerminos {
   markdown: string
 }
 
-type Fila = Record<string, unknown>
-
-// `terminos_versiones` la crea el panel (apex_manager) en paralelo a este
-// cambio y su esquema no estaba confirmado: se acepta el markdown bajo
-// cualquiera de estos nombres. Confirmado el esquema, dejar solo el real.
-const COLUMNAS_MARKDOWN = ['contenido_md', 'markdown', 'contenido', 'texto_md', 'texto', 'cuerpo_md', 'cuerpo'] as const
+// Esquema de apex_manager: version text, texto_md text, publicada_en timestamptz.
+// La RLS solo deja ver a anon las filas con publicada_en <= now().
+type Fila = { version?: unknown; texto_md?: unknown; publicada_en?: unknown }
 
 function etiquetaDe(valor: unknown): string | null {
-  if (typeof valor === 'number' && Number.isFinite(valor)) return `v${valor}`
   if (typeof valor !== 'string') return null
   const v = valor.trim()
   if (!v) return null
@@ -24,9 +20,9 @@ function etiquetaDe(valor: unknown): string | null {
 function aVersion(fila: Fila): VersionTerminos | null {
   const etiqueta = etiquetaDe(fila.version)
   const publicadaEn = typeof fila.publicada_en === 'string' ? fila.publicada_en : null
-  const columna = COLUMNAS_MARKDOWN.find((c) => typeof fila[c] === 'string' && (fila[c] as string).trim())
-  if (!etiqueta || !publicadaEn || !columna) return null
-  return { etiqueta, publicadaEn, markdown: fila[columna] as string }
+  const markdown = typeof fila.texto_md === 'string' && fila.texto_md.trim() ? fila.texto_md : null
+  if (!etiqueta || !publicadaEn || !markdown) return null
+  return { etiqueta, publicadaEn, markdown }
 }
 
 // En el build no hay página vieja que conservar: si Supabase no responde, se
@@ -45,7 +41,7 @@ export async function terminosPublicados(): Promise<VersionTerminos[]> {
   const config = configSupabase()
   if (!config) return fallar('faltan NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
-  const endpoint = `${config.url}/rest/v1/terminos_versiones?select=*&publicada_en=not.is.null&order=publicada_en.desc`
+  const endpoint = `${config.url}/rest/v1/terminos_versiones?select=version,texto_md,publicada_en&order=publicada_en.desc`
 
   let res: Response
   try {
