@@ -220,7 +220,7 @@ export function Navbar({
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0"
+      className="fixed top-0 left-0 right-0 print:hidden"
       style={{ zIndex: 'var(--z-sticky)' } as React.CSSProperties}
     >
       {/* Wrapper del morph (spec §4/§5): al scrollear gana padding y la barra
