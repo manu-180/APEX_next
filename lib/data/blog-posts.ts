@@ -119,7 +119,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting incluido, formulario de contacto que abre WhatsApp con la consulta escrita, SEO on-page básico, optimización mobile (Lighthouse 90+), y el código sube a un repo a tu nombre. Plazo: 15 días. Es lo que ofrezco como [plan Landing Page](/landing-page).',
+        text: 'Un proyecto base de $300k típicamente incluye: diseño responsive a medida, hosting incluido, formulario de contacto que abre WhatsApp con la consulta escrita, SEO on-page básico, optimización mobile (Lighthouse 90+), y, cuando terminás de pagar, el código es tuyo. Plazo: 5 días hábiles desde que tengo tu contenido. Es lo que ofrezco como [plan Landing Page](/landing-page).',
       },
       {
         type: 'paragraph',
@@ -200,8 +200,8 @@ export const BLOG_POSTS: BlogPost[] = [
         ordered: true,
         items: [
           'Pedí precio fijo o cap. Nunca "por hora sin scope".',
-          'Verificá que el código quede en tu cuenta de GitHub.',
-          'Confirmá que el dominio y hosting estén a tu nombre.',
+          'Pedí por escrito cuándo pasa a ser tuyo el código y cómo te lo llevás si te vas.',
+          'Confirmá que el dominio quede a tu nombre.',
           'Preguntá qué pasa si querés cambiar de proveedor.',
           'No pagues mantenimiento mensual si tu sitio no cambia.',
         ],
@@ -214,7 +214,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         q: '¿Cuál es la diferencia entre Tiendanube y un e-commerce custom?',
-        a: 'Tiendanube cuesta $35-65 USD/mes pero el código no es tuyo. Custom cuesta ARS 900k-3M de una sola vez y el código queda a tu nombre, sin costo recurrente significativo. Conviene custom cuando facturás más de $3M/mes.',
+        a: 'Tiendanube cuesta $35-65 USD/mes pero el código no es tuyo. Custom cuesta ARS 900k-3M de una sola vez y, cuando terminás de pagar, el código es tuyo, sin costo recurrente significativo. Conviene custom cuando facturás más de $3M/mes.',
       },
       {
         q: '¿El hosting y el dominio están incluidos en el precio?',
@@ -230,7 +230,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         q: '¿Cuánto tarda en estar lista una página web?',
-        a: 'Una landing está lista en 7-15 días y un sitio interactivo en 15-25 días. En APEX el plazo se pacta por escrito antes de empezar, con un boceto gratis en 24-48 h para que veas el diseño antes de pagar.',
+        a: 'Una landing está lista en 7-15 días y un sitio interactivo en 15-25 días. En APEX, una landing sale en 5 días hábiles, una web interactiva en 10 y una tienda online en 15, desde que tenemos tu contenido. El plazo queda por escrito antes de pagar, y el boceto lo ves gratis en 24-48 h.',
       },
       {
         q: '¿Qué pasa si no me gusta el diseño?',
@@ -238,7 +238,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         q: '¿Puedo pagar mi página web en cuotas?',
-        a: 'Sí. Trabajo con 3 cuotas sin interés, y el primer boceto es gratis: recién pagás cuando aprobás cómo va a quedar tu proyecto.',
+        a: 'Sí. Trabajo con 3 cuotas sin interés —la primera al contratar y las otras a los 30 y a los 60 días—, y el boceto es gratis: recién pagás cuando aprobás cómo va a quedar tu proyecto.',
       },
     ],
   },
@@ -554,11 +554,11 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Las 3 preguntas que tu dev tiene que poder responder antes de firmar. Casos reales de PyMEs que perdieron $1M+ por no preguntar esto.',
     publishedAt: '2026-05-08',
-    updatedAt: '2026-06-19',
-    readingMinutes: 8,
+    updatedAt: '2026-09-26',
+    readingMinutes: 9,
     category: 'estrategia',
     tags: ['contratación', 'propiedad código', 'lock-in', 'riesgos'],
-    tldr: 'El código de tu sitio o app debe quedar 100% a tu nombre desde el día 1 (repositorio en tu cuenta, dominio a tu nombre, datos exportables). Si tu dev no te puede confirmar esto por escrito, no firmes.',
+    tldr: 'Lo que te protege no es en qué cuenta arranca el repositorio, sino tres cosas por escrito: cuándo pasa a ser tuyo el código, cómo te lo llevás si te vas (qué te entregan, en cuánto tiempo y a qué costo) y cómo exportás tus datos. El dominio, siempre a tu nombre. Si tu proveedor no te lo confirma por escrito, no firmes.',
     blocks: [
       {
         type: 'paragraph',
@@ -576,7 +576,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'PyME contrata freelance por ARS 200k. Sitio "listo". A los 6 meses quieren agregar una sección. El freelance no responde. Resultado: pagan ARS 400k a otro dev para tomar control, porque el código original estaba en una cuenta personal del freelance. No podían ni mover el sitio de servidor.',
+        text: 'PyME contrata freelance por ARS 200k. Sitio "listo". A los 6 meses quieren agregar una sección. El freelance no responde. Resultado: pagan ARS 400k a otro dev para tomar control, porque el código original estaba en una cuenta personal del freelance y nada escrito decía cómo recuperarlo. No podían ni mover el sitio de servidor.',
       },
       {
         type: 'heading',
@@ -604,20 +604,20 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'heading',
         level: 3,
-        text: '1. ¿En qué cuenta queda el repositorio?',
+        text: '1. ¿Cuándo pasa a ser mío el código, y dónde vive mientras tanto?',
       },
       {
         type: 'paragraph',
-        text: 'Respuesta correcta: "GitHub a tu nombre, vos sos owner, yo soy collaborator hasta entregar y después salgo." Respuesta peligrosa: "En mi cuenta, te doy acceso" — eso es lock-in puro.',
+        text: 'Respuesta correcta: una condición concreta, como "cuando terminás de pagar", y una respuesta clara sobre dónde está alojado hasta entonces: en tu cuenta o en la infraestructura del proveedor. Respuesta peligrosa: "Es nuestro, vos tenés una licencia de uso", sin fecha de traspaso, o "eso lo vemos después".',
       },
       {
         type: 'heading',
         level: 3,
-        text: '2. ¿En qué cuenta queda el dominio y el hosting?',
+        text: '2. ¿A nombre de quién queda el dominio?',
       },
       {
         type: 'paragraph',
-        text: 'Respuesta correcta: "Vos comprás el dominio a tu nombre. Hosting en tu cuenta de Vercel/AWS/etc." Respuesta peligrosa: "Te lo manejo todo yo" — si el dev desaparece, perdés acceso al sitio.',
+        text: 'Respuesta correcta: "A tu nombre, en NIC Argentina o en el registrador que elijas." El hosting puede estar en tu cuenta o en la del proveedor, pero el dominio es la dirección donde te encuentran tus clientes: tiene que ser tuyo siempre. Respuesta peligrosa: "Lo registro yo y te lo incluyo en el abono" — si mañana te vas, te quedás sin tu dirección.',
       },
       {
         type: 'heading',
@@ -626,12 +626,25 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Respuesta correcta: "Te llevás el repo entero, las bases de datos exportadas, y la documentación. Lo podés correr en otro lado mañana mismo." Respuesta peligrosa: "Lo armé con mi framework propio, sería difícil migrarlo." Si te dicen esto, correlo.',
+        text: 'Respuesta correcta: "Te entregamos el código —el repositorio transferido a tu GitHub o en un .zip—, las fotos y archivos, y tus datos en CSV o JSON, en un plazo definido y sin costo de salida." Si parte de tu sitio corre sobre un servicio que el proveedor comparte con todos sus clientes (un sistema de tienda o de reservas, por ejemplo), te lo tienen que decir antes: esas funciones no se mudan, pero tus datos sí. Respuesta peligrosa: "Lo armé con mi framework propio, sería difícil migrarlo", sin decirte qué te llevás. Si te dicen esto, correlo.',
       },
       {
         type: 'callout',
         variant: 'warning',
-        text: 'Antes de firmar, pedí por escrito (email es válido) que el código quedará en tu cuenta y que podés migrarte en cualquier momento. Si el dev no acepta poner esto por escrito, es un red flag enorme.',
+        text: 'Antes de firmar, pedí por escrito (email es válido) cuándo pasa a ser tuyo el código y cómo es la salida: qué te entregan, en cuánto tiempo y a qué costo. Si el proveedor no acepta ponerlo por escrito, es un red flag enorme.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: '¿Tiene que estar el repositorio en tu cuenta desde el primer día?',
+      },
+      {
+        type: 'paragraph',
+        text: 'No necesariamente. Hay dos modelos honestos. En el primero, el proyecto vive desde el día 1 en tus cuentas (GitHub, hosting, base de datos): tenés todo a mano, pero también te toca crearlas, pagarlas y mantenerlas. En el segundo, el proveedor aloja y mantiene todo en su infraestructura, y el código pasa a ser tuyo cuando terminás de pagar: no te ocupás de nada técnico, pero dependés de que la salida esté bien escrita.',
+      },
+      {
+        type: 'paragraph',
+        text: 'Los dos sirven. Lo que no sirve es el tercero, el más común: el código en la cuenta del dev, sin fecha de traspaso y sin una salida por escrito. De ahí salen los tres casos de arriba.',
       },
       {
         type: 'heading',
@@ -642,7 +655,7 @@ export const BLOG_POSTS: BlogPost[] = [
         type: 'list',
         ordered: true,
         items: [
-          'Pedí formalmente acceso owner al repositorio (email + por WhatsApp).',
+          'Pedí por escrito una copia del código y la exportación de tus datos (email + WhatsApp).',
           'Si el dev no responde en 7 días, escalá legalmente — el código del sitio puede ser tuyo por ley si lo pagaste.',
           'En paralelo, hacé backup de todo lo público (el frontend) y exportá toda la data que tengas acceso.',
           'Considerá contratar a otro dev para una "auditoría de propiedad" — chequea qué tan portable es tu setup actual.',
@@ -655,7 +668,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Porque no necesita atarte para que te quedes. El que te retiene escondiendo el código o el acceso es porque su trabajo no se sostiene solo. Un dev confiado te entrega todo —repo, dominio, datos— y volvés igual, porque trabajás bien con él. El lock-in es una muleta de retención, no una práctica profesional. Si te lo proponen "para simplificar", desconfiá.',
+        text: 'Porque no necesita atarte para que te quedes. El que te retiene escondiendo el código o el acceso es porque su trabajo no se sostiene solo. Un proveedor confiado te deja la salida por escrito —código, archivos y datos, sin costo— y te quedás igual, porque trabajás bien con él. El lock-in es una muleta de retención, no una práctica profesional. Si te lo proponen "para simplificar", desconfiá.',
       },
       {
         type: 'heading',
@@ -665,9 +678,10 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'list',
         items: [
-          'Que el código es tuyo y el repo se crea en TU cuenta de GitHub desde el día 1.',
-          'Que el dominio y el hosting quedan a tu nombre, no del dev.',
-          'Que podés exportar toda la base de datos cuando quieras.',
+          'Cuándo pasa a ser tuyo el código (por ejemplo, cuando terminás de pagar) y dónde vive mientras tanto.',
+          'Que el dominio queda a tu nombre, no del proveedor.',
+          'Cómo es la salida: qué te entregan (código, archivos y datos), en cuántos días y sin costo.',
+          'Que tus datos se exportan en formatos abiertos (CSV o JSON) cuando los pidas.',
           'Qué incluye el proyecto y qué no (scope claro, para evitar el "eso es aparte").',
           'Precio fijo y plazo por escrito, no "por hora sin tope".',
         ],
@@ -690,11 +704,11 @@ export const BLOG_POSTS: BlogPost[] = [
     faq: [
       {
         q: '¿El código de mi sitio es legalmente mío si lo pagué?',
-        a: 'En Argentina, la titularidad del código depende del contrato. Sin contrato escrito, la propiedad puede quedar ambigua. Por eso es crítico pactar por escrito desde el inicio que el código queda a nombre del cliente.',
+        a: 'En Argentina, la titularidad del código depende del contrato. Sin contrato escrito, la propiedad puede quedar ambigua. Por eso es crítico pactar por escrito, antes de empezar, cuándo pasa a ser tuyo y qué te llevás si te vas.',
       },
       {
         q: '¿Qué es el lock-in de un proveedor?',
-        a: 'Es cuando técnicamente es muy difícil o imposible migrar tu sitio o app a otro proveedor. Ocurre cuando el código vive en cuentas del dev, usa frameworks propietarios, o los datos no se pueden exportar.',
+        a: 'Es cuando técnicamente es muy difícil o imposible migrar tu sitio o app a otro proveedor. Ocurre cuando no hay una salida por escrito para llevarte el código, cuando el sitio depende de piezas propietarias que nadie te avisó que no se mudan, o cuando los datos no se pueden exportar.',
       },
       {
         q: '¿Wix y Shopify tienen lock-in?',
@@ -702,7 +716,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         q: '¿Cómo me aseguro que el código quede a mi nombre?',
-        a: 'Pedí que el repositorio se cree directamente en tu cuenta de GitHub (no transferido después). Pedí ser el "owner" desde el día 1. Si te dicen que "es más fácil" empezar en la cuenta del dev y "después transferir", desconfiá.',
+        a: 'Pedí por escrito dos cosas: cuándo pasa a ser tuyo (una condición concreta, como terminar de pagar) y cómo te lo entregan si te vas (el repositorio transferido a tu GitHub o un .zip, en un plazo definido y sin costo). Algunos proveedores trabajan en tu cuenta desde el primer día y otros alojan el proyecto y te lo transfieren al terminar de pagar: los dos modelos sirven si la salida está escrita.',
       },
       {
         q: '¿Me sirve tener el código si no sé programar?',
@@ -710,7 +724,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         q: '¿Cómo maneja APEX la propiedad del código?',
-        a: 'El repositorio se crea en tu cuenta de GitHub desde el día 1, el dominio y el hosting quedan a tu nombre, y todo queda pactado por escrito antes de empezar. Si algún día querés seguir con otro dev, te llevás todo sin pedir permiso.',
+        a: 'Cuando terminás de pagar, el diseño, los textos y el código de tu página son tuyos. Mientras te la alojamos, vive en la infraestructura de APEX, así no tenés que crear ni pagar cuentas técnicas. Si te vas, te lo llevás sin costo: el repositorio transferido a tu GitHub o en un .zip, con tus datos en CSV o JSON. Las funciones del sistema central (tienda, reservas, cursos y panel) no se mudan, porque las comparten todos los clientes, pero tus datos te los llevás siempre. El dominio queda siempre a tu nombre, y todo esto figura en los términos que ves antes de pagar.',
       },
     ],
   },
@@ -876,7 +890,7 @@ export const BLOG_POSTS: BlogPost[] = [
     description:
       'Checklist verificable de 12 puntos para evaluar a un freelance o agencia antes de firmar. Si cumple 9+, vas bien.',
     publishedAt: '2026-05-02',
-    updatedAt: '2026-06-19',
+    updatedAt: '2026-09-26',
     readingMinutes: 8,
     category: 'estrategia',
     tags: ['contratación', 'freelance', 'checklist', 'argentina'],
@@ -898,7 +912,7 @@ export const BLOG_POSTS: BlogPost[] = [
           '**Te muestra trabajos en producción** (no mockups en Behance). Tiene que poder enseñarte sitios reales funcionando, ideal con clientes reconocibles.',
           '**Tiene casos con métricas reales** (no "aumentamos las ventas"). Si te dice "+47% conversión", debería poder mostrar el dato.',
           '**Te explica el plazo y los hitos por escrito**. WhatsApp o email vale como documentación.',
-          '**El código queda en tu cuenta** desde el día 1. Preguntá literalmente: "¿En qué cuenta de GitHub queda?"',
+          '**Te dice por escrito cuándo el código pasa a ser tuyo** y cómo te lo llevás si te vas. Preguntá literalmente: "Si mañana me voy, ¿qué me llevo y cuánto me cuesta?"',
           '**El precio es fijo o tiene un cap explícito**. Sin cap, el proyecto se va al doble.',
           '**Acepta factura A o B** si te corresponde. Es señal de que está inscripto en AFIP en serio.',
           '**Tiene un canal directo** (WhatsApp/email del dev). Si solo hablás con account managers, perdés tiempo.',
@@ -977,7 +991,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'paragraph',
-        text: 'Nunca 100% por adelantado, y nunca 100% contra entrega tampoco. Lo sano: un anticipo razonable para arrancar y el resto en cuotas atadas a hitos. Mejor todavía si, antes de poner un peso, ves un boceto del proyecto — así pagás sobre algo concreto, no sobre una promesa. Es como trabajo en [APEX](/servicios): boceto gratis en 24-48 h y 3 cuotas sin interés.',
+        text: 'Nunca 100% por adelantado, y nunca 100% contra entrega tampoco. Lo sano: cuotas con montos y fechas por escrito, y una salida clara si el proveedor no cumple lo acordado. Mejor todavía si, antes de poner un peso, ves un boceto del proyecto — así pagás sobre algo concreto, no sobre una promesa. Es como trabajo en [APEX](/servicios): boceto gratis en 24-48 h y 3 cuotas sin interés (al contratar, a los 30 y a los 60 días), con el plazo por escrito: si no lo cumplo, podés cancelar y te devuelvo lo que pagaste.',
       },
     ],
     faq: [
