@@ -4,6 +4,7 @@ import { ThemeModeProvider } from '@/components/providers/theme-mode-provider'
 import { ApexThemeProvider } from '@/hooks/useTheme'
 import { AppShell } from '@/components/layout/app-shell'
 import { Footer } from '@/components/layout/footer'
+import { ConsumerRightsBar } from '@/components/legal/consumer-rights-bar'
 import { PersonJsonLd, WebSiteJsonLd, ServiceJsonLd, LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import { GoogleAnalyticsRoot } from '@/components/analytics/google-analytics-root'
 import { MetaPixel } from '@/components/analytics/meta-pixel'
@@ -138,7 +139,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={oxanium.className}>
         <ThemeModeProvider>
           <ApexThemeProvider>
-            <AppShell footer={<Footer />}>{children}</AppShell>
+            <AppShell footer={<Footer />}>
+              <ConsumerRightsBar />
+              {children}
+            </AppShell>
           </ApexThemeProvider>
         </ThemeModeProvider>
         {gaMeasurementId ? <GoogleAnalyticsRoot gaId={gaMeasurementId} /> : null}

@@ -9,6 +9,16 @@ export const WHATSAPP_NUMBER = '14244475253'
 /** Formato E.164 para schema/SEO/clic-to-call (`tel:`). */
 export const WHATSAPP_PHONE_DISPLAY = '+1 424 447 5253'
 
+// Disposición 954/2025, art. 6: con atención solo electrónica, mínimo 8 h por
+// día hábil. Es el mismo horario que publican los términos (sección 1).
+export const HORARIO_ATENCION = 'lunes a viernes de 10 a 18 h (hora de Argentina)'
+
+// Res. 274/2021: texto y destino exactos, no se parafrasean.
+export const VENTANILLA_CONSUMIDOR = {
+  texto: 'Defensa de las y los Consumidores. Para reclamos Ingrese aquí',
+  url: 'https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario',
+} as const
+
 // ─── Owner / Admin ────────────────────────────────────────────────────────────
 export const ADMIN_UUID = '37dad3e9-531c-4657-8db6-ddebbdcfa878'
 
@@ -40,6 +50,9 @@ export const ROUTES = {
   contact:     '/contacto',
   /** Tras abrir WhatsApp desde un CTA del sitio (misma pestaña). */
   gracias:     '/gracias',
+  arrepentimiento: '/arrepentimiento',
+  baja:        '/baja',
+  terminos:    '/terminos',
 } as const
 
 // ─── Social / External ───────────────────────────────────────────────────────

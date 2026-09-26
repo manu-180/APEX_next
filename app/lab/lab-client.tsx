@@ -176,7 +176,7 @@ export function LabClient() {
           }}
         />
 
-        <div className="relative z-[2] mx-auto flex min-h-[100dvh] max-w-6xl flex-col px-6 pb-10 pt-8 md:px-10">
+        <div className="relative z-[2] mx-auto flex min-h-[100dvh] max-w-6xl flex-col px-6 pb-10 pt-[calc(2rem+var(--legal-bar-h))] md:px-10">
           <header className="max-w-2xl">
             <div className="flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.34em] text-white/45">
               <span

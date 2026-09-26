@@ -225,7 +225,7 @@ export function HeroSection() {
       style={{
         backgroundColor: 'var(--color-surface-base)',
         paddingTop:
-          'calc(env(safe-area-inset-top, 0px) + 4rem + clamp(1.25rem, 3.5vw, 2rem))',
+          'calc(env(safe-area-inset-top, 0px) + 4rem + var(--legal-bar-h) + clamp(1.25rem, 3.5vw, 2rem))',
         paddingBottom: 'var(--section-py-hero)',
       }}
     >

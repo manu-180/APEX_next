@@ -13,7 +13,9 @@ import { cn } from '@/lib/utils/cn'
  * encapsulado en mini-avatar verde (mantiene reconocimiento sin gritar),
  * status dot "online", label en tipografía heading.
  *
- * Oculto en /contacto y /gracias (canal ya disponible / ya convirtió).
+ * Oculto en /contacto y /gracias (canal ya disponible / ya convirtió), y en
+ * /arrepentimiento y /baja: quien pide una devolución o una baja no es un lead,
+ * y este botón le contaría una conversión a Google Ads y a Meta.
  * Trackea conversión Google Ads + Meta Lead al click.
  */
 export function WhatsAppFloatingButton() {
@@ -51,14 +53,18 @@ export function WhatsAppFloatingButton() {
     [router],
   )
 
-  const hide = pathname === ROUTES.contact || pathname === ROUTES.gracias
+  const hide =
+    pathname === ROUTES.contact ||
+    pathname === ROUTES.gracias ||
+    pathname === ROUTES.arrepentimiento ||
+    pathname === ROUTES.baja
 
   if (!mounted || hide) return null
 
   return (
     <div
       className={cn(
-        'fixed z-[60] pointer-events-none overflow-visible',
+        'fixed z-[60] pointer-events-none overflow-visible print:hidden',
         'right-[max(1.5rem,calc(env(safe-area-inset-right)+0.5rem))]',
         'bottom-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))]',
       )}
