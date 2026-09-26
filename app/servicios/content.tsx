@@ -31,6 +31,7 @@ import {
   type PricingPlan,
 } from '@/lib/types/services'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
+import { plazoPlan } from '@/lib/data/plazos'
 import { DUR_FAST, DUR_SLOW, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
 
 /**
@@ -101,9 +102,9 @@ const ANCHOR_PLAN_IDS = new Set<string>(['web_interactive', 'app_pro'])
 
 /** De-riskers VISIBLES por plan — boceto gratis y cuotas dejan de ser letra chica. */
 const PLAN_DERISKERS: Record<string, string[]> = {
-  web_basic:       ['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'],
-  web_interactive: ['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'],
-  web_premium:     ['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'],
+  web_basic:       ['Boceto gratis antes de pagar', '3 cuotas sin interés', `Online en ${plazoPlan('web_basic')} días hábiles`],
+  web_interactive: ['Boceto gratis antes de pagar', '3 cuotas sin interés', `Online en ${plazoPlan('web_interactive')} días hábiles`],
+  web_premium:     ['Boceto gratis antes de pagar', '3 cuotas sin interés', `Online en ${plazoPlan('web_premium')} días hábiles`],
   app_mvp:         ['Sin contrato de permanencia', 'Mejoras todos los meses'],
   app_pro:         ['Sin contrato de permanencia', 'Panel admin incluido'],
   app_platform:    ['Propuesta a medida', 'Modelo partner técnico'],

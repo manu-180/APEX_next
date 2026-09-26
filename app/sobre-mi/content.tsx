@@ -21,6 +21,7 @@ import { REVEAL_ITEM_VARIANTS } from '@/components/ui/section-reveal'
 import { ArrowRightIcon, ExternalLinkIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { PROJECTS, ROUTES } from '@/lib/constants'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS, plazoPlan } from '@/lib/data/plazos'
 import { DUR_REVEAL, EASE_OUT, STAGGER_BASE } from '@/lib/motion'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { whatsappUrl } from '@/lib/whatsapp'
@@ -38,14 +39,14 @@ const WA_MSG_SOBRE_MI =
 const FICHA_ROWS = [
   { label: 'Disponibilidad', value: '1-2 proyectos por vez' },
   { label: 'Base', value: 'Buenos Aires · 100% remoto' },
-  { label: 'Entrega', value: 'Fecha pactada = fecha entregada' },
-  { label: 'Código', value: 'Tuyo desde el día uno' },
+  { label: 'Entrega', value: `De ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles, por escrito` },
+  { label: 'Código', value: 'Tuyo al terminar de pagar' },
 ] as const
 
 /** Principios no negociables — copy validado por auditoría, no suavizar. */
 const PRINCIPIOS = [
-  'Tu código. Tuyo. Para siempre.',
-  'Fecha pactada = fecha entregada',
+  'Pagado, tu código es tuyo. Para siempre.',
+  'Plazo pactado = plazo cumplido',
   'WhatsApp directo, sin filtros',
   'Primero el problema. Luego el código.',
 ] as const
@@ -82,7 +83,7 @@ const DIRECT_BENEFITS = [
   {
     n: '02',
     title: 'Más velocidad',
-    body: 'Las decisiones se toman en una charla de WhatsApp, no en una semana de reuniones. Por eso una web sale en 15 días.',
+    body: `Las decisiones se toman en una charla de WhatsApp, no en una semana de reuniones. Por eso una landing sale en ${plazoPlan('web_basic')} días hábiles.`,
   },
   {
     n: '03',

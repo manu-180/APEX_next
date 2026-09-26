@@ -11,6 +11,7 @@ import { APP_URL } from '@/lib/constants'
 import { WA_GRADIENT, WA_SHADOW_CLASS, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { formatARS } from '@/lib/types/services'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 import { REVIEWS } from '@/lib/data/reviews'
 import { STAGGER_BASE } from '@/lib/motion'
 import { cn } from '@/lib/utils/cn'
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   title: {
     absolute: `Cuánto cuesta una página web en Argentina: ${arsInline(PRICE_MIN)} a ${arsInline(PRICE_MAX)}`,
   },
-  description: `Precio de una página web en Argentina: Landing ${arsInline(PRICE_TIERS[0].price)}, Interactiva ${arsInline(PRICE_TIERS[1].price)} y Tienda Online ${arsInline(PRICE_TIERS[2].price)}. Presupuesto cerrado y entrega en 15 días.`,
+  description: `Precio de una página web en Argentina: Landing ${arsInline(PRICE_TIERS[0].price)}, Interactiva ${arsInline(PRICE_TIERS[1].price)} y Tienda Online ${arsInline(PRICE_TIERS[2].price)}. Presupuesto cerrado y online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles.`,
   keywords: [
     'cuanto cuesta una pagina web',
     'cuanto cuesta una pagina web en argentina',
@@ -111,7 +112,7 @@ export default function CuantoCuestaUnaPaginaWebPage() {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: 'Diseño y desarrollo de páginas web en Argentina',
-    description: `Páginas web a medida con precio cerrado: de ${arsInline(PRICE_MIN)} a ${arsInline(PRICE_MAX)} ARS, entrega en 15 días.`,
+    description: `Páginas web a medida con precio cerrado: de ${arsInline(PRICE_MIN)} a ${arsInline(PRICE_MAX)} ARS, online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles según el plan.`,
     provider: { '@type': 'Person', name: 'Manuel Navarro', url: APP_URL },
     areaServed: { '@type': 'Country', name: 'Argentina' },
     serviceType: 'Desarrollo web',
@@ -284,7 +285,7 @@ export default function CuantoCuestaUnaPaginaWebPage() {
             </div>
 
             <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
-              {['Boceto gratis antes de pagar', '3 cuotas sin interés', 'Entrega en 15 días'].map(
+              {['Boceto gratis antes de pagar', '3 cuotas sin interés', `Online desde ${PLAZO_MIN_DIAS} días hábiles`].map(
                 (claim) => (
                   <li
                     key={claim}

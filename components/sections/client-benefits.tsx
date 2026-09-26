@@ -10,6 +10,7 @@ import { whatsappUrl } from '@/lib/whatsapp'
 import { EASE_OUT } from '@/lib/motion'
 import { useParallaxNumber } from '@/hooks/use-parallax-number'
 import { cn } from '@/lib/utils/cn'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 
 /* Stagger reveal para listas (contrato §2: 30–50 ms por item).
    El item entra con transform/opacity; salida no aplica (once: true). */
@@ -43,7 +44,7 @@ const SOLUTIONS = [
   'Aparecés en Google: SEO técnico desde el primer día, no "más adelante".',
   'Tu web muestra, cotiza y junta consultas mientras vos atendés el negocio.',
   'Precio cerrado por escrito antes de arrancar, en 3 cuotas sin interés.',
-  'Entrega en 15 días. Si no cumplo, te devuelvo el depósito.',
+  `Plazo por escrito, de ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles según el plan. Si no cumplo, podés cancelar y te devuelvo lo que pagaste.`,
   'Hablás directo con quien programa — sin intermediarios ni telefonos rotos.',
 ]
 
@@ -190,7 +191,7 @@ export function ClientBenefitsSection() {
             className="bento-surface p-6 sm:p-8 lg:p-9"
             data-hover
             data-inspector-title="La solución"
-            data-inspector-desc="Respuesta directa a cada dolor con claims reales: SEO desde el día uno, precio cerrado, 15 días garantizados."
+            data-inspector-desc="Respuesta directa a cada dolor con claims reales: SEO desde el día uno, precio cerrado, plazo por escrito."
             data-inspector-cat="Copy · Conversión"
           >
             <p className="editorial-label editorial-label--primary mb-5">La solución</p>
@@ -220,7 +221,7 @@ export function ClientBenefitsSection() {
             </m.ul>
 
             <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
-              <AnimatedMetric value={15} suffix="d" label="Entrega garantizada" />
+              <AnimatedMetric value={PLAZO_MIN_DIAS} suffix="d" label="Landing online (días hábiles)" />
               <AnimatedMetric value={48} suffix="h" label="Boceto gratis (24-48 h)" />
               <AnimatedMetric value={3} suffix="" label="Cuotas sin interés" />
             </div>
@@ -278,15 +279,15 @@ const PROCESS_STEPS: ProcessStep[] = [
   },
   {
     number: '03',
-    title: 'Desarrollo en 15 días',
+    title: `Online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles`,
     description:
-      'Aprobás el boceto, cerramos precio por escrito y arranca el reloj. Pagás en 3 cuotas sin interés.',
+      'Aprobás el boceto y cerramos precio y plazo por escrito. Lo pagás de una vez o en 3 cuotas sin interés, y el reloj arranca cuando tengo tu contenido.',
   },
   {
     number: '04',
     title: 'Lanzamiento y soporte',
     description:
-      'Tu web online, en tu dominio y con el código a tu nombre. No desaparezco después de entregar.',
+      'Tu web online, en tu dominio. Terminás de pagar y el código es tuyo. Y no desaparezco después de entregar.',
   },
 ]
 

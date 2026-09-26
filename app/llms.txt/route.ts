@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { APP_URL, WHATSAPP_NUMBER } from '@/lib/constants'
 import { WEB_PLANS, APP_PLANS, FREE_CHANGES_DAYS, GOOGLE_MARKETING, MAINTENANCE_PLANS } from '@/lib/types/services'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS, plazoPlan } from '@/lib/data/plazos'
 import { BLOG_POSTS } from '@/lib/data/blog-posts'
 import { VERTICALS } from '@/lib/data/verticals'
 import { SHOWCASE_TIERS } from '@/lib/data/showcase'
@@ -34,11 +35,11 @@ function buildLlmsTxt(): string {
 
   return `# APEX — Manuel Navarro
 
-> Desarrollo de páginas web y aplicaciones móviles a medida para PyMEs y emprendedores de Argentina. Precio fijo publicado, boceto gratis antes de pagar y entrega en 15 días.
+> Desarrollo de páginas web y aplicaciones móviles a medida para PyMEs y emprendedores de Argentina. Precio fijo publicado, boceto gratis antes de pagar y la página online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles según el plan.
 
 APEX es el estudio de Manuel Navarro, desarrollador full-stack y mobile con base en Buenos Aires. Trabaja 100% remoto con clientes de todo el país y atiende 1 o 2 proyectos por vez: el que diseña, programa y entrega es siempre la misma persona, sin agencia ni vendedores de por medio.
 
-Cómo funciona la contratación: charla de 15 minutos por WhatsApp, boceto gratis de la página en 24-48 h y recién ahí la primera de 3 cuotas sin interés. La entrega es a 15 días desde que se aprueba el boceto, con la fecha pactada por escrito — si no se cumple, se devuelve el depósito. El código vive desde el primer día en un repositorio a nombre del cliente. El hosting va incluido, sin abono obligatorio, y durante ${FREE_CHANGES_DAYS} días desde que la página queda online los cambios no tienen límite. Después, mantenimiento opcional desde ARS ${ars(MAINTENANCE_PLANS[0].price)} por mes. Para quien ya tiene su página, marketing en Google por ARS ${ars(GOOGLE_MARKETING.price)} por mes, más la inversión en anuncios que el cliente le paga directo a Google.
+Cómo funciona la contratación: charla de 15 minutos por WhatsApp, boceto gratis de la página en 24-48 h y, si el cliente sigue, contrata en un pago o en 3 cuotas sin interés (la primera al contratar, las otras a los 30 y 60 días). Plazos estimados: ${plazoPlan('web_basic')} días hábiles para una Landing Page, ${plazoPlan('web_interactive')} para una Web Interactiva y ${plazoPlan('web_premium')} para una Tienda Online, contados desde que APEX tiene el contenido que aporta el cliente; figuran por escrito en el resumen de contratación y, si no se cumplen, el cliente puede cancelar y recuperar lo que pagó. Cuando termina de pagar, el diseño, los textos y el código de su página son suyos: mientras APEX la aloja, vive en su infraestructura, y si se va se la lleva sin costo (repositorio transferido a su GitHub o un .zip, con sus datos en CSV o JSON). Las funciones del sistema central (tienda, reservas, cursos y panel) no se mudan, pero los datos sí. El hosting va incluido, sin abono obligatorio, y durante ${FREE_CHANGES_DAYS} días desde que la página queda online los cambios no tienen límite. Después, mantenimiento opcional desde ARS ${ars(MAINTENANCE_PLANS[0].price)} por mes. Para quien ya tiene su página, marketing en Google por ARS ${ars(GOOGLE_MARKETING.price)} por mes, más la inversión en anuncios que el cliente le paga directo a Google.
 
 ## Servicios y precios
 

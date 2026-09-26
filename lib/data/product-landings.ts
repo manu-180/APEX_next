@@ -1,6 +1,7 @@
 import { ROUTES } from '@/lib/constants'
 import { SHOWCASE_TIERS, type ShowcaseSite } from '@/lib/data/showcase'
 import { arsInline, MAINTENANCE_PLANS, WEB_PLANS } from '@/lib/types/services'
+import { plazoPlan } from '@/lib/data/plazos'
 
 /**
  * Landings por PRODUCTO — una URL por cosa que se vende.
@@ -77,6 +78,8 @@ export interface ProductLanding {
 const TIENDA_PRICE = planPrice('web_premium')
 const LANDING_PRICE = planPrice('web_basic')
 const INTERACTIVA_PRICE = planPrice('web_interactive')
+const TIENDA_DIAS = plazoPlan('web_premium')
+const LANDING_DIAS = plazoPlan('web_basic')
 
 export const TIENDA_ONLINE: ProductLanding = {
   slug: 'tienda-online',
@@ -85,7 +88,7 @@ export const TIENDA_ONLINE: ProductLanding = {
   price: TIENDA_PRICE,
   shortName: 'Tienda online',
   seoTitle: `Tienda online a medida en Argentina desde ${arsInline(TIENDA_PRICE)}`,
-  metaDescription: `Tienda online a medida desde ${arsInline(TIENDA_PRICE)}: catálogo, checkout con MercadoPago y panel propio. Sin abono mensual ni comisión por venta. Entrega en 15 días.`,
+  metaDescription: `Tienda online a medida desde ${arsInline(TIENDA_PRICE)}: catálogo, checkout con MercadoPago y panel propio. Sin abono mensual ni comisión por venta. Online en ${TIENDA_DIAS} días hábiles.`,
   keywords: [
     'tienda online argentina',
     'crear tienda online',
@@ -103,7 +106,7 @@ export const TIENDA_ONLINE: ProductLanding = {
   h1Bold: 'sin comisión por venta.',
   subhead:
     'Catálogo, carrito, checkout con MercadoPago y un panel para manejar todo desde el celular. Tuya, con tu marca, sin abono mensual ni un porcentaje de cada venta yéndose a una plataforma.',
-  answer: `Una tienda online a medida en Argentina arranca en ${arsInline(TIENDA_PRICE)} ARS, con precio cerrado por escrito y entrega en 15 días. Incluye catálogo con filtros y búsqueda, carrito, checkout con MercadoPago, cálculo de envíos, «Mis pedidos» para que tus clientes vean sus compras con un código, sin crear cuenta, y un panel propio para cargar productos, controlar stock y ver pedidos. Se paga una vez: no hay abono mensual ni comisión por venta, así que el margen de cada venta queda entero en tu cuenta.`,
+  answer: `Una tienda online a medida en Argentina arranca en ${arsInline(TIENDA_PRICE)} ARS, con precio cerrado por escrito y online en ${TIENDA_DIAS} días hábiles desde que tengo tu catálogo. Incluye catálogo con filtros y búsqueda, carrito, checkout con MercadoPago, cálculo de envíos, «Mis pedidos» para que tus clientes vean sus compras con un código, sin crear cuenta, y un panel propio para cargar productos, controlar stock y ver pedidos. Se paga una vez: no hay abono mensual ni comisión por venta, así que el margen de cada venta queda entero en tu cuenta.`,
   waMessage: 'Hola Manuel, quiero una tienda online. ¿Cómo arrancamos?',
   pains: [
     {
@@ -112,7 +115,7 @@ export const TIENDA_ONLINE: ProductLanding = {
     },
     {
       title: 'La plataforma se queda con tu margen',
-      body: 'Un marketplace te cobra un porcentaje de cada venta. Una plataforma con abono te cobra todos los meses aunque el mes venga flojo, y sube el plan cuando crecés. Con una tienda propia pagás una vez el desarrollo y después solo el hosting.',
+      body: 'Un marketplace te cobra un porcentaje de cada venta. Una plataforma con abono te cobra todos los meses aunque el mes venga flojo, y sube el plan cuando crecés. Con una tienda propia pagás una vez el desarrollo, y el hosting va incluido.',
     },
     {
       title: 'Tu tienda se parece a las otras mil',
@@ -157,10 +160,10 @@ export const TIENDA_ONLINE: ProductLanding = {
       ['Diseño', 'Plantilla, compartida con miles', 'A medida, solo tuyo'],
       ['Funciones raras del rubro', 'Lo que tenga el plugin', 'Se programa'],
       ['Si dejás de pagar', 'La tienda se cae', 'Sigue online'],
-      ['Dueño del código', 'La plataforma', 'Vos, desde el día 1'],
+      ['Dueño del código', 'La plataforma', 'Vos, al terminar de pagar'],
     ],
     honesty:
-      'Si recién arrancás y todavía no sabés si el producto vende, una plataforma con abono es la decisión correcta: validás rápido y barato. La tienda a medida empieza a convenir cuando la comisión y el abono anual ya se acercan al costo del desarrollo, o cuando necesitás algo que la plataforma no hace. Si no estás seguro de en qué punto estás, decímelo y te lo digo derecho.',
+      'Si recién arrancás y todavía no sabés si el producto vende, una plataforma con abono es la decisión correcta: validás rápido y barato. La tienda a medida empieza a convenir cuando la comisión y el abono anual ya se acercan al costo del desarrollo, o cuando necesitás algo que la plataforma no hace. Si no estás seguro de en qué punto estás, decímelo y te lo digo derecho. Y si algún día te vas, te llevás el diseño y todos tus datos, pero no las funciones de tienda (carrito, cobros y panel), que corren en el sistema central de APEX.',
   },
   work: [
     {
@@ -193,7 +196,7 @@ export const TIENDA_ONLINE: ProductLanding = {
       step: '03',
       title: 'Desarrollo y carga',
       body: 'Armo la tienda, conecto MercadoPago y cargamos el catálogo. Vas viendo el avance en un link real, no en capturas.',
-      meta: '15 días',
+      meta: `${TIENDA_DIAS} días hábiles`,
     },
     {
       step: '04',
@@ -204,7 +207,7 @@ export const TIENDA_ONLINE: ProductLanding = {
   ],
   fitNo: [
     'Si todavía no vendiste una unidad. Validá primero por Instagram o con una plataforma barata; la tienda a medida es para cuando ya sabés que el producto se mueve.',
-    'Si necesitás publicar mañana. El boceto tarda 48 h y la tienda, 15 días desde que aprobás el diseño.',
+    `Si necesitás publicar mañana. El boceto tarda 48 h y la tienda, ${TIENDA_DIAS} días hábiles desde que tengo tu catálogo.`,
     'Si necesitás que te produzcan las fotos y las descripciones de cada producto. La tienda la diseño y la programo; el contenido lo aportás vos.',
   ],
   faq: [
@@ -230,7 +233,7 @@ export const TIENDA_ONLINE: ProductLanding = {
     },
     {
       q: '¿Cuánto tarda en estar online?',
-      a: 'Quince días desde que aprobás el boceto y me pasás el contenido. La fecha queda por escrito antes de arrancar: si no la cumplo, se devuelve el depósito.',
+      a: `${TIENDA_DIAS} días hábiles desde que me pasás el catálogo y conectás tu MercadoPago. El plazo queda por escrito en tu resumen antes de pagar: si no lo cumplo, podés cancelar y te devuelvo lo que pagaste.`,
     },
     {
       q: '¿Y el stock? ¿Se actualiza solo?',
@@ -263,7 +266,7 @@ export const LANDING_PAGE: ProductLanding = {
   price: LANDING_PRICE,
   shortName: 'Landing page',
   seoTitle: `Landing page profesional en Argentina desde ${arsInline(LANDING_PRICE)}`,
-  metaDescription: `Landing page a medida desde ${arsInline(LANDING_PRICE)}: diseño propio, textos incluidos y carga en menos de 2 segundos. Boceto gratis antes de pagar y entrega en 15 días.`,
+  metaDescription: `Landing page a medida desde ${arsInline(LANDING_PRICE)}: diseño propio, textos incluidos y carga en menos de 2 segundos. Boceto gratis antes de pagar y online en ${LANDING_DIAS} días hábiles.`,
   keywords: [
     'landing page argentina',
     'cuanto sale una landing page',
@@ -279,8 +282,8 @@ export const LANDING_PAGE: ProductLanding = {
   h1Light: 'Una landing page',
   h1Bold: 'que trae clientes.',
   subhead:
-    'Una sola página, diseñada a medida y escrita para que el visitante haga una cosa: escribirte. Carga en menos de dos segundos, se ve impecable en el celular y sale en 15 días.',
-  answer: `Una landing page profesional en Argentina cuesta ${arsInline(LANDING_PRICE)} ARS, con precio cerrado y entrega en 15 días desde que se aprueba el diseño. Incluye diseño 100% a medida (sin plantillas), redacción orientada a conversión, botón de WhatsApp y formulario que abre el chat con la consulta ya escrita, SEO técnico, medición con Google Analytics, dominio configurado, hosting incluido y 60 días de cambios sin límite. Antes de pagar nada se ve un boceto gratis del diseño, en 24 a 48 horas.`,
+    `Una sola página, diseñada a medida y escrita para que el visitante haga una cosa: escribirte. Carga en menos de dos segundos, se ve impecable en el celular y sale en ${LANDING_DIAS} días hábiles.`,
+  answer: `Una landing page profesional en Argentina cuesta ${arsInline(LANDING_PRICE)} ARS, con precio cerrado y online en ${LANDING_DIAS} días hábiles desde que tengo tus fotos y los datos del negocio. Incluye diseño 100% a medida (sin plantillas), redacción orientada a conversión, botón de WhatsApp y formulario que abre el chat con la consulta ya escrita, SEO técnico, medición con Google Analytics, dominio configurado, hosting incluido y 60 días de cambios sin límite. Antes de pagar nada se ve un boceto gratis del diseño, en 24 a 48 horas.`,
   waMessage: 'Hola Manuel, quiero una landing page. ¿Cómo arrancamos?',
   pains: [
     {
@@ -332,7 +335,7 @@ export const LANDING_PAGE: ProductLanding = {
       ['Diseño', 'El mismo de otros miles', 'Solo tuyo'],
       ['Velocidad', 'Pesada por lo que no usás', 'Menos de 2 s en móvil'],
       ['Textos', 'Los escribís vos', 'Los escribo yo'],
-      ['Quién la hace', 'Vos, en tus ratos libres', 'Yo, en 15 días'],
+      ['Quién la hace', 'Vos, en tus ratos libres', `Yo, en ${LANDING_DIAS} días hábiles`],
       ['Si dejás de pagar', 'Se cae', 'Sigue online'],
     ],
     honesty:
@@ -369,7 +372,7 @@ export const LANDING_PAGE: ProductLanding = {
       step: '03',
       title: 'Desarrollo y ajustes',
       body: 'La armo entera y la ajustamos sobre la pantalla real, no sobre una descripción en un documento.',
-      meta: '15 días',
+      meta: `${LANDING_DIAS} días hábiles`,
     },
     {
       step: '04',
@@ -394,7 +397,7 @@ export const LANDING_PAGE: ProductLanding = {
     },
     {
       q: '¿En cuánto tiempo la tenés lista?',
-      a: 'El boceto lo ves en 24 a 48 horas. La página completa, en 15 días desde que aprobás el diseño. La fecha queda por escrito antes de arrancar.',
+      a: `El boceto lo ves en 24 a 48 horas. La página completa, en ${LANDING_DIAS} días hábiles desde que tengo tus fotos y los datos del negocio. El plazo queda por escrito en tu resumen, y si no lo cumplo, podés cancelar y te devuelvo lo que pagaste.`,
     },
     {
       q: '¿Los textos los tengo que escribir yo?',

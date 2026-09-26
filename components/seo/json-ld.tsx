@@ -223,7 +223,7 @@ export function LocalBusinessJsonLd() {
         currenciesAccepted: 'ARS',
         paymentAccepted: 'Transferencia bancaria, MercadoPago, tarjeta de crédito',
         foundingDate: '2021',
-        slogan: 'Precio fijo, boceto gratis y entrega en 15 días.',
+        slogan: 'Precio fijo, boceto gratis y plazo por escrito.',
         knowsLanguage: ['es-AR', 'en'],
         areaServed: { '@type': 'Country', name: 'AR' },
         address: {

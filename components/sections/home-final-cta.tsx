@@ -7,6 +7,7 @@ import { ArrowRightIcon, CheckIcon, StarIcon, WhatsAppIcon } from '@/components/
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { ROUTES } from '@/lib/constants'
+import { plazoPlan } from '@/lib/data/plazos'
 import { WA_GRADIENT, WA_SHADOW_CLASS_LG } from '@/lib/constants/whatsapp-ui'
 import { EASE_OUT, SPRING_SNAP } from '@/lib/motion'
 import { useParallaxNumber } from '@/hooks/use-parallax-number'
@@ -138,13 +139,13 @@ export function HomeFinalCtaSection() {
                 Arrancá esta semana.
               </span>
               <strong className="block text-[var(--color-on-surface)]">
-                Tu web, online en 15 días.
+                Tu landing, online en {plazoPlan('web_basic')} días hábiles.
               </strong>
             </h2>
 
             <p className="mt-5 max-w-xl text-pretty leading-relaxed text-[var(--color-on-surface-variant)]">
               Me escribís, charlamos 15 minutos sobre tu negocio y en 24-48 h ves un boceto
-              gratis de tu web. Recién ahí decidís — con alcance, fecha y precio por escrito.
+              gratis de tu web. Recién ahí decidís — con alcance, plazo y precio por escrito.
             </p>
 
             {/* De-riskers */}

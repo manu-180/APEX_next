@@ -8,6 +8,7 @@ import { GridBackground } from '@/components/ui/grid-background'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/utils/cn'
 import { ROUTES, PROJECTS } from '@/lib/constants'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { openWhatsAppWithThankYouPage } from '@/lib/whatsapp-navigate'
@@ -71,9 +72,9 @@ const FEATURES = [
   {
     icon: <TimerIcon />,
     tag: 'PLAZO',
-    value: 'Entrega en 15 días',
-    desc: 'Pactamos una fecha. La cumplimos. Sin excusas.',
-    compact: { value: '15 días', note: 'fecha pactada' },
+    value: `De ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles`,
+    desc: 'Por escrito. Si no cumplimos, podés cancelar y recuperar lo que pagaste.',
+    compact: { value: `${PLAZO_MIN_DIAS}-${PLAZO_MAX_DIAS} días`, note: 'hábiles, por escrito' },
   },
   {
     icon: <PriceTagIcon />,
@@ -299,7 +300,7 @@ export function HeroSection() {
                     'linear-gradient(95deg, var(--color-on-surface) 35%, var(--color-primary) 105%)',
                 }}
               >
-                en 15 días.
+                en días.
               </strong>
             </h1>
 

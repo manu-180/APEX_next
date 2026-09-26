@@ -14,6 +14,7 @@ import { WA_GRADIENT, WA_SHADOW_CLASS, WA_SHADOW_CLASS_LG } from '@/lib/constant
 import { AVG_RATING, REVIEW_COUNT } from '@/lib/data/reviews'
 import { STAGGER_BASE } from '@/lib/motion'
 import { formatARS, WEB_PLANS } from '@/lib/types/services'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 import { cn } from '@/lib/utils/cn'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { FAQ, FIT_NO, FIT_YES, INCLUDED, PAGE_PATH, PROCESS, WORK } from './content'
@@ -28,7 +29,7 @@ const LANDING_PRICE = WEB_PLANS.find((p) => p.id === 'web_basic')?.price ?? 3000
 export const metadata: Metadata = {
   title: 'Diseño y desarrollo de páginas web para empresas',
   description:
-    'Estudio de diseño y desarrollo web en Buenos Aires. Páginas a medida para empresas y PyMEs de toda la Argentina: diseño propio, código propio y entrega en 15 días.',
+    `Estudio de diseño y desarrollo web en Buenos Aires. Páginas a medida para empresas y PyMEs de toda la Argentina: código propio y online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles.`,
   keywords: [
     'diseño de paginas web',
     'diseño y desarrollo web',
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diseño y desarrollo de páginas web para empresas argentinas',
     description:
-      'Diseño a medida y desarrollo propio. Boceto gratis en 48 h, precio cerrado por escrito y entrega en 15 días.',
+      `Diseño a medida y desarrollo propio. Boceto gratis en 48 h, precio cerrado y plazo por escrito: online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles.`,
     url: PAGE_URL,
     siteName: 'APEX Portfolio',
     locale: 'es_AR',
@@ -108,7 +109,7 @@ export default function DisenoDePaginasWebPage() {
     name: 'Diseño y desarrollo de páginas web',
     serviceType: 'Diseño y desarrollo de sitios web a medida',
     description:
-      'Diseño y desarrollo de páginas web profesionales a medida para empresas y PyMEs en Argentina. Diseño propio sin plantillas, desarrollo en Next.js, SEO técnico y entrega en 15 días.',
+      `Diseño y desarrollo de páginas web profesionales a medida para empresas y PyMEs en Argentina. Diseño propio sin plantillas, desarrollo en Next.js, SEO técnico y plazos de ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles.`,
     provider: {
       '@type': 'Person',
       name: 'Manuel Navarro',
@@ -185,7 +186,8 @@ export default function DisenoDePaginasWebPage() {
               <p className="mb-8 max-w-xl text-pretty text-base leading-relaxed text-[var(--color-on-surface-variant)] md:text-lg">
                 Soy Manuel Navarro y diseño y programo yo cada sitio que sale de acá. Nada de plantillas
                 ni de equipos tercerizados: tu empresa arranca con una hoja en blanco, ve el boceto
-                antes de pagar nada y recibe el sitio terminado en 15 días.
+                antes de pagar nada y recibe el sitio terminado en {PLAZO_MIN_DIAS} a {PLAZO_MAX_DIAS} días
+                hábiles, según el plan.
               </p>
 
               <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:items-center">

@@ -40,7 +40,7 @@ const INCLUDED_ALWAYS = [
   'Diseño 100% a medida, sin plantillas genéricas',
   'Carga en menos de 2 segundos + SEO técnico',
   'Hosting incluido y 60 días de cambios sin límite',
-  'El código queda a tu nombre',
+  'Terminás de pagar y el código es tuyo',
 ]
 
 /** Los tres niveles web (los de app viven en /servicios). */

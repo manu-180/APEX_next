@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils/cn'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { WEB_PLANS, formatARS } from '@/lib/types/services'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 import { ROUTES } from '@/lib/constants'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { DELAY_AFTER_PANEL, DUR_BASE, DUR_REVEAL, DUR_SLOW, EASE_OUT, STAGGER_LOOSE } from '@/lib/motion'
@@ -219,8 +220,8 @@ const PROCESS_STEPS = [
   },
   {
     step: '03',
-    title: 'Tu web en 15 días',
-    sub: 'Avances visibles y fecha pactada por escrito',
+    title: `Tu web en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles`,
+    sub: 'Según el plan, con avances visibles y el plazo por escrito',
     highlight: false,
   },
   {
@@ -410,8 +411,8 @@ const WHY_APEX_POINTS = [
     sub: 'Acá no existe el "a cotizar": el número que ves es el número que pagás.',
   },
   {
-    title: 'Entrega en 15 días — o devuelvo el depósito',
-    sub: 'Fecha pactada antes de arrancar, y 60 días de cambios sin límite después.',
+    title: 'Plazo por escrito, con devolución si no cumplo',
+    sub: `De ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles según el plan, desde que tengo tu contenido. Si no lo cumplo, podés cancelar y te devuelvo lo que pagaste.`,
   },
 ] as const
 
@@ -514,7 +515,7 @@ const COMPARISON_ROWS: Array<{
   },
   {
     feature: 'Plazo de entrega',
-    apex: '15 días, por escrito',
+    apex: `${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles, por escrito`,
     wordpress: '4–8 semanas',
     wix: 'Inmediato (DIY)',
     tiendanube: 'Inmediato (DIY)',
@@ -541,21 +542,21 @@ const COMPARISON_ROWS: Array<{
   },
   {
     feature: 'Propiedad del código',
-    apex: '100% tuyo desde día 1',
+    apex: 'Tuyo al terminar de pagar',
     wordpress: 'Sí (open source)',
     wix: 'No (locked)',
     tiendanube: 'No (locked)',
     agencia: 'Depende del contrato',
-    apexWins: true,
+    apexWins: false,
   },
   {
     feature: 'Lock-in del proveedor',
-    apex: 'Cero',
+    apex: 'Bajo: salida sin costo',
     wordpress: 'Bajo',
     wix: 'Alto',
     tiendanube: 'Alto',
     agencia: 'Medio',
-    apexWins: true,
+    apexWins: false,
   },
   {
     feature: 'Pago argentino (factura A/B, MEP)',

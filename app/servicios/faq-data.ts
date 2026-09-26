@@ -7,6 +7,7 @@
  * consume para el schema; static-sections.tsx es client (usa framer-motion).
  */
 import { arsTexto, MAINTENANCE_PLANS } from '@/lib/types/services'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS, plazoPlan } from '@/lib/data/plazos'
 
 export const SERVICIOS_FAQ_ITEMS = [
   {
@@ -15,27 +16,27 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto tarda en estar lista mi página?',
-    a: '15 días desde que aprobás el boceto, para cualquier plan web. La fecha queda pactada por escrito antes de empezar, y el boceto te lo entrego gratis en 24-48 h. Si no cumplo la fecha acordada, te devuelvo el depósito.',
+    a: `Depende del plan: ${plazoPlan('web_basic')} días hábiles una Landing Page, ${plazoPlan('web_interactive')} una Web Interactiva y ${plazoPlan('web_premium')} una Tienda Online, contados desde que tengo lo que te toca a vos (tu contenido y, si hace falta, tu dominio). El plazo queda por escrito en tu resumen antes de pagar, y si no lo cumplo, podés cancelar y te devuelvo lo que pagaste. El boceto lo ves antes, gratis, en 24-48 h.`,
   },
   {
     q: '¿Cómo sé que no me vas a dejar a mitad del proyecto?',
-    a: 'Tres cosas concretas: ves un boceto gratis antes de pagar un peso, pagás en 3 cuotas atadas al avance (nunca todo por adelantado) y el código vive en un repositorio a tu nombre desde el primer día — pase lo que pase, lo hecho es tuyo. Además podés ver mis productos funcionando en producción (BotLode, Botrive, Assistify) y sitios de clientes reales antes de decidir. Hablás conmigo, no con un vendedor.',
+    a: 'Tres cosas concretas: ves un boceto gratis antes de pagar un peso, podés pagar en 3 cuotas sin interés (al contratar, a los 30 y a los 60 días) en vez de todo por adelantado, y el plazo queda por escrito: si no lo cumplo, podés cancelar y te devuelvo lo que pagaste. Además podés ver mis productos funcionando en producción (BotLode, Botrive, Assistify) y sitios de clientes reales antes de decidir. Hablás conmigo, no con un vendedor.',
   },
   {
     q: '¿Cómo es el proceso de trabajo?',
-    a: 'Cuatro pasos: (1) me escribís por WhatsApp y charlamos 15 minutos sobre tu negocio; (2) en 24-48 h te mando un boceto gratis de tu página; (3) si te gusta, pagás la primera de 3 cuotas y en 15 días tenés tu web online, viendo avances en el camino; (4) lanzamos y tenés 60 días de cambios sin límite. Todo por WhatsApp o Zoom, desde cualquier punto del país.',
+    a: `Cuatro pasos: (1) me escribís por WhatsApp y charlamos 15 minutos sobre tu negocio; (2) en 24-48 h te mando un boceto gratis de tu página; (3) si te gusta, contratás —de una vez o en 3 cuotas sin interés— y, desde que tengo tu contenido, tu web sale en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles según el plan, con avances a la vista; (4) lanzamos y tenés 60 días de cambios sin límite. Todo por WhatsApp o Zoom, desde cualquier punto del país.`,
   },
   {
     q: '¿Qué gano con una web a medida en vez de Wix o una plantilla?',
-    a: 'Números concretos: una web a medida carga en menos de 2 segundos (Google posiciona mejor los sitios rápidos), no pagás mensualidades obligatorias (Wix y Tiendanube cobran entre USD 16 y 250 por mes, para siempre), no pagás comisiones por venta y el código es tuyo — sin lock-in. Y está diseñada para convertir: botón de WhatsApp, SEO y velocidad al servicio de generar consultas. Si tu caso es muy simple, te lo digo honestamente: a veces Wix alcanza (mirá la tabla comparativa de esta página).',
+    a: 'Números concretos: una web a medida carga en menos de 2 segundos (Google posiciona mejor los sitios rápidos), no pagás mensualidades obligatorias (Wix y Tiendanube cobran entre USD 16 y 250 por mes, para siempre), no pagás comisiones por venta y, cuando terminás de pagar, el código es tuyo: si te vas, te lo llevás sin costo. Y está diseñada para convertir: botón de WhatsApp, SEO y velocidad al servicio de generar consultas. Si tu caso es muy simple, te lo digo honestamente: a veces Wix alcanza (mirá la tabla comparativa de esta página).',
   },
   {
     q: '¿Qué pasa si no me gusta el resultado?',
-    a: 'El boceto es gratis y sin compromiso: si no te convence, no pagás nada y quedamos como amigos. Una vez en desarrollo, ves avances y los aprobás antes de cada cuota. Y si no llego a la fecha de entrega pactada por escrito, te devuelvo el depósito completo. El riesgo lo tomo yo, no vos.',
+    a: 'El boceto es gratis y sin compromiso: si no te convence, no pagás nada y quedamos como amigos. Una vez que contratás, ves los avances y pedís cambios sin límite hasta 60 días después de publicar. Si no cumplo lo que acordamos por escrito, podés cancelar y te devuelvo lo que pagaste. Y además tenés 10 días corridos para arrepentirte, sin dar motivos.',
   },
   {
     q: '¿Cuáles son las formas de pago?',
-    a: '3 cuotas sin interés, cada una un tercio del total: la primera al aprobar el boceto (activa el calendario de entrega), la segunda durante el desarrollo y la última contra entrega. Acepto transferencia bancaria y MercadoPago.',
+    a: 'De una vez o en 3 cuotas sin interés: la primera al contratar, la segunda a los 30 días y la tercera a los 60. En cuotas pagás lo mismo que de contado. Acepto MercadoPago y transferencia bancaria.',
   },
   {
     q: '¿La página se va a ver bien en el celular?',
@@ -47,7 +48,7 @@ export const SERVICIOS_FAQ_ITEMS = [
   },
   {
     q: '¿De quién es el código cuando terminamos?',
-    a: '100% tuyo desde el día uno. Vive en un repositorio (GitHub) con tu cuenta como propietaria. Si mañana querés seguir con otro desarrollador, te llevás todo sin pedir permiso ni perder un archivo. Cero lock-in.',
+    a: 'Tuyo, cuando terminás de pagar: el diseño, los textos y el código de tu página. Mientras te la alojo, vive en la infraestructura de APEX, así no tenés que crear ni pagar cuentas técnicas. Si te vas, te lo llevás sin costo: el repositorio transferido a tu GitHub o en un .zip, con tus datos en CSV o JSON. Lo único que no se muda son las funciones del sistema central (tienda, reservas, cursos y panel), porque las comparten todos los clientes, pero tus datos te los llevás siempre.',
   },
   {
     q: '¿Pueden integrar MercadoPago, facturación o WhatsApp Business?',

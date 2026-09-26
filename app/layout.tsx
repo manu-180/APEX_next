@@ -84,7 +84,7 @@ export const metadata: Metadata = {
     template: '%s | APEX',
   },
   description:
-    'Diseño y desarrollo de páginas web y apps a medida para PyMEs y emprendedores en Argentina. Precio fijo, boceto gratis en 48 h y entrega en 15 días.',
+    'Diseño y desarrollo de páginas web y apps a medida para PyMEs y emprendedores en Argentina. Precio fijo, boceto gratis en 48 h y online en 5 a 15 días hábiles.',
   keywords: ['páginas web Argentina', 'desarrollo web Argentina', 'diseño de páginas web', 'desarrollo de apps Argentina', 'web para PyMEs', 'tienda online Argentina', 'Flutter', 'Next.js', 'Supabase', 'desarrollador full-stack Argentina'],
   authors: [{ name: 'Manuel Navarro' }],
   creator: 'Manuel Navarro',
@@ -95,13 +95,13 @@ export const metadata: Metadata = {
     siteName: 'APEX Portfolio',
     title: 'Páginas web y apps a medida para PyMEs argentinas | APEX',
     description:
-      'Diseño premium, precio fijo y entrega en 15 días. Boceto gratis en 48 h antes de pagar nada. Web, e-commerce y apps móviles a medida.',
+      'Diseño premium, precio fijo y tu web online en 5 a 15 días hábiles. Boceto gratis en 48 h antes de pagar nada. Web, e-commerce y apps móviles a medida.',
     images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'APEX — Desarrollo de páginas web y apps en Argentina' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Páginas web y apps a medida para PyMEs argentinas | APEX',
-    description: 'Diseño premium, precio fijo y entrega en 15 días. Boceto gratis en 48 h antes de pagar.',
+    description: 'Diseño premium, precio fijo y tu web online en 5 a 15 días hábiles. Boceto gratis en 48 h antes de pagar.',
     images: ['/opengraph-image'],
   },
   robots: { index: true, follow: true },

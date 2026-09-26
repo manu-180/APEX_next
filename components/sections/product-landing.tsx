@@ -19,6 +19,7 @@ import { AVG_RATING, REVIEW_COUNT } from '@/lib/data/reviews'
 import type { ProductLanding } from '@/lib/data/product-landings'
 import { STAGGER_BASE } from '@/lib/motion'
 import { arsInline } from '@/lib/types/services'
+import { plazoPlan } from '@/lib/data/plazos'
 import { cn } from '@/lib/utils/cn'
 import { whatsappUrl } from '@/lib/whatsapp'
 
@@ -130,7 +131,7 @@ export function ProductLandingPage({ data }: { data: ProductLanding }) {
               </div>
 
               <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
-                {['Boceto gratis en 24-48 h', 'Precio cerrado por escrito', 'Entrega en 15 días'].map(
+                {['Boceto gratis en 24-48 h', 'Precio cerrado por escrito', `Online en ${plazoPlan(data.planId)} días hábiles`].map(
                   (claim) => (
                     <li
                       key={claim}

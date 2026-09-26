@@ -10,6 +10,7 @@ import { TiltCtaCard } from '@/components/ui/tilt-cta-card'
 import { ArrowRightIcon, WhatsAppIcon } from '@/components/ui/icons'
 import { WhatsAppOutboundLink } from '@/components/whatsapp/whatsapp-outbound-link'
 import { ROUTES } from '@/lib/constants'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 import { WA_GRADIENT, WA_SHADOW_CLASS } from '@/lib/constants/whatsapp-ui'
 import { EASE_OUT } from '@/lib/motion'
 import { TECH_STACK } from '@/lib/types/theme'
@@ -24,7 +25,7 @@ const WA_MSG_TECNOLOGIAS =
 const HERO_STATS = [
   { value: '5', label: 'piezas — cero relleno' },
   { value: '8+', label: 'productos y sitios en producción' },
-  { value: '15d', label: 'de idea a online' },
+  { value: `${PLAZO_MIN_DIAS}-${PLAZO_MAX_DIAS}`, label: 'días hábiles hasta estar online' },
 ] as const
 
 export function TecnologiasContent() {

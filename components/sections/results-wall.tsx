@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { m, useReducedMotion } from 'framer-motion'
 import { GridBackground } from '@/components/ui/grid-background'
 import { REVIEWS } from '@/lib/data/reviews'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS } from '@/lib/data/plazos'
 import { EASE_OUT } from '@/lib/motion'
 import { useParallaxNumber } from '@/hooks/use-parallax-number'
 import { cn } from '@/lib/utils/cn'
@@ -19,7 +20,7 @@ import { cn } from '@/lib/utils/cn'
  * - Los quotes salen de REVIEWS (single source of truth, ya expuesta en
  *   JSON-LD). Cero testimonios inventados.
  * - Las métricas son promesas operativas del servicio (boceto 24-48 h,
- *   entrega 15 días, 3 cuotas) o derivadas de REVIEWS (rating promedio).
+ *   plazos de lib/data/plazos, 3 cuotas) o derivadas de REVIEWS (rating promedio).
  *   Nada de contadores inflados.
  */
 
@@ -47,9 +48,9 @@ const STATS: StatTile[] = [
     accent: true,
   },
   {
-    value: '15 días',
-    label: 'De boceto a online',
-    caption: 'Fecha pactada por escrito',
+    value: `${PLAZO_MIN_DIAS}-${PLAZO_MAX_DIAS} días`,
+    label: 'Hasta tu web online',
+    caption: 'Hábiles según el plan, desde que tenemos tu contenido',
   },
   {
     value: `${AVG_RATING}★`,

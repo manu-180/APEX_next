@@ -382,8 +382,8 @@ export default async function BlogPostPage({
               ¿Lo querés para tu negocio?
             </h2>
             <p className="text-sm text-[var(--color-on-surface-variant)] mb-5 leading-relaxed">
-              Desarrollo webs y apps a medida para PyMEs argentinas, con precio fijo y fecha
-              garantizada. Mirá los planes o escribime y lo charlamos.
+              Desarrollo webs y apps a medida para PyMEs argentinas, con precio fijo y plazo
+              por escrito. Mirá los planes o escribime y lo charlamos.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link

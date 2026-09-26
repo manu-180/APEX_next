@@ -35,8 +35,8 @@ const FOUNDER_STATS = [
 /** Compromisos respaldados por el FAQ de /servicios — cero promesas nuevas. */
 const COMMITMENTS = [
   'El que te responde el WhatsApp y el que escribe el código somos la misma persona.',
-  'Plazo pactado por escrito: si no llego a la fecha, te devuelvo el depósito.',
-  'El código es tuyo desde el día uno. Sin lock-in, sin letra chica.',
+  'Plazo por escrito: si no cumplo lo que acordamos, podés cancelar y te devuelvo lo que pagaste.',
+  'Cuando terminás de pagar, el código es tuyo. Si te vas, te lo llevás con tus datos, sin costo.',
 ]
 
 /** Productos propios online — prueba verificable, de lib/constants. */

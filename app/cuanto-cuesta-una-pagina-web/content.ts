@@ -1,4 +1,5 @@
 import { arsInline, GOOGLE_MARKETING, MAINTENANCE_PLANS, WEB_PLANS } from '@/lib/types/services'
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS, plazoPlan } from '@/lib/data/plazos'
 
 export interface PriceTier {
   id: string
@@ -99,7 +100,7 @@ export const ALWAYS_INCLUDED: string[] = [
   'Hosting incluido y 60 días de cambios sin límite',
   'Boceto gratis antes de que pagues nada',
   '3 cuotas sin interés',
-  'Entrega en 15 días, por escrito',
+  `Plazo por escrito: de ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles`,
 ]
 
 export const PROCESS_STEPS: Array<{ num: string; title: string; body: string }> = [
@@ -115,8 +116,8 @@ export const PROCESS_STEPS: Array<{ num: string; title: string; body: string }> 
   },
   {
     num: '03',
-    title: 'Online en 15 días',
-    body: 'Fecha pactada por escrito antes de arrancar. Se paga en 3 cuotas sin interés y, desde que sale online, tenés 60 días de cambios sin límite.',
+    title: `Online en ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles`,
+    body: 'Según el plan, desde que tengo tu contenido, y por escrito en tu resumen. Pagás de una vez o en 3 cuotas sin interés y, desde que sale online, tenés 60 días de cambios sin límite.',
   },
 ]
 
@@ -153,11 +154,11 @@ export const FAQ_ITEMS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Cuánto tarda una página web?',
-    a: '15 días desde que arrancamos, con la fecha pactada por escrito antes de empezar. Si no llego en ese plazo, devuelvo el depósito. El boceto lo ves mucho antes: en 24 a 48 horas.',
+    a: `Una Landing Page, ${plazoPlan('web_basic')} días hábiles; una Web Interactiva, ${plazoPlan('web_interactive')}; una Tienda Online, ${plazoPlan('web_premium')}. Se cuentan desde que tengo tu contenido, y el plazo queda por escrito en tu resumen antes de pagar. Si no lo cumplo, podés cancelar y te devuelvo lo que pagaste. El boceto lo ves mucho antes: en 24 a 48 horas.`,
   },
   {
     q: '¿Se puede pagar en cuotas?',
-    a: 'Sí, en 3 cuotas sin interés. Y primero ves el boceto: recién cuando te gusta lo que ves, se paga la primera.',
+    a: 'Sí, en 3 cuotas sin interés: la primera al contratar y las otras a los 30 y a los 60 días. Pagás lo mismo que de contado, y antes de pagar nada ves el boceto, gratis.',
   },
   {
     q: '¿El precio puede cambiar durante el proyecto?',

@@ -1,3 +1,5 @@
+import { PLAZO_MAX_DIAS, PLAZO_MIN_DIAS, plazoPlan } from '@/lib/data/plazos'
+
 import { SHOWCASE_TIERS, type ShowcaseSite } from '@/lib/data/showcase'
 
 export const PAGE_PATH = '/diseno-de-paginas-web'
@@ -72,7 +74,7 @@ export const PROCESS = [
     step: '03',
     title: 'Diseño y desarrollo',
     body: 'Armo el sitio completo con avances visibles. Ajustamos sobre la pantalla real, no sobre una descripción en un documento.',
-    meta: '15 días',
+    meta: `${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles`,
   },
   {
     step: '04',
@@ -90,7 +92,7 @@ export const FIT_YES = [
 ] as const
 
 export const FIT_NO = [
-  'Si lo necesitás para pasado mañana. El boceto tarda 48 h y el sitio, 15 días.',
+  `Si lo necesitás para pasado mañana. El boceto tarda 48 h y el sitio, de ${PLAZO_MIN_DIAS} a ${PLAZO_MAX_DIAS} días hábiles.`,
   'Si buscás lo más barato del mercado. Hay quien te arma una página por monedas; no compito ahí.',
   'Si buscás que te lleven las redes sociales. Diseño y programo sitios, y si querés te llevo los anuncios en Google; las redes, no.',
 ] as const
@@ -110,7 +112,7 @@ export const FAQ = [
   },
   {
     q: '¿Cuánto tarda el diseño y desarrollo de un sitio web?',
-    a: 'El boceto lo ves en 24 a 48 horas. El sitio completo se entrega en 15 días desde que aprobás el diseño y me pasás el contenido. Si el proyecto es más grande —una tienda online o un sistema a medida— te doy la fecha real antes de arrancar y queda por escrito.',
+    a: `El boceto lo ves en 24 a 48 horas. El sitio completo, en ${plazoPlan('web_basic')} días hábiles si es una landing y en ${plazoPlan('web_interactive')} si es una web interactiva, contados desde que me pasás el contenido. Una tienda online lleva ${plazoPlan('web_premium')}, y un sistema a medida, lo que diga su propuesta. El plazo siempre queda por escrito antes de pagar.`,
   },
   {
     q: '¿Qué diferencia hay entre un diseño a medida y una plantilla de WordPress o Wix?',

@@ -8,7 +8,7 @@ import { TopLevelBreadcrumbJsonLd } from '@/components/seo/json-ld'
 export const metadata: Metadata = {
   title: 'Páginas web a medida en Argentina desde $300.000',
   description:
-    'Páginas web a medida desde ARS 300.000, con precio fijo y entrega garantizada en 15 días. Webs, e-commerce y apps móviles para empresas y emprendedores en Argentina.',
+    'Páginas web a medida desde ARS 300.000, con precio fijo y online en 5 a 15 días hábiles. Webs, e-commerce y apps para empresas y emprendedores de Argentina.',
   keywords: [
     'desarrollo de software argentina',
     'desarrollo web argentina',
