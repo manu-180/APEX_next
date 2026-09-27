@@ -1,9 +1,10 @@
+import { withSentryConfig } from '@sentry/nextjs/config'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  productionBrowserSourceMaps: false,
 
   async headers() {
     return [
@@ -157,4 +158,13 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+// Solo servidor y edge, sin SDK de navegador: se sacó en 2026-09 porque pesaba
+// en la carga y el Quality Score de Ads depende de la velocidad de la landing
+// (docs/PROGRESS.md). No agregar instrumentation-client sin medir antes.
+export default withSentryConfig(nextConfig, {
+  org: 'insights-6l',
+  project: 'apex_web',
+  authToken: process.env.SENTRY_BUILD_TOKEN,
+  silent: !process.env.CI,
+  telemetry: false,
+})
