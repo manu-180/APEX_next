@@ -12,6 +12,10 @@ env:
 jobs:
   verify-secrets:
     name: Verify Secrets & Environment
+    # Los runs que dispara Dependabot no reciben los secrets de Actions (solo los de
+    # Dependabot, que no cargamos): el chequeo fallaría siempre. Usar github.actor y no
+    # el autor del PR: si alguien pushea a la rama de Dependabot, el run sí trae secrets.
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Check Sentry DSN
@@ -54,6 +58,8 @@ jobs:
     name: Type Check & Lint
     runs-on: ubuntu-latest
     needs: verify-secrets
+    # Sin esto, el skip de verify-secrets en PRs de Dependabot saltearía también el build.
+    if: ${{ !cancelled() && (needs.verify-secrets.result == 'success' || (needs.verify-secrets.result == 'skipped' && github.actor == 'dependabot[bot]')) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -70,7 +76,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        run: npm run lint --if-present || echo "Lint script not found, skipping"
+        run: npm run lint --if-present
 
       - name: Build
-        run: npm run build --if-present || echo "Build script not found, skipping"
+        run: npm run build --if-present
