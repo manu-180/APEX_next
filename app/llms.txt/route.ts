@@ -92,6 +92,9 @@ Next.js, TypeScript, Tailwind CSS, Supabase (PostgreSQL, auth y realtime), Flutt
 `
 }
 
+// Next 15+ ya no prerenderiza los GET handlers por defecto: sin esto se regenera en cada request.
+export const dynamic = 'force-static'
+
 export function GET() {
   return new NextResponse(buildLlmsTxt(), {
     headers: {

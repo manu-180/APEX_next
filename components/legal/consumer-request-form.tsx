@@ -70,7 +70,7 @@ export function ConsumerRequestForm({ tipo }: { tipo: TipoSolicitud }) {
   const [codigo, setCodigo] = useState<string | null>(null)
   const [canalConfirmado, setCanalConfirmado] = useState<Canal>('whatsapp')
 
-  const refs: Record<Campo, RefObject<HTMLInputElement | HTMLTextAreaElement>> = {
+  const refs: Record<Campo, RefObject<HTMLInputElement | HTMLTextAreaElement | null>> = {
     nombre: useRef<HTMLInputElement>(null),
     contacto: useRef<HTMLInputElement>(null),
     referencia: useRef<HTMLInputElement>(null),
@@ -136,7 +136,7 @@ export function ConsumerRequestForm({ tipo }: { tipo: TipoSolicitud }) {
           Nombre y apellido
         </label>
         <input
-          ref={refs.nombre as RefObject<HTMLInputElement>}
+          ref={refs.nombre as RefObject<HTMLInputElement | null>}
           id={campoId('nombre')}
           name="nombre"
           type="text"
@@ -188,7 +188,7 @@ export function ConsumerRequestForm({ tipo }: { tipo: TipoSolicitud }) {
           {datos.canal === 'whatsapp' ? 'Tu número de WhatsApp' : 'Tu mail'}
         </label>
         <input
-          ref={refs.contacto as RefObject<HTMLInputElement>}
+          ref={refs.contacto as RefObject<HTMLInputElement | null>}
           id={campoId('contacto')}
           name="contacto"
           type={datos.canal === 'whatsapp' ? 'tel' : 'email'}
@@ -221,7 +221,7 @@ export function ConsumerRequestForm({ tipo }: { tipo: TipoSolicitud }) {
           ¿Qué contrataste? <span className="font-normal text-[var(--color-on-surface-variant)]">(opcional)</span>
         </label>
         <input
-          ref={refs.referencia as RefObject<HTMLInputElement>}
+          ref={refs.referencia as RefObject<HTMLInputElement | null>}
           id={campoId('referencia')}
           name="referencia"
           type="text"
@@ -248,7 +248,7 @@ export function ConsumerRequestForm({ tipo }: { tipo: TipoSolicitud }) {
           <span className="font-normal text-[var(--color-on-surface-variant)]">(opcional)</span>
         </label>
         <textarea
-          ref={refs.detalle as RefObject<HTMLTextAreaElement>}
+          ref={refs.detalle as RefObject<HTMLTextAreaElement | null>}
           id={campoId('detalle')}
           name="detalle"
           rows={3}

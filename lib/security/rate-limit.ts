@@ -15,7 +15,7 @@ interface Bucket {
   hits: number[]
   /**
    * Ventana con la que se creó el balde. El store es único: si el barrido
-   * usara la ventana del llamador, el middleware (60 s) podaría los hits del
+   * usara la ventana del llamador, el proxy (60 s) podaría los hits del
    * balde de reservas (600 s) y el tope de 5/10 min se degradaría a 5/min.
    */
   windowMs: number

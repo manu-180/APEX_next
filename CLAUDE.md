@@ -4,7 +4,7 @@ Always work directly on main branch. Never create worktrees or feature branches.
 
 ## Stack
 
-- Next.js 14 (App Router, TypeScript)
+- Next.js 16 (App Router, Turbopack, TypeScript) + React 19 — migrado desde 14 el 2026-09-27 por las alertas críticas de Dependabot. `middleware.ts` ahora es `proxy.ts`; `NextRequest.ip` ya no existe (usar `clientIpFromHeaders`)
 - Tailwind CSS 3
 - Framer Motion 11
 - Provider propio de light/dark (`components/providers/theme-mode-provider.tsx`) — next-themes fue removido

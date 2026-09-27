@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, type JSX } from 'react'
 import { m, AnimatePresence, useReducedMotion, type PanInfo } from 'framer-motion'
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'

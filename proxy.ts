@@ -61,7 +61,7 @@ function isAllowedOrigin(req: NextRequest): boolean {
   }
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const method = req.method.toUpperCase()
 
   if (!ALLOWED_METHODS.has(method)) {
@@ -86,7 +86,7 @@ export function middleware(req: NextRequest) {
   }
 
   // Rate limit por IP (clave por método+ruta para no mezclar GET con POST).
-  const ip = req.ip ?? clientIpFromHeaders(req.headers)
+  const ip = clientIpFromHeaders(req.headers)
   const path = KNOWN_PATHS.has(pathname) ? pathname : '/api/*'
   const key = `${ip}:${method}:${path}`
   const rl = rateLimit(key, isCspReport ? CSP_REPORT_LIMIT : RL_LIMIT, RL_WINDOW_MS)

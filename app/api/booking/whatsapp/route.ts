@@ -13,7 +13,7 @@ import { rateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
  * Endpoint PÚBLICO y sin auth: cada POST dispara un mensaje de WhatsApp real
  * (costo + molestia). Por eso está blindado en capas: content-type, tope de
  * tamaño de body, honeypot, rate limit por IP y saneo de clientName antes de
- * reenviarlo. El middleware ya aplica método/origen/rate-limit general; esto
+ * reenviarlo. El proxy (proxy.ts) ya aplica método/origen/rate-limit general; esto
  * es la segunda barrera, específica de este endpoint caro.
  */
 

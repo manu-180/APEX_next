@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server'
  * prefijo fijo (`[csp]`) para poder filtrarlos y decidir, con datos reales,
  * cuándo pasar la política a enforcing.
  *
- * Pasa por el middleware de /api (rate limit por IP), así que un flood no
+ * Pasa por el proxy de /api (proxy.ts) (rate limit por IP), así que un flood no
  * inunda los logs.
  */
 
